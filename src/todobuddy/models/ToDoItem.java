@@ -1,5 +1,5 @@
 package todobuddy.models;
 
-public class ToDo {
+public class ToDoItem {
 
 }
