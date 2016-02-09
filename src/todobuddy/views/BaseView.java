@@ -7,6 +7,6 @@ package todobuddy.views;
  * @author thenaesh
  *
  */
-public abstract class TaskViewBase {
+public abstract class BaseView {
 	
 }

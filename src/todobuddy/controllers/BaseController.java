@@ -7,6 +7,6 @@ package todobuddy.controllers;
  * @author thenaesh
  *
  */
-public abstract class TaskControllerBase {
+public abstract class BaseController {
 
 }

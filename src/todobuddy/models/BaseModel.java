@@ -7,6 +7,6 @@ package todobuddy.models;
  * @author thenaesh
  *
  */
-public abstract class TaskModelBase {
+public abstract class BaseModel {
 
 }
