@@ -46,6 +46,20 @@ public class Task {
         return _priority.get(); 
     }
     
+    public String getDetailString(){
+        String result = "";
+        if(this.getVenueProperty() != null){
+            result = result + "Venue: " + this.getVenueProperty();
+        } 
+        if(this.getDayProperty() != null){
+            result = result + "Date: " + this.getDayProperty(); 
+        }
+        
+        if(result.equals("")){
+            result = null; 
+        }
+        return result; 
+    }
     
     
     
