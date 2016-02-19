@@ -1,8 +1,180 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.text.Font?>
 
-
-<BorderPane prefHeight="400.0" prefWidth="600.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.65">
-	<!-- TODO Add Nodes -->
+<BorderPane prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #000000;" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+   <top>
+      <AnchorPane prefHeight="75.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+   </top>
+   <center>
+      <AnchorPane prefHeight="150.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <children>
+            <VBox layoutX="136.0" layoutY="14.0" prefHeight="200.0" prefWidth="100.0" spacing="10.0" style="-fx-background-color: #000000;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <children>
+                  <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="50.0" prefWidth="500.0" style="-fx-background-color: #000000;">
+                     <left>
+                        <AnchorPane prefHeight="100.0" prefWidth="91.0" BorderPane.alignment="CENTER" />
+                     </left>
+                     <right>
+                        <AnchorPane prefHeight="100.0" prefWidth="450.0" BorderPane.alignment="CENTER">
+                           <children>
+                              <VBox layoutY="11.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="114.0" prefWidth="409.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <children>
+                                    <AnchorPane prefHeight="50.0" prefWidth="450.0">
+                                       <children>
+                                          <Label layoutY="20.0" prefHeight="30.0" prefWidth="394.0" text="Task 1" textFill="WHITE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="20.0">
+                                             <font>
+                                                <Font size="18.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
+                                    </AnchorPane>
+                                    <HBox prefHeight="50.0" prefWidth="450.0">
+                                       <children>
+                                          <Label prefWidth="177.0" text="Detail 1" textFill="#aba3a3">
+                                             <opaqueInsets>
+                                                <Insets />
+                                             </opaqueInsets>
+                                          </Label>
+                                       </children>
+                                       <VBox.margin>
+                                          <Insets left="15.0" />
+                                       </VBox.margin>
+                                    </HBox>
+                                 </children>
+                              </VBox>
+                              <Circle fill="DODGERBLUE" layoutX="-2.0" layoutY="45.0" radius="12.0" stroke="BLACK" strokeType="INSIDE" />
+                           </children>
+                        </AnchorPane>
+                     </right>
+                  </BorderPane>
+                  <BorderPane layoutX="10.0" layoutY="10.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="50.0" prefWidth="500.0" style="-fx-background-color: #000000;">
+                     <left>
+                        <AnchorPane prefHeight="100.0" prefWidth="91.0" BorderPane.alignment="CENTER" />
+                     </left>
+                     <right>
+                        <AnchorPane prefHeight="100.0" prefWidth="450.0" BorderPane.alignment="CENTER">
+                           <children>
+                              <VBox layoutY="11.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="114.0" prefWidth="409.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <children>
+                                    <AnchorPane prefHeight="50.0" prefWidth="450.0">
+                                       <children>
+                                          <Label layoutX="15.0" layoutY="27.0" text="Task 2" textFill="WHITE" AnchorPane.bottomAnchor="3.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="27.0">
+                                             <font>
+                                                <Font size="18.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
+                                    </AnchorPane>
+                                    <HBox prefHeight="50.0" prefWidth="450.0">
+                                       <children>
+                                          <Label prefWidth="177.0" text="Detail 2" textFill="#aba3a3">
+                                             <opaqueInsets>
+                                                <Insets />
+                                             </opaqueInsets>
+                                          </Label>
+                                       </children>
+                                       <VBox.margin>
+                                          <Insets left="15.0" />
+                                       </VBox.margin>
+                                    </HBox>
+                                 </children>
+                              </VBox>
+                              <Circle fill="DODGERBLUE" layoutX="-2.0" layoutY="49.0" radius="12.0" stroke="BLACK" strokeType="INSIDE" />
+                           </children>
+                        </AnchorPane>
+                     </right>
+                  </BorderPane>
+                  <BorderPane layoutX="10.0" layoutY="10.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="50.0" prefWidth="500.0" style="-fx-background-color: #000000;">
+                     <left>
+                        <AnchorPane prefHeight="100.0" prefWidth="91.0" BorderPane.alignment="CENTER" />
+                     </left>
+                     <right>
+                        <AnchorPane prefHeight="100.0" prefWidth="450.0" BorderPane.alignment="CENTER">
+                           <children>
+                              <VBox layoutY="11.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="114.0" prefWidth="409.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <children>
+                                    <AnchorPane prefHeight="50.0" prefWidth="450.0">
+                                       <children>
+                                          <Label layoutX="14.0" layoutY="18.0" prefHeight="30.0" prefWidth="394.0" text="Task 3" textFill="WHITE" AnchorPane.bottomAnchor="2.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="18.0">
+                                             <font>
+                                                <Font size="18.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
+                                    </AnchorPane>
+                                    <HBox prefHeight="50.0" prefWidth="450.0">
+                                       <children>
+                                          <Label prefWidth="177.0" text="Detail 3" textFill="#aba3a3">
+                                             <opaqueInsets>
+                                                <Insets />
+                                             </opaqueInsets>
+                                          </Label>
+                                       </children>
+                                       <VBox.margin>
+                                          <Insets left="15.0" />
+                                       </VBox.margin>
+                                    </HBox>
+                                 </children>
+                              </VBox>
+                              <Circle fill="DODGERBLUE" layoutX="-2.0" layoutY="44.0" radius="12.0" stroke="BLACK" strokeType="INSIDE" />
+                           </children>
+                        </AnchorPane>
+                     </right>
+                  </BorderPane>
+                  <BorderPane layoutX="10.0" layoutY="130.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="50.0" prefWidth="500.0" style="-fx-background-color: #000000;">
+                     <left>
+                        <AnchorPane prefHeight="100.0" prefWidth="91.0" BorderPane.alignment="CENTER" />
+                     </left>
+                     <right>
+                        <AnchorPane prefHeight="100.0" prefWidth="450.0" BorderPane.alignment="CENTER">
+                           <children>
+                              <VBox layoutY="11.0" nodeOrientation="LEFT_TO_RIGHT" prefHeight="114.0" prefWidth="409.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <children>
+                                    <AnchorPane prefHeight="50.0" prefWidth="450.0">
+                                       <children>
+                                          <Label layoutY="20.0" prefHeight="30.0" prefWidth="394.0" text="Task 4" textFill="WHITE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="20.0">
+                                             <font>
+                                                <Font size="18.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
+                                    </AnchorPane>
+                                    <HBox prefHeight="50.0" prefWidth="450.0">
+                                       <children>
+                                          <Label prefWidth="177.0" text="Detail 4" textFill="#aba3a3">
+                                             <opaqueInsets>
+                                                <Insets />
+                                             </opaqueInsets>
+                                          </Label>
+                                       </children>
+                                       <VBox.margin>
+                                          <Insets left="15.0" />
+                                       </VBox.margin>
+                                    </HBox>
+                                 </children>
+                              </VBox>
+                              <Circle fill="DODGERBLUE" layoutX="-2.0" layoutY="43.0" radius="12.0" stroke="BLACK" strokeType="INSIDE" />
+                           </children>
+                        </AnchorPane>
+                     </right>
+                  </BorderPane>
+               </children>
+               <padding>
+                  <Insets top="10.0" />
+               </padding>
+            </VBox>
+         </children>
+      </AnchorPane>
+   </center>
+   <bottom>
+      <AnchorPane prefHeight="75.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+   </bottom>
 </BorderPane>

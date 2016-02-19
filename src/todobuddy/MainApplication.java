@@ -55,7 +55,7 @@ public class MainApplication extends Application {
         BorderPane inputPane = (BorderPane) loader.load();
 
         // Set person overview into the center of root layout.
-        rootLayout.setTop(inputPane);
+        rootLayout.setBottom(inputPane);
     }
 
     public static void main(String[] args) {

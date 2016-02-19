@@ -7,7 +7,8 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.text.Font?>
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="100.0" prefWidth="500.0" style="-fx-background-color: #000000;" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
    <left>
@@ -21,22 +22,27 @@
                <children>
                   <AnchorPane prefHeight="50.0" prefWidth="450.0">
                      <children>
-                        <Label text="NAME OF TASKS/EVENTS" textFill="WHITE" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="15.0" />
+                        <Label text="NAME OF TASKS/EVENTS" textFill="WHITE" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="20.0">
+                           <font>
+                              <Font size="18.0" />
+                           </font></Label>
                      </children>
                   </AnchorPane>
                   <HBox prefHeight="50.0" prefWidth="450.0">
                      <children>
-                        <Label text="Venue: " textFill="WHITE">
+                        <Label prefWidth="177.0" text="Tasks Detail &lt;Venue/Date/Time&gt;" textFill="#aba3a3">
                            <opaqueInsets>
                               <Insets />
                            </opaqueInsets>
                         </Label>
-                        <Label text="Date:" textFill="WHITE" />
-                        <Label text="Time:" textFill="WHITE" />
                      </children>
+                     <VBox.margin>
+                        <Insets left="15.0" />
+                     </VBox.margin>
                   </HBox>
                </children>
             </VBox>
+            <Circle fill="DODGERBLUE" layoutX="-2.0" layoutY="51.0" radius="12.0" stroke="BLACK" strokeType="INSIDE" />
          </children>
       </AnchorPane>
    </right>
