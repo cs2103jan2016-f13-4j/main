@@ -9,22 +9,22 @@ import javafx.stage.Stage;
 public class RootLayoutController extends Application {
     
     @FXML
-    private Label Task1; 
+    private Label taskLabel1; 
     @FXML
-    private Label Task2; 
+    private Label taskLabel2; 
     @FXML
-    private Label Task3; 
+    private Label taskLabel3; 
     @FXML
-    private Label Task4; 
+    private Label taskLabel4; 
     
     @FXML
-    private Label Detail1; 
+    private Label detailLabel1; 
     @FXML
-    private Label Detail2; 
+    private Label detailLabel2; 
     @FXML
-    private Label Detail3; 
+    private Label detailLabel3; 
     @FXML
-    private Label Detail4;
+    private Label detailLabel4;
     
     @FXML 
     private Circle circle1;
@@ -39,7 +39,12 @@ public class RootLayoutController extends Application {
 	public void start(Stage primaryStage) {
 		
 	}
-
+	
+	public void ShowTask(int start,int range,Task[] taskContainers){
+	    
+	    
+	}
+	 
 	public static void main(String[] args) {
 		launch(args);
 	}
