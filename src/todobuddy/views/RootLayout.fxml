@@ -9,7 +9,7 @@
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #000000;" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #000000;" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="todobuddy.views.RootLayoutController">
    <top>
       <AnchorPane prefHeight="75.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
    </top>
@@ -29,7 +29,7 @@
                                  <children>
                                     <AnchorPane prefHeight="50.0" prefWidth="450.0">
                                        <children>
-                                          <Label layoutY="20.0" prefHeight="30.0" prefWidth="394.0" text="Task 1" textFill="WHITE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="20.0">
+                                          <Label fx:id="taskLabel1" layoutY="20.0" prefHeight="30.0" prefWidth="450.0" text="Task 1" textFill="WHITE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="20.0">
                                              <font>
                                                 <Font size="18.0" />
                                              </font>
@@ -38,7 +38,7 @@
                                     </AnchorPane>
                                     <HBox prefHeight="50.0" prefWidth="450.0">
                                        <children>
-                                          <Label prefWidth="177.0" text="Detail 1" textFill="#aba3a3">
+                                          <Label fx:id="detailLabel1" prefWidth="450.0" text="Detail 1" textFill="#aba3a3">
                                              <opaqueInsets>
                                                 <Insets />
                                              </opaqueInsets>
@@ -66,7 +66,7 @@
                                  <children>
                                     <AnchorPane prefHeight="50.0" prefWidth="450.0">
                                        <children>
-                                          <Label layoutX="15.0" layoutY="27.0" text="Task 2" textFill="WHITE" AnchorPane.bottomAnchor="3.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="27.0">
+                                          <Label fx:id="taskLabel2" layoutX="15.0" layoutY="27.0" prefWidth="450.0" text="Task 2" textFill="WHITE" AnchorPane.bottomAnchor="3.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="27.0">
                                              <font>
                                                 <Font size="18.0" />
                                              </font>
@@ -75,7 +75,7 @@
                                     </AnchorPane>
                                     <HBox prefHeight="50.0" prefWidth="450.0">
                                        <children>
-                                          <Label prefWidth="177.0" text="Detail 2" textFill="#aba3a3">
+                                          <Label fx:id="detailLabel2" prefWidth="450.0" text="Detail 2" textFill="#aba3a3">
                                              <opaqueInsets>
                                                 <Insets />
                                              </opaqueInsets>
@@ -103,7 +103,7 @@
                                  <children>
                                     <AnchorPane prefHeight="50.0" prefWidth="450.0">
                                        <children>
-                                          <Label layoutX="14.0" layoutY="18.0" prefHeight="30.0" prefWidth="394.0" text="Task 3" textFill="WHITE" AnchorPane.bottomAnchor="2.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="18.0">
+                                          <Label fx:id="taskLabel3" layoutX="14.0" layoutY="18.0" prefHeight="30.0" prefWidth="450.0" text="Task 3" textFill="WHITE" AnchorPane.bottomAnchor="2.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="1.0" AnchorPane.topAnchor="18.0">
                                              <font>
                                                 <Font size="18.0" />
                                              </font>
@@ -112,7 +112,7 @@
                                     </AnchorPane>
                                     <HBox prefHeight="50.0" prefWidth="450.0">
                                        <children>
-                                          <Label prefWidth="177.0" text="Detail 3" textFill="#aba3a3">
+                                          <Label fx:id="detailLabel3" prefHeight="17.0" prefWidth="450.0" text="Detail 3" textFill="#aba3a3">
                                              <opaqueInsets>
                                                 <Insets />
                                              </opaqueInsets>
@@ -140,7 +140,7 @@
                                  <children>
                                     <AnchorPane prefHeight="50.0" prefWidth="450.0">
                                        <children>
-                                          <Label layoutY="20.0" prefHeight="30.0" prefWidth="394.0" text="Task 4" textFill="WHITE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="20.0">
+                                          <Label fx:id="taskLabel4" layoutY="20.0" prefHeight="30.0" prefWidth="450.0" text="Task 4" textFill="WHITE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="15.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="20.0">
                                              <font>
                                                 <Font size="18.0" />
                                              </font>
@@ -149,7 +149,7 @@
                                     </AnchorPane>
                                     <HBox prefHeight="50.0" prefWidth="450.0">
                                        <children>
-                                          <Label prefWidth="177.0" text="Detail 4" textFill="#aba3a3">
+                                          <Label fx:id="detailLabel4" prefWidth="450.0" text="Detail 4" textFill="#aba3a3">
                                              <opaqueInsets>
                                                 <Insets />
                                              </opaqueInsets>

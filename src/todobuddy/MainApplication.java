@@ -10,6 +10,7 @@ import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import todobuddy.Task;
+import todobuddy.views.RootLayoutController;
 
 public class MainApplication extends Application {
 
@@ -29,6 +30,7 @@ public class MainApplication extends Application {
     
     @Override
     public void start(Stage primaryStage) {
+        setUpDummyTasks(); 
         this.primaryStage = primaryStage;
         this.primaryStage.setTitle(WINDOW_TITLE);
 
@@ -40,16 +42,27 @@ public class MainApplication extends Application {
         }
     }
 
+    private void setUpDummyTasks() {
+        taskList.add(new Task());
+        taskList.add(new Task("Change Circle Color according to priority","My Laptop","Saturday",1));
+        taskList.add(new Task("Cry Because Tasks Too Many","Everywhere","Everyday",2));
+        taskList.add(new Task());
+    }
+
     private void initializeRootLayout() throws IOException {
         // Load root layout from fxml file.
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(MainApplication.class.getResource(LAYOUT_ROOT_LAYOUT));
         rootLayout = (BorderPane) loader.load();
-
+        RootLayoutController rc = loader.getController(); 
+        rc.showTask(0,this.taskList);
+        
         // Show the scene containing the root layout.
         Scene scene = new Scene(rootLayout);
         primaryStage.setScene(scene);
         primaryStage.show();
+        
+        
     }
 
     private void displayInputPane() throws IOException {
@@ -64,5 +77,9 @@ public class MainApplication extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+    
+    public  ObservableList<Task> getObservableList(){
+        return this.taskList; 
     }
 }

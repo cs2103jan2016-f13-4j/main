@@ -49,7 +49,7 @@ public class Task {
     public String getDetailString(){
         String result = "";
         if(this.getVenueProperty() != null){
-            result = result + "Venue: " + this.getVenueProperty();
+            result = result + "Venue: " + this.getVenueProperty() + " | ";
         } 
         if(this.getDayProperty() != null){
             result = result + "Date: " + this.getDayProperty(); 
