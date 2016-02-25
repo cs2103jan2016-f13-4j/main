@@ -36,9 +36,8 @@ public class YamlParser {
             throw ERROR_YAML_FILE_IMPROPER_START;
         }
 
-        // Learn and adapt to indentation
-        boolean isIndentationLearnt = false;
-        String indentation = null;
+        // Prepare new model
+        BaseModel model = null;
 
         // Begin scanning through file
         while ((line = reader.readLine()) != null) {
@@ -46,6 +45,11 @@ public class YamlParser {
             if (isYamlComment(line)) continue;
             // End the file
             if (isEndOfYamlFile(line)) break;
+
+            switch(countIndents(line)) {
+                case 0:
+
+            }
 
         }
 
