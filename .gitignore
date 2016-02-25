@@ -43,3 +43,5 @@ hs_err_pid*
 
 .idea
 main.iml
+
+data/*
