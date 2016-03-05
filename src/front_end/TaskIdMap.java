@@ -4,6 +4,7 @@ import back_end.storage.base.Index;
 import back_end.storage.relations.Task;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -50,7 +51,6 @@ public class TaskIdMap {
             return this.fromVisualToRawMap_.get(arrayListIndex);
         } catch (IndexOutOfBoundsException e) {
             // FIXME: Handle error
-        } finally {
             return null;
         }
     }
@@ -67,6 +67,11 @@ public class TaskIdMap {
         // Visual index starts from 1 but array list index starts from 0
         // So to get the array list index from visual index, just minus 1
         return visualIndex - 1;
+    }
+
+    // Package methods exposed for testing
+    ArrayList<Index> getIndexList() {
+        return this.fromVisualToRawMap_;
     }
 }
 

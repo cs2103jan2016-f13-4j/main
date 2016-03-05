@@ -34,7 +34,14 @@ public class TaskList {
 
         for (int i = 1; i <= quantity; i++) {
             Task task = new Task("Task" + i);
-            task.setPrimaryKey(new Index(random.nextLong()));
+            Long randomId = random.nextLong();
+
+            // Ensure index is positive
+            if (randomId < 0) {
+                randomId *= -1;
+            }
+
+            task.setPrimaryKey(new Index(randomId));
             taskList.add(task);
         }
 
