@@ -14,7 +14,7 @@ package front_end;
  * The job of the Task Index Mapper is to maintain state of the current mapping between the two index systems.
  * This mapping may change at every Dispatcher heartbeat, but is always a bijection.
  * 
- * Rank: Staff Sergeant (reports to CPT Translation Engine)
+ * Rank: Second Lieutenant (reports to CPT Translation Engine)
  * 
  * created by thenaesh on Mar 6, 2016
  *
