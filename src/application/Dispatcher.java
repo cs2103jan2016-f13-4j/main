@@ -21,6 +21,10 @@ public class Dispatcher {
         this.decisionEngine_ = new StubbedDecisionEngine();
     }
 
+    private static boolean isTerminateCommand(Command command) {
+        return command.getType() == Command.Type.EXIT;
+    }
+
     public void start() {
         Command nextCommand = Command.getInitialCommand();
 
@@ -28,9 +32,5 @@ public class Dispatcher {
             ExecutionResult result = this.decisionEngine_.performCommand(nextCommand);
             nextCommand = this.translationEngine_.displayAndParseCommand(result);
         }
-    }
-
-    private static boolean isTerminateCommand(Command command) {
-        return command.getType() == Command.Type.EXIT;
     }
 }

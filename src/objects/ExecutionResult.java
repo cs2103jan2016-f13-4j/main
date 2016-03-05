@@ -38,7 +38,7 @@ public class ExecutionResult<T> {
     public void addMessage(Message message) {
         // Initialize messages array if there isn't any
         if (this.messages_ == null) {
-           this.messages_ = new ArrayList<>();
+            this.messages_ = new ArrayList<>();
         }
 
         this.messages_.add(message);

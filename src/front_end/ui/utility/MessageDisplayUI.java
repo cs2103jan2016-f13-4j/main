@@ -1,4 +1,4 @@
-package front_end.ui.base;
+package front_end.ui.utility;
 
 import front_end.ui.core.UserInterface;
 import objects.Message;
@@ -10,22 +10,24 @@ import java.util.List;
  */
 public class MessageDisplayUI extends UserInterface<List<Message>> {
 
+    public static final String STRING_FLAG_MESSAGE_FORMAT = "[%1$s]: ";
     private static final String COLOR_ANSI_RESET = "\u001B[0m";
     private static final String COLOR_ANSI_RED = "\u001B[31m";
     private static final String COLOR_ANSI_YELLOW = "\u001B[33m";
     private static final String COLOR_ANSI_CYAN = "\u001B[36m";
-
     private static final String COLOR_MESSAGE_ERROR = COLOR_ANSI_RED;
     private static final String COLOR_MESSAGE_WARNING = COLOR_ANSI_YELLOW;
     private static final String COLOR_MESSAGE_INFO = COLOR_ANSI_CYAN;
-
     private static final String STRING_FLAG_ERROR = "ERROR";
     private static final String STRING_FLAG_WARNING = "WARNING";
     private static final String STRING_FLAG_INFO = "INFO";
-    public static final String STRING_FLAG_MESSAGE_FORMAT = "[%1$s]: ";
 
     public MessageDisplayUI(List<Message> data) {
         super(data);
+    }
+
+    private static String colorString(String text, String color) {
+        return String.format("%s%s%s", color, text, COLOR_ANSI_RESET);
     }
 
     @Override
@@ -67,9 +69,5 @@ public class MessageDisplayUI extends UserInterface<List<Message>> {
     private String formatMessageFlag(String flag, String color) {
         return formatMessageFlag(colorString(flag, color));
 
-    }
-
-    private static String colorString(String text, String color) {
-        return String.format("%s%s%s", color, text, COLOR_ANSI_RESET);
     }
 }

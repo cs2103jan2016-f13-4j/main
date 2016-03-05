@@ -1,12 +1,12 @@
 package front_end;
 
-import front_end.ui.base.CommandPromptUI;
-import front_end.ui.base.MessageDisplayUI;
 import front_end.ui.core.UserInterface;
+import front_end.ui.core.VisualIndexUI;
+import front_end.ui.utility.CommandPromptUI;
+import front_end.ui.utility.MessageDisplayUI;
+import front_end.ui.utility.VisualIdTranslator;
 import objects.Command;
 import objects.ExecutionResult;
-import front_end.ui.base.VisualIdTranslator;
-import front_end.ui.core.VisualIndexUI;
 
 import java.lang.reflect.Constructor;
 import java.util.List;
@@ -31,7 +31,7 @@ public class TranslationEngine {
         // Initialize input reader to read from System.in
         this.skipInput_ = skipInput;
         if (!skipInput) {
-           this.inputReader_ = new Scanner(System.in) ;
+            this.inputReader_ = new Scanner(System.in);
         }
     }
 
@@ -112,7 +112,7 @@ public class TranslationEngine {
     }
 
     private Command waitAndParseInput() {
-        assert(this.skipInput_ == false);
+        assert (this.skipInput_ == false);
 
         // Display command prompt UI
         CommandPromptUI commandPromptUI = new CommandPromptUI();

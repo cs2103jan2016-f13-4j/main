@@ -5,7 +5,7 @@ import factories.TaskList;
 import front_end.ui.DisplayOneTaskUI;
 import front_end.ui.DisplayTaskListUI;
 import objects.ExecutionResult;
-import front_end.ui.base.VisualTuple;
+import front_end.ui.utility.VisualTuple;
 import org.junit.Before;
 import org.junit.Test;
 

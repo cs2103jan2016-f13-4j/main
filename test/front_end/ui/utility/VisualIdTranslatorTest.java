@@ -1,9 +1,7 @@
-package front_end.ui.base;
+package front_end.ui.utility;
 
 import back_end.storage.relations.Task;
 import factories.TaskList;
-import front_end.ui.base.VisualIdTranslator;
-import front_end.ui.base.VisualTuple;
 import org.junit.Before;
 import org.junit.Test;
 

@@ -23,16 +23,16 @@ public class Command {
         this.parameters_ = parameters;
     }
 
+    public static Command getInitialCommand() {
+        Command command = new Command(Type.DISPLAY_ALL, null);
+        return command;
+    }
+
     public Type getType() {
         return this.type_;
     }
 
     public Object[] getParameters() {
         return this.parameters_;
-    }
-
-    public static Command getInitialCommand() {
-        Command command = new Command(Type.DISPLAY_ALL, null);
-        return command;
     }
 }

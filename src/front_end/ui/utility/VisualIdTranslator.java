@@ -1,4 +1,4 @@
-package front_end.ui.base;
+package front_end.ui.utility;
 
 import back_end.storage.base.Index;
 import back_end.storage.base.SerialIdRelation;
