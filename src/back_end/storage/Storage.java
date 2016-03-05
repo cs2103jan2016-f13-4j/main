@@ -81,7 +81,7 @@ public class Storage {
         TreeMap<PrimaryKey, Relation> storageTree = this.storageMap_.get(relation);
 
         if (storageTree == null) {
-           throw new RelationNotFoundException();
+            throw new RelationNotFoundException();
         }
 
         // Search the storage tree for the primary key and return it
@@ -104,6 +104,9 @@ public class Storage {
     }
 
 
-    public class RelationNotFoundException extends Exception {}
-    public class PrimaryKeyMissingException extends Exception {}
+    public class RelationNotFoundException extends Exception {
+    }
+
+    public class PrimaryKeyMissingException extends Exception {
+    }
 }

@@ -8,17 +8,12 @@ import java.io.PrintStream;
 public abstract class UserInterface<T> {
 
     private static final PrintStream STREAM_OUTPUT_DEFAULT = System.out;
-
-    private final PrintStream outputStream_;
     private final T data_;
-
-    public UserInterface(PrintStream outputStream, T data) {
-        this.outputStream_ = outputStream;
-        this.data_ = data;
-    }
+    private PrintStream outputStream_;
 
     public UserInterface(T data) {
-        this(STREAM_OUTPUT_DEFAULT, data);
+        this.outputStream_ = STREAM_OUTPUT_DEFAULT;
+        this.data_ = data;
     }
 
     public T getData() {
@@ -26,6 +21,10 @@ public abstract class UserInterface<T> {
     }
 
     public abstract void render();
+
+    public void setOutputStream(PrintStream outputStream) {
+        this.outputStream_ = outputStream;
+    }
 
     protected void display(String format, Object... arguments) {
         this.outputStream_.printf(format, arguments);

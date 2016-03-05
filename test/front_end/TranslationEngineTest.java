@@ -5,14 +5,15 @@ import factories.TaskList;
 import front_end.ui.DisplayOneTaskUI;
 import front_end.ui.DisplayTaskListUI;
 import front_end.ui.base.View;
+import front_end.ui.base.VisualTuple;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
@@ -59,4 +60,29 @@ public class TranslationEngineTest {
         assertThat(this.engine_.getCurrentIdTranslator(), is(not(nullValue())));
     }
 
+    @Test
+    public void Translation_engine_displays_correct_content() {
+        this.engine_.initializeUI(taskListView_);
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        PrintStream printStream = new PrintStream(outputStream);
+
+        // Inject output stream
+        this.engine_.getCurrentUI().setOutputStream(printStream);
+        this.engine_.getCurrentUI().render();
+
+        // Check output
+        String output = outputStream.toString();
+
+        // Construct expected output
+        StringBuilder expectedOutputBuilder = new StringBuilder();
+        for (Object tuple : this.engine_.getCurrentIdTranslator().getVisualTupleList()) {
+            VisualTuple<Task> visualTaskTuple = (VisualTuple<Task>) tuple;
+            expectedOutputBuilder.append(String.format("%d. %s\n",
+                    visualTaskTuple.getIndex(),
+                    visualTaskTuple.getOriginal().getTask()));
+        }
+
+        assertThat(output, is(equalTo(expectedOutputBuilder.toString())));
+    }
 }

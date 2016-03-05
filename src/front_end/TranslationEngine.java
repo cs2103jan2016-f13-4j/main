@@ -15,32 +15,11 @@ public class TranslationEngine {
 
     private CommandParser commandParser_;
     private View currentView_;
+    private UserInterface currentUI_;
     private VisualIdTranslator currentIdTranslator_;
 
     public TranslationEngine() {
         this.commandParser_ = new CommandParser();
-    }
-
-    public void display(View view) {
-        this.currentView_ = view;
-
-        // Instantiate new User Interface from view data
-        UserInterface currentUI = constructUserInterface(this.currentView_);
-        assert(currentUI != null);
-
-        // If the view class is classified under visual index UI
-        // we provide the translation engine with a Visual ID Mapping
-        if (VisualIndexUI.class.isAssignableFrom(this.currentView_.getUiClass())) {
-            assert(this.currentView_.getData() instanceof List);
-
-            this.currentIdTranslator_ = new VisualIdTranslator((List) view.getData());
-
-            // Assign the visual tuple to view
-            ((VisualIndexUI) currentUI).setVisualTupleList(this.currentIdTranslator_.getVisualTupleList());
-        }
-
-        // Render UI
-        currentUI.render();
     }
 
     private static <T> UserInterface<T> constructUserInterface(View view) {
@@ -66,11 +45,45 @@ public class TranslationEngine {
         return ui;
     }
 
+    public void display(View view) {
+        this.initializeUI(view);
+        this.currentUI_.render();
+    }
+
+    /**
+     * TODO: Write Java-doc for this
+     * Expose as package-level for testing
+     *
+     * @param view
+     */
+    void initializeUI(View view) {
+        this.currentView_ = view;
+
+        // Instantiate new User Interface from view data
+        currentUI_ = constructUserInterface(this.currentView_);
+        assert (currentUI_ != null);
+
+        // If the view class is classified under visual index UI
+        // we provide the translation engine with a Visual ID Mapping
+        if (VisualIndexUI.class.isAssignableFrom(this.currentView_.getUiClass())) {
+            assert (this.currentView_.getData() instanceof List);
+
+            this.currentIdTranslator_ = new VisualIdTranslator((List) view.getData());
+
+            // Assign the visual tuple to view
+            ((VisualIndexUI) currentUI_).setVisualTupleList(this.currentIdTranslator_.getVisualTupleList());
+        }
+    }
+
     /**
      * Package-level methods exposed for testing purposes
      */
     View getCurrentView() {
         return this.currentView_;
+    }
+
+    UserInterface getCurrentUI() {
+        return this.currentUI_;
     }
 
     VisualIdTranslator getCurrentIdTranslator() {

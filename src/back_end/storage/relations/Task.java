@@ -36,8 +36,19 @@ public class Task extends SerialIdRelation {
         return this.task_;
     }
 
+    /**
+     * Setters
+     */
+    public void setTask(String task) {
+        this.task_ = task;
+    }
+
     public String getDetails() {
         return this.details_;
+    }
+
+    public void setDetails(String details) {
+        this.details_ = details;
     }
 
     public Date getCreationTime() {
@@ -48,23 +59,12 @@ public class Task extends SerialIdRelation {
         return this.startTime_;
     }
 
-    public Date getEndTime() {
-        return this.endTime_;
-    }
-
-    /**
-     * Setters
-     */
-    public void setTask(String task) {
-        this.task_ = task;
-    }
-
-    public void setDetails(String details) {
-        this.details_ = details;
-    }
-
     public void setStartTime(Date startTime) {
         this.startTime_ = startTime;
+    }
+
+    public Date getEndTime() {
+        return this.endTime_;
     }
 
     public void setEndTime(Date endTime) {

@@ -42,8 +42,22 @@ public class VisualIdTranslator<T extends SerialIdRelation> {
         }
     }
 
+    private static Integer translateArrayListIndexToVisual(Integer arrayListIndex) {
+        assert (arrayListIndex != null);
+        // Array list index starts from 0 but actual visual index starts from 1
+        // So to get the visual index from array list index, just add 1
+        return arrayListIndex + 1;
+    }
+
+    private static Integer translateVisualIndexToArrayList(Integer visualIndex) {
+        assert (visualIndex != null);
+        // Visual index starts from 1 but array list index starts from 0
+        // So to get the array list index from visual index, just minus 1
+        return visualIndex - 1;
+    }
+
     public Integer translateRawToVisual(Index rawIndex) {
-        assert(rawIndex != null);
+        assert (rawIndex != null);
         Integer arrayListIndex = this.fromRawToVisualMap_.get(rawIndex);
 
         // Index not found
@@ -55,7 +69,7 @@ public class VisualIdTranslator<T extends SerialIdRelation> {
     }
 
     public Index translateVisualToRaw(Integer visualIndex) {
-        assert(visualIndex != null);
+        assert (visualIndex != null);
         Integer arrayListIndex = translateVisualIndexToArrayList(visualIndex);
 
         // Handle case where index not found
@@ -69,20 +83,6 @@ public class VisualIdTranslator<T extends SerialIdRelation> {
 
     public List<VisualTuple<T>> getVisualTupleList() {
         return this.visualTupleList_;
-    }
-
-    private static Integer translateArrayListIndexToVisual(Integer arrayListIndex) {
-        assert(arrayListIndex != null);
-        // Array list index starts from 0 but actual visual index starts from 1
-        // So to get the visual index from array list index, just add 1
-        return arrayListIndex + 1;
-    }
-
-    private static Integer translateVisualIndexToArrayList(Integer visualIndex) {
-        assert(visualIndex != null);
-        // Visual index starts from 1 but array list index starts from 0
-        // So to get the array list index from visual index, just minus 1
-        return visualIndex - 1;
     }
 
     // Package methods exposed for testing

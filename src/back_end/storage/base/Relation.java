@@ -6,6 +6,7 @@ package back_end.storage.base;
 public abstract class Relation implements Comparable<Relation> {
 
     public abstract PrimaryKey getPrimaryKey();
+
     public abstract void setPrimaryKey(PrimaryKey key);
 
     @Override

@@ -2,6 +2,7 @@ package front_end.ui;
 
 import back_end.storage.relations.Task;
 import front_end.ui.base.VisualIndexUI;
+import front_end.ui.base.VisualTuple;
 
 import java.util.List;
 
@@ -16,7 +17,10 @@ public class DisplayTaskListUI extends VisualIndexUI<Task> {
 
     @Override
     public void render() {
-
+        for (VisualTuple<Task> visualTask : this.getVisualTuples()) {
+            Task task = visualTask.getOriginal();
+            this.displayLine("%d. %s", visualTask.getIndex(), task.getTask());
+        }
     }
 
 }
