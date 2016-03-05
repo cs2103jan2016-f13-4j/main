@@ -1,7 +1,7 @@
 package front_end.ui.core;
 
 import back_end.storage.base.SerialIdRelation;
-import front_end.ui.base.VisualTuple;
+import front_end.ui.utility.VisualTuple;
 
 import java.util.List;
 

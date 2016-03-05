@@ -1,19 +1,13 @@
-package front_end.ui.base;
+package front_end.ui.utility;
 
-import back_end.storage.base.Relation;
-import front_end.ui.core.UserInterface;
+import front_end.ui.core.IndependentUI;
 
 /**
  * Created by maianhvu on 5/3/16.
  */
-public class CommandPromptUI extends UserInterface<Relation> {
-
+public class CommandPromptUI extends IndependentUI {
 
     public static final String STRING_COMMAND_PROMPT = "command: ";
-
-    public CommandPromptUI() {
-        super(null);
-    }
 
     @Override
     public void render() {

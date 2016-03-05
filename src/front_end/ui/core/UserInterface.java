@@ -21,12 +21,12 @@ public abstract class UserInterface<T> {
         return this.data_;
     }
 
-    public void setTitle(String title) {
-        this.title_ = title;
-    }
-
     private String getTitle() {
         return this.title_;
+    }
+
+    public void setTitle(String title) {
+        this.title_ = title;
     }
 
     public void render() {

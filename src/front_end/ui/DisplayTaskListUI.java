@@ -2,7 +2,7 @@ package front_end.ui;
 
 import back_end.storage.relations.Task;
 import front_end.ui.core.VisualIndexUI;
-import front_end.ui.base.VisualTuple;
+import front_end.ui.utility.VisualTuple;
 
 import java.util.List;
 
