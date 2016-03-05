@@ -13,7 +13,7 @@ import objects.*;
  * 
  * It has knowledge of the Command Parser and delegates to it to parse the user input string.
  * 
- * Rank: Captain
+ * Rank: Captain (reports to MAJ Dispatcher)
  * 
  * created by thenaesh on Mar 6, 2016
  *

@@ -12,7 +12,7 @@ import objects.*;
  *      1) Report an error (by raising an exception) back to the Dispatcher
  *      2) Perform other actions (conservatively) to allow the command to be eventually fulfilled
  * 
- * Rank: Captain
+ * Rank: Captain (reports to MAJ Dispatcher)
  * 
  * created by thenaesh on Mar 5, 2016
  *

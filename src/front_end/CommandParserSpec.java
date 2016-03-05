@@ -6,7 +6,7 @@ import objects.*;
 /**
  * The Command Parser has one job: take a user input string and turn it into a Command object.
  * 
- * Rank: Lieutenant
+ * Rank: Lieutenant (reports to CPT Translation Engine)
  * 
  * created by thenaesh on Mar 6, 2016
  *
