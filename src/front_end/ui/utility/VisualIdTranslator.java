@@ -12,9 +12,9 @@ import java.util.List;
  */
 public class VisualIdTranslator<T extends SerialIdRelation> {
 
-    private ArrayList<Index> fromVisualToRawMap_;
-    private HashMap<Index, Integer> fromRawToVisualMap_;
-    private List<VisualTuple<T>> visualTupleList_;
+    private final ArrayList<Index> fromVisualToRawMap_;
+    private final HashMap<Index, Integer> fromRawToVisualMap_;
+    private final List<VisualTuple<T>> visualTupleList_;
 
     public VisualIdTranslator(List<T> taskList) {
         this.fromVisualToRawMap_ = new ArrayList<>();
@@ -23,7 +23,7 @@ public class VisualIdTranslator<T extends SerialIdRelation> {
 
         // Populate index map
         for (T tuple : taskList) {
-            Index rawTaskId = (Index) tuple.getPrimaryKey();
+            Index rawTaskId = tuple.getPrimaryKey();
             // Enumerate the task IDs in ascending order
             this.fromVisualToRawMap_.add(rawTaskId);
 

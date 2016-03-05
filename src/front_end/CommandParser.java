@@ -5,7 +5,7 @@ import objects.Command;
 /**
  * Created by maianhvu on 5/3/16.
  */
-public class CommandParser {
+class CommandParser {
 
     public Command parseCommand(String rawCommandString) {
         Command.Type commandType = null;
@@ -32,8 +32,7 @@ public class CommandParser {
             // TODO: Parse command parameters
         }
 
-        Command command = new Command(commandType, parameters);
-        return command;
+        return new Command(commandType, parameters);
     }
 
 }

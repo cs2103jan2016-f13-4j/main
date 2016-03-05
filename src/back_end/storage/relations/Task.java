@@ -11,7 +11,7 @@ public class Task extends SerialIdRelation {
 
     private String task_;
     private String details_;
-    private Date creationTime_;
+    private final Date creationTime_;
     private Date startTime_;
     private Date endTime_;
 

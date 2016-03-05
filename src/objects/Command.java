@@ -15,8 +15,8 @@ public class Command {
         UNRECOGNISED
     }
 
-    private Type type_;
-    private Object[] parameters_;
+    private final Type type_;
+    private final Object[] parameters_;
 
     public Command(Type type, Object[] parameters) {
         this.type_ = type;
@@ -24,8 +24,7 @@ public class Command {
     }
 
     public static Command getInitialCommand() {
-        Command command = new Command(Type.DISPLAY_ALL, null);
-        return command;
+        return new Command(Type.DISPLAY_ALL, null);
     }
 
     public Type getType() {

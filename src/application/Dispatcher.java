@@ -9,12 +9,12 @@ import stubs.StubbedDecisionEngine;
 /**
  * Created by maianhvu on 5/3/16.
  */
-public class Dispatcher {
+class Dispatcher {
 
     private static final boolean NO_SKIP_INPUT = false;
 
-    private TranslationEngine translationEngine_;
-    private DecisionEngine decisionEngine_;
+    private final TranslationEngine translationEngine_;
+    private final DecisionEngine decisionEngine_;
 
     public Dispatcher() {
         this.translationEngine_ = new TranslationEngine(NO_SKIP_INPUT); // Does not skip input

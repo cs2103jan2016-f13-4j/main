@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class MessageDisplayUI extends UserInterface<List<Message>> {
 
-    public static final String STRING_FLAG_MESSAGE_FORMAT = "[%1$s]: ";
+    private static final String STRING_FLAG_MESSAGE_FORMAT = "[%1$s]: ";
     private static final String COLOR_ANSI_RESET = "\u001B[0m";
     private static final String COLOR_ANSI_RED = "\u001B[31m";
     private static final String COLOR_ANSI_YELLOW = "\u001B[33m";

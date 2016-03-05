@@ -7,7 +7,7 @@ import front_end.ui.core.IndependentUI;
  */
 public class CommandPromptUI extends IndependentUI {
 
-    public static final String STRING_COMMAND_PROMPT = "command: ";
+    private static final String STRING_COMMAND_PROMPT = "command: ";
 
     @Override
     public void render() {

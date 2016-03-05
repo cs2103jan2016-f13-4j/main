@@ -10,7 +10,7 @@ import objects.ExecutionResult;
  */
 public class DecisionEngine {
 
-    protected Storage dataStorage_;
+    protected final Storage dataStorage_;
 
     public DecisionEngine() {
         this.dataStorage_ = new Storage();

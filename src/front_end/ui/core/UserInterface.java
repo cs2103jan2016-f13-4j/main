@@ -12,12 +12,12 @@ public abstract class UserInterface<T> {
     private PrintStream outputStream_;
     private String title_;
 
-    public UserInterface(T data) {
+    protected UserInterface(T data) {
         this.outputStream_ = STREAM_OUTPUT_DEFAULT;
         this.data_ = data;
     }
 
-    public T getData() {
+    protected T getData() {
         return this.data_;
     }
 

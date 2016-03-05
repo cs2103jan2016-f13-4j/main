@@ -5,9 +5,9 @@ import back_end.storage.base.Relation;
 /**
  * Created by maianhvu on 5/3/16.
  */
-public class IndependentUI extends UserInterface<Relation> {
+public abstract class IndependentUI extends UserInterface<Relation> {
 
-    public IndependentUI() {
+    protected IndependentUI() {
         super(null);
     }
 

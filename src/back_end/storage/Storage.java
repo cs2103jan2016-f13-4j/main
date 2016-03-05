@@ -11,7 +11,7 @@ import java.util.*;
  * Created by maianhvu on 5/3/16.
  */
 public class Storage {
-    private HashMap<Class<? extends Relation>, TreeMap<PrimaryKey, Relation>> storageMap_;
+    private final HashMap<Class<? extends Relation>, TreeMap<PrimaryKey, Relation>> storageMap_;
 
     public Storage() {
         this.storageMap_ = new HashMap<>();
@@ -99,8 +99,7 @@ public class Storage {
         }
 
         // Add all elements of the storage tree into an array list and returns it
-        ArrayList<T> allRecords = new ArrayList<T>((Collection<T>) storageTree.values());
-        return allRecords;
+        return new ArrayList<T>((Collection<T>) storageTree.values());
     }
 
 

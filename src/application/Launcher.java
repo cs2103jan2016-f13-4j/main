@@ -4,7 +4,7 @@ package application;
 /**
  * Created by maianhvu on 5/3/16.
  */
-public class Launcher {
+class Launcher {
 
     public static void main(String[] args) {
         // Initialize application instance and start it

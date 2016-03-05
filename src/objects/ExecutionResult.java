@@ -11,8 +11,8 @@ import java.util.List;
 public class ExecutionResult<T> {
 
     private List<Message> messages_;
-    private Class<? extends UserInterface<T>> uiClass_;
-    private T data_;
+    private final Class<? extends UserInterface<T>> uiClass_;
+    private final T data_;
 
     public ExecutionResult(Class<? extends UserInterface<T>> uiClass, T data) {
         this.uiClass_ = uiClass;
@@ -20,7 +20,7 @@ public class ExecutionResult<T> {
     }
 
     public static ExecutionResult nullResult() {
-        return new ExecutionResult(null, null);
+        return new ExecutionResult<Object>(null, null);
     }
 
     public boolean hasMessage() {

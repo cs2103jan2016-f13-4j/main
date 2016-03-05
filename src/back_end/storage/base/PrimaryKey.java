@@ -5,9 +5,9 @@ package back_end.storage.base;
  */
 public abstract class PrimaryKey implements Comparable<PrimaryKey> {
 
-    protected Comparable key_;
+    private Comparable key_;
 
-    public PrimaryKey(Comparable key) {
+    PrimaryKey(Comparable key) {
         this.key_ = key;
     }
 

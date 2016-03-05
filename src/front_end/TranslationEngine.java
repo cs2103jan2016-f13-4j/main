@@ -17,9 +17,9 @@ import java.util.Scanner;
  */
 public class TranslationEngine {
 
-    private boolean skipInput_;
+    private final boolean skipInput_;
     private Scanner inputReader_;
-    private CommandParser commandParser_;
+    private final CommandParser commandParser_;
 
     private ExecutionResult currentExecutionResult_;
     private UserInterface currentUI_;
@@ -55,7 +55,6 @@ public class TranslationEngine {
                 ui = constructor.newInstance(executionResult.getData());
                 break;
             } catch (Exception e) {
-                continue;
             }
         }
 
@@ -112,15 +111,14 @@ public class TranslationEngine {
     }
 
     private Command waitAndParseInput() {
-        assert (this.skipInput_ == false);
+        assert (!this.skipInput_);
 
         // Display command prompt UI
         CommandPromptUI commandPromptUI = new CommandPromptUI();
         commandPromptUI.render();
 
         String rawCommandString = this.inputReader_.nextLine();
-        Command command = this.commandParser_.parseCommand(rawCommandString);
-        return command;
+        return this.commandParser_.parseCommand(rawCommandString);
     }
 
     /**

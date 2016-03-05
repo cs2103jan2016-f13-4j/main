@@ -11,8 +11,8 @@ public class Message {
         INFO
     }
 
-    private Type type_;
-    private String message_;
+    private final Type type_;
+    private final String message_;
 
     public Message(Type type, String message) {
         this.type_ = type;
