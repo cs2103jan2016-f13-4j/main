@@ -4,7 +4,7 @@ import java.util.List;
 import objects.*;
 
 
-public class TranslationEngine {
+public abstract class TranslationEngineSpec {
     void display(List<Task> taskList) {
     }
     

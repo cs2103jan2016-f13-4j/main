@@ -10,7 +10,7 @@ import objects.*;
  * created by thenaesh on Mar 5, 2016
  *
  */
-public class TaskScheduler {
+public abstract class TaskSchedulerSpec {
     public LocalDateTime findSlot(List<Task> existingTasks, long duration) {
         return null;
     }

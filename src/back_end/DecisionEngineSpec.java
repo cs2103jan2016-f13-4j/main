@@ -3,7 +3,7 @@ package back_end;
 import objects.*;
 
 
-public class DecisionEngine {
+public abstract class DecisionEngineSpec {
     public ExecutionResult performCommand(Command cmd) {
         return null;
     }

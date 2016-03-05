@@ -3,7 +3,7 @@ package front_end;
 import objects.*;
 
 
-public class CommandParser {
+public abstract class CommandParserSpec {
     Command parseCommand(String cmdStr) {
         return null;
     }
