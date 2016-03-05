@@ -4,10 +4,10 @@ import back_end.storage.relations.Task;
 import factories.TaskList;
 import front_end.ui.DisplayOneTaskUI;
 import front_end.ui.DisplayTaskListUI;
+import front_end.ui.base.View;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.is;

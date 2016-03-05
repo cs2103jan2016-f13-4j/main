@@ -1,8 +1,8 @@
 package front_end;
 
-import back_end.storage.base.SerialIdRelation;
-import back_end.storage.relations.Task;
 import front_end.ui.base.UserInterface;
+import front_end.ui.base.View;
+import front_end.ui.base.VisualIdTranslator;
 import front_end.ui.base.VisualIndexUI;
 
 import java.lang.reflect.Constructor;

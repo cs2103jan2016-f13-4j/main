@@ -1,8 +1,7 @@
-package front_end;
+package front_end.ui.base;
 
 import back_end.storage.base.Index;
 import back_end.storage.base.SerialIdRelation;
-import back_end.storage.relations.Task;
 
 import java.util.ArrayList;
 import java.util.HashMap;

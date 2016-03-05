@@ -1,4 +1,4 @@
-package front_end;
+package front_end.ui.base;
 
 import front_end.ui.base.UserInterface;
 
