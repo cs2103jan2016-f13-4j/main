@@ -21,10 +21,6 @@ public abstract class UserInterface<T> {
         this(STREAM_OUTPUT_DEFAULT, data);
     }
 
-    public boolean hasTaskList() {
-        return false;
-    }
-
     public T getData() {
         return this.data_;
     }

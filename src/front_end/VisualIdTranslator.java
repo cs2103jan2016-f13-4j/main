@@ -1,32 +1,45 @@
 package front_end;
 
 import back_end.storage.base.Index;
+import back_end.storage.base.SerialIdRelation;
 import back_end.storage.relations.Task;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
 /**
  * Created by maianhvu on 5/3/16.
  */
-public class TaskIdMap {
+public class VisualIdTranslator<T extends SerialIdRelation> {
 
     private ArrayList<Index> fromVisualToRawMap_;
     private HashMap<Index, Integer> fromRawToVisualMap_;
+    private List<VisualTuple<T>> visualTupleList_;
 
-    public TaskIdMap(List<Task> taskList) {
+    public VisualIdTranslator(List<T> taskList) {
         this.fromVisualToRawMap_ = new ArrayList<>();
         this.fromRawToVisualMap_ = new HashMap<>();
+        this.visualTupleList_ = new ArrayList<>();
 
         // Populate index map
-        for (Task task : taskList) {
-            Index rawTaskId = (Index) task.getPrimaryKey();
+        for (T tuple : taskList) {
+            Index rawTaskId = (Index) tuple.getPrimaryKey();
             // Enumerate the task IDs in ascending order
             this.fromVisualToRawMap_.add(rawTaskId);
+
+            // Get the index of the latest inserted tuple inside the visualToRaw list
+            Integer lastInsertedIndex = this.fromVisualToRawMap_.size() - 1;
+
             // Map the raw index to the most recently added index inside the array list
-            this.fromRawToVisualMap_.put(rawTaskId, this.fromVisualToRawMap_.size() - 1);
+            this.fromRawToVisualMap_.put(rawTaskId, lastInsertedIndex);
+
+            // Add visual tuple
+            this.visualTupleList_.add(new VisualTuple<T>(
+                    translateArrayListIndexToVisual(lastInsertedIndex),
+                    tuple
+            ));
+
         }
     }
 
@@ -53,6 +66,10 @@ public class TaskIdMap {
             // FIXME: Handle error
             return null;
         }
+    }
+
+    public List<VisualTuple<T>> getVisualTupleList() {
+        return this.visualTupleList_;
     }
 
     private static Integer translateArrayListIndexToVisual(Integer arrayListIndex) {

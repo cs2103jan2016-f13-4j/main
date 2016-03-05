@@ -13,15 +13,15 @@ import static org.hamcrest.MatcherAssert.assertThat;
 /**
  * Created by maianhvu on 5/3/16.
  */
-public class TaskIdMapTest {
+public class VisualIdTranslatorTest {
 
     private List<Task> taskList_;
-    private TaskIdMap taskIdMap_;
+    private VisualIdTranslator taskIdMap_;
 
     @Before
     public void setUp() {
         this.taskList_ = TaskList.buildRandom(10);
-        this.taskIdMap_ = new TaskIdMap(this.taskList_);
+        this.taskIdMap_ = new VisualIdTranslator(this.taskList_);
     }
 
     @Test
@@ -43,6 +43,16 @@ public class TaskIdMapTest {
         for (Task task : this.taskList_) {
             assertThat(this.taskIdMap_.translateRawToVisual(task.getPrimaryKey()),
                     is(currentVisualIndex));
+            currentVisualIndex++;
+        }
+    }
+
+    @Test
+    public void TaskIdMap_has_correct_idTranslationMap() {
+        List<VisualTuple<Task>> idTranslationMap = this.taskIdMap_.getVisualTupleList();
+        int currentVisualIndex = 1;
+        for (VisualTuple<Task> tuple : idTranslationMap) {
+            assertThat(tuple.getIndex(), is(currentVisualIndex));
             currentVisualIndex++;
         }
     }

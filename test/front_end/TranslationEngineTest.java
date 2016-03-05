@@ -35,8 +35,8 @@ public class TranslationEngineTest {
     }
 
     @Test
-    public void Translation_engine_does_not_have_taskIdMap_by_default() {
-        assertThat(this.engine_.getTaskIdMap(), is(nullValue()));
+    public void Translation_engine_does_not_have_idTranslationMap_by_default() {
+        assertThat(this.engine_.getCurrentIdTranslator(), is(nullValue()));
     }
 
     @Test
@@ -46,17 +46,17 @@ public class TranslationEngineTest {
     }
 
     @Test
-    public void Translation_engine_does_not_have_taskIdMap_if_data_is_not_task_list() {
+    public void Translation_engine_does_not_have_idTranslationMap_if_data_is_not_task_list() {
         View<Task> singleTaskView = new View<>(DisplayOneTaskUI.class, new Task("Task 1"));
         this.engine_.display(singleTaskView);
 
-        assertThat(this.engine_.getTaskIdMap(), is(nullValue()));
+        assertThat(this.engine_.getCurrentIdTranslator(), is(nullValue()));
     }
 
     @Test
-    public void Translation_engine_has_taskIdMap_if_data_is_task_list() {
+    public void Translation_engine_has_idTranslationMap_if_data_is_task_list() {
         this.engine_.display(taskListView_);
-        assertThat(this.engine_.getTaskIdMap(), is(not(nullValue())));
+        assertThat(this.engine_.getCurrentIdTranslator(), is(not(nullValue())));
     }
 
 }
