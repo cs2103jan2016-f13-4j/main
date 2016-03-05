@@ -1,7 +1,7 @@
 package front_end;
 
-import objects.Index;
-import objects.Task;
+import back_end.storage.base.Index;
+import back_end.storage.relations.Task;
 
 import java.util.ArrayList;
 import java.util.HashMap;
