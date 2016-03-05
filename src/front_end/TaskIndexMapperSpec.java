@@ -3,7 +3,7 @@ package front_end;
 
 /**
  * Tasks have two different indices:
- *      1) an actual id, used by the Data Store to index the task, as its name implies
+ *      1) an actual id, globally unique, used by the Data Store to index the task
  *      2) a visual id, used to interact with the user
  *              -> ordering when displaying tasks
  *              -> user selection of tasks to edit or delete
