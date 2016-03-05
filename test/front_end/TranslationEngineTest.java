@@ -4,7 +4,7 @@ import back_end.storage.relations.Task;
 import factories.TaskList;
 import front_end.ui.DisplayOneTaskUI;
 import front_end.ui.DisplayTaskListUI;
-import front_end.ui.base.View;
+import objects.ExecutionResult;
 import front_end.ui.base.VisualTuple;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,17 +22,17 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class TranslationEngineTest {
 
     private TranslationEngine engine_;
-    private View<List<Task>> taskListView_;
+    private ExecutionResult<List<Task>> taskListExecutionResult_;
 
     @Before
     public void setUp() {
-        this.taskListView_ = new View<>(DisplayTaskListUI.class, TaskList.buildRandom());
+        this.taskListExecutionResult_ = new ExecutionResult<>(DisplayTaskListUI.class, TaskList.buildRandom());
         this.engine_ = new TranslationEngine();
     }
 
     @Test
     public void Translation_engine_does_not_have_currentView_by_default() {
-        assertThat(this.engine_.getCurrentView(), is(nullValue()));
+        assertThat(this.engine_.getCurrentExecutionResult(), is(nullValue()));
     }
 
     @Test
@@ -42,27 +42,27 @@ public class TranslationEngineTest {
 
     @Test
     public void Translation_engine_has_currentView_upon_display() {
-        this.engine_.display(taskListView_);
-        assertThat(this.engine_.getCurrentView(), is(taskListView_));
+        this.engine_.display(taskListExecutionResult_);
+        assertThat(this.engine_.getCurrentExecutionResult(), is(taskListExecutionResult_));
     }
 
     @Test
     public void Translation_engine_does_not_have_idTranslationMap_if_data_is_not_task_list() {
-        View<Task> singleTaskView = new View<>(DisplayOneTaskUI.class, new Task("Task 1"));
-        this.engine_.display(singleTaskView);
+        ExecutionResult<Task> singleTaskExecutionResult = new ExecutionResult<>(DisplayOneTaskUI.class, new Task("Task 1"));
+        this.engine_.display(singleTaskExecutionResult);
 
         assertThat(this.engine_.getCurrentIdTranslator(), is(nullValue()));
     }
 
     @Test
     public void Translation_engine_has_idTranslationMap_if_data_is_task_list() {
-        this.engine_.display(taskListView_);
+        this.engine_.display(taskListExecutionResult_);
         assertThat(this.engine_.getCurrentIdTranslator(), is(not(nullValue())));
     }
 
     @Test
     public void Translation_engine_displays_correct_content() {
-        this.engine_.initializeUI(taskListView_);
+        this.engine_.initializeUI(taskListExecutionResult_);
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         PrintStream printStream = new PrintStream(outputStream);

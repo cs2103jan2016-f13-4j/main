@@ -1,3 +1,5 @@
+package application;
+
 import back_end.DecisionEngine;
 import front_end.TranslationEngine;
 
@@ -12,5 +14,9 @@ public class Dispatcher {
     public Dispatcher() {
         this.translationEngine_ = new TranslationEngine();
         this.decisionEngine_ = new DecisionEngine();
+    }
+
+    public void start() {
+
     }
 }

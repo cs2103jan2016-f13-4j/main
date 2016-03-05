@@ -1,7 +1,8 @@
 package front_end;
 
+import front_end.ui.MessageDisplayUI;
 import front_end.ui.base.UserInterface;
-import front_end.ui.base.View;
+import objects.ExecutionResult;
 import front_end.ui.base.VisualIdTranslator;
 import front_end.ui.base.VisualIndexUI;
 
@@ -14,7 +15,7 @@ import java.util.List;
 public class TranslationEngine {
 
     private CommandParser commandParser_;
-    private View currentView_;
+    private ExecutionResult currentExecutionResult_;
     private UserInterface currentUI_;
     private VisualIdTranslator currentIdTranslator_;
 
@@ -22,12 +23,12 @@ public class TranslationEngine {
         this.commandParser_ = new CommandParser();
     }
 
-    private static <T> UserInterface<T> constructUserInterface(View view) {
+    private static <T> UserInterface<T> constructUserInterface(ExecutionResult executionResult) {
         // Initialize the UserInterface instance
         UserInterface ui = null;
 
         // Get all available constructors for the UserInterface
-        Constructor<?> constructors[] = view.getUiClass().getConstructors();
+        Constructor<?> constructors[] = executionResult.getUiClass().getConstructors();
 
         // Find appropriate constructor for the user interface
         // and attempt to initialize the user interface with it
@@ -35,7 +36,7 @@ public class TranslationEngine {
             try {
                 Constructor<? extends UserInterface<T>> constructor =
                         (Constructor<? extends UserInterface<T>>) c;
-                ui = constructor.newInstance(view.getData());
+                ui = constructor.newInstance(executionResult.getData());
                 break;
             } catch (Exception e) {
                 continue;
@@ -45,32 +46,44 @@ public class TranslationEngine {
         return ui;
     }
 
-    public void display(View view) {
-        this.initializeUI(view);
+    public void display(ExecutionResult result) {
+        this.displayResultMessages(result);
+        this.initializeUI(result);
         this.currentUI_.render();
+    }
+
+    private void displayResultMessages(ExecutionResult result) {
+        // If there are no messages to display, just skip
+        if (!result.hasMessage()) {
+            return;
+        }
+
+        // Create message display UI and attach messages to it
+        MessageDisplayUI messageUI = new MessageDisplayUI(result.getMessages());
+        messageUI.render();
     }
 
     /**
      * TODO: Write Java-doc for this
      * Expose as package-level for testing
      *
-     * @param view
+     * @param executionResult
      */
-    void initializeUI(View view) {
-        this.currentView_ = view;
+    void initializeUI(ExecutionResult executionResult) {
+        this.currentExecutionResult_ = executionResult;
 
-        // Instantiate new User Interface from view data
-        currentUI_ = constructUserInterface(this.currentView_);
+        // Instantiate new User Interface from executionResult data
+        currentUI_ = constructUserInterface(this.currentExecutionResult_);
         assert (currentUI_ != null);
 
-        // If the view class is classified under visual index UI
+        // If the executionResult class is classified under visual index UI
         // we provide the translation engine with a Visual ID Mapping
-        if (VisualIndexUI.class.isAssignableFrom(this.currentView_.getUiClass())) {
-            assert (this.currentView_.getData() instanceof List);
+        if (VisualIndexUI.class.isAssignableFrom(this.currentExecutionResult_.getUiClass())) {
+            assert (this.currentExecutionResult_.getData() instanceof List);
 
-            this.currentIdTranslator_ = new VisualIdTranslator((List) view.getData());
+            this.currentIdTranslator_ = new VisualIdTranslator((List) executionResult.getData());
 
-            // Assign the visual tuple to view
+            // Assign the visual tuple to executionResult
             ((VisualIndexUI) currentUI_).setVisualTupleList(this.currentIdTranslator_.getVisualTupleList());
         }
     }
@@ -78,8 +91,8 @@ public class TranslationEngine {
     /**
      * Package-level methods exposed for testing purposes
      */
-    View getCurrentView() {
-        return this.currentView_;
+    ExecutionResult getCurrentExecutionResult() {
+        return this.currentExecutionResult_;
     }
 
     UserInterface getCurrentUI() {
