@@ -10,6 +10,7 @@ public abstract class UserInterface<T> {
     private static final PrintStream STREAM_OUTPUT_DEFAULT = System.out;
     private final T data_;
     private PrintStream outputStream_;
+    private String title_;
 
     public UserInterface(T data) {
         this.outputStream_ = STREAM_OUTPUT_DEFAULT;
@@ -20,7 +21,20 @@ public abstract class UserInterface<T> {
         return this.data_;
     }
 
-    public abstract void render();
+    public void setTitle(String title) {
+        this.title_ = title;
+    }
+
+    private String getTitle() {
+        return this.title_;
+    }
+
+    public void render() {
+        // Display title if present
+        if (this.getTitle() != null) {
+            this.displayLine(this.getTitle());
+        }
+    }
 
     public void setOutputStream(PrintStream outputStream) {
         this.outputStream_ = outputStream;

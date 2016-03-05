@@ -14,5 +14,6 @@ public class DisplayOneTaskUI extends UserInterface<Task> {
 
     public void render() {
         // TODO: stub
+        super.render();
     }
 }

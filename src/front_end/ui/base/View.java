@@ -7,15 +7,10 @@ public class View<T> {
 
     private Class<? extends UserInterface<T>> uiClass_;
     private T data_;
-    private String title_;
-
-    public View(Class<? extends UserInterface<T>> uiClass, T data, String title) {
-        this.uiClass_ = uiClass;
-        this.data_ = data;
-    }
 
     public View(Class<? extends UserInterface<T>> uiClass, T data) {
-        this(uiClass, data, null);
+        this.uiClass_ = uiClass;
+        this.data_ = data;
     }
 
     public Class<? extends UserInterface<T>> getUiClass() {
@@ -26,7 +21,4 @@ public class View<T> {
         return this.data_;
     }
 
-    public String getTitle() {
-        return this.title_;
-    }
 }

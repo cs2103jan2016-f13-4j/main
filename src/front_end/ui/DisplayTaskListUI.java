@@ -17,6 +17,7 @@ public class DisplayTaskListUI extends VisualIndexUI<Task> {
 
     @Override
     public void render() {
+        super.render();
         for (VisualTuple<Task> visualTask : this.getVisualTuples()) {
             Task task = visualTask.getOriginal();
             this.displayLine("%d. %s", visualTask.getIndex(), task.getTask());
