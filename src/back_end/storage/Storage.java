@@ -5,8 +5,7 @@ import back_end.storage.base.PrimaryKey;
 import back_end.storage.base.Relation;
 import back_end.storage.base.SerialIdRelation;
 
-import java.util.HashMap;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Created by maianhvu on 5/3/16.
@@ -76,10 +75,10 @@ public class Storage {
         return record.getPrimaryKey();
     }
 
-    public <T extends Relation> T get(Class<T> relation, PrimaryKey primaryKey) throws RelationNotFoundException{
+    public <T extends Relation> T get(Class<T> relation, PrimaryKey primaryKey) throws RelationNotFoundException {
         // Search for the storage tree reference from the relation class first
         // If it does not exist, throw the exception
-        TreeMap<PrimaryKey, ? extends Relation> storageTree = this.storageMap_.get(relation);
+        TreeMap<PrimaryKey, Relation> storageTree = this.storageMap_.get(relation);
 
         if (storageTree == null) {
            throw new RelationNotFoundException();
@@ -88,6 +87,20 @@ public class Storage {
         // Search the storage tree for the primary key and return it
         // Default behaviour for TreeMap is that if key not found, return null
         return (T) storageTree.get(primaryKey);
+    }
+
+    public <T extends Relation> List<T> getAll(Class<T> relation) throws RelationNotFoundException {
+        // Search for storage tree reference from the relation class first
+        // If it does not exist, throw the exception
+        TreeMap<PrimaryKey, Relation> storageTree = this.storageMap_.get(relation);
+
+        if (storageTree == null) {
+            throw new RelationNotFoundException();
+        }
+
+        // Add all elements of the storage tree into an array list and returns it
+        ArrayList<T> allRecords = new ArrayList<T>((Collection<T>) storageTree.values());
+        return allRecords;
     }
 
 
