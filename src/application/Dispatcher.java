@@ -5,7 +5,7 @@ import front_end.*;
 
 
 /**
- * The Dispatcher is the master controller that drives the (independent) front-end and back-end.
+ * The Dispatcher is the master controller that drives the (otherwise independent) front-end and back-end.
  * Its function is analogous to that of the human heart with respect to pulmonary and systemic circulation.
  * 
  * created by thenaesh on 5/3/16
