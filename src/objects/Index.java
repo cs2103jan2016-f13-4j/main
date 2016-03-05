@@ -5,31 +5,23 @@ package objects;
  */
 public class Index implements Comparable<Index> {
 
-    private final long value_;
+    private final Long value_;
 
-    public Index(long value) {
+    public Index(Long value) {
         this.value_ = value;
     }
 
-    public long getValue() {
+    public Long getValue() {
         return this.value_;
     }
 
     @Override
     public int compareTo(Index another) {
-        long difference = this.value_ - another.value_;
+        return this.value_.compareTo(another.value_);
+    }
 
-        // Equal
-        if (difference == 0) {
-            return 0;
-        }
-
-        // This is smaller than another
-        if (difference < 0) {
-            return -1;
-        }
-
-        // This is greater than another
-        return 1;
+    @Override
+    public int hashCode() {
+        return this.value_.hashCode();
     }
 }
