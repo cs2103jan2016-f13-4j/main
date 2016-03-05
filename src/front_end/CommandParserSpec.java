@@ -12,6 +12,15 @@ import objects.*;
  *
  */
 public abstract class CommandParserSpec {
+    
+    /**
+     * parses a given string into a Command object
+     * this Command object may or may not be complete, depending on the string given
+     * (see {@link Command} regarding completeness of Command objects)
+     * 
+     * @param cmdStr
+     * @return the created (complete or incomplete) Command object
+     */
     Command parseCommand(String cmdStr) {
         return null;
     }

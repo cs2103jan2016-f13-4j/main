@@ -1,6 +1,5 @@
 package front_end;
 
-import java.util.List;
 import objects.*;
 
 
@@ -19,9 +18,22 @@ import objects.*;
  *
  */
 public abstract class TranslationEngineSpec {
-    void display(List<Task> taskList) {
+    
+    /**
+     * decides what to to with an execution result sent by the Dispatcher
+     * instructs the UI to carry out that decision
+     * 
+     * @param exeResult
+     */
+    void display(ExecutionResult exeResult) {
     }
     
+    /**
+     * 1) instructs the UI to get a user command string (blocking if necessary)
+     * 2) sends the user command string to the Command Parser, getting back a Command object
+     * 
+     * @return the Command object
+     */
     Command getCommand() {
         return null;
     }

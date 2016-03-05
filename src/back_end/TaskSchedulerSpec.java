@@ -19,7 +19,13 @@ import objects.*;
  *
  */
 public abstract class TaskSchedulerSpec {
-    public LocalDateTime findSlot(List<Task> existingTasks, long duration) {
+    
+    /**
+     * @param existingTasks
+     * @param durationOfNewTask
+     * @return a date/time to slot in the new task
+     */
+    public LocalDateTime findSlotForNewTask(List<Task> existingTasks, long durationOfNewTask) {
         return null;
     }
 }
