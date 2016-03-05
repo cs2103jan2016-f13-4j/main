@@ -1,6 +1,6 @@
 package objects;
 
-import front_end.ui.base.UserInterface;
+import front_end.ui.core.UserInterface;
 
 import java.util.ArrayList;
 import java.util.List;

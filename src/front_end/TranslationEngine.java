@@ -1,11 +1,12 @@
 package front_end;
 
-import front_end.ui.MessageDisplayUI;
-import front_end.ui.base.UserInterface;
+import front_end.ui.base.CommandPromptUI;
+import front_end.ui.base.MessageDisplayUI;
+import front_end.ui.core.UserInterface;
 import objects.Command;
 import objects.ExecutionResult;
 import front_end.ui.base.VisualIdTranslator;
-import front_end.ui.base.VisualIndexUI;
+import front_end.ui.core.VisualIndexUI;
 
 import java.lang.reflect.Constructor;
 import java.util.List;
@@ -61,7 +62,7 @@ public class TranslationEngine {
         return ui;
     }
 
-    public Command display(ExecutionResult result) {
+    public Command displayAndParseCommand(ExecutionResult result) {
         this.displayResultMessages(result);
         this.initializeUI(result);
         this.currentUI_.render();
@@ -75,12 +76,12 @@ public class TranslationEngine {
     }
 
     private void displayResultMessages(ExecutionResult result) {
-        // If there are no messages to display, just skip
+        // If there are no messages to displayAndParseCommand, just skip
         if (!result.hasMessage()) {
             return;
         }
 
-        // Create message display UI and attach messages to it
+        // Create message displayAndParseCommand UI and attach messages to it
         MessageDisplayUI messageUI = new MessageDisplayUI(result.getMessages());
         messageUI.render();
     }
@@ -112,6 +113,11 @@ public class TranslationEngine {
 
     private Command waitAndParseInput() {
         assert(this.skipInput_ == false);
+
+        // Display command prompt UI
+        CommandPromptUI commandPromptUI = new CommandPromptUI();
+        commandPromptUI.render();
+
         String rawCommandString = this.inputReader_.nextLine();
         Command command = this.commandParser_.parseCommand(rawCommandString);
         return command;

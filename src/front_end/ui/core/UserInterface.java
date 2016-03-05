@@ -1,4 +1,4 @@
-package front_end.ui.base;
+package front_end.ui.core;
 
 import java.io.PrintStream;
 

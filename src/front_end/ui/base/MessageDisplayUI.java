@@ -1,6 +1,6 @@
-package front_end.ui;
+package front_end.ui.base;
 
-import front_end.ui.base.UserInterface;
+import front_end.ui.core.UserInterface;
 import objects.Message;
 
 import java.util.List;
@@ -65,7 +65,7 @@ public class MessageDisplayUI extends UserInterface<List<Message>> {
     }
 
     private String formatMessageFlag(String flag, String color) {
-        return colorString(formatMessageFlag(flag), color);
+        return formatMessageFlag(colorString(flag, color));
 
     }
 

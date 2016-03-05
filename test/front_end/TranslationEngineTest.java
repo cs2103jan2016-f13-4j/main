@@ -42,21 +42,21 @@ public class TranslationEngineTest {
 
     @Test
     public void Translation_engine_has_currentView_upon_display() {
-        this.engine_.display(taskListExecutionResult_);
+        this.engine_.displayAndParseCommand(taskListExecutionResult_);
         assertThat(this.engine_.getCurrentExecutionResult(), is(taskListExecutionResult_));
     }
 
     @Test
     public void Translation_engine_does_not_have_idTranslationMap_if_data_is_not_task_list() {
         ExecutionResult<Task> singleTaskExecutionResult = new ExecutionResult<>(DisplayOneTaskUI.class, new Task("Task 1"));
-        this.engine_.display(singleTaskExecutionResult);
+        this.engine_.displayAndParseCommand(singleTaskExecutionResult);
 
         assertThat(this.engine_.getCurrentIdTranslator(), is(nullValue()));
     }
 
     @Test
     public void Translation_engine_has_idTranslationMap_if_data_is_task_list() {
-        this.engine_.display(taskListExecutionResult_);
+        this.engine_.displayAndParseCommand(taskListExecutionResult_);
         assertThat(this.engine_.getCurrentIdTranslator(), is(not(nullValue())));
     }
 

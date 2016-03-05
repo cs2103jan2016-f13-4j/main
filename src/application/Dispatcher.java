@@ -26,7 +26,7 @@ public class Dispatcher {
 
         while (!isTerminateCommand(nextCommand)) {
             ExecutionResult result = this.decisionEngine_.performCommand(nextCommand);
-            nextCommand = this.translationEngine_.display(result);
+            nextCommand = this.translationEngine_.displayAndParseCommand(result);
         }
     }
 
