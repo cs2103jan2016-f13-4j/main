@@ -12,7 +12,7 @@ package front_end;
  * to him (possibly a big scary globally-unique hexadecimal number that goes around town frightening little kids).
  * 
  * The job of the Task Index Mapper is to maintain state of the current mapping between the two index systems.
- * This mapping may change at every Dispatcher heartbeat, but IS ALWAYS BIJECTIVE AT A GIVEN INSTANCE.
+ * This mapping may change at every Dispatcher heartbeat, but is always a bijection.
  * 
  * Rank: Staff Sergeant (reports to CPT Translation Engine)
  * 
