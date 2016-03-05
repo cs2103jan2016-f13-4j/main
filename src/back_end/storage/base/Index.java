@@ -13,4 +13,26 @@ public class Index extends PrimaryKey {
         return new Index((Long) this.getValue() + 1);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) return false;
+        if (this == o) return true;
+
+        if (o instanceof Index) {
+            Index id = (Index) o;
+            return this.getValue().equals(id.getValue());
+        } else if (o instanceof Long) {
+            Long longId = (Long) o;
+            return this.getValue().equals(longId);
+        } else if (o instanceof Integer) {
+            Long longId = new Long((Integer) o);
+            return this.getValue().equals(longId);
+        }
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return this.getValue().toString();
+    }
 }

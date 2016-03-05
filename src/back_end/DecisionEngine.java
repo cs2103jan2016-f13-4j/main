@@ -1,18 +1,24 @@
 package back_end;
 
+import back_end.storage.Storage;
+import back_end.storage.relations.Task;
+import objects.ExecutionResult;
 import objects.Command;
-import objects.Result;
 
 /**
  * Created by maianhvu on 5/3/16.
  */
 public class DecisionEngine {
 
-    public DecisionEngine() {
+    protected Storage dataStorage_;
 
+    public DecisionEngine() {
+        this.dataStorage_ = new Storage();
+
+        this.dataStorage_.initializeStorageFor(Task.class);
     }
 
-    public Result performCommand(Command command) {
+    public ExecutionResult performCommand(Command command) {
         return null; // TODO: stub
     }
 }
