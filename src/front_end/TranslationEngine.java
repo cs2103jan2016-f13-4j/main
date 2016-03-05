@@ -2,25 +2,40 @@ package front_end;
 
 import front_end.ui.MessageDisplayUI;
 import front_end.ui.base.UserInterface;
+import objects.Command;
 import objects.ExecutionResult;
 import front_end.ui.base.VisualIdTranslator;
 import front_end.ui.base.VisualIndexUI;
 
 import java.lang.reflect.Constructor;
 import java.util.List;
+import java.util.Scanner;
 
 /**
  * Created by maianhvu on 5/3/16.
  */
 public class TranslationEngine {
 
+    private boolean skipInput_;
+    private Scanner inputReader_;
     private CommandParser commandParser_;
+
     private ExecutionResult currentExecutionResult_;
     private UserInterface currentUI_;
     private VisualIdTranslator currentIdTranslator_;
 
-    public TranslationEngine() {
+    public TranslationEngine(boolean skipInput) {
         this.commandParser_ = new CommandParser();
+
+        // Initialize input reader to read from System.in
+        this.skipInput_ = skipInput;
+        if (!skipInput) {
+           this.inputReader_ = new Scanner(System.in) ;
+        }
+    }
+
+    public TranslationEngine() {
+        this(true);
     }
 
     private static <T> UserInterface<T> constructUserInterface(ExecutionResult executionResult) {
@@ -46,10 +61,17 @@ public class TranslationEngine {
         return ui;
     }
 
-    public void display(ExecutionResult result) {
+    public Command display(ExecutionResult result) {
         this.displayResultMessages(result);
         this.initializeUI(result);
         this.currentUI_.render();
+
+        // Debug/testing mode, skip input
+        if (this.skipInput_) {
+            return null;
+        }
+
+        return this.waitAndParseInput();
     }
 
     private void displayResultMessages(ExecutionResult result) {
@@ -86,6 +108,13 @@ public class TranslationEngine {
             // Assign the visual tuple to executionResult
             ((VisualIndexUI) currentUI_).setVisualTupleList(this.currentIdTranslator_.getVisualTupleList());
         }
+    }
+
+    private Command waitAndParseInput() {
+        assert(this.skipInput_ == false);
+        String rawCommandString = this.inputReader_.nextLine();
+        Command command = this.commandParser_.parseCommand(rawCommandString);
+        return command;
     }
 
     /**

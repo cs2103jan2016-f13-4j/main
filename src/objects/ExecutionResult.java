@@ -2,6 +2,7 @@ package objects;
 
 import front_end.ui.base.UserInterface;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,12 +19,29 @@ public class ExecutionResult<T> {
         this.data_ = data;
     }
 
+    public static ExecutionResult nullResult() {
+        return new ExecutionResult(null, null);
+    }
+
     public boolean hasMessage() {
         return this.messages_ != null && !this.messages_.isEmpty();
     }
 
     public List<Message> getMessages() {
         return this.messages_;
+    }
+
+    public void setMessages(List<Message> messages) {
+        this.messages_ = messages;
+    }
+
+    public void addMessage(Message message) {
+        // Initialize messages array if there isn't any
+        if (this.messages_ == null) {
+           this.messages_ = new ArrayList<>();
+        }
+
+        this.messages_.add(message);
     }
 
     public Class<? extends UserInterface<T>> getUiClass() {
