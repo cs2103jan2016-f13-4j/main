@@ -19,7 +19,7 @@ package front_end;
  * created by thenaesh on Mar 6, 2016
  *
  */
-public abstract class TaskIndexMapper {
+public abstract class TaskIndexMapperSpec {
     public long translateRawToVisual(long rawID){
         return -1;
     }
