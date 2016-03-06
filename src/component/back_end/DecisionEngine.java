@@ -4,7 +4,7 @@ import component.back_end.storage.*;
 import entity.*;
 
 
-public class DecisionEngine implements DecisionEngineSpec { 
+public class DecisionEngine extends DecisionEngineSpec { 
     protected DataStore dataStore_;
     
     public DecisionEngine() {
@@ -42,6 +42,18 @@ public class DecisionEngine implements DecisionEngineSpec {
         }
         return null;
         
+    }
+
+    @Override
+    protected TaskSchedulerSpec getTaskScheduler() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    protected DataStoreSpec getDataStore() {
+        // TODO Auto-generated method stub
+        return null;
     }
     
 }

@@ -1,7 +1,7 @@
 package component.front_end;
 
-import entity.Command;
-import entity.ExecutionResult;
+import component.front_end.ui.UserInterfaceSpec;
+import entity.*;
 
 
 /**
@@ -18,7 +18,9 @@ import entity.ExecutionResult;
  * created by thenaesh on Mar 6, 2016
  *
  */
-public interface TranslationEngineSpec {
+public abstract class TranslationEngineSpec {
+    protected abstract CommandParserSpec getCommandParser();
+    protected abstract UserInterfaceSpec getUserInterface();
     
     /**
      * decides what to to with an execution result sent by the Dispatcher
@@ -26,7 +28,7 @@ public interface TranslationEngineSpec {
      * 
      * @param exeResult
      */
-    void display(ExecutionResult exeResult);
+    public abstract void display(ExecutionResult exeResult);
     
     /**
      * 1) instructs the UI to get a user command string (blocking if necessary)
@@ -34,5 +36,5 @@ public interface TranslationEngineSpec {
      * 
      * @return the Command object
      */
-    Command getCommand();
+    public abstract Command getCommand();
 }

@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 /**
  * Created by maianhvu on 6/3/16.
  */
-public class CommandParser implements CommandParserSpec {
+public class CommandParser extends CommandParserSpec {
 
     private static final Pattern PATTERN_COMMAND_PARSER = Pattern.compile(
             "(\\w+)(?::(\"[^\"]+\"|[^\"\\s]+))?\\s?"

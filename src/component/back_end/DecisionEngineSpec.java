@@ -1,7 +1,7 @@
 package component.back_end;
 
-import entity.Command;
-import entity.ExecutionResult;
+import entity.*;
+import component.back_end.storage.DataStoreSpec;
 
 
 /**
@@ -18,12 +18,14 @@ import entity.ExecutionResult;
  * created by thenaesh on Mar 5, 2016
  *
  */
-public interface DecisionEngineSpec {
+public abstract class DecisionEngineSpec {
+    protected abstract TaskSchedulerSpec getTaskScheduler();
+    protected abstract DataStoreSpec getDataStore();
     
     /**
      * inspects the given command, decides what to do with it
      * @param cmd
      * @return the result of the command execution, an object containing instructions for the front end
      */
-    ExecutionResult<?> performCommand(Command cmd);
+    public abstract ExecutionResult<?> performCommand(Command cmd);
 }
