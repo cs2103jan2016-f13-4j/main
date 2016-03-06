@@ -26,6 +26,10 @@ abstract class View<T> implements ViewSpec {
         this.contentBuilder_.append(string);
         this.contentBuilder_.append(STRING_NEW_LINE);
     }
+    
+    protected void addText(String string){
+        this.contentBuilder_.append(string);
+    }
 
     @Override
     public String getContent() {

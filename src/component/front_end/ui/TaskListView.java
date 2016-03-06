@@ -1,5 +1,6 @@
 package component.front_end.ui;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import entity.Task;
@@ -8,8 +9,7 @@ import entity.Task;
  * @author Tio
  *
  */
-public class TaskListView extends View<List<Task>>{
-    
+public class TaskListView extends View<List<Task>> {
     private List<Task> viewData_;
     
     public TaskListView(List<Task> list){
@@ -24,8 +24,9 @@ public class TaskListView extends View<List<Task>>{
         }
     }
     
-//    private String constructTimeString(Task t){
-//        String time = super.STRING_EMPTY;
-//        return time;
-//    }
+    private String constructTimeString(Task current){
+        LocalDateTime Start = current.getStartingTime();
+        LocalDateTime End = current.getEndingTime(); 
+        return "";
+    }
 }
