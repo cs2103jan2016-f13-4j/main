@@ -1,6 +1,7 @@
 package component.back_end;
 
-import entity.*;
+import entity.Command;
+import entity.ExecutionResult;
 
 
 /**
@@ -17,12 +18,12 @@ import entity.*;
  * created by thenaesh on Mar 5, 2016
  *
  */
-public abstract class DecisionEngineSpec {
+public interface DecisionEngineSpec {
     
     /**
      * inspects the given command, decides what to do with it
      * @param cmd
      * @return the result of the command execution, an object containing instructions for the front end
      */
-    public abstract ExecutionResult performCommand(Command cmd);
+    ExecutionResult performCommand(Command cmd);
 }

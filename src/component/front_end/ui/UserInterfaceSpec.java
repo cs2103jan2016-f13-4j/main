@@ -1,34 +1,30 @@
 package component.front_end.ui;
 
-import entity.*;
+import entity.View;
 
 
 /**
- * The User Interface has two jobs:
- *      1) render a view ({@link View})
- *      2) get a user command string
- * 
- * The building of the view is the job of the Translation Engine; this class should not care about it.
- * 
+ * The User Interface renders a ({@link View}) and then prompts for user input
+ *
  * Rank: Staff Sergeant (reports to CPT Translation Engine)
  * 
  * created by thenaesh on Mar 6, 2016
- *
  */
-public abstract class UserInterfaceSpec {
+public interface UserInterfaceSpec {
     
     /**
-     * renders the supplied view
+     * Renders the content from the view
      * 
      * @param viewToRender
      */
-    public abstract void render(View viewToRender);
-    
+     void render(View viewToRender);
+
     /**
-     * gets an input string directly from the user
-     * Note that this method does not do any parsing; that is the job of the Command Parser
-     * 
-     * @return user input string
+     * First, renders a CommandPromptView
+     *
+     * Then, uses internal scanner
+     * to get the nextLine() from user input
+     * @return the string read from
      */
-    public abstract String getUserInputString();
+    String queryInput();
 }
