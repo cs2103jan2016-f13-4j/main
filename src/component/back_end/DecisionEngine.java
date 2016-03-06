@@ -7,19 +7,16 @@ import entity.command.Command;
 public class DecisionEngine implements DecisionEngineSpec {
 
     @Override
-    public ExecutionResult<?> performCommand(Command cmd) {
+    public ExecutionResult<?> performCommand(Command command) {
         
-        switch (cmd.getType()) {
+        switch (command.getInstruction().getType()) {
             case ADD:
                 // TODO
                 break;
             case EDIT:
                 // TODO
                 break;
-            case DISPLAY_ALL:
-                // TODO
-                break;
-            case DISPLAY_ONE:
+            case DISPLAY:
                 // TODO
                 break;
             case DELETE:

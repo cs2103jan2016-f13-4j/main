@@ -21,6 +21,14 @@ public class ParameterList {
         this.parameterMap_.put(parameterName, parameterValue);
     }
 
+    public boolean hasParameterNamed(String parameterName) {
+        return this.parameterMap_.containsKey(parameterName);
+    }
+
+    public boolean hasValueForParameter(String parameterName) {
+        return this.parameterMap_.get(parameterName) != null;
+    }
+
     public String getParameter(String parameterName) {
         return this.parameterMap_.get(parameterName);
     }
@@ -55,6 +63,10 @@ public class ParameterList {
 
     public LocalDateTime getDateParameter(String parameterName) {
         return null; // TODO: un-implemented method stub
+    }
+
+    public boolean isEmpty() {
+        return this.parameterMap_.isEmpty();
     }
 
 }
