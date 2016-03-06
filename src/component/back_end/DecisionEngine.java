@@ -1,8 +1,6 @@
 package component.back_end;
 
-import entity.Command;
-import entity.Command.Type;
-import entity.ExecutionResult;
+import entity.*;
 
 
 public class DecisionEngine implements DecisionEngineSpec {
@@ -38,6 +36,15 @@ public class DecisionEngine implements DecisionEngineSpec {
         }
         return null;
         
+    }
+    
+    public void addTask(Task task) {
+    }
+    
+    public void editTask(Task task) {
+    }
+    
+    public void displayTasks(){
     }
 
 }
