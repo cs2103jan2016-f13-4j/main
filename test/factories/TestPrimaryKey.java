@@ -1,12 +1,11 @@
 package factories;
 
-import component.back_end.storage.PrimaryKeySpec;
-import junit.framework.Test;
+import component.back_end.storage.PrimaryKeyInterface;
 
 /**
  * Created by maianhvu on 6/3/16.
  */
-public class TestPrimaryKey implements PrimaryKeySpec<String> {
+public class TestPrimaryKey implements PrimaryKeyInterface<String> {
 
     private String name_;
 
@@ -25,7 +24,7 @@ public class TestPrimaryKey implements PrimaryKeySpec<String> {
     }
 
     @Override
-    public int compareTo(PrimaryKeySpec<String> o) {
+    public int compareTo(PrimaryKeyInterface<String> o) {
         return this.getValue().compareTo(o.getValue());
     }
 

@@ -3,7 +3,7 @@ package entity;
 import java.time.LocalDateTime;
 
 import component.back_end.storage.PrimaryKey;
-import component.back_end.storage.PrimaryKeySpec;
+import component.back_end.storage.PrimaryKeyInterface;
 import component.back_end.storage.Relation;
 import component.back_end.storage.TaskPrimaryKey;
 
@@ -33,7 +33,7 @@ public class Task extends Relation {
     }
     
     @Override
-    public PrimaryKeySpec<?> getPrimaryKey() {
+    public PrimaryKeyInterface<?> getPrimaryKey() {
         return this.pKey_;
     }
     

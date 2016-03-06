@@ -19,12 +19,12 @@ import java.util.List;
  * created by thenaesh on Mar 5, 2016
  *
  */
-public interface TaskSchedulerSpec {
+public abstract class TaskSchedulerSpec {
     
     /**
      * @param existingTasks
      * @param durationOfNewTask
      * @return a date/time to slot in the new task
      */
-    LocalDateTime findSlotForNewTask(List<Task> existingTasks, long durationOfNewTask);
+    public abstract LocalDateTime findSlotForNewTask(List<Task> existingTasks, long durationOfNewTask);
 }

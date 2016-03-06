@@ -13,9 +13,9 @@ import component.front_end.TranslationEngineSpec;
  * created by thenaesh on 5/3/16
  *
  */
-public interface DispatcherSpec {
-    DecisionEngineSpec getDecisionEngine();
-    TranslationEngineSpec getTranslationEngine();
+public abstract class DispatcherSpec {
+    protected abstract DecisionEngineSpec getDecisionEngine();
+    protected abstract TranslationEngineSpec getTranslationEngine();
 
     /*
      * 1) pulls a command in from the front-end
@@ -23,5 +23,5 @@ public interface DispatcherSpec {
      * 3) receives the resulting task list and other instructions from the back-end
      * 4) pushes the instructions to the front end
      */
-    void pulse();
+    public abstract void pulse();
 }

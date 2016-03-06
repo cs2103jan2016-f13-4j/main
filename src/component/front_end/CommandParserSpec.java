@@ -1,6 +1,6 @@
 package component.front_end;
 
-import entity.Command;
+import entity.command.Command;
 
 
 /**
@@ -11,7 +11,7 @@ import entity.Command;
  * created by thenaesh on Mar 6, 2016
  *
  */
-public interface CommandParserSpec {
+public abstract class CommandParserSpec {
     
     /**
      * parses a given string into a Command object
@@ -21,5 +21,5 @@ public interface CommandParserSpec {
      * @param cmdStr
      * @return the created (complete or incomplete) Command object
      */
-    Command parseCommand(String cmdStr);
+    public abstract Command parseCommand(String cmdStr);
 }

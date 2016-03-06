@@ -14,7 +14,7 @@ import java.util.function.Function;
  * created by thenaesh on Mar 5, 2016
  *
  */
-public interface DataStoreSpec {
+public abstract class DataStoreSpec {
     
     /**
      * Adds a tuple into the data store
@@ -25,14 +25,14 @@ public interface DataStoreSpec {
      *
      * @param tuple The tuple to be added
      */
-    void add(RelationSpec tuple);
+    public abstract void add(RelationInterface tuple);
 
     /**
      * Removes a tuple from the data store
      * @param tuple
      * @return
      */
-    RelationSpec remove(RelationSpec tuple);
+    public abstract RelationInterface remove(RelationInterface tuple);
 
     /**
      * Removes a tuple knowing its relation class and its primary key
@@ -40,16 +40,16 @@ public interface DataStoreSpec {
      * @param primaryKey a primary key object
      * @return
      */
-    RelationSpec remove(Class<? extends RelationSpec> relationClass, PrimaryKeySpec primaryKey);
-    
+    public abstract RelationInterface remove(Class<? extends RelationInterface> relationClass, PrimaryKeyInterface primaryKey);
+
     /**
      * Get a list of tasks that match the task descriptor specified (see {@link RelationDescriptor})
      * @param relationClass the Class of the relation
      * @param descriptor the task descriptor
      * @return
      */
-    List<RelationSpec> getAll(Class<? extends RelationSpec> relationClass, RelationDescriptor descriptor);
-    
+    public abstract List<RelationInterface> getAll(Class<? extends RelationInterface> relationClass, RelationDescriptor descriptor);
+
     /**
      * Get a list of tasks that match the task descriptor specified (see {@link RelationDescriptor})
      * and then applies the modifier function to the list before returning it
@@ -60,5 +60,5 @@ public interface DataStoreSpec {
      * @param modifierFunction
      * @return
      */
-    List<RelationSpec> map(RelationDescriptor descriptor, Function<List<RelationSpec>, Void> modifierFunction);
+    public abstract List<RelationInterface> map(RelationDescriptor descriptor, Function<List<RelationInterface>, Void> modifierFunction);
 }
