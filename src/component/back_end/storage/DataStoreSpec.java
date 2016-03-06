@@ -23,17 +23,14 @@ public abstract class DataStoreSpec {
      * before adding it. This will be checked by assertions.
      * @param task
      */
-    public void addTask(Task task) {
-    }
+    public abstract void addTask(Task task);
     
     /**
      * Get a list of tasks that match the task descriptor specified (see {@link TaskDescriptor})
      * @param descriptor
      * @return
      */
-    public List<Task> getTasks(TaskDescriptor descriptor) {
-        return null;
-    }
+    public abstract List<Task> getTasks(TaskDescriptor descriptor);
     
     /**
      * Get a list of tasks that match the task descriptor specified (see {@link TaskDescriptor})
@@ -45,7 +42,5 @@ public abstract class DataStoreSpec {
      * @param modifierFunction
      * @return
      */
-    public List<Task> getTasks(TaskDescriptor descriptor, Function<List<Task>, Void> modifierFunction) {
-        return null;
-    }
+    public abstract List<Task> getTasks(TaskDescriptor descriptor, Function<List<Task>, Void> modifierFunction);
 }

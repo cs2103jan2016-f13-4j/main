@@ -25,8 +25,7 @@ public abstract class TranslationEngineSpec {
      * 
      * @param exeResult
      */
-    void display(ExecutionResult exeResult) {
-    }
+    public abstract void display(ExecutionResult exeResult);
     
     /**
      * 1) instructs the UI to get a user command string (blocking if necessary)
@@ -34,7 +33,5 @@ public abstract class TranslationEngineSpec {
      * 
      * @return the Command object
      */
-    Command getCommand() {
-        return null;
-    }
+    public abstract Command getCommand();
 }

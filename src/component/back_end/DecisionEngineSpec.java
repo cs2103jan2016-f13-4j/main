@@ -24,7 +24,5 @@ public abstract class DecisionEngineSpec {
      * @param cmd
      * @return the result of the command execution, an object containing instructions for the front end
      */
-    public ExecutionResult performCommand(Command cmd) {
-        return null;
-    }
+    public abstract ExecutionResult performCommand(Command cmd);
 }

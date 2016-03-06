@@ -22,8 +22,7 @@ public abstract class UserInterfaceSpec {
      * 
      * @param viewToRender
      */
-    public void render(View viewToRender){
-    }
+    public abstract void render(View viewToRender);
     
     /**
      * gets an input string directly from the user
@@ -31,7 +30,5 @@ public abstract class UserInterfaceSpec {
      * 
      * @return user input string
      */
-    public String getUserInputString() {
-        return null;
-    }
+    public abstract String getUserInputString();
 }

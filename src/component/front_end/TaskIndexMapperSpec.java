@@ -22,10 +22,6 @@ import entity.*;
  *
  */
 public abstract class TaskIndexMapperSpec {
-    public Index translateRawToVisual(Index rawID){
-        return null;
-    }
-    public Index translateVisualToRaw(Index visualID) {
-        return null;
-    }
+    public abstract Index translateRawToVisual(Index rawID);
+    public abstract Index translateVisualToRaw(Index visualID);
 }

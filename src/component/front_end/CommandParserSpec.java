@@ -21,7 +21,5 @@ public abstract class CommandParserSpec {
      * @param cmdStr
      * @return the created (complete or incomplete) Command object
      */
-    Command parseCommand(String cmdStr) {
-        return null;
-    }
+    public abstract Command parseCommand(String cmdStr);
 }

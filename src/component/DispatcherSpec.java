@@ -23,6 +23,5 @@ public abstract class DispatcherSpec {
      * 3) receives the resulting task list and other instructions from the back-end
      * 4) pushes the instructions to the front end
      */
-    public void pulse() {
-    }
+    public abstract void pulse();
 }

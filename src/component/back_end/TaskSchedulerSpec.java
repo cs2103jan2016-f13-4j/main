@@ -26,7 +26,5 @@ public abstract class TaskSchedulerSpec {
      * @param durationOfNewTask
      * @return a date/time to slot in the new task
      */
-    public LocalDateTime findSlotForNewTask(List<Task> existingTasks, long durationOfNewTask) {
-        return null;
-    }
+    public abstract LocalDateTime findSlotForNewTask(List<Task> existingTasks, long durationOfNewTask);
 }
