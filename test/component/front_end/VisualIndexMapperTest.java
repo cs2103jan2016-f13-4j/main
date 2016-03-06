@@ -2,6 +2,7 @@ package component.front_end;
 
 import component.back_end.storage.PrimaryKeyInterface;
 import component.back_end.storage.RelationInterface;
+import component.front_end.ui.core.VisualTuple;
 import factories.TestPrimaryKey;
 import factories.TestRelation;
 import org.junit.Before;
@@ -45,6 +46,14 @@ public class VisualIndexMapperTest {
         for (int i = 1; i <= 3; i++) {
             PrimaryKeyInterface<String> relationKey = (TestPrimaryKey) this.mapper_.translateVisualToRaw(i);
             assertThat(relationKey.getValue(), is(equalTo("relation " + (53 + i))));
+        }
+    }
+
+    @Test
+    public void Visual_index_mapper_gives_correct_visual_id() {
+        List<VisualTuple<? extends RelationInterface>> visualTuples = this.mapper_.getVisualTupleList();
+        for (int i = 1, j = 0; i <= 3; i++, j++) {
+            assertThat(visualTuples.get(j).getIndex(), is(i));
         }
     }
 }

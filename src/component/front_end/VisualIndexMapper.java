@@ -26,6 +26,7 @@ public class VisualIndexMapper extends VisualIndexMapperSpec {
     public VisualIndexMapper(List<RelationInterface> tupleList) {
         this.forwardMap_ = new ArrayList<>();
         this.backwardMap_ = new HashMap<>();
+        this.visualTupleList_ = new ArrayList<>();
 
         // Populate keys
         for (RelationInterface tuple : tupleList)  {
