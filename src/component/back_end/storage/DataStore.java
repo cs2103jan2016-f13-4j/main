@@ -32,7 +32,7 @@ public class DataStore implements DataStoreSpec {
     }
 
     @Override
-    public List<RelationSpec> getAll(Class<? extends RelationSpec> relationClass) {
+    public List<RelationSpec> getAll(Class<? extends RelationSpec> relationClass, RelationDescriptor descriptor) {
         return null;
     }
 

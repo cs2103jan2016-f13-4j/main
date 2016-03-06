@@ -21,6 +21,10 @@ public class TestRelation implements RelationSpec {
         return this.primaryKey_;
     }
 
+    public <T> void setPrimaryKey(PrimaryKeySpec<T> newPrimaryKey) {
+        this.primaryKey_ = (PrimaryKeySpec<String>) newPrimaryKey;
+    }
+
     @Override
     public void updatePrimaryKey() {
         this.primaryKey_ = new TestPrimaryKey(this.name_);
