@@ -45,9 +45,10 @@ public interface DataStoreSpec {
     /**
      * Get a list of tasks that match the task descriptor specified (see {@link RelationDescriptor})
      * @param relationClass the Class of the relation
+     * @param descriptor the task descriptor
      * @return
      */
-    List<RelationSpec> getAll(Class<? extends RelationSpec> relationClass);
+    List<RelationSpec> getAll(Class<? extends RelationSpec> relationClass, RelationDescriptor descriptor);
     
     /**
      * Get a list of tasks that match the task descriptor specified (see {@link RelationDescriptor})
