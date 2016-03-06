@@ -1,7 +1,7 @@
-package application;
+package component;
 
-import back_end.*;
-import front_end.*;
+import component.back_end.*;
+import component.front_end.*;
 
 
 /**

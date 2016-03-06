@@ -1,9 +1,9 @@
-package back_end;
+package component.back_end;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-import communication_objects.*;
+import entity.*;
 
 
 /**

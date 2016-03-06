@@ -1,4 +1,4 @@
-package communication_objects;
+package entity;
 
 
 /**

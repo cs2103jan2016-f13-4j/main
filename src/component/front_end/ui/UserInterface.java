@@ -1,6 +1,6 @@
-package front_end.ui;
+package component.front_end.ui;
 
-import communication_objects.*;
+import entity.*;
 
 
 /**

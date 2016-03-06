@@ -1,6 +1,6 @@
-package back_end;
+package component.back_end;
 
-import communication_objects.*;
+import entity.*;
 
 
 /**

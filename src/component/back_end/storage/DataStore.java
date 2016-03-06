@@ -1,9 +1,9 @@
-package back_end.storage;
+package component.back_end.storage;
 
 import java.util.List;
 import java.util.function.*;
 
-import communication_objects.*;
+import entity.*;
 
 /**
  * The Data Store is the gatekeeper for the actual task data stored on disk.
