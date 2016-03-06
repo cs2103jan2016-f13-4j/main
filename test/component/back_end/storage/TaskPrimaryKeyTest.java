@@ -26,24 +26,24 @@ public class TaskPrimaryKeyTest {
     
     @Test
     public void Identical_task_primary_keys_are_equal() {
-        TaskPrimaryKey pKey1 = new TaskPrimaryKey(this.taskName_, this.startDate_);
-        TaskPrimaryKey pKey2 = new TaskPrimaryKey(this.taskName_, this.startDate_);
+        TaskNameAndStartTime pKey1 = new TaskNameAndStartTime(this.taskName_, this.startDate_);
+        TaskNameAndStartTime pKey2 = new TaskNameAndStartTime(this.taskName_, this.startDate_);
         assertEquals(0, pKey1.compareTo(pKey2));
     }
 
     @Test
     public void Tasks_with_different_names_are_not_equal() {
         String name = "different";
-        TaskPrimaryKey pKey3 = new TaskPrimaryKey(this.taskName_, this.startDate_);
-        TaskPrimaryKey pKey4 = new TaskPrimaryKey(name, this.startDate_);
+        TaskNameAndStartTime pKey3 = new TaskNameAndStartTime(this.taskName_, this.startDate_);
+        TaskNameAndStartTime pKey4 = new TaskNameAndStartTime(name, this.startDate_);
         assertNotEquals(0, pKey3.compareTo(pKey4));
     }
     
     @Test
     public void Tasks_with_different_start_times_are_not_equal() {
         LocalDateTime start = LocalDateTime.of(2016, 3, 6, 14, 0);
-        TaskPrimaryKey pKey5 = new TaskPrimaryKey(this.taskName_, this.startDate_);
-        TaskPrimaryKey pKey6 = new TaskPrimaryKey(this.taskName_, start);
+        TaskNameAndStartTime pKey5 = new TaskNameAndStartTime(this.taskName_, this.startDate_);
+        TaskNameAndStartTime pKey6 = new TaskNameAndStartTime(this.taskName_, start);
         assertNotEquals(0, pKey5.compareTo(pKey6));
     }
 }

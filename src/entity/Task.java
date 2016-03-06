@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import component.back_end.storage.PrimaryKey;
 import component.back_end.storage.PrimaryKeySpec;
 import component.back_end.storage.Relation;
-import component.back_end.storage.TaskPrimaryKey;
+import component.back_end.storage.TaskNameAndStartTime;
 
 /**
  * 
@@ -19,7 +19,7 @@ public class Task extends Relation {
     private LocalDateTime timeBegin_; 
     private LocalDateTime timeEnd_;
     //private int priority_; 
-    private PrimaryKey<TaskPrimaryKey> pKey_;
+    private PrimaryKey<TaskNameAndStartTime> pKey_;
     
     // constructor
     public Task(String name, String detail,LocalDateTime start, LocalDateTime finish){
@@ -38,8 +38,8 @@ public class Task extends Relation {
     }
     
     public void updatePrimaryKey() {
-        TaskPrimaryKey key = new TaskPrimaryKey(this.taskName_, this.timeBegin_);
-        PrimaryKey<TaskPrimaryKey> primaryKey = new PrimaryKey<>(key);
+        TaskNameAndStartTime key = new TaskNameAndStartTime(this.taskName_, this.timeBegin_);
+        PrimaryKey<TaskNameAndStartTime> primaryKey = new PrimaryKey<>(key);
         this.pKey_ = primaryKey;
     }
 
