@@ -25,5 +25,5 @@ public interface DecisionEngineSpec {
      * @param cmd
      * @return the result of the command execution, an object containing instructions for the front end
      */
-    ExecutionResult performCommand(Command cmd);
+    ExecutionResult<?> performCommand(Command cmd);
 }

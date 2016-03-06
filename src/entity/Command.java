@@ -14,7 +14,7 @@ public class Command {
     /**
      * Types
      */
-    public enum Type {
+    public static enum Type {
         ADD,
         EDIT,
         DISPLAY_ALL,
