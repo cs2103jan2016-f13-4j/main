@@ -1,4 +1,4 @@
-package entity;
+package entity.command;
 
 /**
  * Created by maianhvu on 6/3/16.

@@ -1,6 +1,8 @@
 package component.front_end;
 
-import entity.Command;
+import entity.command.Command;
+import entity.command.Instruction;
+import entity.command.ParameterList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,10 +20,11 @@ public class CommandParser implements CommandParserSpec {
 
     @Override
     public Command parseCommand(String rawCommandString) {
-        return null;
-    }
+        // Prepare the instruction and the parameter list
+        Instruction instruction = null;
+        ParameterList paramList = new ParameterList();
 
-    List<String> splitCommand(String rawCommandString) {
+        // Start matching a giant string
         Matcher matcher = PATTERN_COMMAND_PARSER.matcher(rawCommandString.trim());
         ArrayList<String> commandWords = new ArrayList<>();
         while (matcher.find()) {

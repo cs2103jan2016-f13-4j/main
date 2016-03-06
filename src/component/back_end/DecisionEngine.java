@@ -1,6 +1,7 @@
 package component.back_end;
 
 import entity.*;
+import entity.command.Command;
 
 
 public class DecisionEngine implements DecisionEngineSpec {

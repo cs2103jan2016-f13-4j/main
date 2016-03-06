@@ -6,7 +6,7 @@ package component.back_end.storage;
  *
  */
 
-public class PrimaryKey<T extends Comparable<T>> implements PrimaryKeySpec<T> {
+public class PrimaryKey<T extends Comparable<T>> implements PrimaryKeyInterface<T> {
 
     private T value_;
     
@@ -15,7 +15,7 @@ public class PrimaryKey<T extends Comparable<T>> implements PrimaryKeySpec<T> {
     }
 
     @Override
-    public int compareTo(PrimaryKeySpec<T> o) {
+    public int compareTo(PrimaryKeyInterface<T> o) {
         return this.getValue().compareTo(o.getValue());
     }
 

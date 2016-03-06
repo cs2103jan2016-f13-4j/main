@@ -1,6 +1,6 @@
 package component.front_end;
 
-import entity.Command;
+import entity.command.Command;
 import entity.ExecutionResult;
 
 

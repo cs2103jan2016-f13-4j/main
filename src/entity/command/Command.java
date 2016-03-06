@@ -1,7 +1,4 @@
-package entity;
-
-import java.util.ArrayList;
-import java.util.List;
+package entity.command;
 
 /**
  * Created by maianhvu on 5/3/16.
