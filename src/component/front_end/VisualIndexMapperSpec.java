@@ -1,6 +1,6 @@
 package component.front_end;
 
-import entity.*;
+import entity.Index;
 
 
 /**
@@ -21,7 +21,7 @@ import entity.*;
  * created by thenaesh on Mar 6, 2016
  *
  */
-public abstract class TaskIndexMapperSpec {
-    public abstract Index translateRawToVisual(Index rawID);
-    public abstract Index translateVisualToRaw(Index visualID);
+public interface VisualIndexMapperSpec {
+    Integer translateRawToVisual(Index rawId);
+    Index translateVisualToRaw(Integer visualId);
 }

@@ -1,9 +1,9 @@
 package component.back_end;
 
+import entity.Task;
+
 import java.time.LocalDateTime;
 import java.util.List;
-
-import entity.*;
 
 
 /**
@@ -19,12 +19,12 @@ import entity.*;
  * created by thenaesh on Mar 5, 2016
  *
  */
-public abstract class TaskSchedulerSpec {
+public interface TaskSchedulerSpec {
     
     /**
      * @param existingTasks
      * @param durationOfNewTask
      * @return a date/time to slot in the new task
      */
-    public abstract LocalDateTime findSlotForNewTask(List<Task> existingTasks, long durationOfNewTask);
+    LocalDateTime findSlotForNewTask(List<Task> existingTasks, long durationOfNewTask);
 }
