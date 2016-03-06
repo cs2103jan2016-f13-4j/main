@@ -1,6 +1,7 @@
 package entity;
 
 
+import component.back_end.storage.PrimaryKeySpec;
 import component.front_end.VisualIndexMapperSpec;
 
 /**
@@ -10,7 +11,7 @@ import component.front_end.VisualIndexMapperSpec;
  * created by thenaesh on Mar 6, 2016
  *
  */
-public class Index implements Comparable<Index>{
+public class Index implements PrimaryKeySpec {
     private Long rawIndex_;
    
     /**
@@ -28,20 +29,22 @@ public class Index implements Comparable<Index>{
     }
 
     @Override
-    public int compareTo(Index o) {
-        Long rawIndexOther = o.rawIndex_;
-        
-        if (rawIndex_ < rawIndexOther) {
-            return -1;
-        } else if (rawIndex_ > rawIndexOther) {
-            return 1;
-        } else {
-            return 0;
-        }
+    public int hashCode() {
+        return this.rawIndex_.hashCode();
     }
 
     @Override
-    public int hashCode() {
-        return this.rawIndex_.hashCode();
+    public Comparable getValue() {
+        return null;
+    }
+
+    @Override
+    public void setValue(Comparable newKeyValue) {
+
+    }
+
+    @Override
+    public int compareTo(PrimaryKeySpec o) {
+        return 0;
     }
 }
