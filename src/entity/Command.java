@@ -1,5 +1,8 @@
 package entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by maianhvu on 5/3/16.
  */
@@ -8,35 +11,22 @@ public class Command {
     /**
      * Constants
      */
-    private static final Type TYPE_COMMAND_INITIAL = Type.DISPLAY_ALL;
-    private static final Object[] PARAMETERS_COMMAND_INITIAL = null;
-
-    /**
-     * Types
-     */
-    public static enum Type {
-        ADD,
-        EDIT,
-        DISPLAY_ALL,
-        DISPLAY_ONE,
-        DELETE,
-        EXIT,
-        UNRECOGNISED
-    }
+    private static final Instruction INSTRUCTION_COMMAND_INITIAL = new Instruction(Instruction.Type.DISPLAY);
+    private static final ParameterList PARAMETERS_COMMAND_INITIAL = null;
 
     /**
      * Properties
      */
-    private final Type type_;
-    private final Object[] parameters_;
+    private final Instruction instruction_;
+    private final ParameterList parameters_;
 
     /**
      * Constructs a command based on the supplied type and parameters
-     * @param type
+     * @param instruction
      * @param parameters
      */
-    public Command(Type type, Object[] parameters) {
-        this.type_ = type;
+    public Command(Instruction instruction, ParameterList parameters) {
+        this.instruction_ = instruction;
         this.parameters_ = parameters;
     }
 
@@ -45,14 +35,14 @@ public class Command {
      * @return the required initial command
      */
     public static Command getInitialCommand() {
-        return new Command(TYPE_COMMAND_INITIAL, PARAMETERS_COMMAND_INITIAL);
+        return new Command(INSTRUCTION_COMMAND_INITIAL, PARAMETERS_COMMAND_INITIAL);
     }
 
-    public Type getType() {
-        return this.type_;
+    public Instruction getInstruction() {
+        return this.instruction_;
     }
 
-    public Object[] getParameters() {
+    public ParameterList getParameters() {
         return this.parameters_;
     }
 }

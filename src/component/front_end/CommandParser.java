@@ -28,7 +28,8 @@ public class CommandParser implements CommandParserSpec {
             Matcher innerMatcher = PATTERN_COMMAND_PARSER.matcher(matcher.group());
 
             while (innerMatcher.find()) {
-                commandWords.add(innerMatcher.group());
+                commandWords.add(innerMatcher.group(1));
+                commandWords.add(innerMatcher.group(2));
             }
         }
         return commandWords;
