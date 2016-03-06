@@ -1,14 +1,14 @@
 package factories;
 
-import component.back_end.storage.PrimaryKeySpec;
-import component.back_end.storage.RelationSpec;
+import component.back_end.storage.PrimaryKeyInterface;
+import component.back_end.storage.RelationInterface;
 
 /**
  * Created by maianhvu on 6/3/16.
  */
-public class TestRelation implements RelationSpec {
+public class TestRelation implements RelationInterface {
 
-    private PrimaryKeySpec<String> primaryKey_;
+    private PrimaryKeyInterface<String> primaryKey_;
     private final String name_;
 
     public TestRelation(String name) {
@@ -17,12 +17,12 @@ public class TestRelation implements RelationSpec {
     }
 
     @Override
-    public PrimaryKeySpec<String> getPrimaryKey() {
+    public PrimaryKeyInterface<String> getPrimaryKey() {
         return this.primaryKey_;
     }
 
-    public <T> void setPrimaryKey(PrimaryKeySpec<T> newPrimaryKey) {
-        this.primaryKey_ = (PrimaryKeySpec<String>) newPrimaryKey;
+    public <T> void setPrimaryKey(PrimaryKeyInterface<T> newPrimaryKey) {
+        this.primaryKey_ = (PrimaryKeyInterface<String>) newPrimaryKey;
     }
 
     @Override

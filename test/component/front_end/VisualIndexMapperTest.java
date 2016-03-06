@@ -1,7 +1,7 @@
 package component.front_end;
 
-import component.back_end.storage.PrimaryKeySpec;
-import component.back_end.storage.RelationSpec;
+import component.back_end.storage.PrimaryKeyInterface;
+import component.back_end.storage.RelationInterface;
 import factories.TestPrimaryKey;
 import factories.TestRelation;
 import org.junit.Before;
@@ -19,7 +19,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
  */
 public class VisualIndexMapperTest {
 
-    private List<RelationSpec> relationList_;
+    private List<RelationInterface> relationList_;
     private VisualIndexMapper mapper_;
 
     @Before
@@ -35,7 +35,7 @@ public class VisualIndexMapperTest {
     @Test
     public void Visual_index_mapper_translates_from_raw_to_visual_correctly() {
         for (int i = 1; i <= 3; i++) {
-            PrimaryKeySpec<String> relationKey = new TestPrimaryKey("relation " + (53 + i));
+            PrimaryKeyInterface<String> relationKey = new TestPrimaryKey("relation " + (53 + i));
             assertThat(this.mapper_.translateRawToVisual(relationKey), is(i));
         }
     }
@@ -43,7 +43,7 @@ public class VisualIndexMapperTest {
     @Test
     public void Visual_index_mapper_translates_from_visual_to_raw_correctly() {
         for (int i = 1; i <= 3; i++) {
-            PrimaryKeySpec<String> relationKey = (TestPrimaryKey) this.mapper_.translateVisualToRaw(i);
+            PrimaryKeyInterface<String> relationKey = (TestPrimaryKey) this.mapper_.translateVisualToRaw(i);
             assertThat(relationKey.getValue(), is(equalTo("relation " + (53 + i))));
         }
     }

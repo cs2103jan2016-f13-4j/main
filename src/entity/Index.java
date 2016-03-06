@@ -1,6 +1,6 @@
 package entity;
 
-import component.back_end.storage.PrimaryKeySpec;
+import component.back_end.storage.PrimaryKeyInterface;
 import component.front_end.VisualIndexMapperSpec;
 
 /**
@@ -10,7 +10,7 @@ import component.front_end.VisualIndexMapperSpec;
  * created by thenaesh on Mar 6, 2016
  *
  */
-public class Index implements PrimaryKeySpec<Index> {
+public class Index implements PrimaryKeyInterface<Index> {
     private Long rawIndex_;
 
     @Override
@@ -24,7 +24,7 @@ public class Index implements PrimaryKeySpec<Index> {
     }
 
     @Override
-    public int compareTo(PrimaryKeySpec<Index> o) {
+    public int compareTo(PrimaryKeyInterface<Index> o) {
         return 0;
     }
 }

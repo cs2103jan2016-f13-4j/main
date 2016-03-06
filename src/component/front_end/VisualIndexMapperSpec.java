@@ -1,7 +1,6 @@
 package component.front_end;
 
-import component.back_end.storage.PrimaryKeySpec;
-import entity.Index;
+import component.back_end.storage.PrimaryKeyInterface;
 
 
 /**
@@ -23,6 +22,6 @@ import entity.Index;
  *
  */
 public interface VisualIndexMapperSpec {
-    int translateRawToVisual(PrimaryKeySpec<?> rawPrimaryKey);
-    PrimaryKeySpec<?> translateVisualToRaw(int visualId);
+    int translateRawToVisual(PrimaryKeyInterface<?> rawPrimaryKey);
+    PrimaryKeyInterface<?> translateVisualToRaw(int visualId);
 }

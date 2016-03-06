@@ -3,7 +3,7 @@ package component.back_end.storage;
 /**
  * Created by maianhvu on 6/3/16.
  */
-public interface PrimaryKeySpec<T> extends Comparable<PrimaryKeySpec<T>> {
+public interface PrimaryKeyInterface<T> extends Comparable<PrimaryKeyInterface<T>> {
     T getValue();
     void setValue(T newKeyValue);
 

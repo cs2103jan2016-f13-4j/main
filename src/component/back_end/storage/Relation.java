@@ -6,12 +6,12 @@ package component.back_end.storage;
  *
  */
 
-public abstract class Relation implements RelationSpec {
+public abstract class Relation implements RelationInterface {
     
     PrimaryKey pKey_;
 
     @Override
-    public abstract PrimaryKeySpec<?> getPrimaryKey();
+    public abstract PrimaryKeyInterface<?> getPrimaryKey();
     
     @Override
     public abstract void updatePrimaryKey();
