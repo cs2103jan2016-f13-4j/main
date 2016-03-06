@@ -5,7 +5,7 @@ package entity;
  */
 public class Command {
 
-    public enum Type {
+    public static enum Type {
         ADD,
         EDIT,
         DISPLAY_ALL,
