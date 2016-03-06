@@ -43,7 +43,7 @@ public class Task extends Relation {
         this.pKey_ = primaryKey;
     }
 
-    public String getName(){
+    public String getTask(){
         return this.taskName_;
     }
     
