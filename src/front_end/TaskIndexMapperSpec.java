@@ -1,5 +1,7 @@
 package front_end;
 
+import objects.*;
+
 
 /**
  * Tasks have two different indices:
@@ -20,10 +22,10 @@ package front_end;
  *
  */
 public abstract class TaskIndexMapperSpec {
-    public long translateRawToVisual(long rawID){
-        return -1;
+    public Index translateRawToVisual(Index rawID){
+        return null;
     }
-    public long translateVisualToRaw(long visualID) {
-        return -1;
+    public Index translateVisualToRaw(Index visualID) {
+        return null;
     }
 }
