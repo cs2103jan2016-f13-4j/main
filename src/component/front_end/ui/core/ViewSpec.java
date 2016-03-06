@@ -1,4 +1,4 @@
-package component.front_end.ui;
+package component.front_end.ui.core;
 
 /**
  * Created by maianhvu on 6/3/16.

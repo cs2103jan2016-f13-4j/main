@@ -19,6 +19,8 @@ public class CommandParser extends CommandParserSpec {
     private static final Pattern PATTERN_COMMAND_PARSER = Pattern.compile(
             "(\\w+)(?::(\"[^\"]+\"|[^\"\\s]+))?\\s?"
             );
+    public static final char CHARACTER_QUOTATION_MARK = '"';
+    public static final String STRING_EMPTY = "";
 
     @Override
     public Command parseCommand(String rawCommandString) {
@@ -72,10 +74,40 @@ public class CommandParser extends CommandParserSpec {
                 String secondPart = innerMatcher.group(2);
                 assert(firstPart != null);
 
+                // Attempt to strip quotes from second part if there are
+                if (secondPart != null && isSurroundedByQuotes(secondPart)) {
+                    secondPart = stripExtremeCharacters(secondPart);
+                }
+
                 commandComponents.put(firstPart, secondPart);
             }
         }
 
         return commandComponents;
+    }
+
+    /**
+     * Helper methods
+     */
+    private static boolean isSurroundedByQuotes(String string) {
+        assert(string != null);
+
+        if (string.length() < 2 ||
+            string.charAt(0) != CHARACTER_QUOTATION_MARK ||
+            string.charAt(string.length() - 1) != CHARACTER_QUOTATION_MARK) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private static String stripExtremeCharacters(String string) {
+        assert(string != null);
+
+        if (string.length() < 2) {
+            return STRING_EMPTY;
+        }
+
+        return string.substring(1, string.length() - 1);
     }
 }

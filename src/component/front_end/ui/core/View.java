@@ -1,7 +1,7 @@
-package component.front_end.ui;
+package component.front_end.ui.core;
 
 
-abstract class View<T> implements ViewSpec {
+public abstract class View<T> implements ViewSpec {
     private final static String STRING_NEW_LINE = "\n";
 
     private T viewData_;

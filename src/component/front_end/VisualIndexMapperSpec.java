@@ -1,6 +1,10 @@
 package component.front_end;
 
 import component.back_end.storage.PrimaryKeyInterface;
+import component.back_end.storage.RelationInterface;
+import component.front_end.ui.core.VisualTuple;
+
+import java.util.List;
 
 
 /**
@@ -21,7 +25,8 @@ import component.back_end.storage.PrimaryKeyInterface;
  * created by thenaesh on Mar 6, 2016
  *
  */
-public interface VisualIndexMapperSpec {
-    int translateRawToVisual(PrimaryKeyInterface<?> rawPrimaryKey);
-    PrimaryKeyInterface<?> translateVisualToRaw(int visualId);
+public abstract class VisualIndexMapperSpec {
+    public abstract int translateRawToVisual(PrimaryKeyInterface<?> rawPrimaryKey);
+    public abstract PrimaryKeyInterface<?> translateVisualToRaw(int visualId);
+    public abstract List<VisualTuple<? extends RelationInterface>> getVisualTupleList();
 }

@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import component.front_end.ui.core.View;
 import entity.Task;
 /**
  * This child class of View generate the view data when list of tasks object are to be rendered. 
@@ -12,11 +13,11 @@ import entity.Task;
  *
  */
 public class TaskListView extends View<List<Task>> {
-    private static final String DATE_FORMAT = "dd/MM|HH:mm"; 
+    private static final String DATE_FORMAT = "dd/MM|HH:mm";
     private static final String STRING_DATE_DISPLAY_FORMAT = "%s - %s";
     private static final String STRING_SEPARATOR = " | ";
     private static final String NUMBER_FORMAT = "%d. ";
-    
+
     private DateTimeFormatter df;
     
     public TaskListView(List<Task> list){

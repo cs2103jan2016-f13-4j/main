@@ -11,12 +11,12 @@ public class Instruction {
      * Types
      */
     public enum Type {
-        // TYPE_NAME ( isUniversalQuantifiable, doesRequireQuantifier )
-        ADD          ( false,                   false),
-        EDIT         ( true,                    true),
-        DISPLAY      ( true,                    false),
-        DELETE       ( true,                    true),
-        EXIT         ( false,                   false),
+        // TYPE_NAME ( isUniversallyQuantifiable, doesRequireQuantifier )
+        ADD          ( false,                     false),
+        EDIT         ( false,                     true),
+        DISPLAY      ( true,                      false),
+        DELETE       ( true,                      true),
+        EXIT         ( false,                     true),
 
         // Special types
         INVALID     (false, false),
