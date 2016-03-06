@@ -5,7 +5,8 @@ import entity.*;
 
 
 public class DecisionEngine extends DecisionEngineSpec { 
-    protected DataStore dataStore_;
+    protected DataStoreSpec dataStore_ = null;
+    protected TaskSchedulerSpec taskScheduler_ = null;
     
     public DecisionEngine() {
         this.dataStore_ = new DataStore();
