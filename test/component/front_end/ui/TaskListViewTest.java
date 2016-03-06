@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
+import component.front_end.ui.core.VisualTuple;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -19,7 +20,7 @@ public class TaskListViewTest {
       
     private Task task1; 
     private Task task2; 
-    private ArrayList<Task> taskList;
+    private ArrayList<VisualTuple<Task>> taskList;
     private DateTimeFormatter df;
     private LocalDateTime ldtStart1;
     private LocalDateTime ldtStart2;
@@ -28,7 +29,7 @@ public class TaskListViewTest {
     private TaskListView listView;
     
     @Before
-    public void init(){
+    public void setUp(){
        //TO-DO: set up some dummyTask. Set up TaskListView
         ldtStart1 = LocalDateTime.of(2015,10,5,1,0); 
         ldtEnd1 = LocalDateTime.of(2015,10,6,5,0); 
@@ -38,9 +39,9 @@ public class TaskListViewTest {
         task1 = new Task("Stay Alive", "Do not die",ldtStart1,ldtEnd1);
         task2 = new Task("Cry", "Me a river",ldtStart2,ldtEnd2);
         
-        taskList = new ArrayList<Task>(); 
-        taskList.add(task1);
-        taskList.add(task2);
+        taskList = new ArrayList<VisualTuple<Task>>();
+        taskList.add(new VisualTuple<>(1, task1));
+        taskList.add(new VisualTuple<>(2, task2));
         
         listView = new TaskListView(taskList);
     }

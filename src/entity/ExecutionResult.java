@@ -1,7 +1,9 @@
 package entity;
 
 
+import component.back_end.storage.RelationInterface;
 import component.front_end.ui.core.ViewSpec;
+import component.front_end.ui.core.VisualTuple;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,5 +43,9 @@ public class ExecutionResult<T> {
         return this.data_;
     }
     
-    
+    public ExecutionResult<?> transformToVisual(List<VisualTuple<? extends RelationInterface>> visualTupleList) {
+        ExecutionResult<?> visualResult = new ExecutionResult<>(this.viewClass_, visualTupleList);
+        visualResult.messages_ = this.messages_;
+        return visualResult;
+    }
 }

@@ -5,6 +5,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import component.front_end.ui.core.View;
+import component.front_end.ui.core.VisualIndexView;
+import component.front_end.ui.core.VisualTuple;
 import entity.Task;
 /**
  * This child class of View generate the view data when list of tasks object are to be rendered. 
@@ -12,7 +14,7 @@ import entity.Task;
  * @author Tio
  *
  */
-public class TaskListView extends View<List<Task>> {
+public class TaskListView extends VisualIndexView<Task> {
     private static final String DATE_FORMAT = "dd/MM|HH:mm";
     private static final String STRING_DATE_DISPLAY_FORMAT = "%s - %s";
     private static final String STRING_SEPARATOR = " | ";
@@ -20,18 +22,19 @@ public class TaskListView extends View<List<Task>> {
 
     private DateTimeFormatter df;
     
-    public TaskListView(List<Task> list){
+    public TaskListView(List<VisualTuple<Task>> list){
         super(list);
         df = DateTimeFormatter.ofPattern(DATE_FORMAT);
     }
 
     @Override
     public void buildContent() {
-        List<Task> tasks = (List<Task>) this.getViewData();
-        int order = 1; 
-        
-        for (Task task : tasks) {
-            this.addText(this.constructDisplayID(order++));
+        List<VisualTuple<Task>> visualTasks = this.getVisualTupleList();
+
+        for (VisualTuple<Task> visualTask : visualTasks) {
+            this.addText(this.constructDisplayID(visualTask.getIndex()));
+
+            Task task = visualTask.getOriginal();
             this.addText(this.constructTimeString(task));
             this.addText(STRING_SEPARATOR);
             this.addLine(task.getTask());

@@ -45,20 +45,23 @@ public class TranslationEngine extends TranslationEngineSpec {
     private void initializeView(ExecutionResult<?> executionResult) {
         this.currentExecutionResult_ = executionResult;
 
-        // Instantiate new User Interface from executionResult data
-        this.currentView_ = constructView(this.currentExecutionResult_);
-        assert (this.currentView_ != null);
-
         // If the executionResult class is classified under visual index UI
         // we provide the translation engine with a Visual ID Mapping
-        if (VisualIndexView.class.isAssignableFrom(this.currentExecutionResult_.getViewClass())) {
-            assert (this.currentExecutionResult_.getData() instanceof List);
+        if (VisualIndexView.class.isAssignableFrom(executionResult.getViewClass())) {
+            assert (executionResult.getData() instanceof List);
 
             this.currentIndexMapper_ = new VisualIndexMapper((List) executionResult.getData());
 
             // Assign the visual tuple to executionResult
-            ((VisualIndexView) this.currentView_).setVisualTupleList(this.currentIndexMapper_.getVisualTupleList());
+            this.currentExecutionResult_ = executionResult.transformToVisual(
+                    this.currentIndexMapper_.getVisualTupleList()
+            );
         }
+
+        // Instantiate new User Interface from executionResult data
+        this.currentView_ = constructView(this.currentExecutionResult_);
+
+        assert (this.currentView_ != null);
     }
 
     private static <T> View<T> constructView(ExecutionResult<?> executionResult) {

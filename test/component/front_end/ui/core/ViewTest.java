@@ -1,7 +1,8 @@
-package component.front_end.ui;
+package component.front_end.ui.core;
 
 import static org.junit.Assert.*;
 
+import component.front_end.ui.core.View;
 import org.junit.Before;
 import org.junit.Test;
 
