@@ -14,7 +14,7 @@ import entity.*;
  * created by thenaesh on Mar 5, 2016
  *
  */
-public abstract class DataStore {
+public abstract class DataStoreSpec {
     
     /**
      * Add a task into the data store

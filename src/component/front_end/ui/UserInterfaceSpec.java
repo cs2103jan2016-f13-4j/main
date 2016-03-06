@@ -15,7 +15,7 @@ import entity.*;
  * created by thenaesh on Mar 6, 2016
  *
  */
-public abstract class UserInterface {
+public abstract class UserInterfaceSpec {
     
     /**
      * renders the supplied view

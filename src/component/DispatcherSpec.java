@@ -13,7 +13,7 @@ import component.front_end.*;
  * created by thenaesh on 5/3/16
  *
  */
-public class Dispatcher {
+public class DispatcherSpec {
     private DecisionEngineSpec decisionEngine = null;
     private TranslationEngineSpec translationEngine = null;
     
