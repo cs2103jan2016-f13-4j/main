@@ -1,8 +1,5 @@
 package component.front_end.ui;
 
-import entity.View;
-
-
 /**
  * The User Interface renders a ({@link View}) and then prompts for user input
  *

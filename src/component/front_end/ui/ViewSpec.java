@@ -10,6 +10,11 @@ public interface ViewSpec {
     String getContent();
 
     /**
+     * Populates the content of the view
+     */
+    void buildContent();
+
+    /**
      * Returns the data attached with the view
      */
     Object getViewData();
