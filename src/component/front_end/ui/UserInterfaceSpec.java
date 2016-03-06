@@ -7,14 +7,14 @@ package component.front_end.ui;
  * 
  * created by thenaesh on Mar 6, 2016
  */
-public interface UserInterfaceSpec {
+public abstract class UserInterfaceSpec {
     
     /**
      * Renders the content from the view
      * 
      * @param viewToRender
      */
-     void render(View viewToRender);
+     public abstract void render(View viewToRender);
 
     /**
      * First, renders a CommandPromptView
@@ -23,5 +23,5 @@ public interface UserInterfaceSpec {
      * to get the nextLine() from user input
      * @return the string read from
      */
-    String queryInput();
+    public abstract String queryInput();
 }
