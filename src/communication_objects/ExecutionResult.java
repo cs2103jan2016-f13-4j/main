@@ -1,4 +1,4 @@
-package free_objects;
+package communication_objects;
 
 
 public class ExecutionResult {

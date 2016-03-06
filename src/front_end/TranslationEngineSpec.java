@@ -1,6 +1,6 @@
 package front_end;
 
-import free_objects.*;
+import communication_objects.*;
 
 
 /**

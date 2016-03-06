@@ -1,4 +1,4 @@
-package free_objects;
+package communication_objects;
 
 /**
  * Created by maianhvu on 5/3/16.
