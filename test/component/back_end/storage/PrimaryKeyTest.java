@@ -1,9 +1,13 @@
 package component.back_end.storage;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
 import component.back_end.storage.PrimaryKey;
+
+import java.util.HashMap;
 
 /**
  * 
@@ -40,5 +44,23 @@ public class PrimaryKeyTest {
         PrimaryKey<Integer> pKey8 = new PrimaryKey<Integer>(8);
         assertNotEquals(0, pKey7.compareTo(pKey8));
     }
-    
+
+    @Test
+    public void Primary_keys_are_identifiable_from_hash_code() {
+        PrimaryKey<String> originalKey = new PrimaryKey<>("hashedKey");
+
+        HashMap<PrimaryKey<String>, Integer> testMap = new HashMap<>();
+        testMap.put(originalKey, 5);
+
+        PrimaryKey<String> sameKey = new PrimaryKey<>("hashedKey");
+        assertThat(testMap.get(sameKey), is(equalTo(5)));
+    }
+
+    @Test
+    public void Primary_keys_with_same_value_are_equal() {
+        PrimaryKey<String> key1 = new PrimaryKey<>("hello");
+        PrimaryKey<String> key2 = new PrimaryKey<>("hello");
+        assertThat(key1, is(equalTo(key2)));
+    }
+
 }
