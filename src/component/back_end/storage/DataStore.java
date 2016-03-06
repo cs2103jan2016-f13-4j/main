@@ -13,7 +13,7 @@ import entity.RelationDescriptor;
  *
  */
 
-public class DataStore implements DataStoreSpec {
+public class DataStore extends DataStoreSpec {
 
 
     @Override
