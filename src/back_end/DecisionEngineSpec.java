@@ -1,6 +1,6 @@
 package back_end;
 
-import objects.*;
+import free_objects.*;
 
 
 /**

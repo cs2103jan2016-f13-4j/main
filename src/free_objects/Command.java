@@ -1,4 +1,4 @@
-package objects;
+package free_objects;
 
 /**
  * Created by maianhvu on 5/3/16.

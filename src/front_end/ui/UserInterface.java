@@ -1,6 +1,6 @@
 package front_end.ui;
 
-import objects.*;
+import free_objects.*;
 
 
 /**
