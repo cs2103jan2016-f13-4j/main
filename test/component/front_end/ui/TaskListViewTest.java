@@ -48,18 +48,17 @@ public class TaskListViewTest {
     @Test
     public void constructTimeTest() {
         
-        assertThat(listView.constructTimeString(task1),is(equalTo("05/10:01:00 - 06/10|05:00")));
+        assertThat(listView.constructTimeString(task1),is(equalTo("05/10|01:00 - 06/10|05:00")));
         assertThat(listView.constructTimeString(task2),is(equalTo("06/10|12:00 - 06/10|17:00")));
     }
     
     @Test
-    public void getContentTest() {
-        String expectedList1 = "1. 05/10|01:00 - 06/10|05:00 | Stay Alive";
-        String expectedList2 = "2. 06/10|12:00 - 06/10|17:00 | Cry";
-        String combinedOutcome = expectedList1 + "\n" + expectedList2 + "\n";
+    public void buildContentTest() {
+        String expectedList1 = "1. 05/10|01:00 - 06/10|05:00 | Stay Alive\n";
+        String expectedList2 = "2. 06/10|12:00 - 06/10|17:00 | Cry\n";
+        String combinedOutcome = expectedList1 + expectedList2;
         
         listView.buildContent();
-        System.out.print(listView.getContent());
         assertThat(listView.getContent(),is(combinedOutcome));
     }
     
