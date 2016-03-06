@@ -3,8 +3,7 @@ package component.back_end.storage;
 import java.util.List;
 import java.util.function.Function;
 
-import entity.Task;
-import entity.TaskDescriptor;
+import entity.RelationDescriptor;
 
 /**
  * The Data Store is the gatekeeper for the actual task data stored on disk.
@@ -14,24 +13,31 @@ import entity.TaskDescriptor;
  *
  */
 
-public class DataStore extends DataStoreSpec {
+public class DataStore implements DataStoreSpec {
+
 
     @Override
-    public void addTask(Task task) {
-        // TODO Auto-generated method stub
-        
+    public void add(RelationSpec tuple) {
+
     }
 
     @Override
-    public List<Task> getTasks(TaskDescriptor descriptor) {
-        // TODO Auto-generated method stub
+    public RelationSpec remove(RelationSpec tuple) {
         return null;
     }
 
     @Override
-    public List<Task> getTasks(TaskDescriptor descriptor, Function<List<Task>, Void> modifierFunction) {
-        // TODO Auto-generated method stub
+    public RelationSpec remove(Class<? extends RelationSpec> relationClass, PrimaryKeySpec primaryKey) {
         return null;
     }
 
+    @Override
+    public List<RelationSpec> getAll(Class<? extends RelationSpec> relationClass) {
+        return null;
+    }
+
+    @Override
+    public List<RelationSpec> map(RelationDescriptor descriptor, Function<List<RelationSpec>, Void> modifierFunction) {
+        return null;
+    }
 }

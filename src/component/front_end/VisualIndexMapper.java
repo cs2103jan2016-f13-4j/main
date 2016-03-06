@@ -8,7 +8,7 @@ import java.util.HashMap;
 /**
  * Created by maianhvu on 6/3/16.
  */
-public class VisualIndexMapper extends VisualIndexMapperSpec {
+public class VisualIndexMapper implements VisualIndexMapperSpec {
 
     /**
      * Properties
