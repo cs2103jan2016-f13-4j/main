@@ -22,7 +22,7 @@ public class Task {
     }
     
     // functions to access object property
-    public String getName(){
+    public String getTask(){
         return this.taskName_;
     }
     public String getDescription(){
