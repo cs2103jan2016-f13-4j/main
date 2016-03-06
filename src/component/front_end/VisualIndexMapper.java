@@ -35,18 +35,27 @@ public class VisualIndexMapper implements VisualIndexMapperSpec {
             int latestIndex = this.forwardMap_.size() - 1;
 
             // Translate the latestIndex into visual index
-            int visualIndex = 0;
+            int visualIndex = getVisualIdFromArrayListId(latestIndex);
+
+            // Map the visual index back to the primary key
+            this.backwardMap_.put(primaryKey, visualIndex);
         }
     }
 
     @Override
-    public int translateRawToVisual(PrimaryKeySpec<?> rawId) {
-        return 0;
+    public int translateRawToVisual(PrimaryKeySpec<?> rawPrimaryKey) {
+        assert(rawPrimaryKey != null);
+        return this.backwardMap_.get(rawPrimaryKey);
     }
 
     @Override
     public PrimaryKeySpec<?> translateVisualToRaw(int visualId) {
-        return null;
+        int arrayListId = getArrayListIdFromVisualId(visualId);
+        try {
+            return this.forwardMap_.get(arrayListId);
+        } catch (IndexOutOfBoundsException e) {
+            return null;
+        }
     }
 
     private static int getVisualIdFromArrayListId(int arrayListId) {
