@@ -2,6 +2,7 @@ package component.front_end;
 
 import component.front_end.ui.UserInterfaceSpec;
 import entity.*;
+import entity.command.Command;
 
 
 /**

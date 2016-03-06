@@ -20,9 +20,9 @@ public class CommandParserTest {
 
     @Test
     public void Command_parser_splits_raw_command_string_into_correct_elements() {
-        List<String> commandWords = this.parser_.splitCommand("display:all task:\"Hello World!\"");
-        for (String word : commandWords) {
-            System.out.println(word);
-        }
+//        List<String> commandWords = this.parser_.splitCommand("display:all task:\"Hello World!\"");
+//        for (String word : commandWords) {
+//            System.out.println(word);
+//        }
     }
 }
