@@ -23,6 +23,6 @@ import entity.Index;
  *
  */
 public interface VisualIndexMapperSpec {
-    int translateRawToVisual(PrimaryKeySpec<?> rawId);
+    int translateRawToVisual(PrimaryKeySpec<?> rawPrimaryKey);
     PrimaryKeySpec<?> translateVisualToRaw(int visualId);
 }
