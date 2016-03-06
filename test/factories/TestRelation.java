@@ -13,7 +13,7 @@ public class TestRelation implements RelationSpec {
 
     public TestRelation(String name) {
         this.name_ = name;
-        this.primaryKey_ = new TestPrimaryKey(name);
+        this.updatePrimaryKey();
     }
 
     @Override
@@ -27,7 +27,7 @@ public class TestRelation implements RelationSpec {
 
     @Override
     public void updatePrimaryKey() {
-        // TODO Auto-generated method stub
-        
+        this.primaryKey_ = new TestPrimaryKey(this.name_);
     }
+
 }
