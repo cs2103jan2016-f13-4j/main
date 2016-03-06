@@ -1,6 +1,5 @@
 package entity;
 
-
 import component.back_end.storage.PrimaryKeySpec;
 import component.front_end.VisualIndexMapperSpec;
 
