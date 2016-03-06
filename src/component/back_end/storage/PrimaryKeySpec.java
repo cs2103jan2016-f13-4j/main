@@ -6,4 +6,7 @@ package component.back_end.storage;
 public interface PrimaryKeySpec<T> extends Comparable<PrimaryKeySpec<T>> {
     T getValue();
     void setValue(T newKeyValue);
+
+    int hashCode();
+    boolean equals(Object o);
 }

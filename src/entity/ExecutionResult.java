@@ -20,8 +20,5 @@ public class ExecutionResult<T> {
         return data_;
     }
     
-    public Class<? extends View> uiClass() {
-        return null;
-    }
     
 }
