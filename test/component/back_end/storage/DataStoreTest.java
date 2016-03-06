@@ -11,6 +11,12 @@ import org.junit.Test;
 
 import entity.Task;
 
+/**
+ * 
+ * @author Huiyie
+ *
+ */
+
 public class DataStoreTest {
     
     private DataStore dataStore_;
@@ -78,5 +84,10 @@ public class DataStoreTest {
         // use primary keys of tuple_ and tuple2 to retrieve them from HashMap
         assertNotEquals(storageMap.get(this.tuple_.getClass()).get(this.tuple_.getPrimaryKey()),
             storageMap.get(tuple2.getClass()).get(tuple2.getPrimaryKey()));
+    }
+    
+    @Test
+    public void Edit_function_overwrites_data() {
+        
     }
 }
