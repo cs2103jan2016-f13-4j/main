@@ -23,6 +23,7 @@ public class TaskListViewTest {
     private final static String STRING_TITLE_2 =  "Cry";
     private final static String STRING_DETAIL_1 =  "do not die";
     private final static String STRING_DETAIL_2 = "me a river";
+    private static final String STRING_SEPARATOR = " | ";
     private final static String STRING_NEW_LINE = "\n";
     
     private Task task1; 
@@ -65,9 +66,9 @@ public class TaskListViewTest {
         String time2 = start2 + DATE_CONNECTOR + end2;
         
         assertThat(listView.constructTimeString(task1),is(equalTo(time1)));
-        assertThat(listView.constructTimeString(task2),is(equalTo(time1 + time2)));
+        assertThat(listView.constructTimeString(task2),is(equalTo(time2)));
     }
-    /*
+    
     @Test
     public void getContentTest() {
         String start1 = ldtStart1.format(df);
@@ -76,12 +77,13 @@ public class TaskListViewTest {
         String end2 = ldtEnd2.format(df); 
         String time1 = start1 + DATE_CONNECTOR +  end1; 
         String time2 = start2 + DATE_CONNECTOR + end2;
-        String outcome1 = "1. " + time1 + STRING_TITLE_1; 
-        String outcome2 = "2. " + time2 + STRING_TITLE_2;
-        String combinedOutcome = outcome1 + STRING_NEW_LINE + outcome2;
-        
+        String outcome1 = "1. " + time1 + STRING_SEPARATOR + STRING_TITLE_1; 
+        String outcome2 = "2. " + time2 + STRING_SEPARATOR + STRING_TITLE_2;
+        String combinedOutcome = outcome1 + STRING_NEW_LINE + outcome2 + STRING_NEW_LINE;
+        listView.buildContent();
+        System.out.print(listView.getContent());
         assertThat(listView.getContent(),is(combinedOutcome));
     }
-    */
+    
 
 }

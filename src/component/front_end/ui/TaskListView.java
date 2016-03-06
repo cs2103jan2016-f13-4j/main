@@ -6,15 +6,17 @@ import java.util.List;
 
 import entity.Task;
 /**
- * This view class generate the view data when list of tasks object are to be rendered
+ * This child class of View generate the view data when list of tasks object are to be rendered. 
+ * The rendering format is as follow: [display ID]. [Time Span] | [Task Name]
  * @author Tio
  *
  */
 public class TaskListView extends View<List<Task>> {
     private static final String DATE_FORMAT = "dd/MM|HH:mm"; 
-    private static final String DATE_CONNECTOR = " - ";
+    private static final String STRING_DATE_DISPLAY_FORMAT = "%s - %s";
     private static final String STRING_SEPARATOR = " | ";
-    private static final String NUMBER_FORMAT = "%d.";
+    private static final String NUMBER_FORMAT = "%d. ";
+    
     private DateTimeFormatter df;
     
     public TaskListView(List<Task> list){
@@ -26,26 +28,31 @@ public class TaskListView extends View<List<Task>> {
     public void buildContent() {
         List<Task> tasks = (List<Task>) this.getViewData();
         int order = 1; 
+        
         for (Task task : tasks) {
-            this.addText(addOrder(order++));
-            this.constructTimeString(task);
+            this.addText(this.constructDisplayID(order++));
+            this.addText(this.constructTimeString(task));
             this.addText(STRING_SEPARATOR);
             this.addLine(task.getTask());
         }
     }
-    
-    protected String constructTimeString(Task current){
-        LocalDateTime start = current.getStartingTime();
-        LocalDateTime end = current.getEndingTime();
+    /**
+     * this is a helper function that will format the start time and the end time of the task to 
+     * the following form: dd/MM|HH:mm - dd/MM|HH:mm 
+     * @param task - current task that is going to be formatted
+     * @return String containing the start date and end date of the task
+     */
+    protected String constructTimeString(Task task){
+        LocalDateTime start = task.getStartingTime();
+        LocalDateTime end = task.getEndingTime();
+        
         String startDisplay = start.format(df);
         String endDisplay = end.format(df);
-        this.addText(startDisplay);
-        this.addText(DATE_CONNECTOR);
-        this.addText(endDisplay);
-        return this.getContent();
+        
+        return String.format(STRING_DATE_DISPLAY_FORMAT, startDisplay, endDisplay);
     }
-    
-    protected String addOrder(int i){
+    // this is a helper function that deals with the formatting of the display ID of the task
+    protected String constructDisplayID(int i){
         return String.format(NUMBER_FORMAT,(i));
     }
     
