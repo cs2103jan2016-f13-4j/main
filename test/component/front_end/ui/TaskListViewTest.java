@@ -16,16 +16,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 
 public class TaskListViewTest {
-    
-    private final static String DATE_CONNECTOR = " - ";
-    private final static String DATE_FORMAT = "dd/MM|HH:mm";
-    private final static String STRING_TITLE_1 = "Stay Alive";
-    private final static String STRING_TITLE_2 =  "Cry";
-    private final static String STRING_DETAIL_1 =  "do not die";
-    private final static String STRING_DETAIL_2 = "me a river";
-    private static final String STRING_SEPARATOR = " | ";
-    private final static String STRING_NEW_LINE = "\n";
-    
+      
     private Task task1; 
     private Task task2; 
     private ArrayList<Task> taskList;
@@ -43,11 +34,9 @@ public class TaskListViewTest {
         ldtEnd1 = LocalDateTime.of(2015,10,6,5,0); 
         ldtStart2 = LocalDateTime.of(2015,10,6,12,0); 
         ldtEnd2 = LocalDateTime.of(2015,10,6,17,0); 
-        
-        df = DateTimeFormatter.ofPattern(DATE_FORMAT);
-        
-        task1 = new Task(STRING_TITLE_1, STRING_DETAIL_1,ldtStart1,ldtEnd1);
-        task2 = new Task(STRING_TITLE_2, STRING_DETAIL_2,ldtStart2,ldtEnd2);
+   
+        task1 = new Task("Stay Alive", "Do not die",ldtStart1,ldtEnd1);
+        task2 = new Task("Cry", "Me a river",ldtStart2,ldtEnd2);
         
         taskList = new ArrayList<Task>(); 
         taskList.add(task1);
@@ -58,28 +47,17 @@ public class TaskListViewTest {
     
     @Test
     public void constructTimeTest() {
-        String start1 = ldtStart1.format(df);
-        String end1 = ldtEnd1.format(df);
-        String start2 = ldtStart2.format(df);
-        String end2 = ldtEnd2.format(df); 
-        String time1 = start1 + DATE_CONNECTOR +  end1; 
-        String time2 = start2 + DATE_CONNECTOR + end2;
         
-        assertThat(listView.constructTimeString(task1),is(equalTo(time1)));
-        assertThat(listView.constructTimeString(task2),is(equalTo(time2)));
+        assertThat(listView.constructTimeString(task1),is(equalTo("05/10:01:00 - 06/10|05:00")));
+        assertThat(listView.constructTimeString(task2),is(equalTo("06/10|12:00 - 06/10|17:00")));
     }
     
     @Test
     public void getContentTest() {
-        String start1 = ldtStart1.format(df);
-        String end1 = ldtEnd1.format(df);
-        String start2 = ldtStart2.format(df);
-        String end2 = ldtEnd2.format(df); 
-        String time1 = start1 + DATE_CONNECTOR +  end1; 
-        String time2 = start2 + DATE_CONNECTOR + end2;
-        String outcome1 = "1. " + time1 + STRING_SEPARATOR + STRING_TITLE_1; 
-        String outcome2 = "2. " + time2 + STRING_SEPARATOR + STRING_TITLE_2;
-        String combinedOutcome = outcome1 + STRING_NEW_LINE + outcome2 + STRING_NEW_LINE;
+        String expectedList1 = "1. 05/10|01:00 - 06/10|05:00 | Stay Alive";
+        String expectedList2 = "2. 06/10|12:00 - 06/10|17:00 | Cry";
+        String combinedOutcome = expectedList1 + "\n" + expectedList2 + "\n";
+        
         listView.buildContent();
         System.out.print(listView.getContent());
         assertThat(listView.getContent(),is(combinedOutcome));
