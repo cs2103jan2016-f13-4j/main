@@ -3,8 +3,6 @@ package component.front_end.ui;
 
 abstract class View<T> implements ViewSpec {
     private final static String STRING_NEW_LINE = "\n";
-    private final static String STRING_TIME_CONNECTOR = "-";
-    private final static String STRING_EMPTY = "";
 
     private T viewData_;
     private StringBuilder contentBuilder_;
@@ -25,6 +23,10 @@ abstract class View<T> implements ViewSpec {
     protected void addLine(String string) {
         this.contentBuilder_.append(string);
         this.contentBuilder_.append(STRING_NEW_LINE);
+    }
+    
+    protected void addText(String string){
+        this.contentBuilder_.append(string);
     }
 
     @Override
