@@ -1,9 +1,15 @@
 package component.back_end;
 
+import component.back_end.storage.*;
 import entity.*;
 
 
-public class DecisionEngine implements DecisionEngineSpec {
+public class DecisionEngine implements DecisionEngineSpec { 
+    protected DataStore dataStore_;
+    
+    public DecisionEngine() {
+        this.dataStore_ = new DataStore();
+    }
 
     @Override
     public ExecutionResult<?> performCommand(Command cmd) {
@@ -38,13 +44,4 @@ public class DecisionEngine implements DecisionEngineSpec {
         
     }
     
-    public void addTask(Task task) {
-    }
-    
-    public void editTask(Task task) {
-    }
-    
-    public void displayTasks(){
-    }
-
 }
