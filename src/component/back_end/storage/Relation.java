@@ -11,9 +11,8 @@ public abstract class Relation implements RelationSpec {
     PrimaryKey pKey_;
 
     @Override
-    public abstract <T> PrimaryKeySpec<T> getPrimaryKey();
-
+    public abstract PrimaryKeySpec<?> getPrimaryKey();
+    
     @Override
-    public abstract <T> void setPrimaryKey(PrimaryKeySpec<T> newPrimaryKey);
-
+    public abstract void updatePrimaryKey();
 }
