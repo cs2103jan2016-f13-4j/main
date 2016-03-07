@@ -43,7 +43,6 @@ public class InstructionTest {
             if (!type.doesRequireQuantifier || type.isUniversallyQuantifiable) {
                 continue;
             }
-            System.out.println(type);
 
             Instruction inst = new Instruction(type);
             assertThat(inst.getType(), is(Instruction.Type.INVALID));
