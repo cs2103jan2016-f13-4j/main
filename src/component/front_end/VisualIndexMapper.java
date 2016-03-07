@@ -1,6 +1,6 @@
 package component.front_end;
-
 import component.back_end.storage.Task;
+import component.front_end.ui.core.VisualTuple;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,6 +16,7 @@ public class VisualIndexMapper implements VisualIndexMapperSpec {
      */
     private ArrayList<Integer> forwardMap_;
     private HashMap<Integer, Integer> backwardMap_;
+    private ArrayList<VisualTuple<Task>> visualTupleList_;
 
     /**
      * Constructs a visual index mapper based on a list of index
@@ -23,6 +24,7 @@ public class VisualIndexMapper implements VisualIndexMapperSpec {
     public VisualIndexMapper(List<Task> tupleList) {
         this.forwardMap_ = new ArrayList<>();
         this.backwardMap_ = new HashMap<>();
+        this.visualTupleList_ = new ArrayList<>();
 
         // Populate keys
         for (Task tuple : tupleList)  {
@@ -37,6 +39,13 @@ public class VisualIndexMapper implements VisualIndexMapperSpec {
 
             // Map the visual index back to the primary key
             this.backwardMap_.put(primaryKey, visualIndex);
+
+            // Also add the tuple to visual tuple list
+            VisualTuple<Task> visualTuple = new VisualTuple<>(
+                    visualIndex,
+                    tuple
+            );
+            this.visualTupleList_.add(visualTuple);
         }
     }
 
@@ -54,6 +63,11 @@ public class VisualIndexMapper implements VisualIndexMapperSpec {
         } catch (IndexOutOfBoundsException e) {
             return null;
         }
+    }
+
+    @Override
+    public List<VisualTuple<? extends RelationInterface>> getVisualTupleList() {
+        return this.visualTupleList_;
     }
 
     private static int getVisualIdFromArrayListId(int arrayListId) {

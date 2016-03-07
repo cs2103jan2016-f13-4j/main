@@ -44,4 +44,12 @@ public class VisualIndexMapperTest {
             assertThat(relationKey, is(equalTo(53 + i)));
         }
     }
+
+    @Test
+    public void Visual_index_mapper_gives_correct_visual_id() {
+        List<VisualTuple<? extends RelationInterface>> visualTuples = this.mapper_.getVisualTupleList();
+        for (int i = 1, j = 0; i <= 3; i++, j++) {
+            assertThat(visualTuples.get(j).getIndex(), is(i));
+        }
+    }
 }

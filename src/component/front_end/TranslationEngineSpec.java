@@ -1,6 +1,6 @@
 package component.front_end;
 
-import component.front_end.ui.UserInterfaceSpec;
+import component.front_end.ui.core.UserInterfaceSpec;
 import entity.*;
 import entity.command.Command;
 
@@ -27,9 +27,9 @@ public abstract class TranslationEngineSpec {
      * decides what to to with an execution result sent by the Dispatcher
      * instructs the UI to carry out that decision
      * 
-     * @param exeResult
+     * @param result
      */
-    public abstract void display(ExecutionResult exeResult);
+    public abstract void display(ExecutionResult<?> result);
     
     /**
      * 1) instructs the UI to get a user command string (blocking if necessary)

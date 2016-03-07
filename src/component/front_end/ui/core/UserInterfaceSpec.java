@@ -1,4 +1,4 @@
-package component.front_end.ui;
+package component.front_end.ui.core;
 
 /**
  * The User Interface renders a ({@link View}) and then prompts for user input
