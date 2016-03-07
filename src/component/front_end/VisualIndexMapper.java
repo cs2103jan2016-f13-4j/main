@@ -1,7 +1,6 @@
 package component.front_end;
 
-import component.back_end.storage.PrimaryKeyInterface;
-import component.back_end.storage.RelationInterface;
+import component.back_end.storage.Task;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,19 +14,19 @@ public class VisualIndexMapper implements VisualIndexMapperSpec {
     /**
      * Properties
      */
-    private ArrayList<PrimaryKeyInterface<?>> forwardMap_;
-    private HashMap<PrimaryKeyInterface<?>, Integer> backwardMap_;
+    private ArrayList<Integer> forwardMap_;
+    private HashMap<Integer, Integer> backwardMap_;
 
     /**
      * Constructs a visual index mapper based on a list of index
      */
-    public VisualIndexMapper(List<RelationInterface> tupleList) {
+    public VisualIndexMapper(List<Task> tupleList) {
         this.forwardMap_ = new ArrayList<>();
         this.backwardMap_ = new HashMap<>();
 
         // Populate keys
-        for (RelationInterface tuple : tupleList)  {
-            PrimaryKeyInterface<?> primaryKey = tuple.getPrimaryKey();
+        for (Task tuple : tupleList)  {
+            Integer primaryKey = tuple.getId();
             this.forwardMap_.add(primaryKey);
 
             // Get the latest added primary key
@@ -42,13 +41,13 @@ public class VisualIndexMapper implements VisualIndexMapperSpec {
     }
 
     @Override
-    public int translateRawToVisual(PrimaryKeyInterface<?> rawPrimaryKey) {
+    public int translateRawToVisual(Integer rawPrimaryKey) {
         assert(rawPrimaryKey != null);
         return this.backwardMap_.get(rawPrimaryKey);
     }
 
     @Override
-    public PrimaryKeyInterface<?> translateVisualToRaw(int visualId) {
+    public Integer translateVisualToRaw(int visualId) {
         int arrayListId = getArrayListIdFromVisualId(visualId);
         try {
             return this.forwardMap_.get(arrayListId);

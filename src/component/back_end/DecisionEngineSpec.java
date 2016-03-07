@@ -1,7 +1,6 @@
 package component.back_end;
 
-import component.back_end.storage.DataStoreSpec;
-
+import component.back_end.storage.TaskCollection;
 import entity.*;
 import entity.command.Command;
 
@@ -22,7 +21,7 @@ import entity.command.Command;
  */
 public abstract class DecisionEngineSpec {
     protected abstract TaskSchedulerSpec getTaskScheduler();
-    protected abstract DataStoreSpec getDataStore();
+    protected abstract TaskCollection getTaskData();
     
     /**
      * inspects the given command, decides what to do with it

@@ -1,7 +1,5 @@
 package component.front_end;
 
-import component.back_end.storage.PrimaryKeyInterface;
-
 
 /**
  * Tasks have two different indices:
@@ -22,6 +20,6 @@ import component.back_end.storage.PrimaryKeyInterface;
  *
  */
 public interface VisualIndexMapperSpec {
-    int translateRawToVisual(PrimaryKeyInterface<?> rawPrimaryKey);
-    PrimaryKeyInterface<?> translateVisualToRaw(int visualId);
+    int translateRawToVisual(Integer rawPrimaryKey);
+    Integer translateVisualToRaw(int visualId);
 }

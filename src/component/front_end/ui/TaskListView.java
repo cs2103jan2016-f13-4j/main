@@ -1,8 +1,9 @@
 package component.front_end.ui;
 
+import component.back_end.storage.Task;
+
 import java.util.List;
 
-import entity.Task;
 /**
  * This view class generate the view data when list of tasks object are to be rendered
  * @author Tio
@@ -20,7 +21,7 @@ public class TaskListView extends View<List<Task>>{
     public void buildContent() {
         List<Task> tasks = (List<Task>) this.getViewData();
         for (Task task : tasks) {
-            this.addLine(task.getTask());
+            this.addLine(task.getTaskName());
         }
     }
     
