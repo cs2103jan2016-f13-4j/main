@@ -10,19 +10,19 @@ import java.time.LocalDateTime;
  *
  */
 
-public class TaskPrimaryKey implements Comparable<TaskPrimaryKey> {
+public class TaskNameAndStartTime implements Comparable<TaskNameAndStartTime> {
     
     private String task_;
     private LocalDateTime taskStart_;
     
     // Constructor
-    public TaskPrimaryKey(String task, LocalDateTime taskStart) {
+    public TaskNameAndStartTime(String task, LocalDateTime taskStart) {
         this.task_ = task;
         this.taskStart_ = taskStart;
     }
 
     @Override
-    public int compareTo(TaskPrimaryKey o) {
+    public int compareTo(TaskNameAndStartTime o) {
         if (this.getTask().equals(o.getTask())) {
             if (this.getTaskStart().equals(o.getTaskStart())) {
                 return 0;

@@ -1,7 +1,5 @@
 package component.back_end.storage;
 
-import entity.RelationDescriptor;
-
 import java.util.List;
 import java.util.function.Function;
 
@@ -43,15 +41,15 @@ public abstract class DataStoreSpec {
     public abstract RelationInterface remove(Class<? extends RelationInterface> relationClass, PrimaryKeyInterface primaryKey);
 
     /**
-     * Get a list of tasks that match the task descriptor specified (see {@link RelationDescriptor})
+     * Get a list of tasks that match the task descriptor specified (see {@link RelationConstraint})
      * @param relationClass the Class of the relation
      * @param descriptor the task descriptor
      * @return
      */
-    public abstract List<RelationInterface> getAll(Class<? extends RelationInterface> relationClass, RelationDescriptor descriptor);
+    public abstract List<RelationInterface> getAll(Class<? extends RelationInterface> relationClass, RelationConstraint descriptor);
 
     /**
-     * Get a list of tasks that match the task descriptor specified (see {@link RelationDescriptor})
+     * Get a list of tasks that match the task descriptor specified (see {@link RelationConstraint})
      * and then applies the modifier function to the list before returning it
      * 
      * This may be used to, for instance, sort the Task list by some metric before returning it.
@@ -60,5 +58,5 @@ public abstract class DataStoreSpec {
      * @param modifierFunction
      * @return
      */
-    public abstract List<RelationInterface> map(RelationDescriptor descriptor, Function<List<RelationInterface>, Void> modifierFunction);
+    public abstract List<RelationInterface> map(RelationConstraint descriptor, Function<List<RelationInterface>, Void> modifierFunction);
 }
