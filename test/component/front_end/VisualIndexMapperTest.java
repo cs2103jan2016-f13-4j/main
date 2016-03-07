@@ -1,6 +1,7 @@
 package component.front_end;
 
 import component.back_end.storage.Task;
+import component.front_end.ui.core.VisualTuple;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -47,7 +48,7 @@ public class VisualIndexMapperTest {
 
     @Test
     public void Visual_index_mapper_gives_correct_visual_id() {
-        List<VisualTuple<? extends RelationInterface>> visualTuples = this.mapper_.getVisualTupleList();
+        List<VisualTuple<Task>> visualTuples = this.mapper_.getVisualTupleList();
         for (int i = 1, j = 0; i <= 3; i++, j++) {
             assertThat(visualTuples.get(j).getIndex(), is(i));
         }

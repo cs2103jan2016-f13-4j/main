@@ -6,6 +6,7 @@ import component.front_end.ui.core.VisualTuple;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 /**
  * This child class of View generate the view data when list of tasks object are to be rendered. 

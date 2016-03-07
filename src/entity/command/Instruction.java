@@ -48,7 +48,6 @@ public class Instruction {
      * @param type
      */
     public Instruction(Type type) {
-        assert(type.isUniversallyQuantifiable);
         this.type_ = type;
 
         this.inferQuantifierFromString(null);

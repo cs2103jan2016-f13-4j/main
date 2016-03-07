@@ -1,16 +1,14 @@
 package component.front_end.ui;
 
-import static org.junit.Assert.*;
+import component.back_end.storage.Task;
+import component.front_end.ui.core.VisualTuple;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
-import component.front_end.ui.core.VisualTuple;
-import org.junit.Before;
-import org.junit.Test;
-
-import entity.Task;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -18,7 +16,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 public class TaskListViewTest {
       
-    private Task task1; 
+    private Task task1;
     private Task task2; 
     private ArrayList<VisualTuple<Task>> taskList;
     private DateTimeFormatter df;
@@ -36,8 +34,8 @@ public class TaskListViewTest {
         ldtStart2 = LocalDateTime.of(2015,10,6,12,0); 
         ldtEnd2 = LocalDateTime.of(2015,10,6,17,0); 
    
-        task1 = new Task("Stay Alive", "Do not die",ldtStart1,ldtEnd1);
-        task2 = new Task("Cry", "Me a river",ldtStart2,ldtEnd2);
+        task1 = new Task(100, "Stay Alive", "Do not die",ldtStart1,ldtEnd1);
+        task2 = new Task(101, "Cry", "Me a river",ldtStart2,ldtEnd2);
         
         taskList = new ArrayList<VisualTuple<Task>>();
         taskList.add(new VisualTuple<>(1, task1));

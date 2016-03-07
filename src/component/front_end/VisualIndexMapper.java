@@ -16,7 +16,7 @@ public class VisualIndexMapper implements VisualIndexMapperSpec {
      */
     private ArrayList<Integer> forwardMap_;
     private HashMap<Integer, Integer> backwardMap_;
-    private ArrayList<VisualTuple<Task>> visualTupleList_;
+    private List<VisualTuple<Task>> visualTupleList_;
 
     /**
      * Constructs a visual index mapper based on a list of index
@@ -66,7 +66,7 @@ public class VisualIndexMapper implements VisualIndexMapperSpec {
     }
 
     @Override
-    public List<VisualTuple<? extends RelationInterface>> getVisualTupleList() {
+    public List<VisualTuple<Task>> getVisualTupleList() {
         return this.visualTupleList_;
     }
 
