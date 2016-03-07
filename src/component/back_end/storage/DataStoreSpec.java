@@ -1,5 +1,7 @@
 package component.back_end.storage;
 
+import component.back_end.exceptions.storage.PrimaryKeyAlreadyExistsException;
+
 import java.util.List;
 import java.util.function.Function;
 
@@ -23,14 +25,14 @@ public abstract class DataStoreSpec {
      *
      * @param tuple The tuple to be added
      */
-    public abstract void add(RelationInterface tuple);
+    public abstract void add(RelationInterface tuple) throws PrimaryKeyAlreadyExistsException;
 
     /**
      * Removes a tuple from the data store
      * @param tuple
      * @return
      */
-    public abstract RelationInterface remove(RelationInterface tuple);
+    public abstract <T extends RelationInterface> T remove(T tuple);
 
     /**
      * Removes a tuple knowing its relation class and its primary key
@@ -38,7 +40,10 @@ public abstract class DataStoreSpec {
      * @param primaryKey a primary key object
      * @return
      */
-    public abstract RelationInterface remove(Class<? extends RelationInterface> relationClass, PrimaryKeyInterface primaryKey);
+    public abstract <T extends RelationInterface> T remove(
+            Class<T> relationClass,
+            PrimaryKeyInterface primaryKey
+    );
 
     /**
      * Get a list of tasks that match the task descriptor specified (see {@link RelationConstraint})
@@ -46,7 +51,22 @@ public abstract class DataStoreSpec {
      * @param descriptor the task descriptor
      * @return
      */
-    public abstract List<RelationInterface> getAll(Class<? extends RelationInterface> relationClass, RelationConstraint descriptor);
+    public abstract <T extends RelationInterface> List<T> getAll(
+            Class<T> relationClass,
+            RelationConstraint descriptor
+    );
+
+    /**
+     * Returns a tuple value associated with the primary key, which can be found inside the collection
+     * named under the relation class. Returns null if value not found.
+     * @param relationClass a class that implements {@link RelationInterface}
+     * @param primaryKey a primary key that implements {@link PrimaryKeyInterface}
+     * @return the tuple associated with the primary key stored under a collection of its relation class
+     */
+    public abstract <T extends RelationInterface> T get(
+            Class<T> relationClass,
+            PrimaryKeyInterface primaryKey
+    );
 
     /**
      * Get a list of tasks that match the task descriptor specified (see {@link RelationConstraint})
@@ -58,5 +78,8 @@ public abstract class DataStoreSpec {
      * @param modifierFunction
      * @return
      */
-    public abstract List<RelationInterface> map(RelationConstraint descriptor, Function<List<RelationInterface>, Void> modifierFunction);
+    public abstract List<RelationInterface> map(
+            RelationConstraint descriptor,
+            Function<List<RelationInterface>, Void> modifierFunction
+    );
 }

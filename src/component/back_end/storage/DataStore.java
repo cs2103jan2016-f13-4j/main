@@ -1,8 +1,8 @@
 package component.back_end.storage;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.TreeMap;
+import component.back_end.exceptions.storage.PrimaryKeyAlreadyExistsException;
+
+import java.util.*;
 import java.util.function.Function;
 
 /**
@@ -14,104 +14,135 @@ import java.util.function.Function;
  */
 
 public class DataStore extends DataStoreSpec {
-    
+
+    /**
+     * Properties
+     */
     private HashMap<Class<? extends RelationInterface>, TreeMap<PrimaryKeyInterface<?>, RelationInterface>> storageMap_;
 
-    // Constructor
+    /**
+     * Constructs an empty data storage
+     */
     public DataStore() {
-        // initialize HashMap
+        // Initialize HashMap
         this.storageMap_ = new HashMap<>();
     }
 
     @Override
-    public void add(RelationInterface tuple) {
-        Class<? extends RelationInterface> relationClass = (Class<? extends RelationInterface>) tuple.getClass();
-        
-        // check if the function is an add or edit
-        if (this.isAddNewEntry(relationClass)) {
-            this.addStorageTree(relationClass);
-        }
-        
-        // find the storage tree with the particular class as key
-        TreeMap<PrimaryKeyInterface<?>, RelationInterface> storageTree = getStorageFor(relationClass);
+    public void add(RelationInterface tuple) throws PrimaryKeyAlreadyExistsException {
+        assert(this.hasCollectionFor(tuple.getClass()));
+        assert(tuple.getPrimaryKey() != null);
 
-        // add to TreeMap, or overwrites when this is an edit function
-        storageTree.put(tuple.getPrimaryKey(), tuple);
-        
+        // Get collection of values from the tuple's class
+        TreeMap<PrimaryKeyInterface<?>, RelationInterface> collection =
+                this.getCollectionFor(tuple.getClass());
+
+        // Try to find the primary key inside database
+        PrimaryKeyInterface primaryKey = tuple.getPrimaryKey();
+        if (collection.containsKey(primaryKey)) {
+            throw new PrimaryKeyAlreadyExistsException(primaryKey, tuple.getClass());
+        }
+
+        collection.put(primaryKey, tuple);
+    }
+
+    private TreeMap<PrimaryKeyInterface<?>,RelationInterface> getCollectionFor(
+            Class<? extends RelationInterface> aClass) {
+        return this.storageMap_.get(aClass);
     }
 
     /**
-     * Checks if the function is an add or edit.
-     * If the storage tree for this particular relation already exists, then this is an edit.
-     * Else, the function is an add.
+     * Creates and adds new collection
      * 
      * @param relationClass
-     * @return
      */
-    private boolean isAddNewEntry(Class<? extends RelationInterface> relationClass) {
-        // if storage tree for this relation already exists
-        if (this.storageMap_.containsKey(relationClass)) {
-            return false;
-        } else {
-            return true;
+    public void createCollectionFor(Class<? extends RelationInterface> relationClass) {
+        // Create new collection
+        TreeMap<PrimaryKeyInterface<?>, RelationInterface> collection = new TreeMap<>();
+        
+        // Add storage tree for this relation to HashMap
+        this.storageMap_.put(relationClass, collection);
+    }
+
+    private boolean hasCollectionFor(Class<? extends RelationInterface> relationClass) {
+        return this.getCollectionFor(relationClass) != null;
+    }
+
+    @Override
+    public <T extends RelationInterface> T remove(T tuple) {
+        assert(tuple != null);
+        return this.remove((Class<T>) tuple.getClass(), tuple.getPrimaryKey());
+    }
+
+    @Override
+    public <T extends RelationInterface> T remove(Class<T> relationClass, PrimaryKeyInterface primaryKey) {
+        assert(relationClass != null);
+        assert(primaryKey != null);
+        assert(this.hasCollectionFor(relationClass));
+
+        TreeMap<PrimaryKeyInterface<?>, RelationInterface> collection =
+                this.getCollectionFor(relationClass);
+
+        try {
+            // Primary key does not exists in database, return null
+            if (!collection.containsKey(primaryKey)) {
+                return null;
+            }
+
+            return (T) collection.remove(primaryKey);
+        } catch (ClassCastException e) {
+            // Normally this is returned when there is a primary key mismatch
+            return null;
         }
     }
-    
-    /**
-     * Creates and adds new storage tree.
-     * 
-     * @param relationClass
-     */
-    private void addStorageTree(Class<? extends RelationInterface> relationClass) {
-        // create new storage tree
-        TreeMap<PrimaryKeyInterface<?>, RelationInterface> storageTree = new TreeMap<>();
-        
-        // add storage tree for this relation to HashMap
-        this.storageMap_.put(relationClass, storageTree);       
-    }
-
-    private TreeMap<PrimaryKeyInterface<?>, RelationInterface> getStorageFor(
-            Class<? extends RelationInterface> relationClass) {
-        
-        return this.storageMap_.get(relationClass);
-        
-    }
 
     @Override
-    public RelationInterface remove(RelationInterface tuple) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public RelationInterface remove(Class<? extends RelationInterface> relationClass, PrimaryKeyInterface primaryKey) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<RelationInterface> getAll(Class<? extends RelationInterface> relationClass,
+    public <T extends RelationInterface> List<T> getAll(Class<T> relationClass,
             RelationConstraint descriptor) {
-        // TODO Auto-generated method stub
-        return null;
+        assert(relationClass != null);
+        assert(this.hasCollectionFor(relationClass));
+
+        TreeMap<PrimaryKeyInterface<?>, RelationInterface> collection =
+                this.getCollectionFor(relationClass);
+
+        List<T> tuples = new ArrayList<>((Collection<T>) collection.values());
+
+        if (descriptor != null) {
+            for (Iterator<T> it = tuples.iterator(); it.hasNext(); ) {
+                RelationInterface tuple = it.next();
+
+                // Pass it through the function
+                if (!descriptor.matches(tuple)) {
+                    it.remove();
+                }
+            }
+        }
+
+        return tuples;
+    }
+
+    @Override
+    public <T extends RelationInterface> T get(Class<T> relationClass, PrimaryKeyInterface primaryKey) {
+        assert(relationClass != null);
+        assert(primaryKey != null);
+        assert(this.hasCollectionFor(relationClass));
+
+        TreeMap<PrimaryKeyInterface<?>, RelationInterface> collection =
+                this.getCollectionFor(relationClass);
+
+        try {
+            return (T) collection.get(primaryKey);
+        } catch (ClassCastException e) {
+            // Normally this is returned when there is a primary key mismatch
+            return null;
+        }
     }
 
     @Override
     public List<RelationInterface> map(RelationConstraint descriptor,
             Function<List<RelationInterface>, Void> modifierFunction) {
-        // TODO Auto-generated method stub
+        // TODO: Auto-generated method stub
         return null;
-    }
-
-    
-    public HashMap<Class<? extends RelationInterface>, TreeMap<PrimaryKeyInterface<?>, RelationInterface>> getStorageMap() {
-        return storageMap_;
-    }
-
-    
-    public void setStorageMap(
-            HashMap<Class<? extends RelationInterface>, TreeMap<PrimaryKeyInterface<?>, RelationInterface>> storageMap) {
-        storageMap_ = storageMap;
     }
 
 }

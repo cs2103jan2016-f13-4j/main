@@ -1,5 +1,6 @@
 package factories;
 
+import component.back_end.storage.PrimaryKey;
 import component.back_end.storage.PrimaryKeyInterface;
 import component.back_end.storage.RelationInterface;
 
@@ -27,7 +28,7 @@ public class TestRelation implements RelationInterface {
 
     @Override
     public void updatePrimaryKey() {
-        this.primaryKey_ = new TestPrimaryKey(this.name_);
+        this.primaryKey_ = new PrimaryKey<String>(this.name_);
     }
 
 }

@@ -63,4 +63,15 @@ public class PrimaryKeyTest {
         assertThat(key1, is(equalTo(key2)));
     }
 
+    @Test
+    public void Primary_keys_of_a_string_is_equal_to_that_string() {
+        PrimaryKey<String> key = new PrimaryKey<>("hello");
+        assertThat(key, is(equalTo("hello")));
+    }
+
+    @Test
+    public void Primary_keys_of_an_integer_is_equal_to_that_number() {
+        PrimaryKey<Integer> key = new PrimaryKey<>(7);
+        assertThat(key, is(equalTo(7)));
+    }
 }

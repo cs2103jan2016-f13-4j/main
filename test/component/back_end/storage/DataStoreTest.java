@@ -1,11 +1,19 @@
 package component.back_end.storage;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.*;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.TreeMap;
 
+import component.back_end.exceptions.storage.PrimaryKeyAlreadyExistsException;
+import factories.TestPrimaryKey;
+import factories.TestRelation;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -20,74 +28,103 @@ import entity.Task;
 public class DataStoreTest {
     
     private DataStore dataStore_;
-    private RelationInterface tuple_;
-    
+
     @Before
     public void setUp() {
         this.dataStore_ = new DataStore();
-        
-        // initialize attributes
-        String taskName = "homework";
-        String description = "cs2103t";
-        LocalDateTime taskStart = LocalDateTime.of(2016, 3, 6, 14, 30);
-        LocalDateTime taskEnd = LocalDateTime.of(2016, 3, 7, 14, 30);
-        
-        // create tuple
-        this.tuple_ = new Task(taskName, description, taskStart, taskEnd);
+        this.dataStore_.createCollectionFor(TestRelation.class);
     }
 
     @Test
-    public void Add_creates_TreeMap() {
-        
-        // execute add
-        this.dataStore_.add(this.tuple_);
-        
-        HashMap<Class<? extends RelationInterface>, TreeMap<PrimaryKeyInterface<?>, RelationInterface>> 
-            storageMap = this.dataStore_.getStorageMap();
-        
-        // check that a TreeMap with primary key has been created
-        assertNotNull(storageMap.get(this.tuple_.getClass()));
-        
+    public void DataStore_stores_element_after_adding() throws PrimaryKeyAlreadyExistsException {
+        TestRelation tuple = new TestRelation("randomKey");
+        this.dataStore_.add(tuple);
+
+        PrimaryKey<String> key = new PrimaryKey<>("randomKey");
+        assertThat(this.dataStore_.get(TestRelation.class, key), is(equalTo(tuple)));
     }
-    
+
+    @Test(expected = PrimaryKeyAlreadyExistsException.class)
+    public void DataStore_throws_exception_upon_adding_duplicate_primary_key() throws PrimaryKeyAlreadyExistsException {
+        String duplicateKey = "duplicateKey";
+        this.dataStore_.add(new TestRelation(duplicateKey));
+        this.dataStore_.add(new TestRelation(duplicateKey));
+    }
+
     @Test
-    public void Primary_key_of_TreeMap_leads_to_correct_tuple() {
-        // execute add
-        this.dataStore_.add(this.tuple_);
-        
-        HashMap<Class<? extends RelationInterface>, TreeMap<PrimaryKeyInterface<?>, RelationInterface>> 
-            storageMap = this.dataStore_.getStorageMap();
-        
-        // check that the tuples are the same
-        assertEquals(this.tuple_, storageMap.get(this.tuple_.getClass()).get(this.tuple_.getPrimaryKey()));
+    public void DataStore_does_not_have_element_after_removing() throws PrimaryKeyAlreadyExistsException {
+        this.dataStore_.add(new TestRelation("hello!"));
+        PrimaryKey<String> key = new PrimaryKey<>("hello!");
+        this.dataStore_.remove(TestRelation.class, key);
+        assertThat(this.dataStore_.get(TestRelation.class, key), is(nullValue()));
     }
-    
+
     @Test
-    public void Different_primary_keys_point_to_different_tuples_in_TreeMap() {
-        
-        // initialize attributes
-        String taskName = "floorball training";
-        String description = "in MPSH";
-        LocalDateTime taskStart = LocalDateTime.of(2016, 3, 6, 14, 30);
-        LocalDateTime taskEnd = LocalDateTime.of(2016, 3, 7, 14, 30);
-        
-        // create tuple
-        RelationInterface tuple2 = new Task(taskName, description, taskStart, taskEnd);
-        
-        // execute adds
-        this.dataStore_.add(this.tuple_);
-        this.dataStore_.add(tuple2);
-        
-        HashMap<Class<? extends RelationInterface>, TreeMap<PrimaryKeyInterface<?>, RelationInterface>> 
-            storageMap = this.dataStore_.getStorageMap();
-        
-        // use primary keys of tuple_ and tuple2 to retrieve them from HashMap
-        assertNotEquals(storageMap.get(this.tuple_.getClass()).get(this.tuple_.getPrimaryKey()),
-            storageMap.get(tuple2.getClass()).get(tuple2.getPrimaryKey()));
+    public void DataStore_returns_null_upon_removal() {
+        TestRelation result = this.dataStore_.remove(
+                TestRelation.class,
+                new PrimaryKey<>("non existent key")
+                );
+        assertThat(result, is(nullValue()));
     }
-    
+
     @Test
-    public void Edit_function_overwrites_data() {
-        
+    public void DataStore_returns_removed_tuple_upon_successful_removal() throws PrimaryKeyAlreadyExistsException {
+        TestRelation tuple = new TestRelation("whee!");
+        this.dataStore_.add(tuple);
+
+        PrimaryKey<String> key = new PrimaryKey<>("whee!");
+        TestRelation removedTuple = this.dataStore_.remove(TestRelation.class, key);
     }
+
+    @Test
+    public void DataStore_returns_null_on_getting_wrong_primary_key_type() throws PrimaryKeyAlreadyExistsException {
+        this.dataStore_.add(new TestRelation("hello!"));
+        PrimaryKey<Integer> integerKey = new PrimaryKey<>(5);
+
+        assertThat(this.dataStore_.get(TestRelation.class, integerKey), is(nullValue()));
+    }
+
+    @Test
+    public void DataStore_returns_null_on_removing_wrong_primary_key_type() throws PrimaryKeyAlreadyExistsException {
+        this.dataStore_.add(new TestRelation("boo!"));
+        PrimaryKey<Integer> integerKey = new PrimaryKey<>(5);
+
+        assertThat(this.dataStore_.remove(TestRelation.class, integerKey), is(nullValue()));
+    }
+
+    @Test
+    public void DataStore_returns_all_sorted_via_getAll_with_null_descriptor()
+            throws PrimaryKeyAlreadyExistsException {
+        this.dataStore_.add(new TestRelation("relation 51"));
+        this.dataStore_.add(new TestRelation("relation 52"));
+        this.dataStore_.add(new TestRelation("relation 50"));
+
+        List<TestRelation> tuples = this.dataStore_.getAll(TestRelation.class, null);
+        Iterator<TestRelation> it = tuples.iterator();
+        assertThat(it.next().getPrimaryKey(), is(equalTo("relation 50")));
+        assertThat(it.next().getPrimaryKey(), is(equalTo("relation 51")));
+        assertThat(it.next().getPrimaryKey(), is(equalTo("relation 52")));
+    }
+
+    @Test
+    public void DataStore_returns_valid_records_with_descriptor() throws PrimaryKeyAlreadyExistsException {
+        this.dataStore_.add(new TestRelation("twinkle twinkle little star"));
+        this.dataStore_.add(new TestRelation("how I wonder what you are"));
+        this.dataStore_.add(new TestRelation("up above the world so high"));
+        this.dataStore_.add(new TestRelation("like a diamond in the sky"));
+
+        RelationConstraint<TestRelation> indexHasWo = new RelationConstraint<TestRelation>() {
+            @Override
+            public boolean matches(TestRelation tuple) {
+                return tuple.getPrimaryKey().getValue().contains("wo");
+            }
+        };
+
+        List<TestRelation> tuplesWithWo = this.dataStore_.getAll(TestRelation.class, indexHasWo);
+        Iterator<TestRelation> it = tuplesWithWo.iterator();
+        assertThat(it.next().getPrimaryKey(), is(equalTo("how I wonder what you are")));
+        assertThat(it.next().getPrimaryKey(), is(equalTo("up above the world so high")));
+    }
+
 }

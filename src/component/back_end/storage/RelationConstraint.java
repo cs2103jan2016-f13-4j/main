@@ -1,5 +1,6 @@
 package component.back_end.storage;
 
 
-public class RelationConstraint<T extends Relation> {
+public abstract class RelationConstraint<T extends RelationInterface> {
+    public abstract boolean matches(T tuple);
 }

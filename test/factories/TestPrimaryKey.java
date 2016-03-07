@@ -27,19 +27,4 @@ public class TestPrimaryKey implements PrimaryKeyInterface<String> {
     public int compareTo(PrimaryKeyInterface<String> o) {
         return this.getValue().compareTo(o.getValue());
     }
-
-    @Override
-    public int hashCode() {
-        return this.getValue().hashCode();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null) return false;
-        if (this == o) return true;
-        if (!(o instanceof TestPrimaryKey)) return false;
-
-        TestPrimaryKey key = (TestPrimaryKey) o;
-        return this.getValue().equals(key.getValue());
-    }
 }
