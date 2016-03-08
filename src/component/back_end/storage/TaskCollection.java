@@ -1,5 +1,6 @@
 package component.back_end.storage;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -13,9 +14,12 @@ import exception.back_end.PrimaryKeyNotFoundException;
 public class TaskCollection {
 
     private TreeMap<Integer, Task> taskData_;
+    private TreeMap<LocalDateTime, List<Task>> startTimeTree_;
+    private TreeMap<LocalDateTime, List<Task>> endTimeTree_;
 
     public TaskCollection() {
         this.taskData_ = new TreeMap<>();
+        this.startTimeTree_ = new TreeMap<>();
     }
 
     public int save(Task task) {
@@ -33,7 +37,31 @@ public class TaskCollection {
             task.setId(newIndex);
         }
 
+        // add Task entry to the tree that maps ID to Task
         this.taskData_.put(task.getId(), task);
+        
+        // add Task entry to the tree that maps start time to Task
+        // do not add any Task with null start time to this tree
+        if (task.getStartTime() != null) {
+            if (!this.startTimeTree_.containsKey(task.getStartTime())) {
+                // if key yet to exist, put it into the tree and create a list
+                this.startTimeTree_.put(task.getStartTime(), new ArrayList<Task>());
+            }
+            // append Task to end of list
+            this.startTimeTree_.get(task.getStartTime()).add(task);
+        }
+        
+        // add Task entry to the tree that maps end time to Task
+        // do not add any Task with null end time to this tree
+        if (task.getEndTime() != null) {
+            if (!this.endTimeTree_.containsKey(task.getEndTime())) {
+                // if key yet to exist, put it into the tree and create a list
+                this.endTimeTree_.put(task.getEndTime(), new ArrayList<Task>());
+            }
+            // append Task to end of list
+            this.endTimeTree_.get(task.getEndTime()).add(task);
+        }
+        
         return task.getId();
     }
 
