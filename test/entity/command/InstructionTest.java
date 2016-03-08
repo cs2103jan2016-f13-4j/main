@@ -14,7 +14,7 @@ public class InstructionTest {
     public void Instructions_without_quantifier_become_universal_if_their_type_allows() {
         for (Instruction.Type type : Instruction.Type.values()) {
             // Skip types that cannot have universal quantifiers
-            if (!type.isUniversallyQuantifiable || type.doesRequireQuantifier) {
+            if (!type.isAllQuantifiable || type.doesRequireQuantifier) {
                 continue;
             }
 
@@ -22,7 +22,7 @@ public class InstructionTest {
             // become universally quantified
             Instruction inst = new Instruction(type);
 
-            assertThat(inst.isUniversallyQuantified(), is(true));
+            assertThat(inst.hasAllQuantifier(), is(true));
         }
     }
 
@@ -31,19 +31,18 @@ public class InstructionTest {
         for (Instruction.Type type : Instruction.Type.values()) {
             Instruction inst = new Instruction(type, 5);
 
-            assertThat(inst.isUniversallyQuantified(), is(false));
+            assertThat(inst.hasAllQuantifier(), is(false));
         }
     }
 
     @Test
-    public void Instructions_without_quantifier_but_required_quantifier_are_invalid() {
+    public void Instructions_without_quantifier_but_require_quantifier_are_invalid() {
         for (Instruction.Type type : Instruction.Type.values()) {
             // Skip types that do not require quantifier and are automatically
             // universally quantifiable
-            if (!type.doesRequireQuantifier || type.isUniversallyQuantifiable) {
+            if (!type.doesRequireQuantifier || type.isAllQuantifiable) {
                 continue;
             }
-            System.out.println(type);
 
             Instruction inst = new Instruction(type);
             assertThat(inst.getType(), is(Instruction.Type.INVALID));

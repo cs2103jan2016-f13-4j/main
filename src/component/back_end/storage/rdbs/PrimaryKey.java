@@ -1,4 +1,4 @@
-package component.back_end.storage;
+package component.back_end.storage.rdbs;
 
 /**
  * 
@@ -38,9 +38,23 @@ public class PrimaryKey<T extends Comparable<T>> implements PrimaryKeyInterface<
     public boolean equals(Object o) {
         if (o == null) return false;
         if (this == o) return true;
-        if (!(o instanceof PrimaryKey)) return false;
 
-        PrimaryKey<T> key = (PrimaryKey<T>) o;
-        return this.getValue().equals(key.getValue());
+        // Compare two primary keys
+        if (o instanceof PrimaryKey) {
+            try {
+                PrimaryKey<T> key = (PrimaryKey<T>) o;
+                return this.getValue().equals(key.getValue());
+            } catch (ClassCastException e) {
+                return false;
+            }
+        }
+
+        // Compare a key with a value that it holds
+        if (this.getValue().getClass().equals(o.getClass())) {
+            T key = (T) o;
+            return this.getValue().equals(key);
+        }
+
+        return false;
     }
 }

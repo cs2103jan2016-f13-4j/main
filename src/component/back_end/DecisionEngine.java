@@ -6,15 +6,15 @@ import entity.command.Command;
 
 
 public class DecisionEngine extends DecisionEngineSpec { 
-    protected DataStoreSpec dataStore_ = null;
-    protected TaskSchedulerSpec taskScheduler_ = null;
+    protected TaskCollection taskData_;
+    protected TaskSchedulerSpec taskScheduler_;
     
     public DecisionEngine() {
-        this.dataStore_ = new DataStore();
+        this.taskData_ = new TaskCollection();
     }
 
     @Override
-    public ExecutionResult<?> performCommand(Command command) {
+    public Task createTask(Command command) {
         
         switch (command.getInstruction().getType()) {
             case ADD:
@@ -42,6 +42,11 @@ public class DecisionEngine extends DecisionEngineSpec {
         return null;
         
     }
+    
+    @Override
+    public ExecutionResult<?> performCommand(Command cmd) {
+        return null;
+    }
 
     @Override
     protected TaskSchedulerSpec getTaskScheduler() {
@@ -50,7 +55,7 @@ public class DecisionEngine extends DecisionEngineSpec {
     }
 
     @Override
-    protected DataStoreSpec getDataStore() {
+    protected TaskCollection getTaskData() {
         // TODO Auto-generated method stub
         return null;
     }

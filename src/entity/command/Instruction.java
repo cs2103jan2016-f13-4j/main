@@ -5,30 +5,30 @@ package entity.command;
  */
 public class Instruction {
 
-    public static final String STRING_QUANTIFIER_UNIVERSAL = "all";
+    public static final String STRING_QUANTIFIER_ALL = "all";
 
     /**
      * Types
      */
     public enum Type {
-        // TYPE_NAME ( isUniversallyQuantifiable, doesRequireQuantifier )
-        ADD          ( false,                     false),
-        EDIT         ( false,                     true),
-        DISPLAY      ( true,                      false),
-        DELETE       ( true,                      true),
-        EXIT         ( false,                     true),
+        // TYPE_NAME ( isAllQuantifiable, doesRequireQuantifier )
+        ADD          ( false,             false),
+        EDIT         ( false,             true),
+        DISPLAY      ( true,              false),
+        DELETE       ( true,              true),
+        EXIT         ( false,             true),
 
         // Special types
         INVALID     (false, false),
         UNRECOGNISED(false, false);
 
         // Type properties
-        final boolean isUniversallyQuantifiable;
+        final boolean isAllQuantifiable;
         final boolean doesRequireQuantifier;
 
         // Type constructor
         Type(boolean uniQuantifiable, boolean requireQuantifier) {
-            isUniversallyQuantifiable = uniQuantifiable;
+            isAllQuantifiable = uniQuantifiable;
             doesRequireQuantifier = requireQuantifier;
         }
 
@@ -38,8 +38,8 @@ public class Instruction {
      * Properties
      */
     private Type type_;
-    private boolean isUniversallyQuantified_;
-    private Integer indexQuantifier_;
+    private boolean hasAllQuantifier_;
+    private Integer index_;
 
     /**
      * Constructs an instruction and classify it to have
@@ -48,7 +48,6 @@ public class Instruction {
      * @param type
      */
     public Instruction(Type type) {
-        assert(type.isUniversallyQuantifiable);
         this.type_ = type;
 
         this.inferQuantifierFromString(null);
@@ -59,12 +58,12 @@ public class Instruction {
      * visual index.
      *
      * @param type
-     * @param indexQuantifier
+     * @param index
      */
-    public Instruction(Type type, int indexQuantifier) {
+    public Instruction(Type type, int index) {
         this.type_ = type;
-        this.isUniversallyQuantified_ = false;
-        this.indexQuantifier_ = indexQuantifier;
+        this.hasAllQuantifier_ = false;
+        this.index_ = index;
     }
 
     public Instruction(String instruction, String quantifier) {
@@ -74,7 +73,7 @@ public class Instruction {
 
     private void inferQuantifierFromString(String quantifier) {
         // Assume that the instruction is not universally quantified
-        this.isUniversallyQuantified_ = false;
+        this.hasAllQuantifier_ = false;
 
         if (quantifier == null) {
             // If there are no quantifier, and that quantifier is required,
@@ -87,19 +86,19 @@ public class Instruction {
             // If there are no quantifier, and that the type is
             // universally quantifiable, then let the quantifier
             // be universal
-            if (this.type_.isUniversallyQuantifiable) {
-                this.isUniversallyQuantified_ = true;
+            if (this.type_.isAllQuantifiable) {
+                this.hasAllQuantifier_ = true;
             }
 
             // If there are no quantifier, and the type is not
             // universally quantifiable, then there is nothing to worry about
-            // Just remember to set the isUniversallyQuantified to false
+            // Just remember to set the hasAllQuantifier to false
         } else {
 
             // If quantifier is not null and corresponds to the pre-defined
             // universal quantifier, then let the quantifier be universal
-            if (this.type_.isUniversallyQuantifiable && quantifier.equals(STRING_QUANTIFIER_UNIVERSAL)) {
-                this.isUniversallyQuantified_ = true;
+            if (this.type_.isAllQuantifiable && quantifier.equals(STRING_QUANTIFIER_ALL)) {
+                this.hasAllQuantifier_ = true;
             }
 
             // If quantifier is not null, and does not correspond to the
@@ -107,7 +106,7 @@ public class Instruction {
             // into an integer value
             else {
                 try {
-                    this.indexQuantifier_ = Integer.parseInt(quantifier);
+                    this.index_ = Integer.parseInt(quantifier);
                 } catch (NumberFormatException e) {
                     // Number cannot be verified, tag the type as invalid
                     this.type_ = Type.INVALID;
@@ -138,15 +137,15 @@ public class Instruction {
         }
     }
 
-    public boolean isUniversallyQuantified() {
-        return this.isUniversallyQuantified_;
+    public boolean hasAllQuantifier() {
+        return this.hasAllQuantifier_;
     }
 
     public Type getType() {
         return this.type_;
     }
 
-    public Integer getIndexQuantifier() {
-        return this.indexQuantifier_;
+    public Integer getIndex() {
+        return this.index_;
     }
 }
