@@ -38,6 +38,11 @@ public class TranslationEngine extends TranslationEngineSpec {
 
     @Override
     public void display(ExecutionResult<?> result) {
+        // Null view, does not do anything
+        if (result == null) {
+            return;
+        }
+
         this.initializeView(result);
         this.getUserInterface().render(this.currentView_);
     }
