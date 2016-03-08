@@ -20,17 +20,17 @@ public class TaskListView extends VisualIndexView<Task> {
     private static final String STRING_SEPARATOR = " | ";
     private static final String NUMBER_FORMAT = "%d. ";
 
-    private DateTimeFormatter df;
+    private DateTimeFormatter df_;
     
     public TaskListView(List<VisualTuple<Task>> list){
         super(list);
-        df = DateTimeFormatter.ofPattern(DATE_FORMAT);
+        
     }
 
     @Override
     public void buildContent() {
+        this.df_ = DateTimeFormatter.ofPattern(DATE_FORMAT);
         List<VisualTuple<Task>> visualTasks = this.getVisualTupleList();
-
         for (VisualTuple<Task> visualTask : visualTasks) {
             this.addText(this.constructDisplayID(visualTask.getIndex()));
 
@@ -50,8 +50,8 @@ public class TaskListView extends VisualIndexView<Task> {
         LocalDateTime start = task.getStartTime();
         LocalDateTime end = task.getEndTime();
         
-        String startDisplay = start.format(df);
-        String endDisplay = end.format(df);
+        String startDisplay = start.format(this.df_);
+        String endDisplay = end.format(this.df_);
         
         return String.format(STRING_DATE_DISPLAY_FORMAT, startDisplay, endDisplay);
     }
