@@ -37,18 +37,18 @@ public class TaskViewTest {
     String expectedEnd = "Monday, 07 March 2016 | 00:00";
     assertThat(tv.constructTime(ldtStart),is(expectedStart));
     assertThat(tv.constructTime(ldtEnd),is(expectedEnd));
-      
     }
     
     @Test
     public void viewConstructTest() {
     String expectedStart = "Start: Sunday, 06 March 2016 | 22:00\n";    
-    String expectedEnd = "End: Monday, 07 March 2016 | 00:00\n";
+    String expectedEnd = "End  : Monday, 07 March 2016 | 00:00\n";
     String detailHeader = "Detail\n";
     String detail = "2 more chapters left\n";
     String taskName = "Finish ST2334\n";
     String emptyString = "\n";
-    String construct = taskName + emptyString + expectedStart + expectedEnd + emptyString + detailHeader + detail; 
+    String construct = taskName+ expectedStart + expectedEnd + emptyString + detailHeader + detail; 
+    System.out.println(tv.getContent());
     assertThat(tv.getContent(),is(construct)); 
       
     }

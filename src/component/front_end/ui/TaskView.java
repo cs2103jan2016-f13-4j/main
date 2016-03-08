@@ -14,7 +14,7 @@ public class TaskView extends View<VisualTuple<Task>> {
     private final static String STRING_DATE_FORMAT = "EEEE, dd MMMM YYYY | HH:mm";
     private final static String STRING_START_TIME = "Start: ";
     private final static String STRING_EMPTY = ""; 
-    private final static String STRING_END_TIME = "End: ";
+    private final static String STRING_END_TIME = "End  : ";
     private final static String STRING_DETAIL = "Detail";
     private DateTimeFormatter df_;  
     
@@ -29,7 +29,6 @@ public class TaskView extends View<VisualTuple<Task>> {
         VisualTuple<Task> tuple = (VisualTuple<Task>) this.getViewData();
         Task tsk = tuple.getOriginal();
         this.addLine(tsk.getTaskName());
-        this.addLine(STRING_EMPTY); 
         this.addText(STRING_START_TIME);
         this.addLine(constructTime(tsk.getStartTime()));
         this.addText(STRING_END_TIME);
