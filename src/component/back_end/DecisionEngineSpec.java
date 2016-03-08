@@ -30,5 +30,5 @@ public abstract class DecisionEngineSpec {
      * @return the result of the command execution, an object containing instructions for the front end
      */
     public abstract ExecutionResult<?> performCommand(Command cmd);
-    protected abstract Task createTask(Command cmd);
+    protected abstract Task createRawTask(Command cmd);
 }
