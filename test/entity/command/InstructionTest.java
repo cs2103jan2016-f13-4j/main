@@ -36,7 +36,7 @@ public class InstructionTest {
     }
 
     @Test
-    public void Instructions_without_quantifier_but_required_quantifier_are_invalid() {
+    public void Instructions_without_quantifier_but_require_quantifier_are_invalid() {
         for (Instruction.Type type : Instruction.Type.values()) {
             // Skip types that do not require quantifier and are automatically
             // universally quantifiable

@@ -1,7 +1,5 @@
 package component.front_end;
-
-import component.back_end.storage.PrimaryKeyInterface;
-import component.back_end.storage.RelationInterface;
+import component.back_end.storage.Task;
 import component.front_end.ui.core.VisualTuple;
 
 import java.util.ArrayList;
@@ -16,21 +14,21 @@ public class VisualIndexMapper extends VisualIndexMapperSpec {
     /**
      * Properties
      */
-    private ArrayList<PrimaryKeyInterface<?>> forwardMap_;
-    private HashMap<PrimaryKeyInterface<?>, Integer> backwardMap_;
-    private ArrayList<VisualTuple<? extends RelationInterface>> visualTupleList_;
+    private ArrayList<Integer> forwardMap_;
+    private HashMap<Integer, Integer> backwardMap_;
+    private List<VisualTuple<Task>> visualTupleList_;
 
     /**
      * Constructs a visual index mapper based on a list of index
      */
-    public VisualIndexMapper(List<RelationInterface> tupleList) {
+    public VisualIndexMapper(List<Task> tupleList) {
         this.forwardMap_ = new ArrayList<>();
         this.backwardMap_ = new HashMap<>();
         this.visualTupleList_ = new ArrayList<>();
 
         // Populate keys
-        for (RelationInterface tuple : tupleList)  {
-            PrimaryKeyInterface<?> primaryKey = tuple.getPrimaryKey();
+        for (Task tuple : tupleList)  {
+            Integer primaryKey = tuple.getId();
             this.forwardMap_.add(primaryKey);
 
             // Get the latest added primary key
@@ -43,7 +41,7 @@ public class VisualIndexMapper extends VisualIndexMapperSpec {
             this.backwardMap_.put(primaryKey, visualIndex);
 
             // Also add the tuple to visual tuple list
-            VisualTuple<? extends RelationInterface> visualTuple = new VisualTuple<>(
+            VisualTuple<Task> visualTuple = new VisualTuple<>(
                     visualIndex,
                     tuple
             );
@@ -52,23 +50,23 @@ public class VisualIndexMapper extends VisualIndexMapperSpec {
     }
 
     @Override
-    public <T> int translateRawToVisual(PrimaryKeyInterface<T> rawPrimaryKey) {
+    public int translateRawToVisual(Integer rawPrimaryKey) {
         assert(rawPrimaryKey != null);
         return this.backwardMap_.get(rawPrimaryKey);
     }
 
     @Override
-    public <T> PrimaryKeyInterface<T> translateVisualToRaw(int visualId) {
+    public Integer translateVisualToRaw(int visualId) {
         int arrayListId = getArrayListIdFromVisualId(visualId);
         try {
-            return (PrimaryKeyInterface<T>) this.forwardMap_.get(arrayListId);
+            return this.forwardMap_.get(arrayListId);
         } catch (IndexOutOfBoundsException e) {
             return null;
         }
     }
 
     @Override
-    public List<VisualTuple<? extends RelationInterface>> getVisualTupleList() {
+    public List<VisualTuple<Task>> getVisualTupleList() {
         return this.visualTupleList_;
     }
 
