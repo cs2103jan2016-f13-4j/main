@@ -1,19 +1,20 @@
 package component.back_end;
 
-import component.back_end.storage.TaskCollection;
+import static org.junit.Assert.*;
+
+import org.junit.*;
 import component.back_end.storage.Task;
+import component.back_end.storage.TaskCollection;
 import entity.command.*;
-
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Before;
-import org.junit.Test;
 
 
 class DecisionEngineTester extends DecisionEngine {
     public TaskCollection getTaskCollectionForTest() {
         return this.taskData_;
     }
+}
+
+public class DecisionEngineTest {
     private DecisionEngineTester dEngine_;
     
     @Before
@@ -41,5 +42,4 @@ class DecisionEngineTester extends DecisionEngine {
         assertEquals(task.getEndTime().getHour(), 18);
         
     }
-    
 }
