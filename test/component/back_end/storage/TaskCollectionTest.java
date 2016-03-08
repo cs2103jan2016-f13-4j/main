@@ -73,16 +73,16 @@ public class TaskCollectionTest {
         this.taskCollection.save(this.task5_);
     }
     
+    //----------------------------------------------------------------------------------------
+    //
+    // I. Save Tests
+    //
+    //----------------------------------------------------------------------------------------
+    
     @Test
     public void Save_returns_correct_Task_ID() {
         int returnedID = this.taskCollection.save(this.task1_);
         assertEquals(this.TASK_1_ID, returnedID);
-    }
-    
-    @Test
-    public void Get_returns_correct_Task() throws PrimaryKeyNotFoundException {
-        Task returnedTask = this.taskCollection.get(this.TASK_1_ID);
-        assertEquals(this.task1_, returnedTask);
     }
     
     @Test
@@ -97,12 +97,24 @@ public class TaskCollectionTest {
         assertEquals(this.TASK_1_START, this.taskCollection.get(6).getStartTime());
         assertEquals(this.TASK_1_END, this.taskCollection.get(6).getEndTime());
     }
-
-    @Test(expected = PrimaryKeyNotFoundException.class)
-    public void Remove_deletes_correct_Task() throws PrimaryKeyNotFoundException {
-        this.taskCollection.remove(this.TASK_1_ID);
-        this.taskCollection.get(this.TASK_1_ID);
+    
+    //----------------------------------------------------------------------------------------
+    //
+    // II. Get Tests
+    //
+    //----------------------------------------------------------------------------------------
+    
+    @Test
+    public void Get_returns_correct_Task() throws PrimaryKeyNotFoundException {
+        Task returnedTask = this.taskCollection.get(this.TASK_1_ID);
+        assertEquals(this.task1_, returnedTask);
     }
+    
+  //----------------------------------------------------------------------------------------
+    //
+    // III. GetAll Tests
+    //
+    //----------------------------------------------------------------------------------------
     
     @Test
     public void Get_all_method_with_null_parameter_returns_list_correctly() {
@@ -153,6 +165,24 @@ public class TaskCollectionTest {
         // assert that expected results and actual filtered results are the same
         assertEquals(expectedTaskList, this.taskCollection.getAll(taskDescriptor));
     }
+    
+    //----------------------------------------------------------------------------------------
+    //
+    // IV. Remove Tests
+    //
+    //----------------------------------------------------------------------------------------
+    
+    @Test(expected = PrimaryKeyNotFoundException.class)
+    public void Remove_deletes_correct_Task() throws PrimaryKeyNotFoundException {
+        this.taskCollection.remove(this.TASK_1_ID);
+        this.taskCollection.get(this.TASK_1_ID);
+    }
+    
+    //----------------------------------------------------------------------------------------
+    //
+    // V. Search by Time Range Tests
+    //
+    //----------------------------------------------------------------------------------------
     
     @Test
     public void Searching_by_start_before_returns_list_correctly() {           
