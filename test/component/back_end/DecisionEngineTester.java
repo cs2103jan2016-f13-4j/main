@@ -1,8 +1,11 @@
 package component.back_end;
 
 import component.back_end.storage.TaskCollection;
-import entity.command.Instruction;
-import entity.command.ParameterList;
+import component.back_end.storage.Task;
+import entity.command.*;
+
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Before;
 import org.junit.Test;
 
