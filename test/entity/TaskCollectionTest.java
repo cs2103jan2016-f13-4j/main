@@ -3,6 +3,7 @@ package entity;
 import static org.junit.Assert.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -27,6 +28,20 @@ public class TaskCollectionTest {
     private final LocalDateTime TASK_START = LocalDateTime.of(2016, 3, 6, 14, 30);
     private final LocalDateTime TASK_END = LocalDateTime.of(2016, 3, 8, 14, 30);
     private Task task;
+    
+    private final int TASK_2_ID = 2;
+    private final String TASK_2_NAME = "assignment";
+    private final String TASK_2_DESCRIPTION = "cs3230";
+    private final LocalDateTime TASK_2_START = LocalDateTime.of(2016, 3, 6, 14, 30);
+    private final LocalDateTime TASK_2_END = LocalDateTime.of(2016, 3, 8, 14, 30);
+    private Task task2;
+    
+    private final int TASK_3_ID = 3;
+    private final String TASK_3_NAME = "tutorial";
+    private final String TASK_3_DESCRIPTION = "nm2101";
+    private final LocalDateTime TASK_3_START = LocalDateTime.of(2016, 3, 6, 14, 30);
+    private final LocalDateTime TASK_3_END = LocalDateTime.of(2016, 3, 8, 14, 30);
+    private Task task3;
     
     @Before
     public void setUp() {
@@ -65,6 +80,27 @@ public class TaskCollectionTest {
         this.taskCollection.save(this.task);
         this.taskCollection.remove(this.TASK_ID);
         this.taskCollection.get(this.TASK_ID);
+    }
+    
+    @Test
+    public void Get_all_method_returns_list_correctly() {
         
+        // create two additional Tasks for adding into TreeMap
+        this.task2 = new Task (this.TASK_2_ID, this.TASK_2_NAME, this.TASK_2_DESCRIPTION, this.TASK_2_START, this.TASK_2_END);
+        this.task3 = new Task (this.TASK_3_ID, this.TASK_3_NAME, this.TASK_3_DESCRIPTION, this.TASK_3_START, this.TASK_3_END);
+
+        // create expected ArrayList consisting of three Tasks
+        ArrayList<Task> expectedTaskList = new ArrayList<>();
+        expectedTaskList.add(this.task);
+        expectedTaskList.add(this.task2);
+        expectedTaskList.add(this.task3);
+        
+        // add all three Tasks
+        this.taskCollection.save(this.task);
+        this.taskCollection.save(this.task2);
+        this.taskCollection.save(this.task3);
+        
+        // assert that expected and actual ArrayLists are equal
+        assertEquals(expectedTaskList, this.taskCollection.getAll());
     }
 }
