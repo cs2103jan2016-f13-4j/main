@@ -83,7 +83,7 @@ public class TaskCollectionTest {
     }
     
     @Test
-    public void Get_all_method_returns_list_correctly() {
+    public void Get_all_method_with_null_parameter_returns_list_correctly() {
         
         // create two additional Tasks for adding into TreeMap
         this.task2 = new Task (this.TASK_2_ID, this.TASK_2_NAME, this.TASK_2_DESCRIPTION, this.TASK_2_START, this.TASK_2_END);
@@ -101,6 +101,59 @@ public class TaskCollectionTest {
         this.taskCollection.save(this.task3);
         
         // assert that expected and actual ArrayLists are equal
-        assertEquals(expectedTaskList, this.taskCollection.getAll());
+        assertEquals(expectedTaskList, this.taskCollection.getAll(null));
+    }
+    
+    @Test
+    public void Get_all_method_with_task_descriptor_checking_TaskName_returns_list_correctly() {
+        TaskDescriptor taskDescriptor = new TaskDescriptor() {
+          @Override
+          public boolean matches(Task task) {
+              return task.getTaskName().contains("assign");
+          }
+        };
+        
+        // create two additional Tasks for adding into TreeMap
+        this.task2 = new Task (this.TASK_2_ID, this.TASK_2_NAME, this.TASK_2_DESCRIPTION, this.TASK_2_START, this.TASK_2_END);
+        this.task3 = new Task (this.TASK_3_ID, this.TASK_3_NAME, this.TASK_3_DESCRIPTION, this.TASK_3_START, this.TASK_3_END);
+        
+        // add all three Tasks
+        this.taskCollection.save(this.task);
+        this.taskCollection.save(this.task2);
+        this.taskCollection.save(this.task3);
+        
+        // create an ArrayList with Task entries containing 'assign' in task name
+        ArrayList<Task> expectedTaskList = new ArrayList<Task>();
+        expectedTaskList.add(this.task2);
+        
+        // assert that expected results and actual filtered results are the same
+        assertEquals(expectedTaskList, this.taskCollection.getAll(taskDescriptor));
+    }
+    
+    @Test
+    public void Get_all_method_with_task_descriptor_checking_TaskDescription_returns_list_correctly() {
+        TaskDescriptor taskDescriptor = new TaskDescriptor() {
+          @Override
+          public boolean matches(Task task) {
+              return task.getDescription().contains("cs");
+          }
+        };
+        
+        // create two additional Tasks for adding into TreeMap
+        this.task2 = new Task (this.TASK_2_ID, this.TASK_2_NAME, this.TASK_2_DESCRIPTION, this.TASK_2_START, this.TASK_2_END);
+        this.task3 = new Task (this.TASK_3_ID, this.TASK_3_NAME, this.TASK_3_DESCRIPTION, this.TASK_3_START, this.TASK_3_END);
+        
+        // add all three Tasks
+        this.taskCollection.save(this.task);
+        this.taskCollection.save(this.task2);
+        this.taskCollection.save(this.task3);
+        
+        // create an ArrayList with Task entries containing 'cs' in task description
+        ArrayList<Task> expectedTaskList = new ArrayList<Task>();
+        expectedTaskList.add(this.task);
+        expectedTaskList.add(this.task2);
+        
+        // assert that expected results and actual filtered results are the same
+        assertEquals(expectedTaskList, this.taskCollection.getAll(taskDescriptor));
     }
 }
