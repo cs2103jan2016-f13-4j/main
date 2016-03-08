@@ -1,7 +1,7 @@
 package component.back_end.exceptions.storage;
 
-import component.back_end.storage.PrimaryKeyInterface;
-import component.back_end.storage.RelationInterface;
+import component.back_end.storage.rdbs.PrimaryKeyInterface;
+import component.back_end.storage.rdbs.RelationInterface;
 
 /**
  * Created by maianhvu on 7/3/16.

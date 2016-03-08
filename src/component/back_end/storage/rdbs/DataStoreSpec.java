@@ -1,4 +1,4 @@
-package component.back_end.storage;
+package component.back_end.storage.rdbs;
 
 import component.back_end.exceptions.storage.PrimaryKeyAlreadyExistsException;
 
