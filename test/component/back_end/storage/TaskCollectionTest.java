@@ -43,6 +43,20 @@ public class TaskCollectionTest {
     private final LocalDateTime TASK_3_END = LocalDateTime.of(2016, 3, 7, 14, 30);
     private Task task3;
     
+    private final int TASK_4_ID = 4;
+    private final String TASK_4_NAME = "tutorial";
+    private final String TASK_4_DESCRIPTION = "nm2101";
+    private final LocalDateTime TASK_4_START = LocalDateTime.of(2016, 3, 7, 14, 30);
+    private final LocalDateTime TASK_4_END = LocalDateTime.of(2016, 3, 8, 14, 30);
+    private Task task4;
+    
+    private final int TASK_5_ID = 5;
+    private final String TASK_5_NAME = "tutorial";
+    private final String TASK_5_DESCRIPTION = "nm2101";
+    private final LocalDateTime TASK_5_START = LocalDateTime.of(2016, 3, 8, 14, 30);
+    private final LocalDateTime TASK_5_END = LocalDateTime.of(2016, 3, 9, 14, 30);
+    private Task task5;
+    
     @Before
     public void setUp() {
         this.taskCollection = new TaskCollection();
@@ -159,77 +173,121 @@ public class TaskCollectionTest {
     
     @Test
     public void Searching_by_start_before_returns_list_correctly() {
-        // create two additional Tasks for adding into TreeMap
+        // create four additional Tasks for adding into TreeMap
         this.task2 = new Task (this.TASK_2_ID, this.TASK_2_NAME, this.TASK_2_DESCRIPTION, this.TASK_2_START, this.TASK_2_END);
         this.task3 = new Task (this.TASK_3_ID, this.TASK_3_NAME, this.TASK_3_DESCRIPTION, this.TASK_3_START, this.TASK_3_END);
+        this.task4 = new Task (this.TASK_4_ID, this.TASK_4_NAME, this.TASK_4_DESCRIPTION, this.TASK_4_START, this.TASK_4_END);
+        this.task5 = new Task (this.TASK_5_ID, this.TASK_5_NAME, this.TASK_5_DESCRIPTION, this.TASK_5_START, this.TASK_5_END);
         
-        // add all three Tasks
+        // add five three Tasks
         this.taskCollection.save(this.task);
         this.taskCollection.save(this.task2);
         this.taskCollection.save(this.task3);
+        this.taskCollection.save(this.task4);
+        this.taskCollection.save(this.task5);
         
         ArrayList<Task> expectedTaskList = new ArrayList<Task>();
         expectedTaskList.add(this.task);
         expectedTaskList.add(this.task2);
+        expectedTaskList.add(this.task3);
         
      // assert that expected results and actual search results are the same
-        assertEquals(expectedTaskList, this.taskCollection.startBefore(this.TASK_2_START));
+        assertEquals(expectedTaskList, this.taskCollection.startBefore(this.TASK_3_START));
     }
     
     @Test
     public void Searching_by_start_after_returns_list_correctly() {
-     // create two additional Tasks for adding into TreeMap
+        // create four additional Tasks for adding into TreeMap
         this.task2 = new Task (this.TASK_2_ID, this.TASK_2_NAME, this.TASK_2_DESCRIPTION, this.TASK_2_START, this.TASK_2_END);
         this.task3 = new Task (this.TASK_3_ID, this.TASK_3_NAME, this.TASK_3_DESCRIPTION, this.TASK_3_START, this.TASK_3_END);
+        this.task4 = new Task (this.TASK_4_ID, this.TASK_4_NAME, this.TASK_4_DESCRIPTION, this.TASK_4_START, this.TASK_4_END);
+        this.task5 = new Task (this.TASK_5_ID, this.TASK_5_NAME, this.TASK_5_DESCRIPTION, this.TASK_5_START, this.TASK_5_END);
         
-        // add all three Tasks
+        // add all five Tasks
         this.taskCollection.save(this.task);
         this.taskCollection.save(this.task2);
         this.taskCollection.save(this.task3);
+        this.taskCollection.save(this.task4);
+        this.taskCollection.save(this.task5);
         
         ArrayList<Task> expectedTaskList = new ArrayList<Task>();
-        expectedTaskList.add(this.task2);
         expectedTaskList.add(this.task3);
+        expectedTaskList.add(this.task4);
+        expectedTaskList.add(this.task5);
         
         // assert that expected results and actual search results are the same
-        assertEquals(expectedTaskList, this.taskCollection.startAfter(this.TASK_2_START));
+        assertEquals(expectedTaskList, this.taskCollection.startAfter(this.TASK_3_START));
     }
     
     @Test
     public void Searching_by_end_before_returns_list_correctly() {
-     // create two additional Tasks for adding into TreeMap
+        // create four additional Tasks for adding into TreeMap
         this.task2 = new Task (this.TASK_2_ID, this.TASK_2_NAME, this.TASK_2_DESCRIPTION, this.TASK_2_START, this.TASK_2_END);
         this.task3 = new Task (this.TASK_3_ID, this.TASK_3_NAME, this.TASK_3_DESCRIPTION, this.TASK_3_START, this.TASK_3_END);
+        this.task4 = new Task (this.TASK_4_ID, this.TASK_4_NAME, this.TASK_4_DESCRIPTION, this.TASK_4_START, this.TASK_4_END);
+        this.task5 = new Task (this.TASK_5_ID, this.TASK_5_NAME, this.TASK_5_DESCRIPTION, this.TASK_5_START, this.TASK_5_END);
         
-        // add all three Tasks
+        // add all five Tasks
         this.taskCollection.save(this.task);
         this.taskCollection.save(this.task2);
         this.taskCollection.save(this.task3);
+        this.taskCollection.save(this.task4);
+        this.taskCollection.save(this.task5);
         
         ArrayList<Task> expectedTaskList = new ArrayList<Task>();
         expectedTaskList.add(this.task);
         expectedTaskList.add(this.task2);
+        expectedTaskList.add(this.task3);
         
         // assert that expected results and actual search results are the same
-        assertEquals(expectedTaskList, this.taskCollection.endBefore(this.TASK_2_END));
+        assertEquals(expectedTaskList, this.taskCollection.endBefore(this.TASK_3_END));
     }
     
     @Test
     public void Searching_by_end_after_returns_list_correctly() {
-     // create two additional Tasks for adding into TreeMap
+        // create four additional Tasks for adding into TreeMap
         this.task2 = new Task (this.TASK_2_ID, this.TASK_2_NAME, this.TASK_2_DESCRIPTION, this.TASK_2_START, this.TASK_2_END);
         this.task3 = new Task (this.TASK_3_ID, this.TASK_3_NAME, this.TASK_3_DESCRIPTION, this.TASK_3_START, this.TASK_3_END);
+        this.task4 = new Task (this.TASK_4_ID, this.TASK_4_NAME, this.TASK_4_DESCRIPTION, this.TASK_4_START, this.TASK_4_END);
+        this.task5 = new Task (this.TASK_5_ID, this.TASK_5_NAME, this.TASK_5_DESCRIPTION, this.TASK_5_START, this.TASK_5_END);
         
-        // add all three Tasks
+        // add all five Tasks
         this.taskCollection.save(this.task);
         this.taskCollection.save(this.task2);
         this.taskCollection.save(this.task3);
+        this.taskCollection.save(this.task4);
+        this.taskCollection.save(this.task5);
+        
+        ArrayList<Task> expectedTaskList = new ArrayList<Task>();
+        expectedTaskList.add(this.task3);
+        expectedTaskList.add(this.task4);
+        expectedTaskList.add(this.task5);
+        
+        // assert that expected results and actual search results are the same
+        assertEquals(expectedTaskList, this.taskCollection.endAfter(this.TASK_3_END));
+    }
+    
+    @Test
+    public void Searching_by_date_time_range_returns_list_correctly() {
+        // create four additional Tasks for adding into TreeMap
+        this.task2 = new Task (this.TASK_2_ID, this.TASK_2_NAME, this.TASK_2_DESCRIPTION, this.TASK_2_START, this.TASK_2_END);
+        this.task3 = new Task (this.TASK_3_ID, this.TASK_3_NAME, this.TASK_3_DESCRIPTION, this.TASK_3_START, this.TASK_3_END);
+        this.task4 = new Task (this.TASK_4_ID, this.TASK_4_NAME, this.TASK_4_DESCRIPTION, this.TASK_4_START, this.TASK_4_END);
+        this.task5 = new Task (this.TASK_5_ID, this.TASK_5_NAME, this.TASK_5_DESCRIPTION, this.TASK_5_START, this.TASK_5_END);
+        
+        // add all five Tasks
+        this.taskCollection.save(this.task);
+        this.taskCollection.save(this.task2);
+        this.taskCollection.save(this.task3);
+        this.taskCollection.save(this.task4);
+        this.taskCollection.save(this.task5);
         
         ArrayList<Task> expectedTaskList = new ArrayList<Task>();
         expectedTaskList.add(this.task2);
         expectedTaskList.add(this.task3);
+        expectedTaskList.add(this.task4);
         
         // assert that expected results and actual search results are the same
-        assertEquals(expectedTaskList, this.taskCollection.endAfter(this.TASK_2_END));
+        assertEquals(expectedTaskList, this.taskCollection.searchByDateTimeRange(this.TASK_3_START, this.TASK_3_END));
     }
 }
