@@ -35,9 +35,6 @@ public class DecisionEngine extends DecisionEngineSpec {
             case DELETE:
                 // TODO
                 break;
-            case EXIT:
-                // TODO
-                break;
             case UNRECOGNISED:
                 // TODO
                 break;
@@ -51,12 +48,15 @@ public class DecisionEngine extends DecisionEngineSpec {
     
     @Override
     public ExecutionResult<?> performCommand(Command cmd) {
+        
+        assert (cmd.getInstruction().getType() != Instruction.Type.UNRECOGNISED);
+        // handle exit command here, without creating a task unnecessarily
         if (cmd.getInstruction().getType() == Instruction.Type.EXIT) {
             return ExecutionResult.getNullResult();
         }
         
         return null;
-    }
+    }    
 
     @Override
     protected TaskSchedulerSpec getTaskScheduler() {
