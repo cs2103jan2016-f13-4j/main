@@ -20,12 +20,23 @@ class DecisionEngineTester extends DecisionEngine {
     }
     
     @Test
-    public void testCreateTask() {
-        Instruction.Type instrType = Instruction.Type.ADD;
+    public void testCreateRawAddTask() {
+        Instruction instruction = new Instruction(Instruction.Type.ADD);
         
         ParameterList params =  new ParameterList();
-        params.addParameter("param1", "value1");
-        params.addParameter("param2", "value2");
+        params.addParameter("name", "chiong V0.1");
+        params.addParameter("start", "1000");
+        params.addParameter("end", "1800");
+        
+        Command cmd = new Command(instruction, params);
+        
+        
+        Task task = this.dEngine_.createRawTask(cmd);
+        
+        assertEquals(task.getTaskName(), "chiong V0.1");
+        assertEquals(task.getStartTime().getHour(), 10);
+        assertEquals(task.getEndTime().getHour(), 18);
+        
     }
     
 }

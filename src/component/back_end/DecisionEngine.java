@@ -14,7 +14,7 @@ public class DecisionEngine extends DecisionEngineSpec {
     }
 
     @Override
-    public Task createTask(Command command) {
+    public Task createRawTask(Command command) {
         
         switch (command.getInstruction().getType()) {
             case ADD:
