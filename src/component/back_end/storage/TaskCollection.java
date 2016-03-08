@@ -35,6 +35,11 @@ public class TaskCollection {
     //
     //----------------------------------------------------------------------------------------
 
+    /**
+     * Saves a Task object to TreeMap
+     * @param task the Task to put into TreeMap
+     * @return the ID of the added Task
+     */
     public int save(Task task) {
         // TODO: Check for potential time clashes
 
@@ -84,6 +89,12 @@ public class TaskCollection {
     //
     //----------------------------------------------------------------------------------------
 
+    /**
+     * Returns the Task to which the specified index is mapped
+     * @param index the index whose associated Task is to be returned
+     * @return the Task to which the specified index is mapped
+     * @throws PrimaryKeyNotFoundException if the TreeMap contains no mapping for the index
+     */
     public Task get(int index) throws PrimaryKeyNotFoundException {
         // check if TreeMap contains the key that is queried
         if (!this.taskData_.containsKey(index)) {
@@ -102,12 +113,9 @@ public class TaskCollection {
     /**
      * Returns a filtered list of Tasks that match the specified TaskDescriptor
      * Returns the full (unfiltered) list of Tasks when no TaskDescriptor is specified 
-     * 
-     * @param taskDescriptor
-     * 
+     * @param taskDescriptor the TaskDescriptor that determines the criteria for entry match
      * @return results which is a list of filtered Tasks that matches TaskDescriptor if one is specified,
-     * else results is the full lis of Tasks stored in TreeMap
-     * 
+     * else results is the full list of Tasks stored in TreeMap
      */
     public List<Task> getAll(TaskDescriptor taskDescriptor) {
         ArrayList<Task> results = new ArrayList<>(this.taskData_.values());
@@ -136,6 +144,11 @@ public class TaskCollection {
     //
     //----------------------------------------------------------------------------------------
 
+    /**
+     * Removes the mapping for this index from TreeMap if present
+     * @param id index for which mapping should be removed
+     * @return the previous Task associated with id, or null if there was no mapping for id
+     */
     public Task remove(int id) {
         // TODO: Check if ID does not exist
 
@@ -148,26 +161,52 @@ public class TaskCollection {
     //
     //----------------------------------------------------------------------------------------
     
+    /**
+     * Search for all Tasks that has startTime before or at the same time as dateTime
+     * @param dateTime high endpoint (inclusive) of the Tasks in the returned list
+     * @return a list of Tasks that starts before or at the same time as dateTime
+     */
     public List<Task> searchstartBefore(LocalDateTime dateTime) {
         NavigableMap<LocalDateTime, List<Task>> resultsMap = this.startTimeTree_.headMap(dateTime, SEARCH_MAP_BY_DATETIME_INCLUSIVE);
         return this.extractByDateTime(resultsMap);
     }
     
+    /**
+     * Search for all Tasks that has startTime after or at the same time as dateTime
+     * @param dateTime low endpoint (inclusive) of the Tasks in the returned list
+     * @return a list of Tasks that starts after or at the same time as dateTime
+     */
     public List<Task> searchStartAfter(LocalDateTime dateTime) {
         NavigableMap<LocalDateTime, List<Task>> resultsMap = this.startTimeTree_.tailMap(dateTime, SEARCH_MAP_BY_DATETIME_INCLUSIVE);
         return this.extractByDateTime(resultsMap);
     }
     
+    /**
+     * Search for all Tasks that has endTime before or at the same time as dateTime
+     * @param dateTime high endpoint (inclusive) of the Tasks in the returned list
+     * @return a list of Tasks that ends before or at the same time as dateTime
+     */
     public List<Task> searchEndBefore(LocalDateTime dateTime) {
         NavigableMap<LocalDateTime, List<Task>> resultsMap = this.endTimeTree_.headMap(dateTime, SEARCH_MAP_BY_DATETIME_INCLUSIVE);
         return this.extractByDateTime(resultsMap);
     }
     
+    /**
+     * Search for all Tasks that has endTime after or at the same time as dateTime
+     * @param dateTime low endpoint (inclusive) of the Tasks in the returned list
+     * @return a list of Tasks that ends after or at the same time as dateTime
+     */
     public List<Task> searchEndAfter(LocalDateTime dateTime) {
         NavigableMap<LocalDateTime, List<Task>> resultsMap = this.endTimeTree_.tailMap(dateTime, SEARCH_MAP_BY_DATETIME_INCLUSIVE);
         return this.extractByDateTime(resultsMap);
     }
     
+    /**
+     * Search for all Tasks that have startTime or endTime between start and end (inclusive)
+     * @param start low endpoint (inclusive) of the Tasks in the returned list
+     * @param end high endpoint (inclusive) of the Tasks in the returned list
+     * @return a list of Tasks that start or end within the time range start to end (inclusive)
+     */
     public List<Task> searchByDateTimeRange(LocalDateTime start, LocalDateTime end) {
         // collection of all qualifying Tasks that contains no duplicate elements
         HashSet<Task> resultsHashSet = new HashSet<Task>();
@@ -186,6 +225,12 @@ public class TaskCollection {
         return resultList;
     }
     
+    /**
+     * Extracts all Tasks whose indices are contained in resultsMap
+     * @param resultsMap a view of the portion of TreeMap which has startTime and/or endTime 
+     * falling within a certain time range.
+     * @return list of Tasks that satisfy the time range condition
+     */
     public List<Task> extractByDateTime(NavigableMap<LocalDateTime, List<Task>> resultsMap) {
         ArrayList<Task> resultList = new ArrayList<Task>();
         NavigableSet<LocalDateTime> resultsKeySet = resultsMap.navigableKeySet();
