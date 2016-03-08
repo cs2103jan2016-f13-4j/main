@@ -13,23 +13,35 @@ public class Dispatcher extends DispatcherSpec {
     private TranslationEngine translationEngine_;
     private DecisionEngine decisionEngine_;
 
+    /**
+     * Constructs a default dispatcher.
+     */
     public Dispatcher() {
         this.translationEngine_ = new TranslationEngine();
         this.decisionEngine_ = new DecisionEngine();
     }
 
-    @Override
-    public TranslationEngine getTranslationEngine() {
+    /**
+     * Returns the main translation engine used by this dispatcher.
+     * @return the main translation engine
+     */
+    @Override public TranslationEngine getTranslationEngine() {
         return this.translationEngine_;
     }
 
-    @Override
-    public DecisionEngine getDecisionEngine() {
+    /**
+     * Returns the main decision engine used by this dispatcher.
+     * @return the main decision engine
+     */
+    @Override public DecisionEngine getDecisionEngine() {
         return this.decisionEngine_;
     }
 
-    @Override
-    public void pulse() {
+    /**
+     * Starts the dispatcher using an initial command.
+     * After that enter programme's loop until command has a terminate instruction
+     */
+    @Override public void pulse() {
         Command nextCommand = Command.getInitialCommand();
 
         while (!isTerminateCommand(nextCommand)) {
