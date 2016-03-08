@@ -3,6 +3,8 @@ package entity.command;
 import java.time.LocalDateTime;
 import java.util.regex.*;
 
+import util.*;
+
 /**
  * This is the counterpart to the ParameterName enum.
  * Its job is to represent the parameter value (second entry in the ParameterList internal tuples).
@@ -30,17 +32,25 @@ public class ParameterValue {
     
     // method is generic as it may return different types based on the associated parameter name
     // type inference should allow us to omit the type, making the method type-polymorphic (in the Haskell sense)
-    public static <T> T parseParamValue(String strToParse, ParameterName associatedName) {
+    public static ParameterValue parseParamValue(String strToParse, ParameterName associatedName) {
         assert strToParse != null;
         assert associatedName != null;
+        
+        ParameterValue pv = null;
         
         // we return at each case so there's minimal fuss w.r.t. types
         switch (associatedName) {
             case DATE_FROM:
+                LocalDateTime from = StringParser.asDateTime(strToParse);
+                pv = new ParameterValue(LocalDateTime.class, from);
                break;
             case DATE_TO:
+                LocalDateTime to = StringParser.asDateTime(strToParse);
+                pv = new ParameterValue(LocalDateTime.class, to);
                 break;
             case NAME:
+                String name = strToParse;
+                pv = new ParameterValue(String.class, name);
                 break;
             default:
                 // if we reach this point, it means associatedName is not well-defined
@@ -51,13 +61,7 @@ public class ParameterValue {
                 assert false;
         }
         
-        return null; // TODO: remove once all code paths return values
-    }
-    
-    
-    // general parser methods
-    private LocalDateTime asDateTime(String str) {
-        // format: "DDMMYYYY HHMM"
-        return null;
+        assert pv != null;
+        return pv;
     }
 }
