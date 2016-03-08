@@ -9,6 +9,6 @@ import component.front_end.CommandParseException;
  * created by thenaesh on Mar 8, 2016
  *
  */
-public class InvalidParameterNameException extends CommandParseException {
+public class InvalidParameterException extends CommandParseException {
 
 }

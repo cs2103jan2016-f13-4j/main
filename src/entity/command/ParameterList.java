@@ -4,6 +4,15 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 
 /**
+ * When a user enters parameters, they occur in a (name, value) pair.
+ * 
+ * For instance, the issued command `add name:"chiong V0.1 start:1000 end:1400`
+ * should produce the parameter list { (name, "chiong V0.1"), (start, 1000), (end, 1400) }.
+ * 
+ * The ParameterList class encapsulates this list, storing it internally as a map
+ * of (ParameterName, ParameterValue) tuples. The respective documentation for
+ * ParameterName and ParameterValue can be found at {@link ParameterName} and {@link ParameterValue}.
+ * 
  * Created by maianhvu on 6/3/16.
  */
 public class ParameterList {
