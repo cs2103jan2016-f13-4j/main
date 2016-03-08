@@ -192,7 +192,7 @@ public class TaskCollectionTest {
         expectedTaskList.add(this.task3_);
         
      // assert that expected results and actual search results are the same
-        assertEquals(expectedTaskList, this.taskCollection.startBefore(this.TASK_3_START));
+        assertEquals(expectedTaskList, this.taskCollection.searchstartBefore(this.TASK_3_START));
     }
     
     @Test
@@ -203,7 +203,7 @@ public class TaskCollectionTest {
         expectedTaskList.add(this.task5_);
         
         // assert that expected results and actual search results are the same
-        assertEquals(expectedTaskList, this.taskCollection.startAfter(this.TASK_3_START));
+        assertEquals(expectedTaskList, this.taskCollection.searchStartAfter(this.TASK_3_START));
     }
     
     @Test
@@ -214,7 +214,7 @@ public class TaskCollectionTest {
         expectedTaskList.add(this.task3_);
         
         // assert that expected results and actual search results are the same
-        assertEquals(expectedTaskList, this.taskCollection.endBefore(this.TASK_3_END));
+        assertEquals(expectedTaskList, this.taskCollection.searchEndBefore(this.TASK_3_END));
     }
     
     @Test
@@ -225,7 +225,7 @@ public class TaskCollectionTest {
         expectedTaskList.add(this.task5_);
         
         // assert that expected results and actual search results are the same
-        assertEquals(expectedTaskList, this.taskCollection.endAfter(this.TASK_3_END));
+        assertEquals(expectedTaskList, this.taskCollection.searchEndAfter(this.TASK_3_END));
     }
     
     @Test

@@ -118,22 +118,22 @@ public class TaskCollection {
         return this.taskData_.remove(id);
     }
     
-    public List<Task> startBefore(LocalDateTime dateTime) {
+    public List<Task> searchstartBefore(LocalDateTime dateTime) {
         NavigableMap<LocalDateTime, List<Task>> resultsMap = this.startTimeTree_.headMap(dateTime, SEARCH_MAP_BY_DATETIME_INCLUSIVE);
         return this.extractByDateTime(resultsMap);
     }
     
-    public List<Task> startAfter(LocalDateTime dateTime) {
+    public List<Task> searchStartAfter(LocalDateTime dateTime) {
         NavigableMap<LocalDateTime, List<Task>> resultsMap = this.startTimeTree_.tailMap(dateTime, SEARCH_MAP_BY_DATETIME_INCLUSIVE);
         return this.extractByDateTime(resultsMap);
     }
     
-    public List<Task> endBefore(LocalDateTime dateTime) {
+    public List<Task> searchEndBefore(LocalDateTime dateTime) {
         NavigableMap<LocalDateTime, List<Task>> resultsMap = this.endTimeTree_.headMap(dateTime, SEARCH_MAP_BY_DATETIME_INCLUSIVE);
         return this.extractByDateTime(resultsMap);
     }
     
-    public List<Task> endAfter(LocalDateTime dateTime) {
+    public List<Task> searchEndAfter(LocalDateTime dateTime) {
         NavigableMap<LocalDateTime, List<Task>> resultsMap = this.endTimeTree_.tailMap(dateTime, SEARCH_MAP_BY_DATETIME_INCLUSIVE);
         return this.extractByDateTime(resultsMap);
     }
