@@ -25,22 +25,22 @@ public class TaskCollectionTest {
     private final int TASK_ID = 1;
     private final String TASK_NAME = "homework";
     private final String TASK_DESCRIPTION = "cs2103t";
-    private final LocalDateTime TASK_START = LocalDateTime.of(2016, 3, 6, 14, 30);
-    private final LocalDateTime TASK_END = LocalDateTime.of(2016, 3, 8, 14, 30);
+    private final LocalDateTime TASK_START = LocalDateTime.of(2016, 3, 4, 14, 30);
+    private final LocalDateTime TASK_END = LocalDateTime.of(2016, 3, 5, 14, 30);
     private Task task;
     
     private final int TASK_2_ID = 2;
     private final String TASK_2_NAME = "assignment";
     private final String TASK_2_DESCRIPTION = "cs3230";
-    private final LocalDateTime TASK_2_START = LocalDateTime.of(2016, 3, 6, 14, 30);
-    private final LocalDateTime TASK_2_END = LocalDateTime.of(2016, 3, 8, 14, 30);
+    private final LocalDateTime TASK_2_START = LocalDateTime.of(2016, 3, 5, 14, 30);
+    private final LocalDateTime TASK_2_END = LocalDateTime.of(2016, 3, 6, 14, 30);
     private Task task2;
     
     private final int TASK_3_ID = 3;
     private final String TASK_3_NAME = "tutorial";
     private final String TASK_3_DESCRIPTION = "nm2101";
     private final LocalDateTime TASK_3_START = LocalDateTime.of(2016, 3, 6, 14, 30);
-    private final LocalDateTime TASK_3_END = LocalDateTime.of(2016, 3, 8, 14, 30);
+    private final LocalDateTime TASK_3_END = LocalDateTime.of(2016, 3, 7, 14, 30);
     private Task task3;
     
     @Before
@@ -155,5 +155,24 @@ public class TaskCollectionTest {
         
         // assert that expected results and actual filtered results are the same
         assertEquals(expectedTaskList, this.taskCollection.getAll(taskDescriptor));
+    }
+    
+    @Test
+    public void Searching_by_start_before_returns_list_correctly() {
+        // create two additional Tasks for adding into TreeMap
+        this.task2 = new Task (this.TASK_2_ID, this.TASK_2_NAME, this.TASK_2_DESCRIPTION, this.TASK_2_START, this.TASK_2_END);
+        this.task3 = new Task (this.TASK_3_ID, this.TASK_3_NAME, this.TASK_3_DESCRIPTION, this.TASK_3_START, this.TASK_3_END);
+        
+        // add all three Tasks
+        this.taskCollection.save(this.task);
+        this.taskCollection.save(this.task2);
+        this.taskCollection.save(this.task3);
+        
+        ArrayList<Task> expectedTaskList = new ArrayList<Task>();
+        expectedTaskList.add(this.task);
+        expectedTaskList.add(this.task2);
+        
+     // assert that expected results and actual search results are the same
+        assertEquals(expectedTaskList, this.taskCollection.startBefore(this.TASK_2_START));
     }
 }
