@@ -28,6 +28,12 @@ public class TaskCollection {
         this.startTimeTree_ = new TreeMap<>();
         this.endTimeTree_ = new TreeMap<>();
     }
+    
+    //----------------------------------------------------------------------------------------
+    //
+    // I. Save Method
+    //
+    //----------------------------------------------------------------------------------------
 
     public int save(Task task) {
         // TODO: Check for potential time clashes
@@ -71,6 +77,12 @@ public class TaskCollection {
         
         return task.getId();
     }
+    
+    //----------------------------------------------------------------------------------------
+    //
+    // II. Get Method
+    //
+    //----------------------------------------------------------------------------------------
 
     public Task get(int index) throws PrimaryKeyNotFoundException {
         // check if TreeMap contains the key that is queried
@@ -80,6 +92,12 @@ public class TaskCollection {
         // key exists, retrieve Task corresponding to key
         return this.taskData_.get(index);
     }
+    
+    //----------------------------------------------------------------------------------------
+    //
+    // III. GetAll Method
+    //
+    //----------------------------------------------------------------------------------------
     
     /**
      * Returns a filtered list of Tasks that match the specified TaskDescriptor
@@ -111,12 +129,24 @@ public class TaskCollection {
         // return filtered results as a List
         return results;
     }
+    
+    //----------------------------------------------------------------------------------------
+    //
+    // IV. Remove Method
+    //
+    //----------------------------------------------------------------------------------------
 
     public Task remove(int id) {
         // TODO: Check if ID does not exist
 
         return this.taskData_.remove(id);
     }
+    
+    //----------------------------------------------------------------------------------------
+    //
+    // V. Search by Time Range Methods
+    //
+    //----------------------------------------------------------------------------------------
     
     public List<Task> searchstartBefore(LocalDateTime dateTime) {
         NavigableMap<LocalDateTime, List<Task>> resultsMap = this.startTimeTree_.headMap(dateTime, SEARCH_MAP_BY_DATETIME_INCLUSIVE);
