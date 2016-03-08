@@ -42,7 +42,7 @@ public class CommandParser extends CommandParserSpec {
                 continue;
             }
 
-            // Else, we treat the key and value as oridinary parameters
+            // Else, we treat the key and value as ordinary parameters
             paramList.addParameter(key, value);
         }
 
