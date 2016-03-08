@@ -1,16 +1,16 @@
 package component.back_end.storage;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.*;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.TreeMap;
+import java.util.ArrayList;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import component.back_end.storage.Task;
+import component.back_end.storage.TaskCollection;
+import exception.back_end.PrimaryKeyNotFoundException;
 
 /**
  * 
@@ -20,54 +20,87 @@ import org.junit.Test;
 
 public class TaskCollectionTest {
     
-    private TaskCollection taskData_;
-    private Task task_;
+    private TaskCollection taskCollection;
+    
+    private final int TASK_ID = 1;
+    private final String TASK_NAME = "homework";
+    private final String TASK_DESCRIPTION = "cs2103t";
+    private final LocalDateTime TASK_START = LocalDateTime.of(2016, 3, 6, 14, 30);
+    private final LocalDateTime TASK_END = LocalDateTime.of(2016, 3, 8, 14, 30);
+    private Task task;
+    
+    private final int TASK_2_ID = 2;
+    private final String TASK_2_NAME = "assignment";
+    private final String TASK_2_DESCRIPTION = "cs3230";
+    private final LocalDateTime TASK_2_START = LocalDateTime.of(2016, 3, 6, 14, 30);
+    private final LocalDateTime TASK_2_END = LocalDateTime.of(2016, 3, 8, 14, 30);
+    private Task task2;
+    
+    private final int TASK_3_ID = 3;
+    private final String TASK_3_NAME = "tutorial";
+    private final String TASK_3_DESCRIPTION = "nm2101";
+    private final LocalDateTime TASK_3_START = LocalDateTime.of(2016, 3, 6, 14, 30);
+    private final LocalDateTime TASK_3_END = LocalDateTime.of(2016, 3, 8, 14, 30);
+    private Task task3;
     
     @Before
     public void setUp() {
-        this.taskData_ = new TaskCollection();
+        this.taskCollection = new TaskCollection();
+        this.task = new Task (this.TASK_ID, this.TASK_NAME, this.TASK_DESCRIPTION, this.TASK_START, this.TASK_END);
         
-        // initialize attributes
-        String taskName = "homework";
-        String description = "cs2103t";
-        LocalDateTime taskStart = LocalDateTime.of(2016, 3, 6, 14, 30);
-        LocalDateTime taskEnd = LocalDateTime.of(2016, 3, 7, 14, 30);
+    }
+    
+    @Test
+    public void Save_returns_correct_Task_ID() {
+        int returnedID = this.taskCollection.save(this.task);
+        assertEquals(this.TASK_ID, returnedID);
+    }
+    
+    @Test
+    public void Get_returns_correct_Task() throws PrimaryKeyNotFoundException {
+        this.taskCollection.save(this.task);
+        Task returnedTask = this.taskCollection.get(this.TASK_ID);
+        assertEquals(this.task, returnedTask);
+    }
+    
+    @Test
+    public void Save_sets_ID_when_ID_is_null() throws PrimaryKeyNotFoundException {
+        // create Task with null value as ID
+        Task taskNullID = new Task (null, this.TASK_NAME, this.TASK_DESCRIPTION, this.TASK_START, this.TASK_END);
         
-        // create tuple
-        this.task_ = new Task(null, taskName, description, taskStart, taskEnd);
+        this.taskCollection.save(taskNullID);
+        assertEquals(this.TASK_NAME, this.taskCollection.get(1).getTaskName());
+        assertEquals(this.TASK_DESCRIPTION, this.taskCollection.get(1).getDescription());
+        assertEquals(this.TASK_START, this.taskCollection.get(1).getStartTime());
+        assertEquals(this.TASK_END, this.taskCollection.get(1).getEndTime());
     }
 
-    @Test
-    public void Primary_key_of_TreeMap_leads_to_correct_tuple() {
-        // execute add
-        int taskId = this.taskData_.save(this.task_);
-        
-        // check that the tuples are the same
-        assertEquals(this.taskData_.get(taskId), this.task_);
+    @Test(expected = PrimaryKeyNotFoundException.class)
+    public void Remove_deletes_correct_Task() throws PrimaryKeyNotFoundException {
+        this.taskCollection.save(this.task);
+        this.taskCollection.remove(this.TASK_ID);
+        this.taskCollection.get(this.TASK_ID);
     }
     
     @Test
-    public void Different_primary_keys_point_to_different_tuples_in_TreeMap() {
+    public void Get_all_method_returns_list_correctly() {
         
-        // initialize attributes
-        String taskName = "floorball training";
-        String description = "in MPSH";
-        LocalDateTime taskStart = LocalDateTime.of(2016, 3, 6, 14, 30);
-        LocalDateTime taskEnd = LocalDateTime.of(2016, 3, 7, 14, 30);
+        // create two additional Tasks for adding into TreeMap
+        this.task2 = new Task (this.TASK_2_ID, this.TASK_2_NAME, this.TASK_2_DESCRIPTION, this.TASK_2_START, this.TASK_2_END);
+        this.task3 = new Task (this.TASK_3_ID, this.TASK_3_NAME, this.TASK_3_DESCRIPTION, this.TASK_3_START, this.TASK_3_END);
+
+        // create expected ArrayList consisting of three Tasks
+        ArrayList<Task> expectedTaskList = new ArrayList<>();
+        expectedTaskList.add(this.task);
+        expectedTaskList.add(this.task2);
+        expectedTaskList.add(this.task3);
         
-        // create tuple
-        Task task2 = new Task(null, taskName, description, taskStart, taskEnd);
+        // add all three Tasks
+        this.taskCollection.save(this.task);
+        this.taskCollection.save(this.task2);
+        this.taskCollection.save(this.task3);
         
-        // execute adds
-        int index1 = this.taskData_.save(this.task_);
-        int index2 = this.taskData_.save(task2);
-        
-        // use primary keys of task_ and tuple2 to retrieve them from HashMap
-        assertThat(this.taskData_.get(index1), is(not(equalTo(this.taskData_.get(index2)))));
-    }
-    
-    @Test
-    public void Edit_function_overwrites_data() {
-        
+        // assert that expected and actual ArrayLists are equal
+        assertEquals(expectedTaskList, this.taskCollection.getAll());
     }
 }
