@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 /**
  * Created by maianhvu on 7/3/16.
  */
-public class Task {
+public class Task implements Comparable<Task> {
     private Integer id_;
     private String taskName_;
     private String description_;
@@ -21,6 +21,31 @@ public class Task {
         this.endTime_ = endTime;
 
         this.creationTime_ = LocalDateTime.now();
+    }
+    
+    @Override
+    public int compareTo(Task o) {
+        if (this.getId() > o.getId()) {
+            return 1;
+        } else if (this.getId() < o.getId()) {
+            return -1;
+        } else {
+            return 1;
+        }
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this.getId() == ((Task) o).getId()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    @Override
+    public int hashCode() {
+        return this.getId().hashCode();
     }
 
     /**
