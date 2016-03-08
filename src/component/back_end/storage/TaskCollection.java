@@ -131,6 +131,11 @@ public class TaskCollection {
         return this.extractByDateTime(resultsMap);
     }
     
+    public List<Task> endAfter(LocalDateTime dateTime) {
+        NavigableMap<LocalDateTime, List<Task>> resultsMap = this.endTimeTree_.tailMap(dateTime, SEARCH_MAP_BY_DATETIME_INCLUSIVE);
+        return this.extractByDateTime(resultsMap);
+    }
+    
     public List<Task> extractByDateTime(NavigableMap<LocalDateTime, List<Task>> resultsMap) {
         ArrayList<Task> resultList = new ArrayList<Task>();
         NavigableSet<LocalDateTime> resultsKeySet = resultsMap.navigableKeySet();
