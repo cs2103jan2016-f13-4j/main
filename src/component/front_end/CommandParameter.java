@@ -24,4 +24,25 @@ public enum CommandParameter {
     CommandParameter(String paramStr) {
         this.paramStr_ = paramStr;
     }
+    
+    public static CommandParameter convertStringToCommandParameter(String str) {
+        CommandParameter paramType = null;
+        
+        switch (str) {
+            case "from":
+                paramType = CommandParameter.DATE_FROM;
+                break;
+            case "to":
+                paramType = CommandParameter.DATE_TO;
+                break;
+            case "name":
+                paramType = CommandParameter.NAME;
+                break;
+            default:
+                assert false; // shouldn't reach this point
+                
+        }
+        
+        return paramType;
+    }
 }
