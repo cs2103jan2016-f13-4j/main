@@ -2,6 +2,8 @@ package component.back_end.storage;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NavigableMap;
@@ -134,6 +136,24 @@ public class TaskCollection {
     public List<Task> endAfter(LocalDateTime dateTime) {
         NavigableMap<LocalDateTime, List<Task>> resultsMap = this.endTimeTree_.tailMap(dateTime, SEARCH_MAP_BY_DATETIME_INCLUSIVE);
         return this.extractByDateTime(resultsMap);
+    }
+    
+    public List<Task> searchByDateTimeRange(LocalDateTime start, LocalDateTime end) {
+        // collection of all qualifying Tasks that contains no duplicate elements
+        HashSet<Task> resultsHashSet = new HashSet<Task>();
+        
+        NavigableMap<LocalDateTime, List<Task>> startTimeTreeResultsMap = this.startTimeTree_.subMap
+                (start, SEARCH_MAP_BY_DATETIME_INCLUSIVE, end, SEARCH_MAP_BY_DATETIME_INCLUSIVE); 
+        resultsHashSet.addAll(this.extractByDateTime(startTimeTreeResultsMap));
+        
+        NavigableMap<LocalDateTime, List<Task>> endTimeTreeResultsMap = this.endTimeTree_.subMap
+                (start, SEARCH_MAP_BY_DATETIME_INCLUSIVE, end, SEARCH_MAP_BY_DATETIME_INCLUSIVE);
+        resultsHashSet.addAll(this.extractByDateTime(endTimeTreeResultsMap));
+        
+        ArrayList<Task> resultList = new ArrayList<Task>(resultsHashSet);
+        Collections.sort(resultList);
+        
+        return resultList;
     }
     
     public List<Task> extractByDateTime(NavigableMap<LocalDateTime, List<Task>> resultsMap) {
