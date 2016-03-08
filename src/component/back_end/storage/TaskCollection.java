@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NavigableMap;
+import java.util.NavigableSet;
 import java.util.TreeMap;
 
 import exception.back_end.PrimaryKeyNotFoundException;
@@ -12,6 +14,8 @@ import exception.back_end.PrimaryKeyNotFoundException;
  * Created by maianhvu on 7/3/16.
  */
 public class TaskCollection {
+    
+    private final boolean SEARCH_MAP_BY_DATETIME_INCLUSIVE = true;
 
     private TreeMap<Integer, Task> taskData_;
     private TreeMap<LocalDateTime, List<Task>> startTimeTree_;
@@ -20,6 +24,7 @@ public class TaskCollection {
     public TaskCollection() {
         this.taskData_ = new TreeMap<>();
         this.startTimeTree_ = new TreeMap<>();
+        this.endTimeTree_ = new TreeMap<>();
     }
 
     public int save(Task task) {
@@ -109,5 +114,20 @@ public class TaskCollection {
         // TODO: Check if ID does not exist
 
         return this.taskData_.remove(id);
+    }
+    
+    public List<Task> startBefore(LocalDateTime dateTime) {
+        ArrayList<Task> resultList = new ArrayList<Task>();
+        NavigableMap<LocalDateTime, List<Task>> resultsMap = this.startTimeTree_.headMap(dateTime, SEARCH_MAP_BY_DATETIME_INCLUSIVE);
+        NavigableSet<LocalDateTime> resultsKeySet = resultsMap.navigableKeySet();
+        
+        Iterator<LocalDateTime> it = resultsKeySet.iterator();
+        while (it.hasNext()) {
+            LocalDateTime key = it.next();
+            List<Task> values = resultsMap.get(key);
+            resultList.addAll(values);
+        }
+        
+        return resultList;
     }
 }
