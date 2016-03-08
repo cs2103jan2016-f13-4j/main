@@ -3,6 +3,7 @@ package component.back_end;
 import component.back_end.storage.*;
 import entity.*;
 import entity.command.Command;
+import entity.command.Instruction;
 
 
 /**
@@ -50,6 +51,10 @@ public class DecisionEngine extends DecisionEngineSpec {
     
     @Override
     public ExecutionResult<?> performCommand(Command cmd) {
+        if (cmd.getInstruction().getType() == Instruction.Type.EXIT) {
+            return ExecutionResult.getNullResult();
+        }
+        
         return null;
     }
 

@@ -13,6 +13,10 @@ public class ExecutionResult<T> {
     /**
      * Properties
      */
+    public static ExecutionResult<?> getNullResult() {
+        return null;
+    }
+    
     private Class<? extends ViewSpec> viewClass_;
     private List<Message> messages_;
     private T data_;
