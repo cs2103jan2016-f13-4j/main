@@ -56,7 +56,7 @@ public class DecisionEngine extends DecisionEngineSpec {
         }
         
         return null;
-    }    
+    }
 
     @Override
     protected TaskSchedulerSpec getTaskScheduler() {
