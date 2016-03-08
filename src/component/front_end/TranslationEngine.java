@@ -1,5 +1,6 @@
 package component.front_end;
 
+import component.front_end.ui.ErrorDisplayView;
 import component.front_end.ui.core.UserInterface;
 import component.front_end.ui.core.UserInterfaceSpec;
 import component.front_end.ui.core.View;
@@ -109,7 +110,10 @@ public class TranslationEngine extends TranslationEngineSpec {
     }
 
     private void displayFaultyCommandView() {
-
+        this.currentView_ = new ErrorDisplayView(
+                "Your command is either invalid or unrecognised"
+        );
+        this.getUserInterface().render(this.currentView_);
     }
 
     private static boolean mustInterceptCommand(Command command) {
