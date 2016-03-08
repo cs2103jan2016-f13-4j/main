@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
+import exception.back_end.PrimaryKeyNotFoundException;
+
 /**
  * Created by maianhvu on 7/3/16.
  */
@@ -34,7 +36,12 @@ public class TaskCollection {
         return task.getId();
     }
 
-    public Task get(int index) {
+    public Task get(int index) throws PrimaryKeyNotFoundException {
+        // check if TreeMap contains the key that is queried
+        if (!this.taskData_.containsKey(index)) {
+            throw new PrimaryKeyNotFoundException(index);
+        }
+        // key exists, retrieve Task corresponding to key
         return this.taskData_.get(index);
     }
 
