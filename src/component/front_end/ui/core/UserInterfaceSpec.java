@@ -17,7 +17,7 @@ public abstract class UserInterfaceSpec {
      public abstract void render(View viewToRender);
 
     /**
-     * First, renders a CommandPromptView
+     * First, renders a IndependentView
      *
      * Then, uses internal scanner
      * to get the nextLine() from user input

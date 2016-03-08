@@ -16,6 +16,10 @@ import java.util.List;
  * Created by maianhvu on 6/3/16.
  */
 public class TranslationEngine extends TranslationEngineSpec {
+
+    /**
+     * Properties
+     */
     private CommandParser commandParser_;
     private UserInterface userInterface_;
 
@@ -23,6 +27,9 @@ public class TranslationEngine extends TranslationEngineSpec {
     private View<?> currentView_;
     private VisualIndexMapperSpec currentIndexMapper_;
 
+    /**
+     * Constructs a blank translation engine
+     */
     public TranslationEngine() {
         this.commandParser_ = new CommandParser();
         this.userInterface_ = new UserInterface();
@@ -82,12 +89,11 @@ public class TranslationEngine extends TranslationEngineSpec {
         // and attempt to initialize the user interface with it
         for (Constructor<?> c : constructors) {
             try {
-                Constructor<? extends View<T>> constructor =
-                        (Constructor<? extends View<T>>) c;
+                Constructor<? extends View<T>> constructor = (Constructor<? extends View<T>>) c;
                 view = constructor.newInstance(executionResult.getData());
                 break;
             } catch (Exception e) {
-                continue;
+                // Do nothing
             }
         }
 
