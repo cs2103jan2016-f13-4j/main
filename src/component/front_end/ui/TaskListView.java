@@ -1,13 +1,13 @@
 package component.front_end.ui;
 
+import component.back_end.storage.Task;
+import component.front_end.ui.core.VisualIndexView;
+import component.front_end.ui.core.VisualTuple;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import component.front_end.ui.core.View;
-import component.front_end.ui.core.VisualIndexView;
-import component.front_end.ui.core.VisualTuple;
-import entity.Task;
 /**
  * This child class of View generate the view data when list of tasks object are to be rendered. 
  * The rendering format is as follow: [display ID]. [Time Span] | [Task Name]
@@ -37,7 +37,7 @@ public class TaskListView extends VisualIndexView<Task> {
             Task task = visualTask.getOriginal();
             this.addText(this.constructTimeString(task));
             this.addText(STRING_SEPARATOR);
-            this.addLine(task.getTask());
+            this.addLine(task.getTaskName());
         }
     }
     /**
@@ -47,8 +47,8 @@ public class TaskListView extends VisualIndexView<Task> {
      * @return String containing the start date and end date of the task
      */
     protected String constructTimeString(Task task){
-        LocalDateTime start = task.getStartingTime();
-        LocalDateTime end = task.getEndingTime();
+        LocalDateTime start = task.getStartTime();
+        LocalDateTime end = task.getEndTime();
         
         String startDisplay = start.format(df);
         String endDisplay = end.format(df);
