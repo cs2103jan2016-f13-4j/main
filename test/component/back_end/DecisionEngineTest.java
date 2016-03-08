@@ -42,5 +42,4 @@ public class DecisionEngineTest {
         assertEquals(task.getEndTime().getHour(), 18);
         
     }
-    
 }
