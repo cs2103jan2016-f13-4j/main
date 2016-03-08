@@ -89,7 +89,7 @@ public class TranslationEngine extends TranslationEngineSpec {
 
 
     @Override
-    public Command getCommand() {
+    public Command getNextCommand() {
         String rawCommandString = this.userInterface_.queryInput();
         return this.getCommandParser().parseCommand(rawCommandString);
     }
