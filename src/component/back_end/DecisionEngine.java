@@ -14,7 +14,7 @@ public class DecisionEngine extends DecisionEngineSpec {
     }
 
     @Override
-    public ExecutionResult<?> performCommand(Command command) {
+    public Task createTask(Command command) {
         
         switch (command.getInstruction().getType()) {
             case ADD:
@@ -41,6 +41,11 @@ public class DecisionEngine extends DecisionEngineSpec {
         }
         return null;
         
+    }
+    
+    @Override
+    public ExecutionResult<?> performCommand(Command cmd) {
+        return null;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package component.back_end;
 
 import component.back_end.storage.TaskCollection;
+import component.back_end.storage.Task;
 import entity.*;
 import entity.command.Command;
 
@@ -29,4 +30,5 @@ public abstract class DecisionEngineSpec {
      * @return the result of the command execution, an object containing instructions for the front end
      */
     public abstract ExecutionResult<?> performCommand(Command cmd);
+    protected abstract Task createTask(Command cmd);
 }
