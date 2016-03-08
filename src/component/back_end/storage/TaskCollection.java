@@ -1,6 +1,7 @@
 package component.back_end.storage;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -44,9 +45,36 @@ public class TaskCollection {
         // key exists, retrieve Task corresponding to key
         return this.taskData_.get(index);
     }
-
-    public List<Task> getAll() {
-        return new ArrayList<>(this.taskData_.values());
+    
+    /**
+     * Returns a filtered list of Tasks that match the specified TaskDescriptor
+     * Returns the full (unfiltered) list of Tasks when no TaskDescriptor is specified 
+     * 
+     * @param taskDescriptor
+     * 
+     * @return results which is a list of filtered Tasks that matches TaskDescriptor if one is specified,
+     * else results is the full lis of Tasks stored in TreeMap
+     * 
+     */
+    public List<Task> getAll(TaskDescriptor taskDescriptor) {
+        ArrayList<Task> results = new ArrayList<>(this.taskData_.values());
+        
+        // when no task descriptor is specified, taskDescriptor is null
+        if (taskDescriptor == null) {
+            return results;
+        }
+        
+        Iterator<Task> it = results.iterator();
+        while (it.hasNext()) {
+            Task task = it.next();
+            if (!taskDescriptor.matches(task)) {
+                // remove Task that does not match TaskDescriptor
+                it.remove();
+            }
+        }
+        
+        // return filtered results as a List
+        return results;
     }
 
     public Task remove(int id) {
