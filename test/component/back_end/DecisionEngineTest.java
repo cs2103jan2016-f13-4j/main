@@ -1,6 +1,8 @@
 package component.back_end;
 
+import static entity.command.ParameterName;
 import static org.junit.Assert.*;
+
 
 import org.junit.*;
 import component.back_end.storage.Task;
@@ -23,14 +25,18 @@ public class DecisionEngineTest {
         TaskCollection tc = this.dEngine_.getTaskCollectionForTest();
     }
     
+    /*
+     * WARNING: INCOMPLETE/BROKEN TEST! DON'T ASSUME ANYTHING FROM ITS RESULTS!
+     * TODO: fix it after the Command Parser has been fixed
+     */
     @Test
     public void testCreateRawAddTask() {
         Instruction instruction = new Instruction(Instruction.Type.ADD);
         
         ParameterList params =  new ParameterList();
-        params.addParameter("name", "chiong V0.1");
-        params.addParameter("start", "1000");
-        params.addParameter("end", "1800");
+            params.addParameter(ParameterName.NAME, "chiong V0.1");
+            params.addParameter(ParameterName.DATE_FROM, "1000");
+            params.addParameter(ParameterName.DATE_TO, "1800");
         
         Command cmd = new Command(instruction, params);
         

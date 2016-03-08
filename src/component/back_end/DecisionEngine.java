@@ -1,9 +1,11 @@
 package component.back_end;
 
 import component.back_end.storage.*;
+import component.front_end.*;
 import entity.*;
-import entity.command.Command;
-import entity.command.Instruction;
+import entity.command.*;
+
+import java.util.*;
 
 
 /**
@@ -46,6 +48,15 @@ public class DecisionEngine extends DecisionEngineSpec {
         
     }
     
+    protected Task createRawAddTask(Command cmd) {
+        ParameterList params = cmd.getParameters();
+        
+        // TODO: carry on
+        
+        return null;
+    }
+    
+    
     @Override
     public ExecutionResult<?> performCommand(Command cmd) {
         
@@ -57,6 +68,7 @@ public class DecisionEngine extends DecisionEngineSpec {
         
         return null;
     }
+    
 
     @Override
     protected TaskSchedulerSpec getTaskScheduler() {
