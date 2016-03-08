@@ -6,6 +6,7 @@ import component.front_end.ui.core.View;
 import component.front_end.ui.core.VisualIndexView;
 import entity.ExecutionResult;
 import entity.command.Command;
+import entity.command.Instruction;
 
 import java.lang.reflect.Constructor;
 import java.util.List;
@@ -96,6 +97,23 @@ public class TranslationEngine extends TranslationEngineSpec {
     @Override
     public Command getNextCommand() {
         String rawCommandString = this.userInterface_.queryInput();
-        return this.getCommandParser().parseCommand(rawCommandString);
+
+        Command command = this.getCommandParser().parseCommand(rawCommandString);
+
+        if (mustInterceptCommand(command)) {
+            this.displayFaultyCommandView();
+            return this.getNextCommand();
+        }
+
+        return command;
+    }
+
+    private void displayFaultyCommandView() {
+
+    }
+
+    private static boolean mustInterceptCommand(Command command) {
+        Instruction.Type type = command.getInstruction().getType();
+        return type == Instruction.Type.INVALID || type == Instruction.Type.UNRECOGNISED;
     }
 }
