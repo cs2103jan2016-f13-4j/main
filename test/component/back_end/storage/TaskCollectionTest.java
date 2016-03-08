@@ -194,4 +194,23 @@ public class TaskCollectionTest {
         // assert that expected results and actual search results are the same
         assertEquals(expectedTaskList, this.taskCollection.startAfter(this.TASK_2_START));
     }
+    
+    @Test
+    public void Searching_by_end_before_returns_list_correctly() {
+     // create two additional Tasks for adding into TreeMap
+        this.task2 = new Task (this.TASK_2_ID, this.TASK_2_NAME, this.TASK_2_DESCRIPTION, this.TASK_2_START, this.TASK_2_END);
+        this.task3 = new Task (this.TASK_3_ID, this.TASK_3_NAME, this.TASK_3_DESCRIPTION, this.TASK_3_START, this.TASK_3_END);
+        
+        // add all three Tasks
+        this.taskCollection.save(this.task);
+        this.taskCollection.save(this.task2);
+        this.taskCollection.save(this.task3);
+        
+        ArrayList<Task> expectedTaskList = new ArrayList<Task>();
+        expectedTaskList.add(this.task);
+        expectedTaskList.add(this.task2);
+        
+        // assert that expected results and actual search results are the same
+        assertEquals(expectedTaskList, this.taskCollection.endBefore(this.TASK_2_END));
+    }
 }
