@@ -5,9 +5,7 @@ import entity.command.Instruction;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.LinkedHashMap;
-import java.util.List;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -49,7 +47,7 @@ public class CommandParserTest {
         for (String commandString : displayAllCommands) {
             Command displayAll = this.parser_.parseCommand(commandString);
             assertThat(displayAll.getInstruction().getType(), is(Instruction.Type.DISPLAY));
-            assertThat(displayAll.getInstruction().isUniversallyQuantified(), is(true));
+            assertThat(displayAll.getInstruction().hasAllQuantifier(), is(true));
         }
     }
 
@@ -57,23 +55,23 @@ public class CommandParserTest {
     public void Command_parser_correctly_recognizes_display_one_command() {
         Command displayOne = this.parser_.parseCommand("display:6");
         assertThat(displayOne.getInstruction().getType(), is(Instruction.Type.DISPLAY));
-        assertThat(displayOne.getInstruction().isUniversallyQuantified(), is(false));
-        assertThat(displayOne.getInstruction().getIndexQuantifier(), is(6));
+        assertThat(displayOne.getInstruction().hasAllQuantifier(), is(false));
+        assertThat(displayOne.getInstruction().getIndex(), is(6));
     }
 
     @Test
     public void Command_parser_correctly_recognizes_edit_command() {
         Command edit = this.parser_.parseCommand("edit:2");
         assertThat(edit.getInstruction().getType(), is(Instruction.Type.EDIT));
-        assertThat(edit.getInstruction().isUniversallyQuantified(), is(false));
-        assertThat(edit.getInstruction().getIndexQuantifier(), is(2));
+        assertThat(edit.getInstruction().hasAllQuantifier(), is(false));
+        assertThat(edit.getInstruction().getIndex(), is(2));
     }
 
     @Test
     public void Command_parser_correctly_recognizes_delete_command() {
         Command delete = this.parser_.parseCommand("delete:7");
         assertThat(delete.getInstruction().getType(), is(Instruction.Type.DELETE));
-        assertThat(delete.getInstruction().isUniversallyQuantified(), is(false));
-        assertThat(delete.getInstruction().getIndexQuantifier(), is(7));
+        assertThat(delete.getInstruction().hasAllQuantifier(), is(false));
+        assertThat(delete.getInstruction().getIndex(), is(7));
     }
 }

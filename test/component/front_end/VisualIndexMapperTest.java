@@ -1,5 +1,6 @@
 package component.front_end;
 
+import component.back_end.storage.PrimaryKey;
 import component.back_end.storage.PrimaryKeyInterface;
 import component.back_end.storage.RelationInterface;
 import component.front_end.ui.core.VisualTuple;
@@ -36,7 +37,7 @@ public class VisualIndexMapperTest {
     @Test
     public void Visual_index_mapper_translates_from_raw_to_visual_correctly() {
         for (int i = 1; i <= 3; i++) {
-            PrimaryKeyInterface<String> relationKey = new TestPrimaryKey("relation " + (53 + i));
+            PrimaryKeyInterface<String> relationKey = new PrimaryKey<>("relation " + (53 + i));
             assertThat(this.mapper_.translateRawToVisual(relationKey), is(i));
         }
     }
@@ -44,7 +45,7 @@ public class VisualIndexMapperTest {
     @Test
     public void Visual_index_mapper_translates_from_visual_to_raw_correctly() {
         for (int i = 1; i <= 3; i++) {
-            PrimaryKeyInterface<String> relationKey = (TestPrimaryKey) this.mapper_.translateVisualToRaw(i);
+            PrimaryKeyInterface<String> relationKey = this.mapper_.translateVisualToRaw(i);
             assertThat(relationKey.getValue(), is(equalTo("relation " + (53 + i))));
         }
     }

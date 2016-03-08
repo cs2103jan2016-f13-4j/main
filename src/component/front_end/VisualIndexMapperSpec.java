@@ -26,7 +26,7 @@ import java.util.List;
  *
  */
 public abstract class VisualIndexMapperSpec {
-    public abstract int translateRawToVisual(PrimaryKeyInterface<?> rawPrimaryKey);
-    public abstract PrimaryKeyInterface<?> translateVisualToRaw(int visualId);
+    public abstract <T> int translateRawToVisual(PrimaryKeyInterface<T> rawPrimaryKey);
+    public abstract <T> PrimaryKeyInterface<T> translateVisualToRaw(int visualId);
     public abstract List<VisualTuple<? extends RelationInterface>> getVisualTupleList();
 }

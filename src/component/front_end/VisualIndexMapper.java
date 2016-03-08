@@ -52,16 +52,16 @@ public class VisualIndexMapper extends VisualIndexMapperSpec {
     }
 
     @Override
-    public int translateRawToVisual(PrimaryKeyInterface<?> rawPrimaryKey) {
+    public <T> int translateRawToVisual(PrimaryKeyInterface<T> rawPrimaryKey) {
         assert(rawPrimaryKey != null);
         return this.backwardMap_.get(rawPrimaryKey);
     }
 
     @Override
-    public PrimaryKeyInterface<?> translateVisualToRaw(int visualId) {
+    public <T> PrimaryKeyInterface<T> translateVisualToRaw(int visualId) {
         int arrayListId = getArrayListIdFromVisualId(visualId);
         try {
-            return this.forwardMap_.get(arrayListId);
+            return (PrimaryKeyInterface<T>) this.forwardMap_.get(arrayListId);
         } catch (IndexOutOfBoundsException e) {
             return null;
         }
