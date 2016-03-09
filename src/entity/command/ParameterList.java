@@ -39,6 +39,7 @@ public class ParameterList {
     }
 
     public ParameterValue getParameter(ParameterName parameterName) {
+        assert this.hasParameterNamed(parameterName);
         return this.parameterMap_.get(parameterName);
     }
     
