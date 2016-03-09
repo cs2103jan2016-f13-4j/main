@@ -15,6 +15,7 @@ import exception.back_end.PrimaryKeyNotFoundException;
 /**
  * Created by maianhvu on 7/3/16.
  */
+
 public class TaskCollection {
     
     private final boolean SEARCH_MAP_BY_DATETIME_INCLUSIVE = true;
@@ -42,8 +43,11 @@ public class TaskCollection {
      */
     public int save(Task task) {
         // TODO: Check for potential time clashes
-
+        boolean isNewTask = false; 
+        
         if (task.getId() == null) {
+            isNewTask = true;
+            
             // TODO: Extract magic constant
             int newIndex = 1;
 
@@ -54,33 +58,74 @@ public class TaskCollection {
 
             task.setId(newIndex);
         }
+        
+        if (!isNewTask) {
+            // extract the old Task entry from the tree
+            Task oldTask = this.taskData_.get(task.getId());
+            this.addTaskToStartTimeTree(isNewTask, task, oldTask);
+            this.addTaskToEndTimeTree(isNewTask, task, oldTask);
+        } else {
+            this.addTaskToStartTimeTree(isNewTask, task, null);
+            this.addTaskToEndTimeTree(isNewTask, task, null);
+        }
 
         // add Task entry to the tree that maps ID to Task
         this.taskData_.put(task.getId(), task);
-        
-        // add Task entry to the tree that maps start time to Task
-        // do not add any Task with null start time to this tree
-        if (task.getStartTime() != null) {
-            if (!this.startTimeTree_.containsKey(task.getStartTime())) {
-                // if key yet to exist, put it into the tree and create a list
-                this.startTimeTree_.put(task.getStartTime(), new ArrayList<Task>());
-            }
-            // append Task to end of list
-            this.startTimeTree_.get(task.getStartTime()).add(task);
-        }
-        
-        // add Task entry to the tree that maps end time to Task
-        // do not add any Task with null end time to this tree
-        if (task.getEndTime() != null) {
-            if (!this.endTimeTree_.containsKey(task.getEndTime())) {
-                // if key yet to exist, put it into the tree and create a list
-                this.endTimeTree_.put(task.getEndTime(), new ArrayList<Task>());
-            }
-            // append Task to end of list
-            this.endTimeTree_.get(task.getEndTime()).add(task);
-        }
-        
+
         return task.getId();
+    }
+    
+    public void addTaskToStartTimeTree(boolean isNewTask, Task newTask, Task oldTask) {
+        if (!isNewTask) {
+            this.processOldTaskInStartTimeTree(newTask, oldTask);
+        }
+        this.processNewTaskInStartTimeTree(newTask);
+    }
+    
+    public void processOldTaskInStartTimeTree(Task newTask, Task oldTask) {
+        // if oldTask has startTime, then oldTask currently exists in startTimeTree
+        if (oldTask.getStartTime() != null) {
+            // remove oldTask from startTimeTree
+            this.startTimeTree_.get(oldTask.getStartTime()).remove(oldTask);
+        }
+    }
+    
+    public void processNewTaskInStartTimeTree(Task newTask) {
+        // do not add any Task with null start time to this tree
+        if (newTask.getStartTime() != null) {
+            if (!this.startTimeTree_.containsKey(newTask.getStartTime())) {
+                // if key yet to exist, put it into tree and create a list
+                this.startTimeTree_.put(newTask.getStartTime(), new ArrayList<Task>());
+            }
+            // append Task to end of list
+            this.startTimeTree_.get(newTask.getStartTime()).add(newTask);
+        }
+    }
+    
+    public void addTaskToEndTimeTree(boolean isNewTask, Task newTask, Task oldTask) {
+        if (!isNewTask) {
+            this.processOldTaskInEndTimeTree(newTask, oldTask);
+        }
+        this.processNewTaskInEndTimeTree(newTask);
+    }
+    
+    public void processOldTaskInEndTimeTree(Task newTask, Task oldTask) {
+        // if oldTask has endTime, then oldTask currently exists in endTimeTree
+        if (oldTask.getEndTime() != null) {
+            this.endTimeTree_.get(oldTask.getEndTime()).remove(oldTask);
+        }
+    }
+
+    public void processNewTaskInEndTimeTree(Task newTask) {
+        // do not add any Task with null end time to this tree
+        if (newTask.getEndTime() != null) {
+            if (!this.endTimeTree_.containsKey(newTask.getEndTime())) {
+                // if key yet to exist, put it into the tree and create a list
+                this.endTimeTree_.put(newTask.getEndTime(), new ArrayList<Task>());
+            }
+            // append Task to end of list
+            this.endTimeTree_.get(newTask.getEndTime()).add(newTask);
+        }
     }
     
     //----------------------------------------------------------------------------------------
@@ -243,4 +288,26 @@ public class TaskCollection {
         }
         return resultList;
     }
+
+    
+    public TreeMap<LocalDateTime, List<Task>> getStartTimeTree() {
+        return startTimeTree_;
+    }
+
+    
+    public void setStartTimeTree(TreeMap<LocalDateTime, List<Task>> startTimeTree) {
+        startTimeTree_ = startTimeTree;
+    }
+
+    
+    public TreeMap<LocalDateTime, List<Task>> getEndTimeTree() {
+        return endTimeTree_;
+    }
+
+    
+    public void setEndTimeTree(TreeMap<LocalDateTime, List<Task>> endTimeTree) {
+        endTimeTree_ = endTimeTree;
+    }
+    
+    
 }
