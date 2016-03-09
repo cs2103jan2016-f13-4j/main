@@ -20,7 +20,6 @@ public class StringParserTest {
         assertEquals(1993, ldt.getYear());
         assertEquals(20, ldt.getHour());
         assertEquals(0, ldt.getMinute());
-        assertFalse(true);
     }
 
 }
