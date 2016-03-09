@@ -84,20 +84,21 @@ public class DecisionEngine extends DecisionEngineSpec {
         }
         
         
+        ExecutionResult<?> result = null;
+        
         // all the standard commands
-        // TODO: IMPLEMENT THESE!
         switch (cmd.getInstruction().getType()) {
             case ADD:
-                // TODO
+                result = this.handleAdd(cmd);
                 break;
             case EDIT:
-                // TODO
+                result = this.handleEdit(cmd);
                 break;
             case DISPLAY:
-                // TODO
+                result = this.handleDisplay(cmd);
                 break;
             case DELETE:
-                // TODO
+                result = this.handleDelete(cmd);
                 break;
             default:
                 // if we reach this point, LTA Command Parser has failed in his duty
@@ -105,7 +106,7 @@ public class DecisionEngine extends DecisionEngineSpec {
                 assert false;
         }
         
-        return null;
+        return result;
     }
     
 
