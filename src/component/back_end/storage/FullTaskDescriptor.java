@@ -8,6 +8,8 @@ import java.time.LocalDateTime;
  * 
  * Use this when you want to extract a single Task from a collection, and you are able to describe it exactly.
  * 
+ * TODO: Generalise to an arbitrary parameter list, instead of three predefined parameters.
+ * 
  * created by thenaesh on 10 Mar 2016
  *
  */
