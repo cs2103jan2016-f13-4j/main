@@ -15,6 +15,7 @@ public class ParameterListTest {
 
     private ParameterList parameters_;
 
+    /*
     @Before
     public void setUp() {
         this.parameters_ = new ParameterList();
@@ -54,6 +55,7 @@ public class ParameterListTest {
         this.parameters_.addParameter("value", "totally not double");
         assertThat(this.parameters_.getDoubleParameter("value"), is(nullValue()));
     }
+    */
 
 
 

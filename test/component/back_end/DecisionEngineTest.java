@@ -1,6 +1,5 @@
 package component.back_end;
 
-import static entity.command.ParameterName;
 import static org.junit.Assert.*;
 
 
@@ -34,9 +33,12 @@ public class DecisionEngineTest {
         Instruction instruction = new Instruction(Instruction.Type.ADD);
         
         ParameterList params =  new ParameterList();
-            params.addParameter(ParameterName.NAME, "chiong V0.1");
-            params.addParameter(ParameterName.DATE_FROM, "1000");
-            params.addParameter(ParameterName.DATE_TO, "1800");
+            params.addParameter(ParameterName.NAME,
+                    ParameterValue.parseParamValue("chiong V0.1", ParameterName.NAME));
+            params.addParameter(ParameterName.DATE_FROM,
+                    ParameterValue.parseParamValue("1000", ParameterName.DATE_FROM));
+            params.addParameter(ParameterName.DATE_TO,
+                    ParameterValue.parseParamValue("1800", ParameterName.DATE_TO));
         
         Command cmd = new Command(instruction, params);
         

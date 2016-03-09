@@ -4,6 +4,7 @@ import entity.command.Command;
 import entity.command.Instruction;
 import entity.command.ParameterList;
 import entity.command.ParameterName;
+import entity.command.ParameterValue;
 import entity.command.InvalidParameterException;
 
 import java.util.ArrayList;
@@ -47,13 +48,15 @@ public class CommandParser extends CommandParserSpec {
             // Else, we treat the key and value as ordinary parameters
             // But first, we need to check that the key is a legit parameter type
             ParameterName paramName = null;
+            ParameterValue paramValue = null;
             try {
                 paramName = ParameterName.parseParamName(key);
+                paramValue = ParameterValue.parseParamValue(value, paramName);
             } catch (InvalidParameterException e) {
                 // TODO: Add a proper exception handler for this; an assertion is not the way to go
                 assert false;
             }
-            paramList.addParameter(paramName, value);
+            paramList.addParameter(paramName, paramValue);
         }
 
         // Ensure that the instruction at least has a value
