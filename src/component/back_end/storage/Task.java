@@ -15,6 +15,7 @@ public class Task implements Comparable<Task> {
     private LocalDateTime startTime_;
     private LocalDateTime endTime_;
 
+    private final int NUMBER_OF_ATTRIBUTES_TO_SERIALIZE = 5; 
     private final String CSV_DELIMITER = ", ";
 
     public Task(Integer id, String taskName, String description, LocalDateTime startTime, LocalDateTime endTime) {
@@ -25,6 +26,25 @@ public class Task implements Comparable<Task> {
         this.endTime_ = endTime;
 
         this.creationTime_ = LocalDateTime.now();
+    }
+    
+    public String encodeTaskToString() {
+        StringBuilder sb = new StringBuilder();
+        String[] attributesArr = this.taskAttributesToStringArray();
+        for (String attribute : attributesArr) {
+            sb.append(attribute).append(this.CSV_DELIMITER);
+        }
+        return sb.toString();
+    }
+    
+    public String[] taskAttributesToStringArray() {
+        String[] attributesArr = new String[this.NUMBER_OF_ATTRIBUTES_TO_SERIALIZE];
+        attributesArr[0] = this.id_.toString();
+        attributesArr[1] = this.taskName_;
+        attributesArr[2] = this.description_;
+        attributesArr[3] = this.startTime_.toString();
+        attributesArr[4] = this.endTime_.toString();
+        return attributesArr;
     }
     
     public void decodeTaskFromString(String line) {

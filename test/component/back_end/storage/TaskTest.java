@@ -22,6 +22,18 @@ public class TaskTest {
     private Task task_;
     
     @Test
+    public void Task_is_encoded_correctly() {
+        this.task_ = new Task(this.TASK_ID, this.TASK_NAME, this.TASK_DESCRIPTION, this.TASK_START, this.TASK_END);
+        String taskString = this.task_.encodeTaskToString();
+        String[] taskStringArr = taskString.split(", ");
+        assertEquals(this.TASK_ID.toString(), taskStringArr[0]);
+        assertEquals(this.TASK_NAME, taskStringArr[1]);
+        assertEquals(this.TASK_DESCRIPTION, taskStringArr[2]);
+        assertEquals(this.TASK_START.toString(), taskStringArr[3]);
+        assertEquals(this.TASK_END.toString(), taskStringArr[4]);
+    }
+    
+    @Test
     public void Decoded_Task_has_correct_attributes_assigned() {
         this.task_ = new Task(null, null, null, null, null);
         // String to parse into Task object
