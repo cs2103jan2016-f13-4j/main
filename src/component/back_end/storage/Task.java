@@ -5,13 +5,17 @@ import java.time.LocalDateTime;
 /**
  * Created by maianhvu on 7/3/16.
  */
+
 public class Task implements Comparable<Task> {
+    
     private Integer id_;
     private String taskName_;
     private String description_;
     private LocalDateTime creationTime_;
     private LocalDateTime startTime_;
     private LocalDateTime endTime_;
+
+    private final String CSV_DELIMITER = ", ";
 
     public Task(Integer id, String taskName, String description, LocalDateTime startTime, LocalDateTime endTime) {
         this.id_ = id;
@@ -21,6 +25,22 @@ public class Task implements Comparable<Task> {
         this.endTime_ = endTime;
 
         this.creationTime_ = LocalDateTime.now();
+    }
+    
+    public void decodeTaskFromString(String line) {
+        // use comma as separator
+        String[] taskStringArr = line.split(this.CSV_DELIMITER);
+        
+        if (taskStringArr.length != 5) {
+            throw new IllegalArgumentException();
+        }
+                
+        this.id_ = Integer.parseInt(taskStringArr[0]);
+        this.taskName_ = taskStringArr[1];
+        this.description_ = taskStringArr[2];
+        this.startTime_ = LocalDateTime.parse(taskStringArr[3]);
+        this.endTime_ = LocalDateTime.parse(taskStringArr[4]);
+
     }
     
     @Override

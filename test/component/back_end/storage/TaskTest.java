@@ -4,7 +4,6 @@ import static org.junit.Assert.*;
 
 import java.time.LocalDateTime;
 
-import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -22,34 +21,18 @@ public class TaskTest {
     private final LocalDateTime TASK_END = LocalDateTime.of(2016, 3, 8, 14, 30);
     private Task task_;
     
-    @Before
-    public void setUp() {
-        this.task_ = new Task (this.TASK_ID, this.TASK_NAME, this.TASK_DESCRIPTION, this.TASK_START, this.TASK_END);
-    }
-    
     @Test
-    public void GetId_method_retrieves_Task_ID_correctly() {
-        assertEquals(this.TASK_ID, this.task_.getId());
-    }
-    
-    @Test
-    public void GetTaskName_method_retrieves_Task_Name_correctly() {
-        assertEquals(this.TASK_NAME, this.task_.getTaskName());
-    }
-    
-    @Test
-    public void GetTaskDescription_method_retrieves_Task_Description_correctly() {
-        assertEquals(this.TASK_DESCRIPTION, this.task_.getDescription());
-    }
-    
-    @Test
-    public void GetStartTime_method_retrieves_Task_Start_Time_correctly() {
-        assertEquals(this.TASK_START, this.task_.getStartTime());
-    }
-    
-    @Test
-    public void GetEndTime_method_retrieves_Task_End_Time_correctly() {
-        assertEquals(this.TASK_END, this.task_.getEndTime());
+    public void Decoded_Task_has_correct_attributes_assigned() {
+        this.task_ = new Task(null, null, null, null, null);
+        // String to parse into Task object
+        String taskString = "88, buy groceries, more fruits, 2016-03-09t14:30:00, 2016-03-09t15:30:00";     
+        this.task_.decodeTaskFromString(taskString);
+        
+        assertSame(88, this.task_.getId());
+        assertEquals("buy groceries", this.task_.getTaskName());
+        assertEquals("more fruits", this.task_.getDescription());
+        assertEquals(LocalDateTime.parse("2016-03-09t14:30:00"), this.task_.getStartTime());
+        assertEquals(LocalDateTime.parse("2016-03-09t15:30:00"), this.task_.getEndTime());
     }
     
     @Test
