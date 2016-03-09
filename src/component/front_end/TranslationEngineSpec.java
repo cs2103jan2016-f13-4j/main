@@ -37,5 +37,5 @@ public abstract class TranslationEngineSpec {
      * 
      * @return the Command object
      */
-    public abstract Command getCommand();
+    public abstract Command getNextCommand();
 }

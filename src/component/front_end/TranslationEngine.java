@@ -1,11 +1,13 @@
 package component.front_end;
 
+import component.front_end.ui.ErrorDisplayView;
 import component.front_end.ui.core.UserInterface;
 import component.front_end.ui.core.UserInterfaceSpec;
 import component.front_end.ui.core.View;
 import component.front_end.ui.core.VisualIndexView;
 import entity.ExecutionResult;
 import entity.command.Command;
+import entity.command.Instruction;
 
 import java.lang.reflect.Constructor;
 import java.util.List;
@@ -14,6 +16,10 @@ import java.util.List;
  * Created by maianhvu on 6/3/16.
  */
 public class TranslationEngine extends TranslationEngineSpec {
+
+    /**
+     * Properties
+     */
     private CommandParser commandParser_;
     private UserInterface userInterface_;
 
@@ -21,27 +27,52 @@ public class TranslationEngine extends TranslationEngineSpec {
     private View<?> currentView_;
     private VisualIndexMapperSpec currentIndexMapper_;
 
+    /**
+     * Constructs a default translation engine.
+     */
     public TranslationEngine() {
         this.commandParser_ = new CommandParser();
         this.userInterface_ = new UserInterface();
     }
 
-    @Override
-    protected CommandParserSpec getCommandParser() {
+    /**
+     * Returns the main command parser used by this translation engine.
+     * @return the main command parser
+     */
+    @Override protected CommandParserSpec getCommandParser() {
         return this.commandParser_;
     }
 
-    @Override
-    protected UserInterfaceSpec getUserInterface() {
+    /**
+     * Returns the main user interface used by this translation engine.
+     * @return the main user interface
+     */
+    @Override protected UserInterfaceSpec getUserInterface() {
         return this.userInterface_;
     }
 
-    @Override
-    public void display(ExecutionResult<?> result) {
+    /**
+     * Constructs a view to be rendered based on the information
+     * gathered from the execution result passed in. Then notifies
+     * the user interface to render the constructed view.
+     *
+     * @param result the execution result to display
+     */
+    @Override public void display(ExecutionResult<?> result) {
+        // Null view, does not do anything
+        if (result == null) {
+            return;
+        }
+
         this.initializeView(result);
         this.getUserInterface().render(this.currentView_);
     }
 
+    /**
+     * Initializes a View using the information gathered from the
+     * execution result and set it to the current fields.
+     * @param executionResult the result to gather info from
+     */
     private void initializeView(ExecutionResult<?> executionResult) {
         this.currentExecutionResult_ = executionResult;
 
@@ -64,6 +95,14 @@ public class TranslationEngine extends TranslationEngineSpec {
         assert (this.currentView_ != null);
     }
 
+    /**
+     * Constructs a View instance using the constructor provided from the execution result
+     * and its data.
+     *
+     * @param executionResult the execution result passed in
+     * @param <T> any data type that is used to display the execution result
+     * @return the view constructed
+     */
     private static <T> View<T> constructView(ExecutionResult<?> executionResult) {
         // Initialize the View instance
         View view = null;
@@ -75,12 +114,11 @@ public class TranslationEngine extends TranslationEngineSpec {
         // and attempt to initialize the user interface with it
         for (Constructor<?> c : constructors) {
             try {
-                Constructor<? extends View<T>> constructor =
-                        (Constructor<? extends View<T>>) c;
+                Constructor<? extends View<T>> constructor = (Constructor<? extends View<T>>) c;
                 view = constructor.newInstance(executionResult.getData());
                 break;
             } catch (Exception e) {
-                continue;
+                // Do nothing
             }
         }
 
@@ -88,9 +126,44 @@ public class TranslationEngine extends TranslationEngineSpec {
     }
 
 
-    @Override
-    public Command getCommand() {
+    /**
+     * Prompts the user for the next command string and passes the command string
+     * through a command parser to be given to the dispatcher. Will detect commands
+     * that are of {@link Instruction} type INVALID or UNRECOGNISED, and intercepts
+     * the passing to dispatcher and ask the user to provide input again.
+     *
+     * @return the command parsed from user input
+     */
+    @Override public Command getNextCommand() {
         String rawCommandString = this.userInterface_.queryInput();
-        return this.getCommandParser().parseCommand(rawCommandString);
+
+        Command command = this.getCommandParser().parseCommand(rawCommandString);
+
+        if (mustInterceptCommand(command)) {
+            this.displayFaultyCommandView();
+            return this.getNextCommand();
+        }
+
+        return command;
+    }
+
+    /**
+     * Displays a message to notify the user of invalid or unrecognised command.
+     */
+    private void displayFaultyCommandView() {
+        this.currentView_ = new ErrorDisplayView(
+                "Your command is either invalid or unrecognised"
+        );
+        this.getUserInterface().render(this.currentView_);
+    }
+
+    /**
+     * Determines if the command is of the instruction type that has to be intercepted.
+     * @param command the command to be examined
+     * @return whether the command needs to be intercepted
+     */
+    private static boolean mustInterceptCommand(Command command) {
+        Instruction.Type type = command.getInstruction().getType();
+        return type == Instruction.Type.INVALID || type == Instruction.Type.UNRECOGNISED;
     }
 }

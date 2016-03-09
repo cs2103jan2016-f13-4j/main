@@ -18,10 +18,12 @@ public abstract class DispatcherSpec {
     protected abstract TranslationEngineSpec getTranslationEngine();
 
     /*
-     * 1) pulls a command in from the front-end
-     * 2) pushes it to the back-end for processing
-     * 3) receives the resulting task list and other instructions from the back-end
-     * 4) pushes the instructions to the front end
+     * 1. Starts a the application with an initial command
+     * 2. Enter programme loop until command is exit
+     *    2.1 Pass the command to back end
+     *    2.2 Decision engine returns execution result
+     *    2.3 Pass the execution result to translation engine
+     *    2.4 Translation engine returns the next command to be executed
      */
     public abstract void pulse();
 }

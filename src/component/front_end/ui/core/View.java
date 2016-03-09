@@ -6,10 +6,12 @@ public abstract class View<T> implements ViewSpec {
 
     private T viewData_;
     private StringBuilder contentBuilder_;
-    
+
     public View(T data){
         this.viewData_ = data;
         this.contentBuilder_ = new StringBuilder();
+
+        this.buildContent();
     }
 
     @Override

@@ -19,7 +19,7 @@ public class VisualIndexMapper extends VisualIndexMapperSpec {
     private List<VisualTuple<Task>> visualTupleList_;
 
     /**
-     * Constructs a visual index mapper based on a list of index
+     * Constructs a visual index mapper based on a list of index.
      */
     public VisualIndexMapper(List<Task> tupleList) {
         this.forwardMap_ = new ArrayList<>();
@@ -49,14 +49,12 @@ public class VisualIndexMapper extends VisualIndexMapperSpec {
         }
     }
 
-    @Override
-    public int translateRawToVisual(Integer rawPrimaryKey) {
+    @Override public int translateRawToVisual(Integer rawPrimaryKey) {
         assert(rawPrimaryKey != null);
         return this.backwardMap_.get(rawPrimaryKey);
     }
 
-    @Override
-    public Integer translateVisualToRaw(int visualId) {
+    @Override public Integer translateVisualToRaw(int visualId) {
         int arrayListId = getArrayListIdFromVisualId(visualId);
         try {
             return this.forwardMap_.get(arrayListId);
@@ -65,8 +63,7 @@ public class VisualIndexMapper extends VisualIndexMapperSpec {
         }
     }
 
-    @Override
-    public List<VisualTuple<Task>> getVisualTupleList() {
+    @Override public List<VisualTuple<Task>> getVisualTupleList() {
         return this.visualTupleList_;
     }
 

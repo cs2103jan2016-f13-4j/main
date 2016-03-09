@@ -16,7 +16,7 @@ public class Instruction {
         EDIT         ( false,             true),
         DISPLAY      ( true,              false),
         DELETE       ( true,              true),
-        EXIT         ( false,             true),
+        EXIT         ( false,             false),
 
         // Special types
         INVALID     (false, false),
