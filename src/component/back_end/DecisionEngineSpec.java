@@ -22,7 +22,7 @@ import entity.command.Command;
  */
 public abstract class DecisionEngineSpec {
     protected abstract TaskSchedulerSpec getTaskScheduler();
-    protected abstract TaskCollection getTaskData();
+    protected abstract TaskCollection getTaskCollection();
     
     /**
      * inspects the given command, decides what to do with it

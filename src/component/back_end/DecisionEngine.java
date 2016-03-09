@@ -50,9 +50,25 @@ public class DecisionEngine extends DecisionEngineSpec {
         
         
         // we now build the Task object for adding into the store
-        Task taskToAdd = new Task(null, name, "", from, to);
+        Task task = new Task(null, name, "", from, to);
         
-        return taskToAdd;
+        return task;
+    }
+    
+    protected ExecutionResult<?> handleAdd(Command cmd) {
+        return null;
+    }
+    
+    protected ExecutionResult<?> handleEdit(Command cmd) {
+        return null;
+    }
+    
+    protected ExecutionResult<?> handleDisplay(Command cmd) {
+        return null;
+    }
+    
+    protected ExecutionResult<?> handleDelete(Command cmd) {
+        return null;
     }
     
     
@@ -85,6 +101,7 @@ public class DecisionEngine extends DecisionEngineSpec {
                 break;
             default:
                 // if we reach this point, LTA Command Parser has failed in his duty
+                // and awaits court martial
                 assert false;
         }
         
@@ -99,7 +116,7 @@ public class DecisionEngine extends DecisionEngineSpec {
     }
 
     @Override
-    protected TaskCollection getTaskData() {
+    protected TaskCollection getTaskCollection() {
         // TODO Auto-generated method stub
         return null;
     }
