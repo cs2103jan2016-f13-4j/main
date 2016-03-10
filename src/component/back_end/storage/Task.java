@@ -118,7 +118,7 @@ public class Task implements Comparable<Task> {
     /**
      * Setters
      */
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id_ = id;
     }
 
