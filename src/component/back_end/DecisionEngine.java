@@ -23,6 +23,11 @@ public class DecisionEngine extends DecisionEngineSpec {
     }
 
     
+    protected List<Task> fullMatcher(String name, LocalDateTime start, LocalDateTime end) {
+        TaskDescriptor desc = new SingleMatchDescriptor(name, start, end);
+        return this.getTaskCollection().getAll(desc);
+    }
+    
     /**
      * creates a Task from a specified command object when it makes sense
      * we should blow up when creating a Task doesn't really make sense
