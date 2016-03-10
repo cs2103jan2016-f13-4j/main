@@ -25,6 +25,7 @@ public class StringParser {
             "(\\d\\d)(\\d\\d)(\\d\\d\\d\\d) (\\d\\d)(\\d\\d)");
     
     public static LocalDateTime asDateTime(String str) {
+        assert str != null;
         Matcher matcher = PATTERN_DATE.matcher(str);
         matcher.matches();
         
