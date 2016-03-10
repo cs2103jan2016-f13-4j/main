@@ -1,7 +1,6 @@
 package component.back_end;
 
 import component.back_end.storage.*;
-import component.front_end.*;
 import component.front_end.ui.TaskListView;
 import entity.*;
 import entity.command.*;
@@ -11,6 +10,7 @@ import java.util.*;
 
 
 /**
+ * TODO: Extract TaskCollectionSpec from TaskCollection
  * 
  * created by thenaesh on Mar 8, 2016
  *
@@ -20,15 +20,14 @@ public class DecisionEngine extends DecisionEngineSpec {
     protected TaskSchedulerSpec taskScheduler_;
     
     public DecisionEngine() {
-        this.taskData_ = new TaskCollection();
-        this.taskScheduler_ = null;
+        this(new TaskCollection(), null);
+    }
+    
+    public DecisionEngine(TaskCollection tc, TaskSchedulerSpec ts) {
+        this.taskData_ = tc;
+        this.taskScheduler_ = ts;
     }
 
-    
-    protected List<Task> fullMatcher(String name, LocalDateTime start, LocalDateTime end) {
-        TaskDescriptor desc = new SingleMatchDescriptor(name, start, end);
-        return this.getTaskCollection().getAll(desc);
-    }
     
     /**
      * creates a Task from a specified command object when it makes sense
@@ -63,6 +62,8 @@ public class DecisionEngine extends DecisionEngineSpec {
     }
     
     protected ExecutionResult<?> handleAdd(Command cmd) {
+        assert cmd.getInstruction().getType() == Instruction.Type.ADD;
+        
         Task taskToAdd = this.createTask(cmd);
         this.getTaskCollection().save(taskToAdd);
         
@@ -70,6 +71,8 @@ public class DecisionEngine extends DecisionEngineSpec {
     }
     
     protected ExecutionResult<?> handleEdit(Command cmd) {
+        assert cmd.getInstruction().getType() == Instruction.Type.EDIT;
+        
         int id = cmd.getInstruction().getIndex();
         Task updatedTask = this.createTask(cmd);
         updatedTask.setId(id);
@@ -79,11 +82,15 @@ public class DecisionEngine extends DecisionEngineSpec {
     }
     
     protected ExecutionResult<?> handleDisplay(Command cmd) {
+        assert cmd.getInstruction().getType() == Instruction.Type.DISPLAY;
+        
         List<Task> listToDisplay = this.getTaskCollection().getAll(UniversalDescriptor.get());
         return new ExecutionResult<>(TaskListView.class, listToDisplay);
     }
     
     protected ExecutionResult<?> handleDelete(Command cmd) {
+        assert cmd.getInstruction().getType() == Instruction.Type.DELETE;
+        
         int id = cmd.getInstruction().getIndex();
         this.getTaskCollection().remove(id);
         

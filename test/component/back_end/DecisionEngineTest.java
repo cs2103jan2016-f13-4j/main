@@ -10,41 +10,46 @@ import component.back_end.storage.TaskCollection;
 import entity.command.*;
 
 
-class DecisionEngineTester extends DecisionEngine {
-    public TaskCollection getTaskCollectionForTest() {
-        return this.taskData_;
-    }
-}
-
 public class DecisionEngineTest {
-    private DecisionEngineTester dEngine_;
+    private DecisionEngine dEngine_;
+    private TaskCollection tc_;
     
-    @Before
-    public void setUp() {
-        this.dEngine_ = new DecisionEngineTester();
-        TaskCollection tc = this.dEngine_.getTaskCollectionForTest();
+    private Command CMD_ADD;
+    private Command CMD_EDIT;
+    private Command CMD_DISPLAY;
+    private Command CMD_DELETE;
+    
+    
+    private void initSampleCommands() {
+        this.initSampleAddCommand();
     }
     
-    /*
-     * WARNING: INCOMPLETE/BROKEN TEST! DON'T ASSUME ANYTHING FROM ITS RESULTS!
-     * TODO: fix it after the Command Parser has been fixed
-     */
-    @Test
-    public void testCreateTask() {
+    private void initSampleAddCommand() {
         Instruction instruction = new Instruction(Instruction.Type.ADD);
         
         ParameterList params =  new ParameterList();
-            params.addParameter(ParameterName.NAME,
-                    ParameterValue.parseParamValue("chiong V0.1", ParameterName.NAME));
-            params.addParameter(ParameterName.DATE_FROM,
-                    ParameterValue.parseParamValue("20022016 1000", ParameterName.DATE_FROM));
-            params.addParameter(ParameterName.DATE_TO,
-                    ParameterValue.parseParamValue("11032017 1800", ParameterName.DATE_TO));
+        params.addParameter(ParameterName.NAME, ParameterValue.parseParamValue("chiong V0.1", ParameterName.NAME));
+        params.addParameter(ParameterName.DATE_FROM, ParameterValue.parseParamValue("20022016 1000", ParameterName.DATE_FROM));
+        params.addParameter(ParameterName.DATE_TO, ParameterValue.parseParamValue("11032017 1800", ParameterName.DATE_TO));
         
-        Command cmd = new Command(instruction, params);
-        
-        
-        Task task = this.dEngine_.createTask(cmd);
+        this.CMD_ADD = new Command(instruction, params);
+    }
+    
+    private void initSampleEditCommand(int index) {
+        Instruction instruction = new Instruction(Instruction.Type.EDIT, index);
+    }
+    
+    
+    @Before
+    public void setUp() {
+        this.tc_ = new TaskCollection();
+        this.dEngine_ = new DecisionEngine(this.tc_, null);
+        this.initSampleCommands();
+    }
+    
+    @Test
+    public void testCreateTask() {
+        Task task = this.dEngine_.createTask(this.CMD_ADD);
         
         assertEquals(task.getTaskName(), "chiong V0.1");
         
@@ -59,5 +64,26 @@ public class DecisionEngineTest {
         assertEquals(task.getEndTime().getDayOfMonth(), 11);
         assertEquals(task.getEndTime().getHour(), 18);
         assertEquals(task.getEndTime().getMinute(), 0);
+    }
+    
+    
+    @Test
+    public void testHandleAdd() {
+        
+    }
+    
+    @Test
+    public void testHandleEdit() {
+        
+    }
+    
+    @Test
+    public void testHandleDisplay() {
+        
+    }
+    
+    @Test
+    public void testHandleDelete() {
+        
     }
 }
