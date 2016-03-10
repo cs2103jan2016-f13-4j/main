@@ -21,6 +21,7 @@ public class DecisionEngine extends DecisionEngineSpec {
     
     public DecisionEngine() {
         this.taskData_ = new TaskCollection();
+        this.taskScheduler_ = null;
     }
 
     
