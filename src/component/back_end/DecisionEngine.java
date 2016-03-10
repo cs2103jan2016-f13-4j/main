@@ -2,6 +2,7 @@ package component.back_end;
 
 import component.back_end.storage.*;
 import component.front_end.*;
+import component.front_end.ui.TaskListView;
 import entity.*;
 import entity.command.*;
 
@@ -61,19 +62,31 @@ public class DecisionEngine extends DecisionEngineSpec {
     }
     
     protected ExecutionResult<?> handleAdd(Command cmd) {
-        return null;
+        Task taskToAdd = this.createTask(cmd);
+        this.getTaskCollection().save(taskToAdd);
+        
+        return this.handleDisplay(cmd);
     }
     
     protected ExecutionResult<?> handleEdit(Command cmd) {
-        return null;
+        int id = cmd.getInstruction().getIndex();
+        Task updatedTask = this.createTask(cmd);
+        updatedTask.setId(id);
+        this.getTaskCollection().save(updatedTask);
+        
+        return this.handleDisplay(cmd);
     }
     
     protected ExecutionResult<?> handleDisplay(Command cmd) {
-        return null;
+        List<Task> listToDisplay = this.getTaskCollection().getAll(UniversalDescriptor.get());
+        return new ExecutionResult<>(TaskListView.class, listToDisplay);
     }
     
     protected ExecutionResult<?> handleDelete(Command cmd) {
-        return null;
+        int id = cmd.getInstruction().getIndex();
+        this.getTaskCollection().remove(id);
+        
+        return this.handleDisplay(cmd);
     }
     
     
@@ -117,14 +130,12 @@ public class DecisionEngine extends DecisionEngineSpec {
 
     @Override
     protected TaskSchedulerSpec getTaskScheduler() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.taskScheduler_;
     }
 
     @Override
     protected TaskCollection getTaskCollection() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.taskData_;
     }
     
 }
