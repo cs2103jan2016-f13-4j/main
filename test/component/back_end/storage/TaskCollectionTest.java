@@ -5,11 +5,10 @@ import static org.junit.Assert.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
+import component.back_end.storage.query.TaskDescriptor;
 import org.junit.Before;
 import org.junit.Test;
 
-import component.back_end.storage.Task;
-import component.back_end.storage.TaskCollection;
 import exception.back_end.PrimaryKeyNotFoundException;
 
 /**

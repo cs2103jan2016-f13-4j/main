@@ -1,4 +1,4 @@
-package component.front_end;
+package skeleton.front_end;
 
 import entity.command.Command;
 

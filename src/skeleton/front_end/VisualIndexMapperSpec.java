@@ -1,4 +1,4 @@
-package component.front_end;
+package skeleton.front_end;
 
 import component.back_end.storage.Task;
 import component.front_end.ui.core.VisualTuple;

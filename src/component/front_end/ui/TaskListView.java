@@ -31,6 +31,16 @@ public class TaskListView extends VisualIndexView<Task> {
     public void buildContent() {
         this.df_ = DateTimeFormatter.ofPattern(DATE_FORMAT);
         List<VisualTuple<Task>> visualTasks = this.getVisualTupleList();
+
+        // Case when there are no tasks present
+        if (visualTasks.size() == 0) {
+            this.addLine("There are no more outstanding tasks!");
+            this.addLine("Create a new one using \"add name:<task name> from:<start> to:<end>\"");
+            return;
+        }
+
+        // Case when there are tasks to be displayed
+        this.addLine("Found %d task(s):", visualTasks.size());
         for (VisualTuple<Task> visualTask : visualTasks) {
             this.addText(this.constructDisplayID(visualTask.getIndex()));
 

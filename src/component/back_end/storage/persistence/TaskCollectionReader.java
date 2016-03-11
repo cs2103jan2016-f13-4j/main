@@ -1,4 +1,7 @@
-package component.back_end.storage;
+package component.back_end.storage.persistence;
+
+import component.back_end.storage.Task;
+import component.back_end.storage.TaskCollection;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -12,7 +15,6 @@ import java.io.IOException;
 public class TaskCollectionReader {
 
     private TaskCollection taskCollection_;
-    private BufferedReader reader_;
     private String fileName_ = "ToDoData.csv";
     
     public TaskCollectionReader() {
@@ -25,15 +27,15 @@ public class TaskCollectionReader {
     }
     
     public void read() throws IOException {
-        this.reader_ = new BufferedReader(new FileReader(this.fileName_));
+        BufferedReader reader_ = new BufferedReader(new FileReader(this.fileName_));
         String currLine;
-        while ((currLine = this.reader_.readLine()) != null) {
+        while ((currLine = reader_.readLine()) != null) {
             Task task = new Task(null, null, null, null, null);
             task.decodeTaskFromString(currLine);
             task.setId(null);
             this.taskCollection_.save(task);
         }
-        this.reader_.close();
+        reader_.close();
     }
     
     public TaskCollection getTaskCollection() {

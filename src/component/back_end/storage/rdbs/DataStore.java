@@ -1,6 +1,6 @@
 package component.back_end.storage.rdbs;
 
-import component.back_end.exceptions.storage.PrimaryKeyAlreadyExistsException;
+import exception.back_end.storage.PrimaryKeyAlreadyExistsException;
 
 import java.util.*;
 import java.util.function.Function;

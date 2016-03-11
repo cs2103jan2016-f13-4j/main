@@ -1,4 +1,4 @@
-package component.front_end;
+package exception.front_end;
 
 
 /**

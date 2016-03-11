@@ -1,4 +1,4 @@
-package util;
+package utility;
 
 import static org.junit.Assert.*;
 
@@ -6,8 +6,6 @@ import java.time.LocalDateTime;
 import java.time.Month;
 
 import org.junit.Test;
-
-import utility.StringParser;
 
 
 public class StringParserTest {

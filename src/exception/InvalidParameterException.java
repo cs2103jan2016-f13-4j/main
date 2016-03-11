@@ -1,6 +1,6 @@
-package entity.command;
+package exception;
 
-import component.front_end.CommandParseException;
+import exception.front_end.CommandParseException;
 
 
 /**

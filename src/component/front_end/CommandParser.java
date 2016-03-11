@@ -5,12 +5,11 @@ import entity.command.Instruction;
 import entity.command.ParameterList;
 import entity.command.ParameterName;
 import entity.command.ParameterValue;
-import entity.command.InvalidParameterException;
+import exception.InvalidParameterException;
+import skeleton.front_end.CommandParserSpec;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -105,13 +104,10 @@ public class CommandParser extends CommandParserSpec {
     private static boolean isSurroundedByQuotes(String string) {
         assert(string != null);
 
-        if (string.length() < 2 ||
-            string.charAt(0) != CHARACTER_QUOTATION_MARK ||
-            string.charAt(string.length() - 1) != CHARACTER_QUOTATION_MARK) {
-            return false;
-        }
+        return !(string.length() < 2 ||
+                string.charAt(0) != CHARACTER_QUOTATION_MARK ||
+                string.charAt(string.length() - 1) != CHARACTER_QUOTATION_MARK);
 
-        return true;
     }
 
     private static String stripExtremeCharacters(String string) {

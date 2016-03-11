@@ -53,12 +53,12 @@ public class TaskListViewTest {
     
     @Test
     public void buildContentTest() {
-        String expectedList1 = "1. 05/10|01:00 - 06/10|05:00 | Stay Alive\n";
-        String expectedList2 = "2. 06/10|12:00 - 06/10|17:00 | Cry\n";
-        String combinedOutcome = expectedList1 + expectedList2;
-        
-        listView.buildContent();
-        assertThat(listView.getContent(),is(combinedOutcome));
+        StringBuilder expectedContent = new StringBuilder();
+        expectedContent.append("Found 2 task(s):\n");
+        expectedContent.append("1. 05/10|01:00 - 06/10|05:00 | Stay Alive\n");
+        expectedContent.append("2. 06/10|12:00 - 06/10|17:00 | Cry\n");
+
+        assertThat(listView.getContent(), is(equalTo(expectedContent.toString())));
     }
     
 

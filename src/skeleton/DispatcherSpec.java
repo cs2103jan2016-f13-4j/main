@@ -1,7 +1,7 @@
-package component;
+package skeleton;
 
-import component.back_end.DecisionEngineSpec;
-import component.front_end.TranslationEngineSpec;
+import skeleton.back_end.DecisionEngineSpec;
+import skeleton.front_end.TranslationEngineSpec;
 
 
 /**

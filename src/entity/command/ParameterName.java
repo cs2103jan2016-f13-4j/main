@@ -1,5 +1,7 @@
 package entity.command;
 
+import exception.InvalidParameterException;
+
 /**
  * This enumerates the name of parameter (e.g. name, start date, end date, ...).
  * Its job is to represent the parameter name (first entry in the ParameterList internal tuples).
@@ -22,7 +24,7 @@ public enum ParameterName {
     
     final String paramStr_;
     
-    private ParameterName(String paramStr) {
+    ParameterName(String paramStr) {
         this.paramStr_ = paramStr;
     }
     

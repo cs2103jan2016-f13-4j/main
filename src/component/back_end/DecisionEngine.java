@@ -1,9 +1,12 @@
 package component.back_end;
 
 import component.back_end.storage.*;
+import component.back_end.storage.query.UniversalDescriptor;
 import component.front_end.ui.TaskListView;
 import entity.*;
 import entity.command.*;
+import skeleton.back_end.DecisionEngineSpec;
+import skeleton.back_end.TaskSchedulerSpec;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -15,7 +18,7 @@ import java.util.*;
  * created by thenaesh on Mar 8, 2016
  *
  */
-public class DecisionEngine extends DecisionEngineSpec { 
+public class DecisionEngine extends DecisionEngineSpec {
     protected TaskCollection taskData_;
     protected TaskSchedulerSpec taskScheduler_;
     
@@ -56,9 +59,7 @@ public class DecisionEngine extends DecisionEngineSpec {
         
         
         // we now build the Task object for adding into the store
-        Task task = new Task(null, name, "", from, to);
-        
-        return task;
+        return new Task(null, name, "", from, to);
     }
     
     protected ExecutionResult<?> handleAdd(Command cmd) {

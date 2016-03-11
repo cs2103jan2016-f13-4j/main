@@ -1,4 +1,8 @@
-package component.back_end.storage;
+package component.back_end.storage.persistence;
+
+import component.back_end.storage.Task;
+import component.back_end.storage.TaskCollection;
+import component.back_end.storage.query.TaskDescriptor;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -14,8 +18,6 @@ public class TaskCollectionWriter {
     
     private TaskCollection taskCollection_;
     private TaskDescriptor taskDescriptor_ = null;
-    private List<Task> taskList_;
-    private BufferedWriter writer_;
     private String fileName_ = "ToDoData.csv";
     
     public TaskCollectionWriter(TaskCollection collection) throws IOException {
@@ -28,13 +30,13 @@ public class TaskCollectionWriter {
     }
     
     public void save() throws IOException {
-        this.writer_ = new BufferedWriter(new FileWriter(this.fileName_));
-        this.taskList_ = this.taskCollection_.getAll(this.taskDescriptor_);
-        for (Task task : this.taskList_) {
-            this.writer_.write(task.encodeTaskToString());
-            this.writer_.newLine();
+        BufferedWriter writer_ = new BufferedWriter(new FileWriter(this.fileName_));
+        List<Task> taskList_ = this.taskCollection_.getAll(this.taskDescriptor_);
+        for (Task task : taskList_) {
+            writer_.write(task.encodeTaskToString());
+            writer_.newLine();
         }
-        this.writer_.close();
+        writer_.close();
     }
 
 }

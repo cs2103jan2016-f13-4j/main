@@ -5,6 +5,7 @@ import component.front_end.TranslationEngine;
 import entity.ExecutionResult;
 import entity.command.Command;
 import entity.command.Instruction;
+import skeleton.DispatcherSpec;
 
 /**
  * Created by maianhvu on 8/3/16.

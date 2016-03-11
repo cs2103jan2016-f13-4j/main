@@ -1,6 +1,6 @@
-package component.back_end.storage;
+package component.back_end.storage.query;
 
-import component.back_end.storage.TaskDescriptor;
+import component.back_end.storage.Task;
 
 
 /**

@@ -26,7 +26,7 @@ public class TaskView extends View<VisualTuple<Task>> {
     @Override
     public void buildContent() {
         this.df_ = DateTimeFormatter.ofPattern(STRING_DATE_FORMAT);
-        VisualTuple<Task> tuple = (VisualTuple<Task>) this.getViewData();
+        @SuppressWarnings("unchecked") VisualTuple<Task> tuple = (VisualTuple<Task>) this.getViewData();
         Task tsk = tuple.getOriginal();
         this.addLine(tsk.getTaskName());
         this.addText(STRING_START_TIME);

@@ -7,17 +7,24 @@ package exception.back_end;
  */
 
 public class PrimaryKeyNotFoundException extends Exception {
-    
-    private int primaryKey_;
-    private final String MESSAGE = "Primary key not found: ";
 
+    /**
+     * Properties
+     */
+    private int primaryKey_;
+    private final String STRING_MESSAGE_ERROR = "Primary key not found: ";
+
+    /**
+     * Constructs a new PrimaryKeyNotFoundException with the provided integer
+     * primary key
+     * @param pKey an integer key
+     */
     public PrimaryKeyNotFoundException(int pKey) {
         this.primaryKey_ = pKey;
     }
     
-    @Override
-    public String getMessage() {
-        return this.MESSAGE + this.primaryKey_;
+    @Override public String getMessage() {
+        return this.STRING_MESSAGE_ERROR + this.primaryKey_;
     }
     
 }

@@ -1,4 +1,4 @@
-package component.back_end.exceptions.storage;
+package exception.back_end.storage;
 
 import component.back_end.storage.rdbs.PrimaryKeyInterface;
 import component.back_end.storage.rdbs.RelationInterface;

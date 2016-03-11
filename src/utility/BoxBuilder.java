@@ -1,9 +1,9 @@
 package utility;
 
 /**
- * Created by maianhvu on 8/3/16.
+ * @@author Mai Anh Vu
  */
-public class BoxBuildingUtil {
+public class BoxBuilder {
 
     /**
      * Constant

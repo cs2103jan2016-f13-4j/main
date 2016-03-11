@@ -1,6 +1,7 @@
 package component.front_end;
 import component.back_end.storage.Task;
 import component.front_end.ui.core.VisualTuple;
+import skeleton.front_end.VisualIndexMapperSpec;
 
 import java.util.ArrayList;
 import java.util.HashMap;

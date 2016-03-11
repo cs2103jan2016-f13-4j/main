@@ -1,7 +1,6 @@
-package component.back_end;
+package skeleton.back_end;
 
 import component.back_end.storage.TaskCollection;
-import component.back_end.storage.Task;
 import entity.*;
 import entity.command.Command;
 

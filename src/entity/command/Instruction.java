@@ -148,4 +148,10 @@ public class Instruction {
     public Integer getIndex() {
         return this.index_;
     }
+
+    public void setIndex(Integer index) {
+        assert(index != null);
+
+        this.index_ = index;
+    }
 }

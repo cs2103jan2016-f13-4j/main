@@ -1,6 +1,5 @@
 package component.front_end.ui.core;
 
-
 public abstract class View<T> implements ViewSpec {
     private final static String STRING_NEW_LINE = "\n";
 
@@ -22,13 +21,17 @@ public abstract class View<T> implements ViewSpec {
         return this.viewData_;
     }
 
-    protected void addLine(String string) {
-        this.contentBuilder_.append(string);
+    protected void addLine() {
+        this.contentBuilder_.append(STRING_NEW_LINE);
+    }
+
+    protected void addLine(String string, Object... args) {
+        this.addText(string, args);
         this.contentBuilder_.append(STRING_NEW_LINE);
     }
     
-    protected void addText(String string){
-        this.contentBuilder_.append(string);
+    protected void addText(String string, Object... args){
+        this.contentBuilder_.append(String.format(string, args));
     }
 
     @Override

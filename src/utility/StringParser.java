@@ -6,7 +6,7 @@ import java.util.regex.*;
 
 /**
  * This class contains static methods to assist in parsing strings.
- * Due to the very general nature of these methods, they are placed in util instead of elsewhere.
+ * Due to the very general nature of these methods, they are placed in utility instead of elsewhere.
  * 
  * We don't include methods whose functionality can be trivially implemented elsewhere
  * (such as String -> Integer).

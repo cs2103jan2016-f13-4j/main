@@ -8,6 +8,9 @@ import component.front_end.ui.core.VisualIndexView;
 import entity.ExecutionResult;
 import entity.command.Command;
 import entity.command.Instruction;
+import skeleton.front_end.CommandParserSpec;
+import skeleton.front_end.TranslationEngineSpec;
+import skeleton.front_end.VisualIndexMapperSpec;
 
 import java.lang.reflect.Constructor;
 import java.util.List;
@@ -23,7 +26,6 @@ public class TranslationEngine extends TranslationEngineSpec {
     private CommandParser commandParser_;
     private UserInterface userInterface_;
 
-    private ExecutionResult<?> currentExecutionResult_;
     private View<?> currentView_;
     private VisualIndexMapperSpec currentIndexMapper_;
 
@@ -74,23 +76,24 @@ public class TranslationEngine extends TranslationEngineSpec {
      * @param executionResult the result to gather info from
      */
     private void initializeView(ExecutionResult<?> executionResult) {
-        this.currentExecutionResult_ = executionResult;
+        ExecutionResult<?> currentExecutionResult_ = executionResult;
 
         // If the executionResult class is classified under visual index UI
         // we provide the translation engine with a Visual ID Mapping
         if (VisualIndexView.class.isAssignableFrom(executionResult.getViewClass())) {
             assert (executionResult.getData() instanceof List);
 
+            //noinspection unchecked
             this.currentIndexMapper_ = new VisualIndexMapper((List) executionResult.getData());
 
             // Assign the visual tuple to executionResult
-            this.currentExecutionResult_ = executionResult.transformToVisual(
+            currentExecutionResult_ = executionResult.transformToVisual(
                     this.currentIndexMapper_.getVisualTupleList()
             );
         }
 
         // Instantiate new User Interface from executionResult data
-        this.currentView_ = constructView(this.currentExecutionResult_);
+        this.currentView_ = constructView(currentExecutionResult_);
 
         assert (this.currentView_ != null);
     }
@@ -99,11 +102,11 @@ public class TranslationEngine extends TranslationEngineSpec {
      * Constructs a View instance using the constructor provided from the execution result
      * and its data.
      *
-     * @param executionResult the execution result passed in
      * @param <T> any data type that is used to display the execution result
+     * @param executionResult the execution result passed in
      * @return the view constructed
      */
-    private static <T> View<T> constructView(ExecutionResult<?> executionResult) {
+    private static <T> View constructView(ExecutionResult<?> executionResult) {
         // Initialize the View instance
         View view = null;
 
@@ -114,7 +117,8 @@ public class TranslationEngine extends TranslationEngineSpec {
         // and attempt to initialize the user interface with it
         for (Constructor<?> c : constructors) {
             try {
-                Constructor<? extends View<T>> constructor = (Constructor<? extends View<T>>) c;
+                @SuppressWarnings("unchecked") Constructor<? extends View<T>> constructor =
+                        (Constructor<? extends View<T>>) c;
                 view = constructor.newInstance(executionResult.getData());
                 break;
             } catch (Exception e) {
@@ -139,12 +143,31 @@ public class TranslationEngine extends TranslationEngineSpec {
 
         Command command = this.getCommandParser().parseCommand(rawCommandString);
 
+        // If the command is either INVALID or UNDEFINED, we immediately capture this command
+        // on the front end and let the user specify a new (potentially) valid command. This
+        // function is recursive to ensure this process repeats until the user inputs a valid
+        // command.
         if (mustInterceptCommand(command)) {
             this.displayFaultyCommandView();
             return this.getNextCommand();
         }
 
+        // If the command instruction has an index that appears on the screen
+        // but does not truly reflect the actual index in the back end, attempt
+        // to convert it from the visual index (current) to the raw index
+        if (shouldApplyVisualIndexMapping(command)) {
+            int visualIndex = command.getInstruction().getIndex();
+            command.getInstruction().setIndex(
+                    this.currentIndexMapper_.translateVisualToRaw(
+                            visualIndex
+                    ));
+        }
+
         return command;
+    }
+
+    private static boolean shouldApplyVisualIndexMapping(Command command) {
+        return command.getInstruction().getIndex() != null;
     }
 
     /**

@@ -1,5 +1,7 @@
 package component;
 
+import skeleton.DispatcherSpec;
+
 /**
  * Created by maianhvu on 8/3/16.
  */
