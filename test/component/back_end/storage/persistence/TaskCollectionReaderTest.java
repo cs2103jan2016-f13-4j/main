@@ -1,4 +1,4 @@
-package component.back_end.storage;
+package component.back_end.storage.persistence;
 
 import static org.junit.Assert.*;
 
@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import component.back_end.storage.Task;
+import component.back_end.storage.TaskCollection;
 import component.back_end.storage.persistence.TaskCollectionReader;
 import org.junit.Before;
 import org.junit.Test;
