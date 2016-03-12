@@ -14,6 +14,7 @@ public class Task implements Comparable<Task> {
     private final LocalDateTime _creationTime;
     private LocalDateTime _startTime;
     private LocalDateTime _endTime;
+    private boolean _isCompleted;
 
     private final int NUMBER_OF_ATTRIBUTES_TO_SERIALIZE = 5; 
     private final String CSV_DELIMITER = ", ";
@@ -115,12 +116,20 @@ public class Task implements Comparable<Task> {
     public LocalDateTime getEndTime() {
         return this._endTime;
     }
+    
+    public boolean isCompleted() {
+        return this._isCompleted;
+    }
 
     /**
      * Setters
      */
     public void setId(Integer id) {
         this._id = id;
+    }
+    
+    public void setCompleted(boolean isCompleted) {
+        this._isCompleted = isCompleted;
     }
 
 }
