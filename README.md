@@ -42,23 +42,39 @@ implementation process are:
 
 Your MOM consists of X main components, as seen in Figure 1.
 
-# Important API of each component
+# Important API
 
-# Design descriptions
+**Shared entities:**
+
+* `ExecutionResult`: contains the result of executing commands in the back end
+* `Command`: contains the instruction and parameters for a command to be executed
+
+**Main components**:
+
+* `DecisionEngine`:
+* `TranslationEngine`:
+* `Dispatcher`:
 
 # Code Examples
 
-# Instruction for setting up & testing
+# Setting up & testing
 
-## Development Environment
+**Development Environment**
 
 Eclipse is the preferred development environment. Download and install
-the latest Eclipse from https://eclipse.org/doanloads/.
+the latest Eclipse from https://eclipse.org/downloads/.
 
-## Source Code
+**Source Code**
 
 Clone the latest source code from the `develop` branch of the GitHub repo,
 located at https://github.com/cs2103jan2016-f13-4j/main. If you want to clone
 the latest stable release, checkout the `master` branch of the repository.
+
+**Testing**
+
+All unit tests are available under the `test` directory. You can right click
+**test** folder, choose **Run As > JUnit Test** to run all tests, or apply
+the same steps to the individual test sources.
+
 
 # Known issues & future work
