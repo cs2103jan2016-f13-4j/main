@@ -1,5 +1,7 @@
 package component;
 
+import java.io.IOException;
+
 import skeleton.DispatcherSpec;
 
 /**
@@ -7,7 +9,7 @@ import skeleton.DispatcherSpec;
  */
 public class Launcher {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         DispatcherSpec application = new Dispatcher();
         application.pulse();
     }

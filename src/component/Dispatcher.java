@@ -1,5 +1,7 @@
 package component;
 
+import java.io.IOException;
+
 import component.back_end.DecisionEngine;
 import component.front_end.TranslationEngine;
 import entity.ExecutionResult;
@@ -16,8 +18,9 @@ public class Dispatcher extends DispatcherSpec {
 
     /**
      * Constructs a default dispatcher.
+     * @throws IOException 
      */
-    public Dispatcher() {
+    public Dispatcher() throws IOException {
         this.translationEngine_ = new TranslationEngine();
         this.decisionEngine_ = new DecisionEngine();
     }

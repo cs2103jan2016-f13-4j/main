@@ -8,6 +8,7 @@ import entity.command.*;
 import skeleton.back_end.DecisionEngineSpec;
 import skeleton.back_end.TaskSchedulerSpec;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -22,7 +23,7 @@ public class DecisionEngine extends DecisionEngineSpec {
     protected final TaskCollection taskData_;
     protected final TaskSchedulerSpec taskScheduler_;
     
-    public DecisionEngine() {
+    public DecisionEngine() throws IOException {
         this(new TaskCollection(), null);
     }
     
