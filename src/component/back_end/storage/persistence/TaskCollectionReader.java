@@ -4,6 +4,7 @@ import component.back_end.storage.Task;
 import component.back_end.storage.TaskCollection;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
@@ -15,18 +16,22 @@ import java.io.IOException;
 public class TaskCollectionReader {
 
     private final TaskCollection taskCollection_;
-    private String fileName_ = "ToDoData.csv";
+    private String fileName_ = "data/ToDoData.csv";
+    private boolean isFile_ = false;
     
-    public TaskCollectionReader() {
-        this.taskCollection_ = new TaskCollection();
-    }
-    
-    public TaskCollectionReader(String fileName) {
-        this.taskCollection_ = new TaskCollection();
-        this.fileName_ = fileName;
+    public TaskCollectionReader(TaskCollection taskCollection) {
+        this.taskCollection_ = taskCollection;
+        this.isFile_ = new File(this.fileName_).isFile();
     }
     
     public void read() throws IOException {
+        if (!this.isFile_) {
+            File file = new File(this.fileName_);
+            // no data file exists, create new file and return
+            this.isFile_ = file.createNewFile();
+            return;
+        }
+        
         BufferedReader reader_ = new BufferedReader(new FileReader(this.fileName_));
         String currLine;
         while ((currLine = reader_.readLine()) != null) {

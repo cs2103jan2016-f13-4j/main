@@ -18,7 +18,7 @@ public class TaskCollectionWriter {
     
     private final TaskCollection taskCollection_;
     private final TaskDescriptor taskDescriptor_ = null;
-    private String fileName_ = "ToDoData.csv";
+    private String fileName_ = "data/ToDoData.csv";
     
     public TaskCollectionWriter(TaskCollection collection) {
         this.taskCollection_ = collection;  

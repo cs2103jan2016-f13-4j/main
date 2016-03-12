@@ -1,5 +1,6 @@
 package component.back_end.storage;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,6 +11,8 @@ import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.TreeMap;
 
+import component.back_end.storage.persistence.TaskCollectionReader;
+import component.back_end.storage.persistence.TaskCollectionWriter;
 import component.back_end.storage.query.TaskDescriptor;
 import exception.back_end.PrimaryKeyNotFoundException;
 
@@ -24,11 +27,18 @@ public class TaskCollection {
     private final TreeMap<Integer, Task> taskData_;
     private TreeMap<LocalDateTime, List<Task>> startTimeTree_;
     private TreeMap<LocalDateTime, List<Task>> endTimeTree_;
+    private TaskCollectionWriter taskCollectionWriter_;
+    private TaskCollectionReader taskCollectionReader_;
 
-    public TaskCollection() {
+    public TaskCollection() throws IOException {
         this.taskData_ = new TreeMap<>();
         this.startTimeTree_ = new TreeMap<>();
         this.endTimeTree_ = new TreeMap<>();
+        this.taskCollectionWriter_ = new TaskCollectionWriter(this);
+        this.taskCollectionReader_ = new TaskCollectionReader(this);
+        
+        // load Task data from file at start of session
+        this.loadTasks();
     }
     
     //----------------------------------------------------------------------------------------
@@ -308,5 +318,14 @@ public class TaskCollection {
         endTimeTree_ = endTimeTree;
     }
     
+    //----------------------------------------------------------------------------------------
+    //
+    // VI. Load Tasks Method
+    //
+    //----------------------------------------------------------------------------------------
+ 
+    public void loadTasks() throws IOException {
+        this.taskCollectionReader_.read();
+    }
     
 }
