@@ -21,7 +21,7 @@ public class TaskCollection {
     
     private final boolean SEARCH_MAP_BY_DATETIME_INCLUSIVE = true;
 
-    private TreeMap<Integer, Task> taskData_;
+    private final TreeMap<Integer, Task> taskData_;
     private TreeMap<LocalDateTime, List<Task>> startTimeTree_;
     private TreeMap<LocalDateTime, List<Task>> endTimeTree_;
 
@@ -76,14 +76,14 @@ public class TaskCollection {
         return task.getId();
     }
     
-    public void addTaskToStartTimeTree(boolean isNewTask, Task newTask, Task oldTask) {
+    private void addTaskToStartTimeTree(boolean isNewTask, Task newTask, Task oldTask) {
         if (!isNewTask) {
             this.processOldTaskInStartTimeTree(newTask, oldTask);
         }
         this.processNewTaskInStartTimeTree(newTask);
     }
     
-    public void processOldTaskInStartTimeTree(Task newTask, Task oldTask) {
+    private void processOldTaskInStartTimeTree(Task newTask, Task oldTask) {
         // if oldTask has startTime, then oldTask currently exists in startTimeTree
         if (oldTask.getStartTime() != null) {
             // remove oldTask from startTimeTree
@@ -91,38 +91,38 @@ public class TaskCollection {
         }
     }
     
-    public void processNewTaskInStartTimeTree(Task newTask) {
+    private void processNewTaskInStartTimeTree(Task newTask) {
         // do not add any Task with null start time to this tree
         if (newTask.getStartTime() != null) {
             if (!this.startTimeTree_.containsKey(newTask.getStartTime())) {
                 // if key yet to exist, put it into tree and create a list
-                this.startTimeTree_.put(newTask.getStartTime(), new ArrayList<Task>());
+                this.startTimeTree_.put(newTask.getStartTime(), new ArrayList<>());
             }
             // append Task to end of list
             this.startTimeTree_.get(newTask.getStartTime()).add(newTask);
         }
     }
     
-    public void addTaskToEndTimeTree(boolean isNewTask, Task newTask, Task oldTask) {
+    private void addTaskToEndTimeTree(boolean isNewTask, Task newTask, Task oldTask) {
         if (!isNewTask) {
             this.processOldTaskInEndTimeTree(newTask, oldTask);
         }
         this.processNewTaskInEndTimeTree(newTask);
     }
     
-    public void processOldTaskInEndTimeTree(Task newTask, Task oldTask) {
+    private void processOldTaskInEndTimeTree(Task newTask, Task oldTask) {
         // if oldTask has endTime, then oldTask currently exists in endTimeTree
         if (oldTask.getEndTime() != null) {
             this.endTimeTree_.get(oldTask.getEndTime()).remove(oldTask);
         }
     }
 
-    public void processNewTaskInEndTimeTree(Task newTask) {
+    private void processNewTaskInEndTimeTree(Task newTask) {
         // do not add any Task with null end time to this tree
         if (newTask.getEndTime() != null) {
             if (!this.endTimeTree_.containsKey(newTask.getEndTime())) {
                 // if key yet to exist, put it into the tree and create a list
-                this.endTimeTree_.put(newTask.getEndTime(), new ArrayList<Task>());
+                this.endTimeTree_.put(newTask.getEndTime(), new ArrayList<>());
             }
             // append Task to end of list
             this.endTimeTree_.get(newTask.getEndTime()).add(newTask);
@@ -255,7 +255,7 @@ public class TaskCollection {
      */
     public List<Task> searchByDateTimeRange(LocalDateTime start, LocalDateTime end) {
         // collection of all qualifying Tasks that contains no duplicate elements
-        HashSet<Task> resultsHashSet = new HashSet<Task>();
+        HashSet<Task> resultsHashSet = new HashSet<>();
         
         NavigableMap<LocalDateTime, List<Task>> startTimeTreeResultsMap = this.startTimeTree_.subMap
                 (start, SEARCH_MAP_BY_DATETIME_INCLUSIVE, end, SEARCH_MAP_BY_DATETIME_INCLUSIVE); 
@@ -265,7 +265,7 @@ public class TaskCollection {
                 (start, SEARCH_MAP_BY_DATETIME_INCLUSIVE, end, SEARCH_MAP_BY_DATETIME_INCLUSIVE);
         resultsHashSet.addAll(this.extractByDateTime(endTimeTreeResultsMap));
         
-        ArrayList<Task> resultList = new ArrayList<Task>(resultsHashSet);
+        ArrayList<Task> resultList = new ArrayList<>(resultsHashSet);
         Collections.sort(resultList);
         
         return resultList;
@@ -277,13 +277,11 @@ public class TaskCollection {
      * falling within a certain time range.
      * @return list of Tasks that satisfy the time range condition
      */
-    public List<Task> extractByDateTime(NavigableMap<LocalDateTime, List<Task>> resultsMap) {
-        ArrayList<Task> resultList = new ArrayList<Task>();
+    private List<Task> extractByDateTime(NavigableMap<LocalDateTime, List<Task>> resultsMap) {
+        ArrayList<Task> resultList = new ArrayList<>();
         NavigableSet<LocalDateTime> resultsKeySet = resultsMap.navigableKeySet();
-        
-        Iterator<LocalDateTime> it = resultsKeySet.iterator();
-        while (it.hasNext()) {
-            LocalDateTime key = it.next();
+
+        for (LocalDateTime key : resultsKeySet) {
             List<Task> values = resultsMap.get(key);
             resultList.addAll(values);
         }

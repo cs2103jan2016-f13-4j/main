@@ -17,9 +17,9 @@ public class ExecutionResult<T> {
         return null;
     }
     
-    private Class<? extends ViewSpec> viewClass_;
+    private final Class<? extends ViewSpec> viewClass_;
     private List<Message> messages_;
-    private T data_;
+    private final T data_;
 
     public ExecutionResult(Class<? extends ViewSpec> viewClass, T data) {
         this.viewClass_ = viewClass;

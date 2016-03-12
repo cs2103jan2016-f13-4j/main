@@ -3,8 +3,8 @@ package component.front_end.ui.core;
 public abstract class View<T> implements ViewSpec {
     private final static String STRING_NEW_LINE = "\n";
 
-    private T viewData_;
-    private StringBuilder contentBuilder_;
+    private final T viewData_;
+    private final StringBuilder contentBuilder_;
 
     public View(T data){
         this.viewData_ = data;

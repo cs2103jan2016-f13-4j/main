@@ -66,9 +66,9 @@ public class TaskListView extends VisualIndexView<Task> {
         return String.format(STRING_DATE_DISPLAY_FORMAT, startDisplay, endDisplay);
     }
     // this is a helper function that deals with the formatting of the display ID of the task
-    protected String constructDisplayID(int i){
+    private String constructDisplayID(int i){
         return String.format(NUMBER_FORMAT,(i));
     }
-    
+
 
 }

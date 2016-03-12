@@ -16,15 +16,15 @@ import java.util.List;
  */
 public class TaskCollectionWriter {
     
-    private TaskCollection taskCollection_;
-    private TaskDescriptor taskDescriptor_ = null;
+    private final TaskCollection taskCollection_;
+    private final TaskDescriptor taskDescriptor_ = null;
     private String fileName_ = "ToDoData.csv";
     
-    public TaskCollectionWriter(TaskCollection collection) throws IOException {
+    public TaskCollectionWriter(TaskCollection collection) {
         this.taskCollection_ = collection;  
     }
     
-    public TaskCollectionWriter(TaskCollection collection, String fileName) throws IOException {
+    public TaskCollectionWriter(TaskCollection collection, String fileName) {
         this.taskCollection_ = collection;
         this.fileName_ = fileName;
     }

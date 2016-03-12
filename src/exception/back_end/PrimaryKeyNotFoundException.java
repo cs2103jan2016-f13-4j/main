@@ -11,7 +11,7 @@ public class PrimaryKeyNotFoundException extends Exception {
     /**
      * Properties
      */
-    private int primaryKey_;
+    private final int primaryKey_;
     private final String STRING_MESSAGE_ERROR = "Primary key not found: ";
 
     /**

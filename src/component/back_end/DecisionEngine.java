@@ -19,8 +19,8 @@ import java.util.*;
  *
  */
 public class DecisionEngine extends DecisionEngineSpec {
-    protected TaskCollection taskData_;
-    protected TaskSchedulerSpec taskScheduler_;
+    protected final TaskCollection taskData_;
+    protected final TaskSchedulerSpec taskScheduler_;
     
     public DecisionEngine() {
         this(new TaskCollection(), null);

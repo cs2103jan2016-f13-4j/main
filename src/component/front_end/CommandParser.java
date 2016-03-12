@@ -8,7 +8,6 @@ import entity.command.ParameterValue;
 import exception.InvalidParameterException;
 import skeleton.front_end.CommandParserSpec;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,8 +20,8 @@ public class CommandParser extends CommandParserSpec {
     private static final Pattern PATTERN_COMMAND_PARSER = Pattern.compile(
             "(\\w+)(?::(\"[^\"]+\"|[^\"\\s]+))?\\s?"
             );
-    public static final char CHARACTER_QUOTATION_MARK = '"';
-    public static final String STRING_EMPTY = "";
+    private static final char CHARACTER_QUOTATION_MARK = '"';
+    private static final String STRING_EMPTY = "";
 
     @Override
     public Command parseCommand(String rawCommandString) {
@@ -72,7 +71,6 @@ public class CommandParser extends CommandParserSpec {
 
         // Start matching the whole string against words of the command string
         Matcher matcher = PATTERN_COMMAND_PARSER.matcher(rawCommandString.trim());
-        ArrayList<String> commandWords = new ArrayList<>();
 
         // Outer loop to find all the command words
         while (matcher.find()) {

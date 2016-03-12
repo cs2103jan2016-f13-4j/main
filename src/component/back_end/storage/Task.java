@@ -11,7 +11,7 @@ public class Task implements Comparable<Task> {
     private Integer id_;
     private String taskName_;
     private String description_;
-    private LocalDateTime creationTime_;
+    private final LocalDateTime creationTime_;
     private LocalDateTime startTime_;
     private LocalDateTime endTime_;
 
@@ -76,11 +76,12 @@ public class Task implements Comparable<Task> {
     
     @Override
     public boolean equals(Object o) {
-        if (this.getId() == ((Task) o).getId()) {
-            return true;
-        } else {
-            return false;
-        }
+        if (o == null) return false;
+        if (this == o) return true;
+        if (!(o instanceof Task)) return false;
+
+        Task task = (Task) o;
+        return this.getId().equals(task.getId());
     }
     
     @Override

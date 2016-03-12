@@ -23,8 +23,8 @@ public class TranslationEngine extends TranslationEngineSpec {
     /**
      * Properties
      */
-    private CommandParser commandParser_;
-    private UserInterface userInterface_;
+    private final CommandParser commandParser_;
+    private final UserInterface userInterface_;
 
     private View<?> currentView_;
     private VisualIndexMapperSpec currentIndexMapper_;
