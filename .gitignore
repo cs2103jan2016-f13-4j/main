@@ -47,3 +47,5 @@ main.iml
 data/*
 classes/*
 tmp/*
+
+!doc/
