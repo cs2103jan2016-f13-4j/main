@@ -1,3 +1,4 @@
+![Your MOM](https://github.com/cs2103jan2016-f13-4j/main/blob/documentation/doc/assets/images/logo.jpg)
 # Introduction
 
 Welcome to the developer guide for Your MOM!
@@ -40,7 +41,7 @@ implementation process are:
 
 # Architecture
 
-Your MOM consists of X main components, as seen in Figure 1.
+![Architecture](https://github.com/cs2103jan2016-f13-4j/main/blob/documentation/doc/assets/images/architecture_diagram.png)
 
 # Important API
 
