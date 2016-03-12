@@ -2,6 +2,7 @@ package component.back_end;
 
 import static org.junit.Assert.*;
 
+import java.io.IOException;
 import java.time.Month;
 
 import org.junit.*;
@@ -41,7 +42,7 @@ public class DecisionEngineTest {
     
     
     @Before
-    public void setUp() {
+    public void setUp() throws IOException {
         this.tc_ = new TaskCollection();
         this.dEngine_ = new DecisionEngine(this.tc_, null);
         this.initSampleCommands();

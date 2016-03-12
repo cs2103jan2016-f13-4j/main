@@ -1,5 +1,6 @@
 package component.back_end.storage;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,6 +11,7 @@ import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.TreeMap;
 
+import component.back_end.storage.persistence.DiskIO;
 import component.back_end.storage.query.TaskDescriptor;
 import exception.back_end.PrimaryKeyNotFoundException;
 
@@ -24,11 +26,17 @@ public class TaskCollection {
     private final TreeMap<Integer, Task> taskData_;
     private TreeMap<LocalDateTime, List<Task>> startTimeTree_;
     private TreeMap<LocalDateTime, List<Task>> endTimeTree_;
+    
+    private DiskIO diskIO_;
 
-    public TaskCollection() {
+    public TaskCollection() throws IOException {
         this.taskData_ = new TreeMap<>();
         this.startTimeTree_ = new TreeMap<>();
         this.endTimeTree_ = new TreeMap<>();
+        this.diskIO_ = new DiskIO(this);
+        // load data from disk when initializing TaskCollection
+        // if there is no existing file, create new file
+        this.diskIO_.read();
     }
     
     //----------------------------------------------------------------------------------------

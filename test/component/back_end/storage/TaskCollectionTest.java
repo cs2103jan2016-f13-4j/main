@@ -2,6 +2,7 @@ package component.back_end.storage;
 
 import static org.junit.Assert.*;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
@@ -52,7 +53,7 @@ public class TaskCollectionTest {
     private Task task5_;
     
     @Before
-    public void setUp() {
+    public void setUp() throws IOException {
         this.taskCollection = new TaskCollection();
         this.task1_ = new Task (null, this.TASK_1_NAME, this.TASK_1_DESCRIPTION, this.TASK_1_START, this.TASK_1_END);
         this.task2_ = new Task (null, this.TASK_2_NAME, this.TASK_2_DESCRIPTION, this.TASK_2_START, this.TASK_2_END);
