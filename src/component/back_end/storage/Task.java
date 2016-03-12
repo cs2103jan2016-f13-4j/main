@@ -8,24 +8,24 @@ import java.time.LocalDateTime;
 
 public class Task implements Comparable<Task> {
     
-    private Integer id_;
-    private String taskName_;
-    private String description_;
-    private final LocalDateTime creationTime_;
-    private LocalDateTime startTime_;
-    private LocalDateTime endTime_;
+    private Integer _id;
+    private String _taskName;
+    private String _description;
+    private final LocalDateTime _creationTime;
+    private LocalDateTime _startTime;
+    private LocalDateTime _endTime;
 
     private final int NUMBER_OF_ATTRIBUTES_TO_SERIALIZE = 5; 
     private final String CSV_DELIMITER = ", ";
 
     public Task(Integer id, String taskName, String description, LocalDateTime startTime, LocalDateTime endTime) {
-        this.id_ = id;
-        this.taskName_ = taskName;
-        this.description_ = description;
-        this.startTime_ = startTime;
-        this.endTime_ = endTime;
+        this._id = id;
+        this._taskName = taskName;
+        this._description = description;
+        this._startTime = startTime;
+        this._endTime = endTime;
 
-        this.creationTime_ = LocalDateTime.now();
+        this._creationTime = LocalDateTime.now();
     }
     
     public String encodeTaskToString() {
@@ -39,11 +39,11 @@ public class Task implements Comparable<Task> {
     
     public String[] taskAttributesToStringArray() {
         String[] attributesArr = new String[this.NUMBER_OF_ATTRIBUTES_TO_SERIALIZE];
-        attributesArr[0] = this.id_.toString();
-        attributesArr[1] = this.taskName_;
-        attributesArr[2] = this.description_;
-        attributesArr[3] = this.startTime_.toString();
-        attributesArr[4] = this.endTime_.toString();
+        attributesArr[0] = this._id.toString();
+        attributesArr[1] = this._taskName;
+        attributesArr[2] = this._description;
+        attributesArr[3] = this._startTime.toString();
+        attributesArr[4] = this._endTime.toString();
         return attributesArr;
     }
     
@@ -55,11 +55,11 @@ public class Task implements Comparable<Task> {
             throw new IllegalArgumentException();
         }
                 
-        this.id_ = Integer.parseInt(taskStringArr[0]);
-        this.taskName_ = taskStringArr[1];
-        this.description_ = taskStringArr[2];
-        this.startTime_ = LocalDateTime.parse(taskStringArr[3]);
-        this.endTime_ = LocalDateTime.parse(taskStringArr[4]);
+        this._id = Integer.parseInt(taskStringArr[0]);
+        this._taskName = taskStringArr[1];
+        this._description = taskStringArr[2];
+        this._startTime = LocalDateTime.parse(taskStringArr[3]);
+        this._endTime = LocalDateTime.parse(taskStringArr[4]);
 
     }
     
@@ -93,34 +93,34 @@ public class Task implements Comparable<Task> {
      * Getters
      */
     public Integer getId() {
-        return this.id_;
+        return this._id;
     }
 
     public String getTaskName() {
-        return this.taskName_;
+        return this._taskName;
     }
 
     public String getDescription() {
-        return this.description_;
+        return this._description;
     }
 
     public LocalDateTime getCreationTime() {
-        return this.creationTime_;
+        return this._creationTime;
     }
 
     public LocalDateTime getStartTime() {
-        return this.startTime_;
+        return this._startTime;
     }
 
     public LocalDateTime getEndTime() {
-        return this.endTime_;
+        return this._endTime;
     }
 
     /**
      * Setters
      */
     public void setId(Integer id) {
-        this.id_ = id;
+        this._id = id;
     }
 
 }
