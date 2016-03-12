@@ -2,10 +2,13 @@ package component.back_end.storage;
 
 import static org.junit.Assert.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 
+import component.back_end.storage.persistence.DiskIO;
 import component.back_end.storage.query.TaskDescriptor;
 import org.junit.Before;
 import org.junit.Test;
@@ -91,6 +94,22 @@ public class TaskCollectionTest {
         assertEquals(this.TASK_1_DESCRIPTION, this.taskCollection.get(6).getDescription());
         assertEquals(this.TASK_1_START, this.taskCollection.get(6).getStartTime());
         assertEquals(this.TASK_1_END, this.taskCollection.get(6).getEndTime());
+    }
+    
+    @Test
+    public void Write_to_disk_method_in_TaskCollection_works_correctly() throws IOException {
+        File file = new File("data/testWrite/writeToDisk.csv");
+        // check that file does not exist in the beginning
+        assertFalse(file.isFile());
+        
+        DiskIO diskIO = new DiskIO(this.taskCollection, "data/testWrite/writeToDisk.csv");
+        this.taskCollection.setDiskIO(diskIO);
+        this.taskCollection.writeToDisk();
+        // check that file gets created when writeToFile() is called
+        assertTrue(file.isFile());
+        
+        // delete the file for future testing of writing file function
+        file.delete();
     }
     
     //----------------------------------------------------------------------------------------

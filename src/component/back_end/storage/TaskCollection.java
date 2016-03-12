@@ -84,6 +84,15 @@ public class TaskCollection {
         return task.getId();
     }
     
+    /**
+     * Writes all Task data currently stored in the TreeMap.
+     * @return list of Tasks that was written to disk
+     * @throws IOException
+     */
+    public List<Task> writeToDisk() throws IOException {
+        return this.diskIO_.write();
+    }
+    
     private void addTaskToStartTimeTree(boolean isNewTask, Task newTask, Task oldTask) {
         if (!isNewTask) {
             this.processOldTaskInStartTimeTree(newTask, oldTask);
@@ -316,5 +325,12 @@ public class TaskCollection {
         endTimeTree_ = endTimeTree;
     }
     
+    public DiskIO getDiskIO() {
+        return diskIO_;
+    }
+    
+    public void setDiskIO(DiskIO diskIO) {
+        diskIO_ = diskIO;
+    }    
     
 }
