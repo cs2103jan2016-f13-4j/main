@@ -1,5 +1,6 @@
 package component.front_end;
 
+
 import component.front_end.ui.ErrorDisplayView;
 import component.front_end.ui.core.UserInterface;
 import component.front_end.ui.core.UserInterfaceSpec;
@@ -23,18 +24,18 @@ public class TranslationEngine extends TranslationEngineSpec {
     /**
      * Properties
      */
-    private final CommandParser commandParser_;
-    private final UserInterface userInterface_;
+    private final CommandParser _commandParser;
+    private final UserInterface _userInterface;
 
-    private View<?> currentView_;
-    private VisualIndexMapperSpec currentIndexMapper_;
+    private View<?> _currentView;
+    private VisualIndexMapperSpec _currentIndexMapper;
 
     /**
      * Constructs a default translation engine.
      */
     public TranslationEngine() {
-        this.commandParser_ = new CommandParser();
-        this.userInterface_ = new UserInterface();
+        this._commandParser = new CommandParser();
+        this._userInterface = new UserInterface();
     }
 
     /**
@@ -42,7 +43,7 @@ public class TranslationEngine extends TranslationEngineSpec {
      * @return the main command parser
      */
     @Override protected CommandParserSpec getCommandParser() {
-        return this.commandParser_;
+        return this._commandParser;
     }
 
     /**
@@ -50,7 +51,7 @@ public class TranslationEngine extends TranslationEngineSpec {
      * @return the main user interface
      */
     @Override protected UserInterfaceSpec getUserInterface() {
-        return this.userInterface_;
+        return this._userInterface;
     }
 
     /**
@@ -67,7 +68,7 @@ public class TranslationEngine extends TranslationEngineSpec {
         }
 
         this.initializeView(result);
-        this.getUserInterface().render(this.currentView_);
+        this.getUserInterface().render(this._currentView);
     }
 
     /**
@@ -76,7 +77,7 @@ public class TranslationEngine extends TranslationEngineSpec {
      * @param executionResult the result to gather info from
      */
     private void initializeView(ExecutionResult<?> executionResult) {
-        ExecutionResult<?> currentExecutionResult_ = executionResult;
+        ExecutionResult<?> currentExecutionResult = executionResult;
 
         // If the executionResult class is classified under visual index UI
         // we provide the translation engine with a Visual ID Mapping
@@ -84,18 +85,18 @@ public class TranslationEngine extends TranslationEngineSpec {
             assert (executionResult.getData() instanceof List);
 
             //noinspection unchecked
-            this.currentIndexMapper_ = new VisualIndexMapper((List) executionResult.getData());
+            this._currentIndexMapper = new VisualIndexMapper((List) executionResult.getData());
 
             // Assign the visual tuple to executionResult
-            currentExecutionResult_ = executionResult.transformToVisual(
-                    this.currentIndexMapper_.getVisualTupleList()
+            currentExecutionResult = executionResult.transformToVisual(
+                    this._currentIndexMapper.getVisualTupleList()
             );
         }
 
         // Instantiate new User Interface from executionResult data
-        this.currentView_ = constructView(currentExecutionResult_);
+        this._currentView = constructView(currentExecutionResult);
 
-        assert (this.currentView_ != null);
+        assert (this._currentView != null);
     }
 
     /**
@@ -139,7 +140,7 @@ public class TranslationEngine extends TranslationEngineSpec {
      * @return the command parsed from user input
      */
     @Override public Command getNextCommand() {
-        String rawCommandString = this.userInterface_.queryInput();
+        String rawCommandString = this._userInterface.queryInput();
 
         Command command = this.getCommandParser().parseCommand(rawCommandString);
 
@@ -158,7 +159,7 @@ public class TranslationEngine extends TranslationEngineSpec {
         if (shouldApplyVisualIndexMapping(command)) {
             int visualIndex = command.getInstruction().getIndex();
             command.getInstruction().setIndex(
-                    this.currentIndexMapper_.translateVisualToRaw(
+                    this._currentIndexMapper.translateVisualToRaw(
                             visualIndex
                     ));
         }
@@ -174,10 +175,10 @@ public class TranslationEngine extends TranslationEngineSpec {
      * Displays a message to notify the user of invalid or unrecognised command.
      */
     private void displayFaultyCommandView() {
-        this.currentView_ = new ErrorDisplayView(
+        this._currentView = new ErrorDisplayView(
                 "Your command is either invalid or unrecognised"
         );
-        this.getUserInterface().render(this.currentView_);
+        this.getUserInterface().render(this._currentView);
     }
 
     /**
