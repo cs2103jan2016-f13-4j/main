@@ -22,7 +22,7 @@ public class StringParser {
     
     // date pattern: DDMMYYYY HHMM
     private static final Pattern PATTERN_DATE = Pattern.compile(
-            "(\\d\\d)(\\d\\d)(\\d\\d\\d\\d) (\\d\\d)(\\d\\d)");
+            "(\\d{2})(\\d{2})(\\d{4}) (\\d{2})(\\d{2})");
     
     public static LocalDateTime asDateTime(String str) {
         assert str != null;
