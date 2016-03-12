@@ -7,8 +7,8 @@ import component.back_end.storage.rdbs.RelationInterface;
  * Created by maianhvu on 7/3/16.
  */
 public class PrimaryKeyAlreadyExistsException extends Exception {
-    private PrimaryKeyInterface primaryKey_;
-    private Class<? extends RelationInterface> relationClass_;
+    private final PrimaryKeyInterface primaryKey_;
+    private final Class<? extends RelationInterface> relationClass_;
 
     public PrimaryKeyAlreadyExistsException(PrimaryKeyInterface primaryKey,
                                             Class<? extends RelationInterface> relationClass) {

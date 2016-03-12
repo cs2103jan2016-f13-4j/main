@@ -5,7 +5,7 @@ package entity.command;
  */
 public class Instruction {
 
-    public static final String STRING_QUANTIFIER_ALL = "all";
+    private static final String STRING_QUANTIFIER_ALL = "all";
 
     /**
      * Types

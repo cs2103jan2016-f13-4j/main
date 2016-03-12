@@ -14,7 +14,7 @@ import java.io.IOException;
  */
 public class TaskCollectionReader {
 
-    private TaskCollection taskCollection_;
+    private final TaskCollection taskCollection_;
     private String fileName_ = "ToDoData.csv";
     
     public TaskCollectionReader() {

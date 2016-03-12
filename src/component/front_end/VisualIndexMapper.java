@@ -15,9 +15,9 @@ public class VisualIndexMapper extends VisualIndexMapperSpec {
     /**
      * Properties
      */
-    private ArrayList<Integer> forwardMap_;
-    private HashMap<Integer, Integer> backwardMap_;
-    private List<VisualTuple<Task>> visualTupleList_;
+    private final ArrayList<Integer> forwardMap_;
+    private final HashMap<Integer, Integer> backwardMap_;
+    private final List<VisualTuple<Task>> visualTupleList_;
 
     /**
      * Constructs a visual index mapper based on a list of index.

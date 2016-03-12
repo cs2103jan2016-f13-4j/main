@@ -16,9 +16,9 @@ import java.time.LocalDateTime;
  *
  */
 public class SingleMatchDescriptor extends TaskDescriptor {
-    protected String nameDesc_;
-    protected LocalDateTime startDesc_;
-    protected LocalDateTime endDesc_;
+    private final String nameDesc_;
+    private final LocalDateTime startDesc_;
+    private final LocalDateTime endDesc_;
 
     public SingleMatchDescriptor(String nameDesc, LocalDateTime startDesc, LocalDateTime endDesc) {
         this.nameDesc_ = nameDesc;

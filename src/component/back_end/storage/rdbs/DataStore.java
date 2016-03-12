@@ -18,7 +18,7 @@ public class DataStore extends DataStoreSpec {
     /**
      * Properties
      */
-    private HashMap<Class<? extends RelationInterface>, TreeMap<PrimaryKeyInterface<?>, RelationInterface>> storageMap_;
+    private final HashMap<Class<? extends RelationInterface>, TreeMap<PrimaryKeyInterface<?>, RelationInterface>> storageMap_;
 
     /**
      * Constructs an empty data storage

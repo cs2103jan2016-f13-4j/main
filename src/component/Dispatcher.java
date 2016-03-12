@@ -11,8 +11,8 @@ import skeleton.DispatcherSpec;
  * Created by maianhvu on 8/3/16.
  */
 public class Dispatcher extends DispatcherSpec {
-    private TranslationEngine translationEngine_;
-    private DecisionEngine decisionEngine_;
+    private final TranslationEngine translationEngine_;
+    private final DecisionEngine decisionEngine_;
 
     /**
      * Constructs a default dispatcher.

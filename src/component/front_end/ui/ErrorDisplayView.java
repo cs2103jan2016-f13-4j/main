@@ -8,7 +8,7 @@ import utility.BoxBuilder;
  */
 public class ErrorDisplayView extends View<String> {
 
-    public static final int SIZE_WIDTH_BOX = 30;
+    private static final int SIZE_WIDTH_BOX = 30;
 
     public ErrorDisplayView(String errorMessage) {
         super(errorMessage);
