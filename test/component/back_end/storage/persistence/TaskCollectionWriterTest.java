@@ -19,7 +19,7 @@ public class TaskCollectionWriterTest {
     
     private TaskCollection taskCollection_;
     private TaskCollectionWriter taskCollectionWriter_;
-    private final String FILE_NAME = "test.csv";
+    private final String FILE_NAME = "tmp/test.csv";
     
     private final String TASK_1_NAME = "homework";
     private final String TASK_1_DESCRIPTION = "cs2103t";

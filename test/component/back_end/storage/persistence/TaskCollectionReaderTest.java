@@ -54,7 +54,7 @@ public class TaskCollectionReaderTest {
     
     @Before
     public void setUp() {
-        this.taskCollectionReader_ = new TaskCollectionReader("test1.csv");
+        this.taskCollectionReader_ = new TaskCollectionReader("tmp/test1.csv");
         
         this.task1_ = new Task (1, this.TASK_1_NAME, this.TASK_1_DESCRIPTION, this.TASK_1_START, this.TASK_1_END);
         this.task2_ = new Task (2, this.TASK_2_NAME, this.TASK_2_DESCRIPTION, this.TASK_2_START, this.TASK_2_END);
