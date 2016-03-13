@@ -43,6 +43,22 @@ implementation process are:
 
 ![Architecture](https://github.com/cs2103jan2016-f13-4j/main/blob/documentation/doc/assets/images/architecture_diagram.png)
 
+Your MOM is a Java application. The diagram above gives an overview of the main
+components.
+
+* **User Interface**: The User Interface seen by the user is made of
+  Command-Line Interface elements, whose structures are defined in the
+  respective `View` classes.
+* **Translation Logic**: The logic unit responsible for translating back-end
+  objects into human-readable elements, and the other way round (for the
+  consumption of the Decision Logic unit).
+* **Dispatcher**: Man-in-the-middle component that continually passes data
+  between Translation Logic and Decision Logic
+* **Decision Logic**: The logic unit responsible executing commands and
+  interacting with the data storage.  This will also dictate the type of result
+  that will eventually be translated at Translation Logic, and visualised in
+  the User Interface.
+
 # Important API
 
 **Shared entities:**
