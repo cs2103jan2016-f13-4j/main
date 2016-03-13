@@ -58,6 +58,10 @@ public class DiskIOTest {
     
     @Before
     public void setUp() throws IOException {
+        // Ensure test read directory exists
+        (new File("data/testRead")).mkdirs();
+        (new File("data/testNoFile")).mkdirs();
+
         this._taskCollection = new TaskCollection();
         
         this._task1 = new Task (1, this.TASK_1_NAME, this.TASK_1_DESCRIPTION, this.TASK_1_START, this.TASK_1_END);
