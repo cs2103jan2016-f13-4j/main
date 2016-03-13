@@ -58,7 +58,7 @@ public class TaskCollectionTest {
     @Before
     public void setUp() throws IOException {
         // Ensure task write directory exists
-        (new File("data/testWrite")).mkdirs();
+        (new File("tmp/testWrite")).mkdirs();
 
         this.taskCollection = new TaskCollection();
         this.task1_ = new Task (null, this.TASK_1_NAME, this.TASK_1_DESCRIPTION, this.TASK_1_START, this.TASK_1_END);
@@ -101,11 +101,11 @@ public class TaskCollectionTest {
     
     @Test
     public void Write_to_disk_method_in_TaskCollection_works_correctly() throws IOException {
-        File file = new File("data/testWrite/writeToDisk.csv");
+        File file = new File("tmp/testWrite/writeToDisk.csv");
         // check that file does not exist in the beginning
         assertFalse(file.isFile());
         
-        DiskIO diskIO = new DiskIO(this.taskCollection, "data/testWrite/writeToDisk.csv");
+        DiskIO diskIO = new DiskIO(this.taskCollection, "tmp/testWrite/writeToDisk.csv");
         this.taskCollection.setDiskIO(diskIO);
 
         this.taskCollection.writeToDisk();

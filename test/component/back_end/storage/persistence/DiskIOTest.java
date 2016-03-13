@@ -59,8 +59,9 @@ public class DiskIOTest {
     @Before
     public void setUp() throws IOException {
         // Ensure test read directory exists
-        (new File("data/testRead")).mkdirs();
-        (new File("data/testNoFile")).mkdirs();
+        (new File("tmp/testWrite")).mkdirs();
+        (new File("tmp/testRead")).mkdirs();
+        (new File("tmp/testNoFile")).mkdirs();
 
         this._taskCollection = new TaskCollection();
         
@@ -75,7 +76,7 @@ public class DiskIOTest {
     public void Read_function_extracts_tasks_data_from_file() throws IOException {
         // saved a .csv file with data of tasks 1 to 5
         // check if DiskIO read method works correctly
-        this._diskIO = new DiskIO(this._taskCollection, "data/testRead/ToDoData.csv");
+        this._diskIO = new DiskIO(this._taskCollection, "tmp/testRead/ToDoData.csv");
         this._diskIO.read();
         List<Task> taskList = this._taskCollection.getAll(null);
         
@@ -90,7 +91,7 @@ public class DiskIOTest {
     public void Read_function_creates_new_data_file_if_none_exists() throws IOException {
         // navigate to a directory where the data file does not exist
         // check that file does not exist at the start
-        String pathName = "data/testNoFile/ToDoData.csv";
+        String pathName = "tmp/testNoFile/ToDoData.csv";
         File file = new File(pathName);
         assertFalse(file.isFile());
         
@@ -119,7 +120,7 @@ public class DiskIOTest {
         this._taskCollection.save(this._task4);
         this._taskCollection.save(this._task5);
         
-        String pathName = "data/testWrite/ToDoData.csv";
+        String pathName = "tmp/testWrite/ToDoData.csv";
         File file = new File(pathName);
         this._diskIO = new DiskIO(this._taskCollection, pathName);
         this._diskIO.write();
