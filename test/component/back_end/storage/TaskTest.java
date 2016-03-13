@@ -32,7 +32,22 @@ public class TaskTest {
         assertEquals(this.TASK_START.toString(), taskStringArr[3]);
         assertEquals(this.TASK_END.toString(), taskStringArr[4]);
     }
-    
+
+    @Test
+    public void Task_with_special_characters_still_encode_correctly() {
+        String specialTaskName = "A task with comma, and \"quotes\", and \"comma, within quotes\"";
+        specialTaskName += ", and backslash before quote\\\"";
+        Task specialTask = new Task(
+                123,
+                specialTaskName,
+                "Random description",
+                TASK_START,
+                TASK_END);
+        String taskString = this.task_.encodeTaskToString();
+        // TODO: Try to decode the task string see if the task name is equal to specialTaskName
+    }
+
+
     @Test
     public void Decoded_Task_has_correct_attributes_assigned() {
         this.task_ = new Task(null, null, null, null, null);
@@ -46,7 +61,7 @@ public class TaskTest {
         assertEquals(LocalDateTime.parse("2016-03-09t14:30:00"), this.task_.getStartTime());
         assertEquals(LocalDateTime.parse("2016-03-09t15:30:00"), this.task_.getEndTime());
     }
-    
+
     @Test
     public void SetId_method_successfully_assign_ID_to_Task() {
         // create Task with null ID
