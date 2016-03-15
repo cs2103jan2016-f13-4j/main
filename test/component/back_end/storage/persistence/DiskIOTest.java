@@ -84,11 +84,11 @@ public class DiskIOTest {
         // stub
         // write the data to file as a string
         BufferedWriter writer = new BufferedWriter(new FileWriter("tmp/testRead/ToDoData.csv"));
-        writer.write("1, homework, cs2103t, 2016-03-04T14:30, 2016-03-05T14:30\n"
-                + "2, assignment, cs3230, 2016-03-05T14:30, 2016-03-06T14:30\n"
-                + "3, tutorial, nm2101, 2016-03-06T14:30, 2016-03-07T14:30\n"
-                + "4, tutorial, nm2101, 2016-03-07T14:30, 2016-03-08T14:30\n"
-                + "5, tutorial, nm2101, 2016-03-08T14:30, 2016-03-09T14:30");
+        writer.write("\"1\", \"homework\", \"cs2103t\", \"2016-03-04T14:30\", \"2016-03-05T14:30\"\n"
+                + "\"2\", \"assignment\", \"cs3230\", \"2016-03-05T14:30\", \"2016-03-06T14:30\"\n"
+                + "\"3\", \"tutorial\", \"nm2101\", \"2016-03-06T14:30\", \"2016-03-07T14:30\"\n"
+                + "\"4\", \"tutorial\", \"nm2101\", \"2016-03-07T14:30\", \"2016-03-08T14:30\"\n"
+                + "\"5\", \"tutorial\", \"nm2101\", \"2016-03-08T14:30\", \"2016-03-09T14:30\"");
         
         writer.close();
 

@@ -17,7 +17,7 @@ public class Task implements Comparable<Task> {
     private boolean _isCompleted;
 
     private final int NUMBER_OF_ATTRIBUTES_TO_SERIALIZE = 5; 
-    private final String CSV_DELIMITER = ", ";
+    private final String CSV_DELIMITER = "\", \"";
 
     public Task(Integer id, String taskName, String description, LocalDateTime startTime, LocalDateTime endTime) {
         this._id = id;
@@ -32,20 +32,23 @@ public class Task implements Comparable<Task> {
     public String encodeTaskToString() {
         StringBuilder sb = new StringBuilder();
         String[] attributesArr = this.taskAttributesToStringArray();
-        for (String attribute : attributesArr) {
-            sb.append(attribute).append(this.CSV_DELIMITER);
+        // the last attribute will be appended outside the loop
+        for (int i = 0; i < attributesArr.length - 1; i++) {
+            sb.append(attributesArr[i]).append(", ");
         }
+        sb.append(attributesArr[attributesArr.length - 1]);
         return sb.toString();
     }
     
     public String[] taskAttributesToStringArray() {
         String[] attributesArr = new String[this.NUMBER_OF_ATTRIBUTES_TO_SERIALIZE];
-        attributesArr[0] = this._id.toString();
+        
         // wrap strings in quotes
+        attributesArr[0] = "\"" + this._id.toString() + "\"";
         attributesArr[1] = "\"" + this._taskName + "\"";
         attributesArr[2] = "\"" + this._description + "\"";
-        attributesArr[3] = this._startTime.toString();
-        attributesArr[4] = this._endTime.toString();
+        attributesArr[3] = "\"" + this._startTime.toString() + "\"";
+        attributesArr[4] = "\"" + this._endTime.toString() + "\"";
         return attributesArr;
     }
     
@@ -56,14 +59,23 @@ public class Task implements Comparable<Task> {
         if (taskStringArr.length != 5) {
             throw new IllegalArgumentException();
         }
-                
-        this._id = Integer.parseInt(taskStringArr[0]);
+        
         // use substring to remove surrounding quotes
-        this._taskName = taskStringArr[1].substring(1, taskStringArr[1].length() - 1);
-        this._description = taskStringArr[2].substring(1, taskStringArr[2].length() - 1);
-        this._startTime = LocalDateTime.parse(taskStringArr[3]);
-        this._endTime = LocalDateTime.parse(taskStringArr[4]);
+        // first array element has the ending quote removed due to the chosen delimiter
+        this._id = Integer.parseInt(taskStringArr[0].substring(1, taskStringArr[0].length()));
 
+        // second array element has both starting and ending quotes removed
+        this._taskName = taskStringArr[1];
+        
+        // third array element has both starting and ending quotes removed
+        this._description = taskStringArr[2];
+        
+        // fourth array element has both starting and ending quotes removed
+        this._startTime = LocalDateTime.parse(taskStringArr[3]);
+                
+        // fifth array element has the starting quote removed
+        this._endTime = LocalDateTime.parse(taskStringArr[4].substring(0, taskStringArr[4].length() - 1));
+        
     }
     
     @Override

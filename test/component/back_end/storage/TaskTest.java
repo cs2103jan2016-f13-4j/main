@@ -26,11 +26,11 @@ public class TaskTest {
         this.task_ = new Task(this.TASK_ID, this.TASK_NAME, this.TASK_DESCRIPTION, this.TASK_START, this.TASK_END);
         String taskString = this.task_.encodeTaskToString();
         String[] taskStringArr = taskString.split(", ");
-        assertEquals(this.TASK_ID.toString(), taskStringArr[0]);
+        assertEquals("\"" + this.TASK_ID.toString() + "\"", taskStringArr[0]);
         assertEquals("\"" + this.TASK_NAME + "\"", taskStringArr[1]);
         assertEquals("\"" + this.TASK_DESCRIPTION + "\"", taskStringArr[2]);
-        assertEquals(this.TASK_START.toString(), taskStringArr[3]);
-        assertEquals(this.TASK_END.toString(), taskStringArr[4]);
+        assertEquals("\"" + this.TASK_START.toString() + "\"", taskStringArr[3]);
+        assertEquals("\"" + this.TASK_END.toString() + "\"", taskStringArr[4]);
     }
 
     @Test
@@ -43,8 +43,12 @@ public class TaskTest {
                 "Random description",
                 TASK_START,
                 TASK_END);
-        String taskString = this.task_.encodeTaskToString();
-        // TODO: Try to decode the task string see if the task name is equal to specialTaskName
+        String taskString = specialTask.encodeTaskToString();
+
+        // decode the task string and check if the task name is equal to specialTaskName
+        Task decodedTask = new Task(null, null, null, null, null);
+        decodedTask.decodeTaskFromString(taskString);
+        assertEquals("A task with comma, and \"quotes\", and \"comma, within quotes\", and backslash before quote\\\"", decodedTask.getTaskName());
     }
 
 
@@ -52,7 +56,7 @@ public class TaskTest {
     public void Decoded_Task_has_correct_attributes_assigned() {
         this.task_ = new Task(null, null, null, null, null);
         // String to parse into Task object
-        String taskString = "88, \"marketing pitch\", \"to microsoft\", 2016-03-09t14:30:00, 2016-03-09t15:30:00";     
+        String taskString = "\"88\", \"marketing pitch\", \"to microsoft\", \"2016-03-09t14:30:00\", \"2016-03-09t15:30:00\"";     
         this.task_.decodeTaskFromString(taskString);
         
         assertSame(88, this.task_.getId());
