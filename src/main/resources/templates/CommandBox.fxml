@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Line?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="113.0" prefWidth="635.0" styleClass="command-box__wrapper" stylesheets="@../styles/CommandBox.css" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox layoutX="146.0" layoutY="-43.0" styleClass="command-box__container" AnchorPane.bottomAnchor="13.0" AnchorPane.leftAnchor="16.0" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="13.0">
+         <children>
+            <BorderPane minHeight="-Infinity" prefHeight="50.0" prefWidth="200.0" styleClass="command-box__input" />
+            <Line endX="602.0" stroke="#ededed" />
+            <AnchorPane minHeight="-Infinity" prefHeight="36.0" prefWidth="200.0" styleClass="command-box__status-bar" />
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

@@ -2,10 +2,11 @@ package component;
 
 
 import javafx.application.Application;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import utility.Resources;
 
@@ -45,25 +46,43 @@ public class Launcher extends Application {
 
         primaryStage.setTitle(STRING_APP_TITLE);
         primaryStage.setScene(new Scene(this._rootLayout));
-        primaryStage.show();
+
+        // Constraint
+        primaryStage.setMinWidth(this._rootLayout.getMinWidth());
+        primaryStage.setMaxWidth(this._rootLayout.getMaxWidth());
+        primaryStage.setMinHeight(this._rootLayout.getMinHeight());
 
         this._primaryStage = primaryStage;
+        this.initializeHeader();
+        this.initializeCommandBox();
 
-        this.displayHeader();
+        primaryStage.show();
     }
 
-    private void displayHeader() {
+    private void initializeHeader() {
         AnchorPane header = Resources.getTemplate("Header");
 
         if (header == null) {
             return;
         }
 
+        // Drop shadow for header
+        DropShadow shadow = new DropShadow();
+        shadow.setOffsetX(0);
+        shadow.setOffsetY(5.0);
+        shadow.setColor(Color.GRAY);
+
         this._rootLayout.setTop(header);
     }
 
-    private void displayCommandBar() {
+    private void initializeCommandBox() {
+        AnchorPane commandBox = Resources.getTemplate("CommandBox");
 
+        if (commandBox == null) {
+            return;
+        }
+
+        this._rootLayout.setBottom(commandBox);
     }
 
 }

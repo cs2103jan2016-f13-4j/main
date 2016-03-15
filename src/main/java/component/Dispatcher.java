@@ -58,6 +58,9 @@ public class Dispatcher extends DispatcherSpec {
             // Read the next command
             nextCommand = this.translationEngine_.getNextCommand();
         }
+
+        // TODO: Terminate the program
+
     }
 
     private static boolean isTerminateCommand(Command command) {
