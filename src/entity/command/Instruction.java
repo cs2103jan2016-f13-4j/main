@@ -16,6 +16,7 @@ public class Instruction {
         EDIT         ( false,             true),
         DISPLAY      ( true,              false),
         DELETE       ( true,              true),
+        SEARCH       ( false,             false),
         EXIT         ( false,             false),
 
         // Special types
@@ -122,14 +123,28 @@ public class Instruction {
 
         // Search through the instruction in the definitions
         switch (instruction) {
+            // Create a new task
             case "add":
                 return Type.ADD;
+
+            // Update an existing task
             case "edit":
                 return Type.EDIT;
+
+            // List out all tasks
             case "display":
                 return Type.DISPLAY;
+
+            // Delete a task
             case "delete":
                 return Type.DELETE;
+
+            // Searching
+            case "search":
+            case "find":
+                return Type.SEARCH;
+
+            // Terminate
             case "exit":
                 return Type.EXIT;
             default:
