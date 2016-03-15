@@ -3,8 +3,10 @@ package component.back_end.storage.persistence;
 import static org.junit.Assert.*;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -78,6 +80,17 @@ public class DiskIOTest {
         // saved a .csv file with data of tasks 1 to 5
         // check if DiskIO read method works correctly
         this._diskIO = new DiskIO(this._taskCollection, "tmp/testRead/ToDoData.csv");
+        
+        // stub
+        // write the data to file as a string
+        BufferedWriter writer = new BufferedWriter(new FileWriter("tmp/testRead/ToDoData.csv"));
+        writer.write("1, homework, cs2103t, 2016-03-04T14:30, 2016-03-05T14:30\n"
+                + "2, assignment, cs3230, 2016-03-05T14:30, 2016-03-06T14:30\n"
+                + "3, tutorial, nm2101, 2016-03-06T14:30, 2016-03-07T14:30\n"
+                + "4, tutorial, nm2101, 2016-03-07T14:30, 2016-03-08T14:30\n"
+                + "5, tutorial, nm2101, 2016-03-08T14:30, 2016-03-09T14:30");
+        
+        writer.close();
 
         this._diskIO.read();
         List<Task> taskList = this._taskCollection.getAll(null);
