@@ -1,5 +1,6 @@
 package component.front_end;
 
+import component.front_end.CommandParser;
 import entity.command.Command;
 import entity.command.Instruction;
 import org.junit.Before;

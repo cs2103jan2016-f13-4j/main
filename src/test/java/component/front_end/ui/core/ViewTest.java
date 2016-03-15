@@ -15,7 +15,7 @@ public class ViewTest {
     private final static String STRING_EMPTY = "";
     private final static String STRING_DUMMY = "hello";
     private final static String STRING_NEW_LINE = "\n";
-    
+
     private class TestView extends View<Object> {
         public TestView() {
             super(null);
@@ -25,20 +25,20 @@ public class ViewTest {
         @Override
         public void buildContent() {
             // TODO Auto-generated method stub
-            
+
         }
     }
-    
-    
+
+
     TestView tView1;
     TestView tView2;
     String result;
-    
-    @Before 
+
+    @Before
     public void init(){
-        result = STRING_EMPTY; 
+        result = STRING_EMPTY;
         tView1 = new TestView();
-        tView2 = new TestView(); 
+        tView2 = new TestView();
     }
     @Test
     public void testAddText() {
@@ -49,7 +49,7 @@ public class ViewTest {
         tView1.addText("");
         assertThat(tView1.getContent(), is(equalTo(STRING_DUMMY + STRING_DUMMY)));
     }
-    
+
     @Test
     public void testAddLine() {
         tView1.addLine(STRING_DUMMY);
