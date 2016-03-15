@@ -16,7 +16,7 @@ public class ExecutionResult<T> {
     public static ExecutionResult<?> getNullResult() {
         return null;
     }
-    
+
     private final Class<? extends ViewSpec> viewClass_;
     private List<Message> messages_;
     private final T data_;
@@ -42,13 +42,14 @@ public class ExecutionResult<T> {
     public Class<? extends ViewSpec> getViewClass() {
         return this.viewClass_;
     }
-    
+
     public T getData() {
         return this.data_;
     }
-    
-    public ExecutionResult<?> transformToVisual(List<VisualTuple<Task>> visualTupleList) {
-        ExecutionResult<?> visualResult = new ExecutionResult<>(this.viewClass_, visualTupleList);
+
+    public <V> ExecutionResult<List<VisualTuple<V>>> transformToVisual(List<VisualTuple<V>> visualTupleList) {
+        assert(this.data_ instanceof List);
+        ExecutionResult<List<VisualTuple<V>>> visualResult = new ExecutionResult<>(this.viewClass_, visualTupleList);
         visualResult.messages_ = this.messages_;
         return visualResult;
     }

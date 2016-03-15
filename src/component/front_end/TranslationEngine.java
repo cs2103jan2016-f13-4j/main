@@ -102,13 +102,12 @@ public class TranslationEngine extends TranslationEngineSpec {
      * Constructs a View instance using the constructor provided from the execution result
      * and its data.
      *
-     * @param <T> any data type that is used to display the execution result
      * @param executionResult the execution result passed in
      * @return the view constructed
      */
-    private static <T> View constructView(ExecutionResult<?> executionResult) {
+    private static View<?> constructView(ExecutionResult<?> executionResult) {
         // Initialize the View instance
-        View view = null;
+        View<?> view = null;
 
         // Get all available constructors for the View
         Constructor<?> constructors[] = executionResult.getViewClass().getConstructors();
@@ -117,8 +116,8 @@ public class TranslationEngine extends TranslationEngineSpec {
         // and attempt to initialize the user interface with it
         for (Constructor<?> c : constructors) {
             try {
-                @SuppressWarnings("unchecked") Constructor<? extends View<T>> constructor =
-                        (Constructor<? extends View<T>>) c;
+                Constructor<? extends View<?>> constructor =
+                        (Constructor<? extends View<?>>) c;
                 view = constructor.newInstance(executionResult.getData());
                 break;
             } catch (Exception e) {

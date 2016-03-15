@@ -18,28 +18,39 @@ import component.back_end.storage.query.TaskDescriptor;
  *
  */
 public class DiskIO {
-    
+
     private final TaskCollection _taskCollection;
     private String _fileName = "data/ToDoData.csv";
     private final TaskDescriptor _taskDescriptor = null;
 
-    public DiskIO(TaskCollection taskCollection) {
-        this._taskCollection = taskCollection;
-    }
-    
     public DiskIO(TaskCollection taskCollection, String fileName) {
         this._taskCollection = taskCollection;
         this._fileName = fileName;
+
+        if (this._fileName != null) {
+            // Try to create directory
+            File folder = new File(this._fileName).getParentFile();
+            folder.mkdirs();
+        }
     }
-    
+
+    public DiskIO(TaskCollection taskCollection) {
+        this(taskCollection, null);
+    }
+
     public TaskCollection read() throws IOException {
+        if (this._fileName == null) {
+            // TODO: Return null
+            return null;
+        }
+
         boolean isFile = new File(this._fileName).isFile();
         if (!isFile) {
             File f = new File(this._fileName);
             isFile = f.createNewFile();
             return this._taskCollection;
         }
-        
+
         BufferedReader reader = new BufferedReader(new FileReader(this._fileName));
         String currLine;
         while((currLine = reader.readLine()) != null) {
@@ -51,7 +62,7 @@ public class DiskIO {
         reader.close();
         return this._taskCollection;
     }
-    
+
     public List<Task> write() throws IOException {
         BufferedWriter writer = new BufferedWriter(new FileWriter(this._fileName));
         List<Task> taskList = this._taskCollection.getAll(this._taskDescriptor);
@@ -62,10 +73,10 @@ public class DiskIO {
         writer.close();
         return taskList;
     }
-    
+
     public static void main(String[] args) throws IOException {
         DiskIO io = new DiskIO(new TaskCollection());
         io.write();
     }
-    
+
 }
