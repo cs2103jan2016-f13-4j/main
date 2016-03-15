@@ -1,6 +1,12 @@
 package component.front_end.ui.core;
 
 import component.front_end.ui.CommandPromptView;
+import javafx.scene.Scene;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
+import javafx.stage.Stage;
+import utility.Resources;
 
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -11,26 +17,69 @@ import java.util.Scanner;
  */
 public class UserInterface extends UserInterfaceSpec {
 
-    private static final InputStream STREAM_INPUT_DEFAULT = System.in;
-    private static final PrintStream STREAM_OUTPUT_DEFAULT = System.out;
-    private static final CommandPromptView VIEW_COMMAND_PROMPT = new CommandPromptView();
+    /**
+     * Constants
+     */
+    public static final String STRING_APP_TITLE = "Your MOM";
 
-    private final Scanner _inputScanner;
-    private final PrintStream _outputPrinter;
+    /**
+     * Properties
+     */
+    private BorderPane _rootLayout;
+    private Stage _primaryStage;
 
-    public UserInterface() {
-        this._inputScanner = new Scanner(STREAM_INPUT_DEFAULT);
-        this._outputPrinter = STREAM_OUTPUT_DEFAULT;
+    public UserInterface(Stage primaryStage) {
+        this._primaryStage = primaryStage;
+
+        this._rootLayout = Resources.getTemplate("MainContainer");
+
+        if (this._rootLayout == null) {
+            return;
+        }
+
+        primaryStage.setTitle(STRING_APP_TITLE);
+        primaryStage.setScene(new Scene(this._rootLayout));
+
+        // Constraint
+        primaryStage.setMinWidth(this._rootLayout.getMinWidth());
+        primaryStage.setMaxWidth(this._rootLayout.getMaxWidth());
+        primaryStage.setMinHeight(this._rootLayout.getMinHeight());
+
+        this._primaryStage = primaryStage;
+        this.initializeHeader();
+        this.initializeCommandBox();
+
+        primaryStage.show();
     }
+
+    private void initializeHeader() {
+        AnchorPane header = Resources.getTemplate("Header");
+
+        if (header == null) {
+            return;
+        }
+
+        this._rootLayout.setTop(header);
+    }
+
+    private void initializeCommandBox() {
+        AnchorPane commandBox = Resources.getTemplate("CommandBox");
+
+        if (commandBox == null) {
+            return;
+        }
+
+        this._rootLayout.setBottom(commandBox);
+    }
+
 
     @Override
     public void render(View viewToRender) {
-        this._outputPrinter.print(viewToRender.getContent());
+
     }
 
     @Override
     public String queryInput() {
-        this.render(VIEW_COMMAND_PROMPT);
-        return this._inputScanner.nextLine();
+        return null;
     }
 }

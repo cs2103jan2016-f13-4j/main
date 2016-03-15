@@ -8,6 +8,7 @@ import component.front_end.ui.core.VisualIndexView;
 import entity.ExecutionResult;
 import entity.command.Command;
 import entity.command.Instruction;
+import javafx.stage.Stage;
 import skeleton.front_end.CommandParserSpec;
 import skeleton.front_end.TranslationEngineSpec;
 import skeleton.front_end.VisualIndexMapperSpec;
@@ -32,9 +33,9 @@ public class TranslationEngine extends TranslationEngineSpec {
     /**
      * Constructs a default translation engine.
      */
-    public TranslationEngine() {
+    public TranslationEngine(Stage primaryStage) {
         this.commandParser_ = new CommandParser();
-        this.userInterface_ = new UserInterface();
+        this.userInterface_ = new UserInterface(primaryStage);
     }
 
     /**

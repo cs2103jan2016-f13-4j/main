@@ -7,6 +7,7 @@ import component.front_end.TranslationEngine;
 import entity.ExecutionResult;
 import entity.command.Command;
 import entity.command.Instruction;
+import javafx.stage.Stage;
 import skeleton.DispatcherSpec;
 
 /**
@@ -20,8 +21,8 @@ public class Dispatcher extends DispatcherSpec {
      * Constructs a default dispatcher.
      * @throws IOException 
      */
-    public Dispatcher() throws IOException {
-        this.translationEngine_ = new TranslationEngine();
+    public Dispatcher(Stage primaryStage) throws IOException {
+        this.translationEngine_ = new TranslationEngine(primaryStage);
         this.decisionEngine_ = new DecisionEngine();
     }
 
@@ -48,16 +49,14 @@ public class Dispatcher extends DispatcherSpec {
     @Override public void pulse() {
         Command nextCommand = Command.getInitialCommand();
 
-        while (!isTerminateCommand(nextCommand)) {
-            // Let decision engine decide what to do with the command first
-            ExecutionResult<?> result = this.decisionEngine_.performCommand(nextCommand);
+        // Let decision engine decide what to do with the command first
+        ExecutionResult<?> result = this.decisionEngine_.performCommand(nextCommand);
 
-            // Show the result
-            this.translationEngine_.display(result);
+        // Show the result
+        this.translationEngine_.display(result);
 
-            // Read the next command
-            nextCommand = this.translationEngine_.getNextCommand();
-        }
+        // Read the next command
+        nextCommand = this.translationEngine_.getNextCommand();
 
         // TODO: Terminate the program
 
