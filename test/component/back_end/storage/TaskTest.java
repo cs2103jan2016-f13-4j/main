@@ -43,12 +43,34 @@ public class TaskTest {
                 "Random description",
                 TASK_START,
                 TASK_END);
-        String taskString = specialTask.encodeTaskToString();
-
-        // decode the task string and check if the task name is equal to specialTaskName
+        String specialTaskString = specialTask.encodeTaskToString();
+        
+        String expected = ""
+                + "\"123\", "
+                + "\"A task with comma, and \"quotes\", and \"comma, within quotes\", and backslash before quote\\\"\", "
+                + "\"Random description\", "
+                + "\"2016-03-06T14:30\", \"2016-03-08T14:30\"";
+        
+        assertEquals(expected, specialTaskString);
+}
+    
+    @Test
+    public void Task_with_special_characters_still_decode_correctly() {
+        String specialString = "A task with comma, and \"quotes\", and \"comma, within quotes\", and backslash before quote\\\"";
+        String taskString = ""
+                + "\"123\", " + "\"" + specialString + "\", "
+                + "\"Random description\", "
+                + "\"" + this.TASK_START.toString() + "\", \"" + this.TASK_END.toString() + "\"";
+        
         Task decodedTask = new Task(null, null, null, null, null);
+        // decode the task string and check if the task attributes are equal to what we expect
         decodedTask.decodeTaskFromString(taskString);
-        assertEquals("A task with comma, and \"quotes\", and \"comma, within quotes\", and backslash before quote\\\"", decodedTask.getTaskName());
+        
+        assertSame(123, decodedTask.getId());
+        assertEquals(specialString, decodedTask.getTaskName());
+        assertEquals("Random description", decodedTask.getDescription());
+        assertEquals(this.TASK_START, decodedTask.getStartTime());
+        assertEquals(this.TASK_END, decodedTask.getEndTime());
     }
 
 
