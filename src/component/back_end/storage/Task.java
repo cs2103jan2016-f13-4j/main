@@ -41,8 +41,9 @@ public class Task implements Comparable<Task> {
     public String[] taskAttributesToStringArray() {
         String[] attributesArr = new String[this.NUMBER_OF_ATTRIBUTES_TO_SERIALIZE];
         attributesArr[0] = this._id.toString();
-        attributesArr[1] = this._taskName;
-        attributesArr[2] = this._description;
+        // wrap strings in quotes
+        attributesArr[1] = "\"" + this._taskName + "\"";
+        attributesArr[2] = "\"" + this._description + "\"";
         attributesArr[3] = this._startTime.toString();
         attributesArr[4] = this._endTime.toString();
         return attributesArr;
@@ -57,8 +58,9 @@ public class Task implements Comparable<Task> {
         }
                 
         this._id = Integer.parseInt(taskStringArr[0]);
-        this._taskName = taskStringArr[1];
-        this._description = taskStringArr[2];
+        // use substring to remove surrounding quotes
+        this._taskName = taskStringArr[1].substring(1, taskStringArr[1].length() - 1);
+        this._description = taskStringArr[2].substring(1, taskStringArr[2].length() - 1);
         this._startTime = LocalDateTime.parse(taskStringArr[3]);
         this._endTime = LocalDateTime.parse(taskStringArr[4]);
 

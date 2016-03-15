@@ -27,8 +27,8 @@ public class TaskTest {
         String taskString = this.task_.encodeTaskToString();
         String[] taskStringArr = taskString.split(", ");
         assertEquals(this.TASK_ID.toString(), taskStringArr[0]);
-        assertEquals(this.TASK_NAME, taskStringArr[1]);
-        assertEquals(this.TASK_DESCRIPTION, taskStringArr[2]);
+        assertEquals("\"" + this.TASK_NAME + "\"", taskStringArr[1]);
+        assertEquals("\"" + this.TASK_DESCRIPTION + "\"", taskStringArr[2]);
         assertEquals(this.TASK_START.toString(), taskStringArr[3]);
         assertEquals(this.TASK_END.toString(), taskStringArr[4]);
     }
@@ -52,12 +52,12 @@ public class TaskTest {
     public void Decoded_Task_has_correct_attributes_assigned() {
         this.task_ = new Task(null, null, null, null, null);
         // String to parse into Task object
-        String taskString = "88, buy groceries, more fruits, 2016-03-09t14:30:00, 2016-03-09t15:30:00";     
+        String taskString = "88, \"marketing pitch\", \"to microsoft\", 2016-03-09t14:30:00, 2016-03-09t15:30:00";     
         this.task_.decodeTaskFromString(taskString);
         
         assertSame(88, this.task_.getId());
-        assertEquals("buy groceries", this.task_.getTaskName());
-        assertEquals("more fruits", this.task_.getDescription());
+        assertEquals("marketing pitch", this.task_.getTaskName());
+        assertEquals("to microsoft", this.task_.getDescription());
         assertEquals(LocalDateTime.parse("2016-03-09t14:30:00"), this.task_.getStartTime());
         assertEquals(LocalDateTime.parse("2016-03-09t15:30:00"), this.task_.getEndTime());
     }
