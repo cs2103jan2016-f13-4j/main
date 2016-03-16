@@ -19,12 +19,17 @@ import component.back_end.storage.query.TaskDescriptor;
  */
 public class DiskIO {
 
+    private String _fileName;
     private final TaskCollection _taskCollection;
-    private String _fileName = "data/ToDoData.csv";
     private final TaskDescriptor _taskDescriptor = null;
+    private final String DEFAULT_FILE_NAME = "tmp/ToDoData.csv";
 
     public DiskIO(TaskCollection taskCollection, String fileName) {
         this._taskCollection = taskCollection;
+        if (fileName == null || fileName.equals(null) || fileName.equals("")) {
+            // assign default file name
+            fileName = this.DEFAULT_FILE_NAME;
+        }
         this._fileName = fileName;
 
         if (this._fileName != null) {
@@ -44,7 +49,7 @@ public class DiskIO {
             return null;
         }
 
-        boolean isFile = new File(this._fileName).isFile();
+        boolean isFile = this.checkIsFile();
         if (!isFile) {
             File f = new File(this._fileName);
             isFile = f.createNewFile();
@@ -64,7 +69,7 @@ public class DiskIO {
     }
 
     public List<Task> write() throws IOException {
-        BufferedWriter writer = new BufferedWriter(new FileWriter(this._fileName));
+        BufferedWriter writer = new BufferedWriter(new FileWriter(new File(this._fileName)));
         List<Task> taskList = this._taskCollection.getAll(this._taskDescriptor);
         for (Task task : taskList) {
             writer.write(task.encodeTaskToString());
@@ -73,10 +78,9 @@ public class DiskIO {
         writer.close();
         return taskList;
     }
-
-    public static void main(String[] args) throws IOException {
-        DiskIO io = new DiskIO(new TaskCollection());
-        io.write();
+    
+    public boolean checkIsFile() {
+        return new File(this._fileName).isFile();
     }
 
 }
