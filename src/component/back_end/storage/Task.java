@@ -15,9 +15,19 @@ public class Task implements Comparable<Task> {
     private LocalDateTime _startTime;
     private LocalDateTime _endTime;
     private boolean _isCompleted;
+    private Priority _priority;
 
     private final int NUMBER_OF_ATTRIBUTES_TO_SERIALIZE = 5; 
     private final String CSV_DELIMITER = "\", \"";
+    
+    /**
+     * Priority types
+     * @author Huiyie
+     *
+     */
+    public enum Priority {
+        LOW, MEDIUM, HIGH
+    };
 
     public Task(Integer id, String taskName, String description, LocalDateTime startTime, LocalDateTime endTime) {
         this._id = id;
@@ -131,15 +141,24 @@ public class Task implements Comparable<Task> {
         return this._endTime;
     }
     
+    public Priority getPriority() {
+        return this._priority;
+    }
+    
     public boolean isCompleted() {
         return this._isCompleted;
     }
+
 
     /**
      * Setters
      */
     public void setId(Integer id) {
         this._id = id;
+    }
+    
+    public void setPriority(Priority priority) {
+        this._priority = priority;
     }
     
     public void setCompleted(boolean isCompleted) {
