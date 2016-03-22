@@ -12,6 +12,6 @@ public interface DecisionEngineSpec {
 
     ExecutionResult performCommand(Command cmd);
 
-    TaskSchedulerSpec getTaskScheduler();
+    SchedulerSpec getTaskScheduler();
 
 }

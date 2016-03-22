@@ -3,7 +3,7 @@ package logic;
 import shared.*;
 import skeleton.CollectionSpec;
 import skeleton.DecisionEngineSpec;
-import skeleton.TaskSchedulerSpec;
+import skeleton.SchedulerSpec;
 import storage.Task;
 import storage.TaskCollection;
 
@@ -168,8 +168,8 @@ public class DecisionEngine implements DecisionEngineSpec {
 
 
     @Override
-    public TaskSchedulerSpec getTaskScheduler() {
-        return TaskScheduler.getInstance();
+    public SchedulerSpec getTaskScheduler() {
+        return Scheduler.getInstance();
     }
 
     @Override
