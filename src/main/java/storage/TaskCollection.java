@@ -237,6 +237,16 @@ public class TaskCollection implements CollectionSpec<Task> {
         return this.taskData_.remove(id);
     }
 
+    public void removeAll() {
+        this.removeAllFromTreeMap(this.taskData_);
+        this.removeAllFromTreeMap(this.startTimeTree_);
+        this.removeAllFromTreeMap(this.endTimeTree_);
+    }
+
+    private void removeAllFromTreeMap(TreeMap<?, ?> treeMap) {
+        treeMap.clear();
+    }
+
     // ----------------------------------------------------------------------------------------
     //
     // V. Search by Time Range Methods
@@ -347,6 +357,10 @@ public class TaskCollection implements CollectionSpec<Task> {
             resultList.addAll(values);
         }
         return resultList;
+    }
+
+    public TreeMap<Integer, Task> getDataTree() {
+        return taskData_;
     }
 
     public TreeMap<LocalDateTime, List<Task>> getStartTimeTree() {
