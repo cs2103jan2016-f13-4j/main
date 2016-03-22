@@ -81,8 +81,21 @@ public class DecisionEngine implements DecisionEngineSpec {
      * @param cmd
      * @return
      */
-    boolean checkCommandCompleteness(Command cmd) {
-        return false;
+    boolean isCommandComplete(Command cmd) {
+        ParameterList params = cmd.getParameters();
+
+        boolean hasName = params.hasParameterNamed(ParameterName.NAME);
+        boolean hasStart = params.hasParameterNamed(ParameterName.DATE_FROM);
+        boolean hasEnd = params.hasParameterNamed(ParameterName.DATE_TO);
+
+        boolean isComplete = hasName && hasStart && hasEnd;
+        return isComplete;
+    }
+
+    boolean isCommmandQuery(Command cmd) {
+        ParameterList params = cmd.getParameters();
+
+        return params.hasParameterNamed(ParameterName.QUERY);
     }
 
 
