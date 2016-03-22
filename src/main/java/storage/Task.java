@@ -20,6 +20,7 @@ public class Task implements Comparable<Task> {
     private LocalDateTime _endTime;
     private final LocalDateTime _creationTime;
     private boolean _isCompleted;
+    private Priority _priority;
 
     /**
      * TODO: Write JavaDoc
@@ -39,6 +40,16 @@ public class Task implements Comparable<Task> {
 
         this._creationTime = LocalDateTime.now();
     }
+
+    /**
+     * Priority types
+     * 
+     * @author Huiyie
+     *
+     */
+    public enum Priority {
+        LOW, MEDIUM, HIGH
+    };
 
     public String encodeTaskToString() {
         StringBuilder sb = new StringBuilder();
@@ -137,6 +148,10 @@ public class Task implements Comparable<Task> {
         return this._endTime;
     }
 
+    public Priority getPriority() {
+        return this._priority;
+    }
+
     public boolean isCompleted() {
         return this._isCompleted;
     }
@@ -146,6 +161,10 @@ public class Task implements Comparable<Task> {
      */
     public void setId(Integer id) {
         this._id = id;
+    }
+
+    public void setPriority(Priority priority) {
+        this._priority = priority;
     }
 
     public void setCompleted(boolean isCompleted) {
