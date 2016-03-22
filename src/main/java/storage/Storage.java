@@ -14,11 +14,11 @@ import exception.ExceptionHandler;
 import exception.PrimaryKeyNotFoundException;
 import skeleton.CollectionSpec;
 
-public class TaskCollection implements CollectionSpec<Task> {
+public class Storage implements CollectionSpec<Task> {
 
-    private static final TaskCollection instance = new TaskCollection();
+    private static final Storage instance = new Storage();
 
-    public static TaskCollection getInstance() {
+    public static Storage getInstance() {
         return instance;
     }
 
@@ -30,15 +30,16 @@ public class TaskCollection implements CollectionSpec<Task> {
 
     private DiskIO diskIO_;
 
-    private TaskCollection() {
+    private Storage() {
         this.taskData_ = new TreeMap<>();
         this.startTimeTree_ = new TreeMap<>();
         this.endTimeTree_ = new TreeMap<>();
-        this.diskIO_ = new DiskIO(this);
-        // load data from disk when initializing TaskCollection
-        // if there is no existing file, create new file
+
         try {
+            this.diskIO_ = new DiskIO(this);
             this.diskIO_.read();
+            // load data from disk when initializing TaskCollection
+            // if there is no existing file, create new file
         } catch (IOException e) {
             ExceptionHandler.handle(e);
         }
@@ -97,8 +98,11 @@ public class TaskCollection implements CollectionSpec<Task> {
      * @return list of Tasks that was written to disk
      * @throws IOException
      */
-    public List<Task> writeToDisk() throws IOException {
-        return this.diskIO_.write();
+    public void writeToDisk() throws IOException {
+        List<Task> taskList = this.getAll();
+        for (Task task : taskList) {
+            this.diskIO_.write(task.encodeTaskToString());
+        }
     }
 
     private void addTaskToStartTimeTree(boolean isNewTask, Task newTask, Task oldTask) {

@@ -5,7 +5,7 @@ import skeleton.CollectionSpec;
 import skeleton.DecisionEngineSpec;
 import skeleton.SchedulerSpec;
 import storage.Task;
-import storage.TaskCollection;
+import storage.Storage;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -192,7 +192,7 @@ public class DecisionEngine implements DecisionEngineSpec {
 
     @Override
     public CollectionSpec<Task> getTaskCollection() {
-        return TaskCollection.getInstance();
+        return Storage.getInstance();
     }
 
 }

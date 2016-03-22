@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.List;
 
 /**
  * Handles reading from and writing to disk.
@@ -17,10 +16,10 @@ import java.util.List;
 public class DiskIO {
 
     private String _fileName;
-    private final TaskCollection _taskCollection;
+    private final Storage _taskCollection;
     private final String DEFAULT_FILE_NAME = "tmp/ToDoData.csv";
 
-    public DiskIO(TaskCollection taskCollection, String fileName) {
+    public DiskIO(Storage taskCollection, String fileName) throws IOException {
         this._taskCollection = taskCollection;
         if (fileName == null || fileName.equals(null) || fileName.equals("")) {
             // assign default file name
@@ -32,14 +31,17 @@ public class DiskIO {
             // Try to create directory
             File folder = new File(this._fileName).getParentFile();
             folder.mkdirs();
+
+            File file = new File(this._fileName);
+            file.createNewFile();
         }
     }
 
-    public DiskIO(TaskCollection taskCollection) {
+    public DiskIO(Storage taskCollection) throws IOException {
         this(taskCollection, null);
     }
 
-    public TaskCollection read() throws IOException {
+    public Storage read() throws IOException {
         if (this._fileName == null) {
             // TODO: Return null
             return null;
@@ -65,15 +67,12 @@ public class DiskIO {
         return this._taskCollection;
     }
 
-    public List<Task> write() throws IOException {
+    public String write(String line) throws IOException {
         BufferedWriter writer = new BufferedWriter(new FileWriter(new File(this._fileName)));
-        List<Task> taskList = this._taskCollection.getAll();
-        for (Task task : taskList) {
-            writer.write(task.encodeTaskToString());
-            writer.newLine();
-        }
+        writer.write(line);
+        writer.newLine();
         writer.close();
-        return taskList;
+        return line;
     }
 
     public boolean checkIsFile() {
