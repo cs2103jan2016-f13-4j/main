@@ -1,6 +1,6 @@
 package logic;
 
-import static org.junit.Assert.*:
+import static org.junit.Assert.*;
 
 import org.junit.*;
 
