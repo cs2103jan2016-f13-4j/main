@@ -75,6 +75,18 @@ public class DecisionEngine implements DecisionEngineSpec {
 
 
     /**
+     * checks whether the supplied command is completely defined (name, start time, end time, etc)
+     * this information may then be used to decide if the Scheduler should be called
+     *
+     * @param cmd
+     * @return
+     */
+    boolean checkCommandCompleteness(Command cmd) {
+        return false;
+    }
+
+
+    /**
      * creates a Task from a specified command object when it makes sense
      * we should blow up when creating a Task doesn't really make sense
      * @param cmd
