@@ -26,7 +26,7 @@ import exception.PrimaryKeyNotFoundException;
 public class DiskIOTest {
 
     private DiskIO _diskIO;
-    private TaskCollection _taskCollection;
+    private Storage _taskCollection;
 
     private final String TASK_1_NAME = "homework";
     private final String TASK_1_DESCRIPTION = "cs2103t";
@@ -64,7 +64,7 @@ public class DiskIOTest {
         (new File("tmp/testRead")).mkdirs();
         (new File("tmp/testNoFile")).mkdirs();
 
-        this._taskCollection = TaskCollection.getInstance();
+        this._taskCollection = Storage.getInstance();
 
         this._task1 = new Task(1, this.TASK_1_NAME, this.TASK_1_DESCRIPTION, this.TASK_1_START, this.TASK_1_END);
         this._task2 = new Task(2, this.TASK_2_NAME, this.TASK_2_DESCRIPTION, this.TASK_2_START, this.TASK_2_END);
@@ -134,7 +134,9 @@ public class DiskIOTest {
         String pathName = "tmp/testWrite/ToDoData.csv";
         File file = new File(pathName);
         this._diskIO = new DiskIO(this._taskCollection, pathName);
-        this._diskIO.write();
+        this._taskCollection.writeToDisk();
+
+        assertTrue(file.isFile());
 
         BufferedReader reader = new BufferedReader(new FileReader(pathName));
         String currLine;
