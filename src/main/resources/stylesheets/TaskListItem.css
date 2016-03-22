@@ -1,0 +1,27 @@
+.item__container {
+    -fx-background-color: #ffffff;
+}
+
+.item__index,
+.item__name,
+.item__date {
+    -fx-font-family: "Lato";
+}
+
+.item__name {
+    -fx-text-fill: #383838;
+}
+
+.item__index,
+.item__date {
+    -fx-text-fill: #636363;
+}
+
+.item__index {
+    -fx-font-weight: bold;
+}
+
+.item__date {
+    -fx-font-style: italic;
+    -fx-text-alignment: right;
+}

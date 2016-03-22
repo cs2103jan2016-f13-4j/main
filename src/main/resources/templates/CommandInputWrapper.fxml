@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.Line?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml/1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+            prefHeight="73.0" prefWidth="420.0" styleClass="wrapper"
+            stylesheets="@../stylesheets/Window.css" xmlns="http://javafx.com/javafx/8.0.65"
+            fx:controller="ui.controller.CommandInputController">
+    <children>
+        <Line endX="420.0" stroke="#e6e6e6"/>
+        <AnchorPane layoutX="14.0" layoutY="-63.0" prefHeight="200.0" prefWidth="200.0"
+                    styleClass="command-input__container" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="18.0"
+                    AnchorPane.rightAnchor="18.0" AnchorPane.topAnchor="15.0" fx:id="_commandInputContainer"/>
+    </children>
+</AnchorPane>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Line?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="65.0" prefWidth="420.0" styleClass="wrapper" stylesheets="@../stylesheets/Window.css" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.controller.HeaderController">
+   <children>
+      <ImageView fx:id="_iconView" fitHeight="48.0" fitWidth="48.0" layoutX="21.0" layoutY="9.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="9.0" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="8.0">
+         <image>
+            <Image url="@../images/mom.png" />
+         </image>
+      </ImageView>
+      <Line endX="419.0" layoutY="65.0" stroke="#e6e6e6" />
+      <Label fx:id="_headerLabel" layoutX="71.0" layoutY="9.0" prefHeight="48.0" prefWidth="334.0" styleClass="header__label" text="Label" AnchorPane.bottomAnchor="9.0" AnchorPane.leftAnchor="72.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="8.0" />
+   </children>
+</AnchorPane>

@@ -1,0 +1,28 @@
+.wrapper {
+    -fx-background-color: #f7f7f7;
+}
+
+.header__label {
+    -fx-font-family: "Lato";
+    -fx-font-style: italic;
+}
+
+.command-input__container {
+    -fx-background-color: #fff;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.04), 8, 0.0, 4, 8);
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+}
+
+.command-input__field {
+    -fx-font-family: "Lato";
+}
+
+.command-input__field .scroll-bar:horizontal:disabled {
+    -fx-opacity: 0;
+}
+
+.container--main {
+    -fx-background-color: #fff;
+}
+
