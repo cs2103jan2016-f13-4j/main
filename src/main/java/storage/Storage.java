@@ -1,6 +1,5 @@
 package storage;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -86,7 +85,7 @@ public class Storage implements CollectionSpec<Task> {
         return task.getId();
     }
 
-    public void writeToDisk() throws IOException {
+    public void writeToDisk() {
         List<Task> taskList = this.getAll();
         ArrayList<String> taskStrings = new ArrayList<String>();
         for (Task task : taskList) {
@@ -164,10 +163,15 @@ public class Storage implements CollectionSpec<Task> {
      * @throws PrimaryKeyNotFoundException
      *             if the TreeMap contains no mapping for the index
      */
-    @Override public Task get(int index) throws PrimaryKeyNotFoundException {
+    @Override public Task get(int index) {
         // check if TreeMap contains the key that is queried
         if (!this.taskData_.containsKey(index)) {
-            throw new PrimaryKeyNotFoundException(index);
+            try {
+                throw new PrimaryKeyNotFoundException(index);
+            } catch (PrimaryKeyNotFoundException e) {
+                // TODO Auto-generated catch block
+                ExceptionHandler.handle(e);
+            }
         }
         // key exists, retrieve Task corresponding to key
         return this.taskData_.get(index);
@@ -388,19 +392,14 @@ public class Storage implements CollectionSpec<Task> {
     // ----------------------------------------------------------------------------------------
 
     public void readFromDisk() {
-        try {
-            ArrayList<String> taskStrings = this.diskIO_.read();
-            for (String taskString : taskStrings) {
-                Task currTask = new Task(null, null, null, null, null);
-                currTask.decodeTaskFromString(taskString);
-                // Set null id to indicate this is a new task to be added, not
-                // an update
-                currTask.setId(null);
-                this.save(currTask);
-            }
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            ExceptionHandler.handle(e);
+        ArrayList<String> taskStrings = this.diskIO_.read();
+        for (String taskString : taskStrings) {
+            Task currTask = new Task(null, null, null, null, null);
+            currTask.decodeTaskFromString(taskString);
+            // Set null id to indicate this is a new task to be added, not
+            // an update
+            currTask.setId(null);
+            this.save(currTask);
         }
     }
 }

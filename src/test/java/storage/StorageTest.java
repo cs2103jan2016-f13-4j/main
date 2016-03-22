@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import org.junit.Before;
 import org.junit.Test;
 
-import exception.PrimaryKeyNotFoundException;
+import exception.ExceptionHandler;
 
 /**
  * 
@@ -56,7 +56,7 @@ public class StorageTest {
     private final LocalDateTime TASK_5_END = LocalDateTime.of(2016, 3, 9, 14, 30);
     private Task task5_;
 
-    @Before public void setUp() throws IOException {
+    @Before public void setUp() {
         this._storage = Storage.getInstance();
 
         // Clear all pre-existing data in TaskCollection
@@ -86,7 +86,7 @@ public class StorageTest {
         assertEquals(1, returnedID);
     }
 
-    @Test public void Save_sets_ID_when_ID_is_null() throws PrimaryKeyNotFoundException {
+    @Test public void Save_sets_ID_when_ID_is_null() {
         // create Task with null value as ID
         Task taskNullID = new Task(null, this.TASK_1_NAME, this.TASK_1_DESCRIPTION, this.TASK_1_START, this.TASK_1_END);
 
@@ -96,22 +96,29 @@ public class StorageTest {
         assertEquals(this.TASK_1_DESCRIPTION, this._storage.get(6).getDescription());
         assertEquals(this.TASK_1_START, this._storage.get(6).getStartTime());
         assertEquals(this.TASK_1_END, this._storage.get(6).getEndTime());
+
     }
 
-    @Test public void Write_to_disk_method_in_TaskCollection_works_correctly() throws IOException {
+    @Test public void Write_to_disk_method_in_TaskCollection_works_correctly() {
         File expectedFile = new File("tmp/Expected.csv");
-        BufferedWriter writer = new BufferedWriter(new FileWriter(expectedFile));
+        BufferedWriter writer;
 
         String taskString1 = "\"1\", \"marketing pitch\", \"client XYZ\", \"2016-03-09T14:30\", \"2016-03-09T16:30\"";
         String taskString2 = "\"2\", \"sales meeting\", \"client ABC\", \"2016-03-11T12:00\", \"2016-03-11T14:30\"";
         ArrayList<String> taskStrings = new ArrayList<String>();
         taskStrings.add(taskString1);
         taskStrings.add(taskString2);
-        for (String taskString : taskStrings) {
-            writer.write(taskString);
-            writer.newLine();
+        try {
+            writer = new BufferedWriter(new FileWriter(expectedFile));
+            for (String taskString : taskStrings) {
+                writer.write(taskString);
+
+                writer.newLine();
+            }
+            writer.close();
+        } catch (IOException e) {
+            ExceptionHandler.handle(e);
         }
-        writer.close();
 
         Task task1 = new Task(null, "marketing pitch", "client XYZ", LocalDateTime.of(2016, 3, 9, 14, 30),
                 LocalDateTime.of(2016, 3, 9, 16, 30));
@@ -138,9 +145,11 @@ public class StorageTest {
     //
     // ----------------------------------------------------------------------------------------
 
-    @Test public void Get_returns_correct_Task() throws PrimaryKeyNotFoundException {
-        Task returnedTask = this._storage.get(1);
+    @Test public void Get_returns_correct_Task() {
+        Task returnedTask;
+        returnedTask = this._storage.get(1);
         assertEquals(this.task1_, returnedTask);
+
     }
 
     // ----------------------------------------------------------------------------------------
@@ -167,10 +176,10 @@ public class StorageTest {
     //
     // ----------------------------------------------------------------------------------------
 
-    @Test(expected = PrimaryKeyNotFoundException.class) public void Remove_deletes_correct_Task()
-            throws PrimaryKeyNotFoundException {
-        this._storage.remove(1);
-        this._storage.get(1);
+    public void Remove_deletes_correct_Task() {
+        Task actualTask = this._storage.remove(1);
+        this.task1_.setId(1);
+        assertEquals(this.task1_, actualTask);
     }
 
     @Test public void Remove_all_clears_all_data() {
@@ -242,7 +251,7 @@ public class StorageTest {
     //
     // ----------------------------------------------------------------------------------------
 
-    @Test public void Task_entry_in_tree_gets_shifted_when_start_time_changes() throws PrimaryKeyNotFoundException {
+    @Test public void Task_entry_in_tree_gets_shifted_when_start_time_changes() {
         // check that the list initially contains the old task
         assertTrue(this._storage.getStartTimeTree().get(this.TASK_1_START).contains(this.task1_));
 
@@ -259,7 +268,7 @@ public class StorageTest {
         assertTrue(this._storage.getStartTimeTree().get(this.TASK_2_START).contains(newTask));
     }
 
-    @Test public void Task_entry_in_tree_gets_shifted_when_end_time_changes() throws PrimaryKeyNotFoundException {
+    @Test public void Task_entry_in_tree_gets_shifted_when_end_time_changes() {
         // check that the list initially contains the old task
         assertTrue(this._storage.getEndTimeTree().get(this.TASK_2_END).contains(this.task2_));
 

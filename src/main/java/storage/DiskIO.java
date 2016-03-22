@@ -35,17 +35,22 @@ public class DiskIO {
         folder.mkdirs();
     }
 
-    public ArrayList<String> read() throws IOException {
+    public ArrayList<String> read() {
         // Create file if it does not already exist
         this.checkFileExists();
-
-        BufferedReader reader = new BufferedReader(new FileReader(this._fileName));
         ArrayList<String> taskStrings = new ArrayList<String>();
-        String currLine;
-        while ((currLine = reader.readLine()) != null) {
-            taskStrings.add(currLine);
+
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(this._fileName));
+
+            String currLine;
+            while ((currLine = reader.readLine()) != null) {
+                taskStrings.add(currLine);
+            }
+            reader.close();
+        } catch (IOException e) {
+            ExceptionHandler.handle(e);
         }
-        reader.close();
         return taskStrings;
     }
 

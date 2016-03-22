@@ -17,7 +17,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import exception.ExceptionHandler;
-import exception.PrimaryKeyNotFoundException;
 
 /**
  *
@@ -59,10 +58,10 @@ public class DiskIOTest {
     private final LocalDateTime TASK_5_END = LocalDateTime.of(2016, 3, 9, 14, 30);
     private Task _task5;
 
-    @Before public void setUp() throws IOException {
+    @Before public void setUp() {
         this._storage = Storage.getInstance();
         this._diskIO = DiskIO.getInstance();
-        
+
         // Clear remnants of previous test(s)
         this._storage.removeAll();
         this._storage.writeToDisk();
@@ -92,14 +91,9 @@ public class DiskIOTest {
         file.delete();
         assertFalse(file.exists());
 
-        try {
-            this._diskIO.read();
-            // Check that file gets created after the read method is called
-            assertTrue(file.exists());
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            ExceptionHandler.handle(e);
-        }
+        this._diskIO.read();
+        // Check that file gets created after the read method is called
+        assertTrue(file.exists());
     }
 
     @Test public void Read_function_extracts_tasks_data_from_file() {
@@ -127,14 +121,9 @@ public class DiskIOTest {
             ExceptionHandler.handle(e);
         }
 
-        try {
-            ArrayList<String> actualTaskList = this._diskIO.read();
-            // Check that actual list matches expected list
-            assertEquals(taskStrings, actualTaskList);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            ExceptionHandler.handle(e);
-        }
+        ArrayList<String> actualTaskList = this._diskIO.read();
+        // Check that actual list matches expected list
+        assertEquals(taskStrings, actualTaskList);
     }
 
     // ----------------------------------------------------------------------------------------
