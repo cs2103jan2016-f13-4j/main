@@ -1,9 +1,8 @@
 package skeleton;
 
-import exception.PrimaryKeyNotFoundException;
-import storage.DescriptorSpec;
-
 import java.util.List;
+
+import exception.PrimaryKeyNotFoundException;
 
 public interface CollectionSpec<T> {
 
@@ -16,8 +15,6 @@ public interface CollectionSpec<T> {
     T get(int index) throws PrimaryKeyNotFoundException;
 
     List<T> getAll();
-
-    List<T> getAll(DescriptorSpec<T> descriptor);
 
     String getStoragePath();
 }

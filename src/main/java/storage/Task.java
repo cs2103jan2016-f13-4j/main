@@ -1,6 +1,5 @@
 package storage;
 
-
 import java.time.LocalDateTime;
 
 public class Task implements Comparable<Task> {
@@ -21,9 +20,11 @@ public class Task implements Comparable<Task> {
     private LocalDateTime _endTime;
     private final LocalDateTime _creationTime;
     private boolean _isCompleted;
+    private Priority _priority;
 
     /**
      * TODO: Write JavaDoc
+     * 
      * @param id
      * @param taskName
      * @param description
@@ -40,22 +41,36 @@ public class Task implements Comparable<Task> {
         this._creationTime = LocalDateTime.now();
     }
 
+    /**
+     * Priority types
+     * 
+     * @author Huiyie
+     *
+     */
+    public enum Priority {
+        LOW, MEDIUM, HIGH
+    };
+
     public String encodeTaskToString() {
         StringBuilder sb = new StringBuilder();
         String[] attributesArr = this.taskAttributesToStringArray();
-        for (String attribute : attributesArr) {
-            sb.append(attribute).append(this.CSV_DELIMITER);
+        // the last attribute will be appended outside the loop
+        for (int i = 0; i < attributesArr.length - 1; i++) {
+            sb.append(attributesArr[i]).append(", ");
         }
+        sb.append(attributesArr[attributesArr.length - 1]);
         return sb.toString();
     }
 
     public String[] taskAttributesToStringArray() {
         String[] attributesArr = new String[this.NUMBER_OF_ATTRIBUTES_TO_SERIALIZE];
-        attributesArr[0] = this._id.toString();
-        attributesArr[1] = this._taskName;
-        attributesArr[2] = this._description;
-        attributesArr[3] = this._startTime.toString();
-        attributesArr[4] = this._endTime.toString();
+
+        // wrap strings in quotes
+        attributesArr[0] = "\"" + this._id.toString() + "\"";
+        attributesArr[1] = "\"" + this._taskName + "\"";
+        attributesArr[2] = "\"" + this._description + "\"";
+        attributesArr[3] = "\"" + this._startTime.toString() + "\"";
+        attributesArr[4] = "\"" + this._endTime.toString() + "\"";
         return attributesArr;
     }
 
@@ -67,31 +82,42 @@ public class Task implements Comparable<Task> {
             throw new IllegalArgumentException();
         }
 
-        this._id = Integer.parseInt(taskStringArr[0]);
+        // use substring to remove surrounding quotes
+        // first array element has the ending quote removed due to the chosen
+        // delimiter
+        this._id = Integer.parseInt(taskStringArr[0].substring(1, taskStringArr[0].length()));
+
+        // second array element has both starting and ending quotes removed
         this._taskName = taskStringArr[1];
+
+        // third array element has both starting and ending quotes removed
         this._description = taskStringArr[2];
+
+        // fourth array element has both starting and ending quotes removed
         this._startTime = LocalDateTime.parse(taskStringArr[3]);
-        this._endTime = LocalDateTime.parse(taskStringArr[4]);
+
+        // fifth array element has the starting quote removed
+        this._endTime = LocalDateTime.parse(taskStringArr[4].substring(0, taskStringArr[4].length() - 1));
 
     }
 
-    @Override
-    public int compareTo(Task o) {
+    @Override public int compareTo(Task o) {
         return this.getId().compareTo(o.getId());
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (o == null) return false;
-        if (this == o) return true;
-        if (!(o instanceof Task)) return false;
+    @Override public boolean equals(Object o) {
+        if (o == null)
+            return false;
+        if (this == o)
+            return true;
+        if (!(o instanceof Task))
+            return false;
 
         Task task = (Task) o;
         return this.getId().equals(task.getId());
     }
 
-    @Override
-    public int hashCode() {
+    @Override public int hashCode() {
         return this.getId().hashCode();
     }
 
@@ -122,6 +148,10 @@ public class Task implements Comparable<Task> {
         return this._endTime;
     }
 
+    public Priority getPriority() {
+        return this._priority;
+    }
+
     public boolean isCompleted() {
         return this._isCompleted;
     }
@@ -131,6 +161,10 @@ public class Task implements Comparable<Task> {
      */
     public void setId(Integer id) {
         this._id = id;
+    }
+
+    public void setPriority(Priority priority) {
+        this._priority = priority;
     }
 
     public void setCompleted(boolean isCompleted) {
