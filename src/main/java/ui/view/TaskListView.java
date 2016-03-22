@@ -48,7 +48,7 @@ public class TaskListView extends View {
 
         public Item() {
             super();
-            this._container = Resources.getComponent(STRING_NAME_TEMPLATE);
+            this._container = Resources.getInstance().getComponent(STRING_NAME_TEMPLATE);
             this._indexLabel = (Label) this._container.lookup("#indexLabel");
             this._nameLabel = (Label) this._container.lookup("#nameLabel");
             this._dateLabel = (Label) this._container.lookup("#dateLabel");

@@ -2,11 +2,11 @@ package logic;
 
 import javafx.util.Pair;
 import shared.Command;
+import shared.ExecutionResult;
 import skeleton.CommandParserSpec;
 import skeleton.TranslationEngineSpec;
 import skeleton.UserInterfaceSpec;
 import storage.Task;
-import ui.view.TaskListView;
 import ui.UserInterface;
 import ui.view.TextListView;
 import ui.view.View;
@@ -24,7 +24,7 @@ public class TranslationEngine implements TranslationEngineSpec {
     /**
      * Properties
      */
-    private Function<Command, Void> _commandExecutionHandler;
+    private Function<Command, ExecutionResult> _commandExecutionHandler;
     private VisualIndexMapper _indexMapper;
 
     /**
@@ -45,7 +45,7 @@ public class TranslationEngine implements TranslationEngineSpec {
         return instance;
     }
 
-    @Override public void setCommandExecutionHandler(Function<Command, Void> handler) {
+    @Override public void setCommandExecutionHandler(Function<Command, ExecutionResult> handler) {
         assert (handler != null);
         this._commandExecutionHandler = handler;
     }
@@ -73,16 +73,25 @@ public class TranslationEngine implements TranslationEngineSpec {
      * @param result
      */
     @Override public void displayResult(ExecutionResult result) {
+        if (result.isShutdownSignal()) {
+            // Do not display shutdown signal
+            return;
+        }
 
         switch (result.getViewType()) {
             case TASK_LIST:
                 // Convert list
                 List<Pair<Integer, Task>> visualTaskList =
-                        VisualIndexMapper.getInstance().translateRawToVisual((List<Task>) result.getData());
+                        VisualIndexMapper.getInstance().translateRawToVisual(result.getData());
                 View view = new TextListView(visualTaskList);
                 this.getUserInterface().render(view);
                 break;
         }
+    }
+
+    @Override
+    public void shutdown() {
+        this.getUserInterface().cleanUp();
     }
 
     private void translateCommand(String commandString) {
@@ -96,7 +105,11 @@ public class TranslationEngine implements TranslationEngineSpec {
             this._indexMapper.translateVisualToRaw(command);
         }
 
-        this._commandExecutionHandler.apply(command);
+        // Schedule for displaying
+        this._commandExecutionHandler.andThen(result -> {
+            this.displayResult(result);
+            return null;
+        }).apply(command);
     }
 
     @Override public UserInterfaceSpec getUserInterface() {

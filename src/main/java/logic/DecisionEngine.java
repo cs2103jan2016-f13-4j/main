@@ -186,6 +186,11 @@ public class DecisionEngine implements DecisionEngineSpec {
     }
 
     @Override
+    public void shutdown() {
+        // TODO: stub
+    }
+
+    @Override
     public CollectionSpec<Task> getTaskCollection() {
         return TaskCollection.getInstance();
     }

@@ -1,0 +1,8 @@
+.command-input__field .scroll-bar {
+    -fx-opacity: 0;
+    visibility: hidden;
+}
+
+.red {
+    -fx-text-fill: #fa4646;
+}

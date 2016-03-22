@@ -14,4 +14,5 @@ public interface UserInterfaceSpec {
 
     void render(View view);
 
+    void cleanUp();
 }
