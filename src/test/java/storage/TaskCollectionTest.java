@@ -22,7 +22,7 @@ import exception.PrimaryKeyNotFoundException;
 
 public class TaskCollectionTest {
 
-    private TaskCollection taskCollection;
+    private Storage taskCollection;
 
     private final String TASK_1_NAME = "homework";
     private final String TASK_1_DESCRIPTION = "cs2103t";
@@ -58,7 +58,7 @@ public class TaskCollectionTest {
         // Ensure task write directory exists
         (new File("tmp/testWrite")).mkdirs();
 
-        this.taskCollection = TaskCollection.getInstance();
+        this.taskCollection = Storage.getInstance();
 
         // Clear all pre-existing data in TaskCollection
         this.taskCollection.removeAll();
