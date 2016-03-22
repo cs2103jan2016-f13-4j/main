@@ -22,8 +22,6 @@ public class CommandInputController {
 
         this._inputField.getStyleClass().add("command-input__field");
         this._inputField.setWrapText(false);
-        ScrollBar scrollBar = (ScrollBar) this._inputField.lookup(".scroll-bar:horizontal");
-        scrollBar.setDisable(true);
 
         // Arrange the input field correctly
         AnchorPane.setLeftAnchor(this._inputField, PADDING_HORZ_COMMAND_INPUT);

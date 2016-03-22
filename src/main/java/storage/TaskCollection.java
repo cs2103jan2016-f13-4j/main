@@ -215,11 +215,14 @@ public class TaskCollection implements CollectionSpec<Task> {
     //----------------------------------------------------------------------------------------
 
     @Override public int add(Task item) {
-        return 0;
+        assert item.getId() == null;
+        return this.save(item);
     }
 
     @Override public boolean edit(int index, Task item) {
-        return false;
+        assert item.getId() == index;
+        this.save(item);
+        return true;
     }
 
     /**
