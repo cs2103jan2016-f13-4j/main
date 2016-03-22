@@ -61,7 +61,8 @@ public class DiskIOTest {
 
     @Before public void setUp() throws IOException {
         this._storage = Storage.getInstance();
-
+        this._diskIO = DiskIO.getInstance();
+        
         // Clear remnants of previous test(s)
         this._storage.removeAll();
         this._storage.writeToDisk();
@@ -87,7 +88,6 @@ public class DiskIOTest {
     // ----------------------------------------------------------------------------------------
 
     @Test public void Read_function_creates_new_data_file_if_none_exists() {
-        this._diskIO = DiskIO.getInstance();
         File file = new File("tmp/ToDoData.csv");
         file.delete();
         assertFalse(file.exists());
@@ -127,7 +127,6 @@ public class DiskIOTest {
             ExceptionHandler.handle(e);
         }
 
-        this._diskIO = DiskIO.getInstance();
         try {
             ArrayList<String> actualTaskList = this._diskIO.read();
             // Check that actual list matches expected list
@@ -144,34 +143,7 @@ public class DiskIOTest {
     //
     // ----------------------------------------------------------------------------------------
 
-    @Test public void Write_function_works() throws IOException, PrimaryKeyNotFoundException {
-        // set all id to null to indicate that these are new tasks
-        this._task1.setId(null);
-        this._task2.setId(null);
-        this._task3.setId(null);
-        this._task4.setId(null);
-        this._task5.setId(null);
-
-        this._storage.save(this._task1);
-        this._storage.save(this._task2);
-        this._storage.save(this._task3);
-        this._storage.save(this._task4);
-        this._storage.save(this._task5);
-        this._storage.writeToDisk();
-
-        BufferedReader reader = new BufferedReader(new FileReader("tmp/ToDoData.csv"));
-
-        String currLine;
-        int index = 1;
-        while ((currLine = reader.readLine()) != null) {
-            assertEquals(this._storage.get(index).encodeTaskToString(), currLine);
-            index++;
-        }
-        reader.close();
-    }
-
     @Test public void Write_function_writes_data_into_file_correctly() throws IOException {
-        this._diskIO = DiskIO.getInstance();
 
         String taskString1 = "\"1\", \"marketing pitch\", \"client XYZ\", \"2016-03-09T14:30\", \"2016-03-09T16:30\"";
         String taskString2 = "\"2\", \"sales meeting\", \"client ABC\", \"2016-03-11T12:00\", \"2016-03-11T14:30\"";
