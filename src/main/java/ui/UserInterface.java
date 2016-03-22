@@ -67,7 +67,7 @@ public class UserInterface implements UserInterfaceSpec {
         this._primaryStage = ApplicationContext.getPrimaryStage();
         assert (this._primaryStage == null);
 
-        this.initializeFonts();
+        //this.initializeFonts();
 
         this.setRootView();
         this.registerHeader();

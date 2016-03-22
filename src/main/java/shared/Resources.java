@@ -49,6 +49,7 @@ public class Resources {
     }
 
     public static String getFontUrl(String font) {
-        return CLASS_LOADER_DEFAULT.getResource(STRING_PATH_FONTS.concat(font)).toExternalForm();
+        String fontPath = STRING_PATH_FONTS.concat(font);
+        return CLASS_LOADER_DEFAULT.getResource(fontPath).toExternalForm();
     }
 }
