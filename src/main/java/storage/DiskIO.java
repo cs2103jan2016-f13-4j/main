@@ -1,19 +1,31 @@
 package storage;
 
-import skeleton.CollectionSpec;
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 
+/**
+ * Handles reading from and writing to disk.
+ * 
+ * @author Huiyie
+ *
+ */
 public class DiskIO {
 
-
+    private String _fileName;
     private final TaskCollection _taskCollection;
-    private String _fileName = "data/ToDoData.csv";
-    private final DescriptorSpec<Task> _taskDescriptor = null;
+    private final String DEFAULT_FILE_NAME = "tmp/ToDoData.csv";
 
     public DiskIO(TaskCollection taskCollection, String fileName) {
         this._taskCollection = taskCollection;
+        if (fileName == null || fileName.equals(null) || fileName.equals("")) {
+            // assign default file name
+            fileName = this.DEFAULT_FILE_NAME;
+        }
         this._fileName = fileName;
 
         if (this._fileName != null) {
@@ -33,7 +45,7 @@ public class DiskIO {
             return null;
         }
 
-        boolean isFile = new File(this._fileName).isFile();
+        boolean isFile = this.checkIsFile();
         if (!isFile) {
             File f = new File(this._fileName);
             isFile = f.createNewFile();
@@ -42,10 +54,11 @@ public class DiskIO {
 
         BufferedReader reader = new BufferedReader(new FileReader(this._fileName));
         String currLine;
-        while((currLine = reader.readLine()) != null) {
+        while ((currLine = reader.readLine()) != null) {
             Task task = new Task(null, null, null, null, null);
             task.decodeTaskFromString(currLine);
-            task.setId(null); // set null id to indicate this is a new task to be added, not an update
+            task.setId(null); // set null id to indicate this is a new task to
+                              // be added, not an update
             this._taskCollection.save(task);
         }
         reader.close();
@@ -53,8 +66,8 @@ public class DiskIO {
     }
 
     public List<Task> write() throws IOException {
-        BufferedWriter writer = new BufferedWriter(new FileWriter(this._fileName));
-        List<Task> taskList = this._taskCollection.getAll(this._taskDescriptor);
+        BufferedWriter writer = new BufferedWriter(new FileWriter(new File(this._fileName)));
+        List<Task> taskList = this._taskCollection.getAll();
         for (Task task : taskList) {
             writer.write(task.encodeTaskToString());
             writer.newLine();
@@ -62,4 +75,9 @@ public class DiskIO {
         writer.close();
         return taskList;
     }
+
+    public boolean checkIsFile() {
+        return new File(this._fileName).isFile();
+    }
+
 }
