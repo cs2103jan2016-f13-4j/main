@@ -51,14 +51,19 @@ public class DiskIO {
         return taskStringList;
     }
 
-    public String write(String line) throws IOException {
-        BufferedWriter writer = new BufferedWriter(new FileWriter(new File(this._fileName), true));
-
-        writer.write(line);
-        writer.newLine();
-
-        writer.close();
-        return line;
+    public ArrayList<String> write(ArrayList<String> taskStrings) {
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(new File(this._fileName), true));
+            for (String taskString : taskStrings) {
+                writer.write(taskString);
+                writer.newLine();
+            }
+            writer.close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            ExceptionHandler.handle(e);
+        }
+        return taskStrings;
     }
 
     public boolean checkIsFile() {

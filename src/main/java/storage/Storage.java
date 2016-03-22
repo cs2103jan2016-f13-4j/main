@@ -91,17 +91,13 @@ public class Storage implements CollectionSpec<Task> {
         return task.getId();
     }
 
-    /**
-     * Writes all Task data currently stored in the TreeMap.
-     * 
-     * @return list of Tasks that was written to disk
-     * @throws IOException
-     */
     public void writeToDisk() throws IOException {
         List<Task> taskList = this.getAll();
+        ArrayList<String> taskStrings = new ArrayList<String>();
         for (Task task : taskList) {
-            this.diskIO_.write(task.encodeTaskToString());
+            taskStrings.add(task.encodeTaskToString());
         }
+        this.diskIO_.write(taskStrings);
     }
 
     private void addTaskToStartTimeTree(boolean isNewTask, Task newTask, Task oldTask) {

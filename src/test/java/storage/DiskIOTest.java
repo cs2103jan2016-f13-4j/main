@@ -176,8 +176,14 @@ public class DiskIOTest {
 
     @Test public void Write_function_writes_data_into_file_correctly() throws IOException {
         this._diskIO = DiskIO.getInstance();
-        this._diskIO.write("\"1\", \"marketing pitch\", \"client XYZ\", \"2016-03-09T14:30\", \"2016-03-09T16:30\"");
-        this._diskIO.write("\"2\", \"sales meeting\", \"client ABC\", \"2016-03-11T12:00\", \"2016-03-11T14:30\"");
+
+        String taskString1 = "\"1\", \"marketing pitch\", \"client XYZ\", \"2016-03-09T14:30\", \"2016-03-09T16:30\"";
+        String taskString2 = "\"2\", \"sales meeting\", \"client ABC\", \"2016-03-11T12:00\", \"2016-03-11T14:30\"";
+        ArrayList<String> taskStrings = new ArrayList<String>();
+        taskStrings.add(taskString1);
+        taskStrings.add(taskString2);
+
+        this._diskIO.write(taskStrings);
 
         BufferedReader reader = new BufferedReader(new FileReader("tmp/ToDoData.csv"));
         assertEquals("\"1\", \"marketing pitch\", \"client XYZ\", \"2016-03-09T14:30\", \"2016-03-09T16:30\"",
