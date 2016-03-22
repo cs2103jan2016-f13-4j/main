@@ -8,7 +8,7 @@ public class Task implements Comparable<Task> {
      * Constants
      */
     private final int NUMBER_OF_ATTRIBUTES_TO_SERIALIZE = 5;
-    private final String CSV_DELIMITER = ", ";
+    private final String CSV_DELIMITER = "\", \"";
 
     /**
      * Properties
