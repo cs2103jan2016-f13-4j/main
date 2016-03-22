@@ -32,6 +32,48 @@ public class DecisionEngine implements DecisionEngineSpec {
         // TODO: stub
     }
 
+
+    @Override public ExecutionResult performCommand(Command cmd) {
+
+        // this sort of nonsense should have been handled in the front end
+        assert (cmd.getInstruction().getType() != Instruction.Type.UNRECOGNISED);
+
+        // handle exit command here, without creating a task unnecessarily
+        if (cmd.getInstruction().getType() == Instruction.Type.EXIT) {
+            ApplicationContext.getPrimaryStage().close();
+            return null;
+        }
+
+        // Prepare final execution result to be returned
+        ExecutionResult result = null;
+
+        // all the standard commands
+        switch (cmd.getInstruction().getType()) {
+            case ADD:
+                result = this.handleAdd(cmd);
+                break;
+            case EDIT:
+                result = this.handleEdit(cmd);
+                break;
+            case DISPLAY:
+                result = this.handleDisplay(cmd);
+                break;
+            case DELETE:
+                result = this.handleDelete(cmd);
+                break;
+            case SEARCH:
+                result = this.handleSearch(cmd);
+                break;
+            default:
+                // if we reach this point, LTA Command Parser has failed in his duty
+                // and awaits court martial
+                assert false;
+        }
+
+        return result;
+    }
+
+
     /**
      * creates a Task from a specified command object when it makes sense
      * we should blow up when creating a Task doesn't really make sense
@@ -110,46 +152,6 @@ public class DecisionEngine implements DecisionEngineSpec {
                 .collect(Collectors.toList());
 
         return new ExecutionResult(ViewType.TASK_LIST, foundTask);
-    }
-
-    @Override public ExecutionResult performCommand(Command cmd) {
-
-        // this sort of nonsense should have been handled in the front end
-        assert (cmd.getInstruction().getType() != Instruction.Type.UNRECOGNISED);
-
-        // handle exit command here, without creating a task unnecessarily
-        if (cmd.getInstruction().getType() == Instruction.Type.EXIT) {
-            ApplicationContext.getPrimaryStage().close();
-            return null;
-        }
-
-        // Prepare final execution result to be returned
-        ExecutionResult result = null;
-
-        // all the standard commands
-        switch (cmd.getInstruction().getType()) {
-            case ADD:
-                result = this.handleAdd(cmd);
-                break;
-            case EDIT:
-                result = this.handleEdit(cmd);
-                break;
-            case DISPLAY:
-                result = this.handleDisplay(cmd);
-                break;
-            case DELETE:
-                result = this.handleDelete(cmd);
-                break;
-            case SEARCH:
-                result = this.handleSearch(cmd);
-                break;
-            default:
-                // if we reach this point, LTA Command Parser has failed in his duty
-                // and awaits court martial
-                assert false;
-        }
-
-        return result;
     }
 
 
