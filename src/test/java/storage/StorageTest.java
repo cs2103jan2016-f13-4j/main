@@ -4,7 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -20,9 +22,9 @@ import exception.PrimaryKeyNotFoundException;
  *
  */
 
-public class TaskCollectionTest {
+public class StorageTest {
 
-    private Storage taskCollection;
+    private Storage _storage;
 
     private final String TASK_1_NAME = "homework";
     private final String TASK_1_DESCRIPTION = "cs2103t";
@@ -55,13 +57,10 @@ public class TaskCollectionTest {
     private Task task5_;
 
     @Before public void setUp() throws IOException {
-        // Ensure task write directory exists
-        (new File("tmp/testWrite")).mkdirs();
-
-        this.taskCollection = Storage.getInstance();
+        this._storage = Storage.getInstance();
 
         // Clear all pre-existing data in TaskCollection
-        this.taskCollection.removeAll();
+        this._storage.removeAll();
 
         this.task1_ = new Task(null, this.TASK_1_NAME, this.TASK_1_DESCRIPTION, this.TASK_1_START, this.TASK_1_END);
         this.task2_ = new Task(null, this.TASK_2_NAME, this.TASK_2_DESCRIPTION, this.TASK_2_START, this.TASK_2_END);
@@ -69,11 +68,11 @@ public class TaskCollectionTest {
         this.task4_ = new Task(null, this.TASK_4_NAME, this.TASK_4_DESCRIPTION, this.TASK_4_START, this.TASK_4_END);
         this.task5_ = new Task(null, this.TASK_5_NAME, this.TASK_5_DESCRIPTION, this.TASK_5_START, this.TASK_5_END);
 
-        this.taskCollection.save(this.task1_);
-        this.taskCollection.save(this.task2_);
-        this.taskCollection.save(this.task3_);
-        this.taskCollection.save(this.task4_);
-        this.taskCollection.save(this.task5_);
+        this._storage.save(this.task1_);
+        this._storage.save(this.task2_);
+        this._storage.save(this.task3_);
+        this._storage.save(this.task4_);
+        this._storage.save(this.task5_);
     }
 
     // ----------------------------------------------------------------------------------------
@@ -83,7 +82,7 @@ public class TaskCollectionTest {
     // ----------------------------------------------------------------------------------------
 
     @Test public void Save_returns_correct_Task_ID() {
-        int returnedID = this.taskCollection.save(this.task1_);
+        int returnedID = this._storage.save(this.task1_);
         assertEquals(1, returnedID);
     }
 
@@ -92,28 +91,45 @@ public class TaskCollectionTest {
         Task taskNullID = new Task(null, this.TASK_1_NAME, this.TASK_1_DESCRIPTION, this.TASK_1_START, this.TASK_1_END);
 
         // the next assigned ID will be 6
-        this.taskCollection.save(taskNullID);
-        assertEquals(this.TASK_1_NAME, this.taskCollection.get(6).getTaskName());
-        assertEquals(this.TASK_1_DESCRIPTION, this.taskCollection.get(6).getDescription());
-        assertEquals(this.TASK_1_START, this.taskCollection.get(6).getStartTime());
-        assertEquals(this.TASK_1_END, this.taskCollection.get(6).getEndTime());
+        this._storage.save(taskNullID);
+        assertEquals(this.TASK_1_NAME, this._storage.get(6).getTaskName());
+        assertEquals(this.TASK_1_DESCRIPTION, this._storage.get(6).getDescription());
+        assertEquals(this.TASK_1_START, this._storage.get(6).getStartTime());
+        assertEquals(this.TASK_1_END, this._storage.get(6).getEndTime());
     }
 
     @Test public void Write_to_disk_method_in_TaskCollection_works_correctly() throws IOException {
-        File file = new File("tmp/ToDoData.csv");
+        File expectedFile = new File("tmp/Expected.csv");
+        BufferedWriter writer = new BufferedWriter(new FileWriter(expectedFile));
 
-        DiskIO diskIO = DiskIO.getInstance();
-        this.taskCollection.setDiskIO(diskIO);
+        String taskString1 = "\"1\", \"marketing pitch\", \"client XYZ\", \"2016-03-09T14:30\", \"2016-03-09T16:30\"";
+        String taskString2 = "\"2\", \"sales meeting\", \"client ABC\", \"2016-03-11T12:00\", \"2016-03-11T14:30\"";
+        ArrayList<String> taskStrings = new ArrayList<String>();
+        taskStrings.add(taskString1);
+        taskStrings.add(taskString2);
+        for (String taskString : taskStrings) {
+            writer.write(taskString);
+            writer.newLine();
+        }
+        writer.close();
 
-        this.taskCollection.writeToDisk();
+        Task task1 = new Task(null, "marketing pitch", "client XYZ", LocalDateTime.of(2016, 3, 9, 14, 30),
+                LocalDateTime.of(2016, 3, 9, 16, 30));
+        Task task2 = new Task(null, "sales meeting", "client ABC", LocalDateTime.of(2016, 3, 11, 12, 00),
+                LocalDateTime.of(2016, 3, 11, 14, 30));
+        this._storage.save(task1);
+        this._storage.save(task2);
+        this._storage.writeToDisk();
+
+        File actualFile = new File("tmp/ToDoData.csv");
         // check that file gets created when writeToFile() is called
-        assertTrue(file.isFile());
+        assertTrue(actualFile.isFile());
 
         // delete the file for future testing of writing file function
-        file.delete();
+        actualFile.delete();
 
         // check that file does not exist in the end after deletion
-        assertFalse(file.isFile());
+        assertFalse(actualFile.isFile());
     }
 
     // ----------------------------------------------------------------------------------------
@@ -123,7 +139,7 @@ public class TaskCollectionTest {
     // ----------------------------------------------------------------------------------------
 
     @Test public void Get_returns_correct_Task() throws PrimaryKeyNotFoundException {
-        Task returnedTask = this.taskCollection.get(1);
+        Task returnedTask = this._storage.get(1);
         assertEquals(this.task1_, returnedTask);
     }
 
@@ -142,7 +158,7 @@ public class TaskCollectionTest {
         expectedTaskList.add(this.task5_);
 
         // assert that expected and actual ArrayLists are equal
-        assertEquals(expectedTaskList, this.taskCollection.getAll());
+        assertEquals(expectedTaskList, this._storage.getAll());
     }
 
     // ----------------------------------------------------------------------------------------
@@ -153,15 +169,15 @@ public class TaskCollectionTest {
 
     @Test(expected = PrimaryKeyNotFoundException.class) public void Remove_deletes_correct_Task()
             throws PrimaryKeyNotFoundException {
-        this.taskCollection.remove(1);
-        this.taskCollection.get(1);
+        this._storage.remove(1);
+        this._storage.get(1);
     }
 
     @Test public void Remove_all_clears_all_data() {
-        this.taskCollection.removeAll();
-        assertEquals(0, this.taskCollection.getDataTree().size());
-        assertEquals(0, this.taskCollection.getStartTimeTree().size());
-        assertEquals(0, this.taskCollection.getEndTimeTree().size());
+        this._storage.removeAll();
+        assertEquals(0, this._storage.getDataTree().size());
+        assertEquals(0, this._storage.getStartTimeTree().size());
+        assertEquals(0, this._storage.getEndTimeTree().size());
     }
 
     // ----------------------------------------------------------------------------------------
@@ -177,7 +193,7 @@ public class TaskCollectionTest {
         expectedTaskList.add(this.task3_);
 
         // assert that expected results and actual search results are the same
-        assertEquals(expectedTaskList, this.taskCollection.searchstartBefore(this.TASK_3_START));
+        assertEquals(expectedTaskList, this._storage.searchstartBefore(this.TASK_3_START));
     }
 
     @Test public void Searching_by_start_after_returns_list_correctly() {
@@ -187,7 +203,7 @@ public class TaskCollectionTest {
         expectedTaskList.add(this.task5_);
 
         // assert that expected results and actual search results are the same
-        assertEquals(expectedTaskList, this.taskCollection.searchStartAfter(this.TASK_3_START));
+        assertEquals(expectedTaskList, this._storage.searchStartAfter(this.TASK_3_START));
     }
 
     @Test public void Searching_by_end_before_returns_list_correctly() {
@@ -197,7 +213,7 @@ public class TaskCollectionTest {
         expectedTaskList.add(this.task3_);
 
         // assert that expected results and actual search results are the same
-        assertEquals(expectedTaskList, this.taskCollection.searchEndBefore(this.TASK_3_END));
+        assertEquals(expectedTaskList, this._storage.searchEndBefore(this.TASK_3_END));
     }
 
     @Test public void Searching_by_end_after_returns_list_correctly() {
@@ -207,7 +223,7 @@ public class TaskCollectionTest {
         expectedTaskList.add(this.task5_);
 
         // assert that expected results and actual search results are the same
-        assertEquals(expectedTaskList, this.taskCollection.searchEndAfter(this.TASK_3_END));
+        assertEquals(expectedTaskList, this._storage.searchEndAfter(this.TASK_3_END));
     }
 
     @Test public void Searching_by_date_time_range_returns_list_correctly() {
@@ -217,7 +233,7 @@ public class TaskCollectionTest {
         expectedTaskList.add(this.task4_);
 
         // assert that expected results and actual search results are the same
-        assertEquals(expectedTaskList, this.taskCollection.searchByDateTimeRange(this.TASK_3_START, this.TASK_3_END));
+        assertEquals(expectedTaskList, this._storage.searchByDateTimeRange(this.TASK_3_START, this.TASK_3_END));
     }
 
     // ----------------------------------------------------------------------------------------
@@ -228,36 +244,36 @@ public class TaskCollectionTest {
 
     @Test public void Task_entry_in_tree_gets_shifted_when_start_time_changes() throws PrimaryKeyNotFoundException {
         // check that the list initially contains the old task
-        assertTrue(this.taskCollection.getStartTimeTree().get(this.TASK_1_START).contains(this.task1_));
+        assertTrue(this._storage.getStartTimeTree().get(this.TASK_1_START).contains(this.task1_));
 
         Task newTask = new Task(1, this.TASK_1_NAME, this.TASK_1_DESCRIPTION, this.TASK_2_START, this.TASK_1_END);
         // edit the start time of task1
-        this.taskCollection.save(newTask);
+        this._storage.save(newTask);
 
         // check that the list corresponding to the old start time no longer
         // contains the task
-        assertFalse(this.taskCollection.getStartTimeTree().get(this.TASK_1_START).contains(this.task1_));
+        assertFalse(this._storage.getStartTimeTree().get(this.TASK_1_START).contains(this.task1_));
 
         // check that the list corresponding to the new start time now contains
         // the updated task
-        assertTrue(this.taskCollection.getStartTimeTree().get(this.TASK_2_START).contains(newTask));
+        assertTrue(this._storage.getStartTimeTree().get(this.TASK_2_START).contains(newTask));
     }
 
     @Test public void Task_entry_in_tree_gets_shifted_when_end_time_changes() throws PrimaryKeyNotFoundException {
         // check that the list initially contains the old task
-        assertTrue(this.taskCollection.getEndTimeTree().get(this.TASK_2_END).contains(this.task2_));
+        assertTrue(this._storage.getEndTimeTree().get(this.TASK_2_END).contains(this.task2_));
 
         Task newTask = new Task(2, this.TASK_2_NAME, this.TASK_2_DESCRIPTION, this.TASK_2_START, this.TASK_3_END);
         // edit the end time of task2
-        this.taskCollection.save(newTask);
+        this._storage.save(newTask);
 
         // check that the list corresponding to the old end time no longer
         // contains the task
-        assertFalse(this.taskCollection.getEndTimeTree().get(this.TASK_2_END).contains(this.task2_));
+        assertFalse(this._storage.getEndTimeTree().get(this.TASK_2_END).contains(this.task2_));
 
         // check that the list corresponding to the new end time now contains
         // the updated task
-        assertTrue(this.taskCollection.getEndTimeTree().get(this.TASK_3_END).contains(newTask));
+        assertTrue(this._storage.getEndTimeTree().get(this.TASK_3_END).contains(newTask));
     }
 
 }

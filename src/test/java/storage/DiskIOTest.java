@@ -27,7 +27,7 @@ import exception.PrimaryKeyNotFoundException;
 public class DiskIOTest {
 
     private DiskIO _diskIO;
-    private Storage _taskCollection;
+    private Storage _storage;
 
     private final String TASK_1_NAME = "homework";
     private final String TASK_1_DESCRIPTION = "cs2103t";
@@ -60,15 +60,11 @@ public class DiskIOTest {
     private Task _task5;
 
     @Before public void setUp() throws IOException {
-        // Ensure test read directory exists
-        (new File("tmp/testWrite")).mkdirs();
-        (new File("tmp/testRead")).mkdirs();
-        (new File("tmp/testNoFile")).mkdirs();
+        this._storage = Storage.getInstance();
 
-        this._taskCollection = Storage.getInstance();
         // Clear remnants of previous test(s)
-        this._taskCollection.removeAll();
-        this._taskCollection.writeToDisk();
+        this._storage.removeAll();
+        this._storage.writeToDisk();
         File file = new File("tmp/ToDoData.csv");
         file.delete();
 
@@ -156,19 +152,19 @@ public class DiskIOTest {
         this._task4.setId(null);
         this._task5.setId(null);
 
-        this._taskCollection.save(this._task1);
-        this._taskCollection.save(this._task2);
-        this._taskCollection.save(this._task3);
-        this._taskCollection.save(this._task4);
-        this._taskCollection.save(this._task5);
-        this._taskCollection.writeToDisk();
+        this._storage.save(this._task1);
+        this._storage.save(this._task2);
+        this._storage.save(this._task3);
+        this._storage.save(this._task4);
+        this._storage.save(this._task5);
+        this._storage.writeToDisk();
 
         BufferedReader reader = new BufferedReader(new FileReader("tmp/ToDoData.csv"));
 
         String currLine;
         int index = 1;
         while ((currLine = reader.readLine()) != null) {
-            assertEquals(this._taskCollection.get(index).encodeTaskToString(), currLine);
+            assertEquals(this._storage.get(index).encodeTaskToString(), currLine);
             index++;
         }
         reader.close();

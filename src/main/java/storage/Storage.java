@@ -10,6 +10,7 @@ import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.TreeMap;
 
+import exception.ExceptionHandler;
 import exception.PrimaryKeyNotFoundException;
 import skeleton.CollectionSpec;
 
@@ -34,14 +35,8 @@ public class Storage implements CollectionSpec<Task> {
         this.startTimeTree_ = new TreeMap<>();
         this.endTimeTree_ = new TreeMap<>();
 
-        // try {
         this.diskIO_ = DiskIO.getInstance();
-        // this.readFromDisk();
-        // load data from disk when initializing Storage
-        // if there is no existing file, create new file
-        // } catch (IOException e) {
-        // ExceptionHandler.handle(e);
-        // }
+        this.readFromDisk();
     }
 
     // ----------------------------------------------------------------------------------------
@@ -391,12 +386,21 @@ public class Storage implements CollectionSpec<Task> {
     // VI. Read from file Method
     //
     // ----------------------------------------------------------------------------------------
-    /*
-     * public void readFromDisk() throws IOException { String currLine; Task
-     * currTask = new Task(null, null, null, null, null); do { currLine =
-     * this.diskIO_.read(); if (currLine != null) {
-     * currTask.decodeTaskFromString(currLine); // Set null id to indicate this
-     * is a new task to be added, not // an update currTask.setId(null);
-     * this.save(currTask); } } while (currLine != null); }
-     */
+
+    public void readFromDisk() {
+        try {
+            ArrayList<String> taskStrings = this.diskIO_.read();
+            for (String taskString : taskStrings) {
+                Task currTask = new Task(null, null, null, null, null);
+                currTask.decodeTaskFromString(taskString);
+                // Set null id to indicate this is a new task to be added, not
+                // an update
+                currTask.setId(null);
+                this.save(currTask);
+            }
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            ExceptionHandler.handle(e);
+        }
+    }
 }

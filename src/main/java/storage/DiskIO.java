@@ -25,7 +25,6 @@ public class DiskIO {
     }
 
     private String _fileName;
-    // private final Storage _taskCollection;
     private final String DEFAULT_FILE_NAME = "tmp/ToDoData.csv";
 
     private DiskIO() {
@@ -34,7 +33,6 @@ public class DiskIO {
         // Try to create directory
         File folder = new File(this._fileName).getParentFile();
         folder.mkdirs();
-
     }
 
     public ArrayList<String> read() throws IOException {
@@ -42,13 +40,13 @@ public class DiskIO {
         this.checkFileExists();
 
         BufferedReader reader = new BufferedReader(new FileReader(this._fileName));
-        ArrayList<String> taskStringList = new ArrayList<String>();
+        ArrayList<String> taskStrings = new ArrayList<String>();
         String currLine;
         while ((currLine = reader.readLine()) != null) {
-            taskStringList.add(currLine);
+            taskStrings.add(currLine);
         }
         reader.close();
-        return taskStringList;
+        return taskStrings;
     }
 
     public ArrayList<String> write(ArrayList<String> taskStrings) {
@@ -64,10 +62,6 @@ public class DiskIO {
             ExceptionHandler.handle(e);
         }
         return taskStrings;
-    }
-
-    public boolean checkIsFile() {
-        return new File(this._fileName).isFile();
     }
 
     private File checkFileExists() {
