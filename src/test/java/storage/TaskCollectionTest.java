@@ -100,11 +100,9 @@ public class TaskCollectionTest {
     }
 
     @Test public void Write_to_disk_method_in_TaskCollection_works_correctly() throws IOException {
-        File file = new File("tmp/testWrite/writeToDisk.csv");
-        // check that file does not exist in the beginning
-        assertFalse(file.isFile());
+        File file = new File("tmp/ToDoData.csv");
 
-        DiskIO diskIO = new DiskIO(this.taskCollection, "tmp/testWrite/writeToDisk.csv");
+        DiskIO diskIO = DiskIO.getInstance();
         this.taskCollection.setDiskIO(diskIO);
 
         this.taskCollection.writeToDisk();
@@ -113,6 +111,9 @@ public class TaskCollectionTest {
 
         // delete the file for future testing of writing file function
         file.delete();
+
+        // check that file does not exist in the end after deletion
+        assertFalse(file.isFile());
     }
 
     // ----------------------------------------------------------------------------------------

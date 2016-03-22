@@ -10,7 +10,6 @@ import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.TreeMap;
 
-import exception.ExceptionHandler;
 import exception.PrimaryKeyNotFoundException;
 import skeleton.CollectionSpec;
 
@@ -35,14 +34,14 @@ public class Storage implements CollectionSpec<Task> {
         this.startTimeTree_ = new TreeMap<>();
         this.endTimeTree_ = new TreeMap<>();
 
-        try {
-            this.diskIO_ = new DiskIO(this);
-            this.diskIO_.read();
-            // load data from disk when initializing TaskCollection
-            // if there is no existing file, create new file
-        } catch (IOException e) {
-            ExceptionHandler.handle(e);
-        }
+        // try {
+        this.diskIO_ = DiskIO.getInstance();
+        // this.readFromDisk();
+        // load data from disk when initializing Storage
+        // if there is no existing file, create new file
+        // } catch (IOException e) {
+        // ExceptionHandler.handle(e);
+        // }
     }
 
     // ----------------------------------------------------------------------------------------
@@ -391,4 +390,17 @@ public class Storage implements CollectionSpec<Task> {
         diskIO_ = diskIO;
     }
 
+    // ----------------------------------------------------------------------------------------
+    //
+    // VI. Read from file Method
+    //
+    // ----------------------------------------------------------------------------------------
+    /*
+     * public void readFromDisk() throws IOException { String currLine; Task
+     * currTask = new Task(null, null, null, null, null); do { currLine =
+     * this.diskIO_.read(); if (currLine != null) {
+     * currTask.decodeTaskFromString(currLine); // Set null id to indicate this
+     * is a new task to be added, not // an update currTask.setId(null);
+     * this.save(currTask); } } while (currLine != null); }
+     */
 }

@@ -2,16 +2,12 @@ package storage;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -65,59 +61,41 @@ public class DiskIOTest {
         (new File("tmp/testNoFile")).mkdirs();
 
         this._taskCollection = Storage.getInstance();
+        // Clear remnants of previous test(s)
+        this._taskCollection.removeAll();
+        this._taskCollection.writeToDisk();
+        File file = new File("tmp/ToDoData.csv");
+        file.delete();
 
         this._task1 = new Task(1, this.TASK_1_NAME, this.TASK_1_DESCRIPTION, this.TASK_1_START, this.TASK_1_END);
         this._task2 = new Task(2, this.TASK_2_NAME, this.TASK_2_DESCRIPTION, this.TASK_2_START, this.TASK_2_END);
         this._task3 = new Task(3, this.TASK_3_NAME, this.TASK_3_DESCRIPTION, this.TASK_3_START, this.TASK_3_END);
         this._task4 = new Task(4, this.TASK_4_NAME, this.TASK_4_DESCRIPTION, this.TASK_4_START, this.TASK_4_END);
         this._task5 = new Task(5, this.TASK_5_NAME, this.TASK_5_DESCRIPTION, this.TASK_5_START, this.TASK_5_END);
-
     }
 
-    @Test public void Read_function_extracts_tasks_data_from_file() throws IOException {
-        // saved a .csv file with data of tasks 1 to 5
-        // check if DiskIO read method works correctly
-        this._diskIO = new DiskIO(this._taskCollection, "tmp/testRead/ToDoData.csv");
-
-        // stub
-        // write the data to file as a string
-        BufferedWriter writer = new BufferedWriter(new FileWriter("tmp/testRead/ToDoData.csv"));
-        writer.write("\"1\", \"homework\", \"cs2103t\", \"2016-03-04T14:30\", \"2016-03-05T14:30\"\n"
-                + "\"2\", \"assignment\", \"cs3230\", \"2016-03-05T14:30\", \"2016-03-06T14:30\"\n"
-                + "\"3\", \"tutorial\", \"nm2101\", \"2016-03-06T14:30\", \"2016-03-07T14:30\"\n"
-                + "\"4\", \"tutorial\", \"nm2101\", \"2016-03-07T14:30\", \"2016-03-08T14:30\"\n"
-                + "\"5\", \"tutorial\", \"nm2101\", \"2016-03-08T14:30\", \"2016-03-09T14:30\"");
-
-        writer.close();
-
-        this._diskIO.read();
-        List<Task> taskList = this._taskCollection.getAll();
-
-        assertEquals(this._task1, taskList.get(0));
-        assertEquals(this._task2, taskList.get(1));
-        assertEquals(this._task3, taskList.get(2));
-        assertEquals(this._task4, taskList.get(3));
-        assertEquals(this._task5, taskList.get(4));
+    @Test public void File_does_not_exist_upon_setting_up() throws IOException {
+        File file = new File("tmp/ToDoData.csv");
+        assertFalse(file.exists());
     }
 
-    @Test public void Read_function_creates_new_data_file_if_none_exists() throws IOException {
-        // navigate to a directory where the data file does not exist
-        // check that file does not exist at the start
-        String pathName = "tmp/testNoFile/ToDoData.csv";
-        File file = new File(pathName);
-        assertFalse(file.isFile());
+    /*
+     * @Test public void Read_function_creates_new_data_file_if_none_exists()
+     * throws IOException { // navigate to a directory where the data file does
+     * not exist // check that file does not exist at the start String pathName
+     * = "tmp/ToDoData.csv"; File file = new File(pathName); file.delete();
+     * assertFalse(file.isFile());
+     * 
+     * this._diskIO = DiskIO.getInstance(); this._diskIO.read();
+     * 
+     * // check that the file gets created after the read method is called
+     * assertTrue(new File(pathName).isFile());
+     * 
+     * // delete the file for future testing of creating file function
+     * file.delete(); }
+     */
 
-        this._diskIO = new DiskIO(this._taskCollection, pathName);
-        this._diskIO.read();
-
-        // check that the file gets created after the read method is called
-        assertTrue(new File(pathName).isFile());
-
-        // delete the file for future testing of creating file function
-        file.delete();
-    }
-
-    @Test public void Write_function_writes_data_into_file_correctly() throws IOException, PrimaryKeyNotFoundException {
+    @Test public void Write_function_works() throws IOException, PrimaryKeyNotFoundException {
         // set all id to null to indicate that these are new tasks
         this._task1.setId(null);
         this._task2.setId(null);
@@ -130,15 +108,10 @@ public class DiskIOTest {
         this._taskCollection.save(this._task3);
         this._taskCollection.save(this._task4);
         this._taskCollection.save(this._task5);
-
-        String pathName = "tmp/testWrite/ToDoData.csv";
-        File file = new File(pathName);
-        this._diskIO = new DiskIO(this._taskCollection, pathName);
         this._taskCollection.writeToDisk();
 
-        assertTrue(file.isFile());
+        BufferedReader reader = new BufferedReader(new FileReader("tmp/ToDoData.csv"));
 
-        BufferedReader reader = new BufferedReader(new FileReader(pathName));
         String currLine;
         int index = 1;
         while ((currLine = reader.readLine()) != null) {
@@ -146,9 +119,16 @@ public class DiskIOTest {
             index++;
         }
         reader.close();
+    }
 
-        // delete the file for future testing of writing file function
-        file.delete();
+    @Test public void Write_function_writes_data_into_file_correctly() throws IOException {
+        this._diskIO = DiskIO.getInstance();
+        this._diskIO.write("\"1\", \"marketing pitch\", \"client XYZ\", \"2016-03-09T14:30\", \"2016-03-09T16:30\"");
+
+        BufferedReader reader = new BufferedReader(new FileReader("tmp/ToDoData.csv"));
+        assertEquals("\"1\", \"marketing pitch\", \"client XYZ\", \"2016-03-09T14:30\", \"2016-03-09T16:30\"",
+                reader.readLine());
+        reader.close();
     }
 
 }

@@ -1,11 +1,11 @@
 package storage;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+
+import exception.ExceptionHandler;
 
 /**
  * Handles reading from and writing to disk.
@@ -15,62 +15,40 @@ import java.io.IOException;
  */
 public class DiskIO {
 
+    private static final DiskIO instance = new DiskIO();
+
+    public static DiskIO getInstance() {
+        return instance;
+    }
+
     private String _fileName;
-    private final Storage _taskCollection;
+    // private final Storage _taskCollection;
     private final String DEFAULT_FILE_NAME = "tmp/ToDoData.csv";
 
-    public DiskIO(Storage taskCollection, String fileName) throws IOException {
-        this._taskCollection = taskCollection;
-        if (fileName == null || fileName.equals(null) || fileName.equals("")) {
-            // assign default file name
-            fileName = this.DEFAULT_FILE_NAME;
-        }
-        this._fileName = fileName;
+    private DiskIO() {
+        this._fileName = this.DEFAULT_FILE_NAME;
 
-        if (this._fileName != null) {
-            // Try to create directory
-            File folder = new File(this._fileName).getParentFile();
-            folder.mkdirs();
+        File file = new File(this._fileName);
 
-            File file = new File(this._fileName);
+        // Try to create directory
+        File folder = new File(this._fileName).getParentFile();
+        folder.mkdirs();
+
+        // Try to create file
+        try {
             file.createNewFile();
-        }
-    }
-
-    public DiskIO(Storage taskCollection) throws IOException {
-        this(taskCollection, null);
-    }
-
-    public Storage read() throws IOException {
-        if (this._fileName == null) {
-            // TODO: Return null
-            return null;
+        } catch (IOException e) {
+            ExceptionHandler.handle(e);
         }
 
-        boolean isFile = this.checkIsFile();
-        if (!isFile) {
-            File f = new File(this._fileName);
-            isFile = f.createNewFile();
-            return this._taskCollection;
-        }
-
-        BufferedReader reader = new BufferedReader(new FileReader(this._fileName));
-        String currLine;
-        while ((currLine = reader.readLine()) != null) {
-            Task task = new Task(null, null, null, null, null);
-            task.decodeTaskFromString(currLine);
-            task.setId(null); // set null id to indicate this is a new task to
-                              // be added, not an update
-            this._taskCollection.save(task);
-        }
-        reader.close();
-        return this._taskCollection;
     }
 
     public String write(String line) throws IOException {
-        BufferedWriter writer = new BufferedWriter(new FileWriter(new File(this._fileName)));
+        BufferedWriter writer = new BufferedWriter(new FileWriter(new File(this._fileName), true));
+
         writer.write(line);
         writer.newLine();
+
         writer.close();
         return line;
     }
