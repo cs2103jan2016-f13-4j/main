@@ -1,9 +1,12 @@
 package storage;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import exception.ExceptionHandler;
 
@@ -28,19 +31,24 @@ public class DiskIO {
     private DiskIO() {
         this._fileName = this.DEFAULT_FILE_NAME;
 
-        File file = new File(this._fileName);
-
         // Try to create directory
         File folder = new File(this._fileName).getParentFile();
         folder.mkdirs();
 
-        // Try to create file
-        try {
-            file.createNewFile();
-        } catch (IOException e) {
-            ExceptionHandler.handle(e);
-        }
+    }
 
+    public ArrayList<String> read() throws IOException {
+        // Create file if it does not already exist
+        this.checkFileExists();
+
+        BufferedReader reader = new BufferedReader(new FileReader(this._fileName));
+        ArrayList<String> taskStringList = new ArrayList<String>();
+        String currLine;
+        while ((currLine = reader.readLine()) != null) {
+            taskStringList.add(currLine);
+        }
+        reader.close();
+        return taskStringList;
     }
 
     public String write(String line) throws IOException {
@@ -57,4 +65,16 @@ public class DiskIO {
         return new File(this._fileName).isFile();
     }
 
+    private File checkFileExists() {
+        File file = new File(this._fileName);
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                ExceptionHandler.handle(e);
+            }
+        }
+        return file;
+    }
 }
