@@ -5,6 +5,8 @@ import skeleton.DecisionEngineSpec;
 import skeleton.DispatcherSpec;
 import skeleton.TranslationEngineSpec;
 
+import java.util.function.Function;
+
 public class Dispatcher implements DispatcherSpec {
 
     /**
@@ -13,9 +15,31 @@ public class Dispatcher implements DispatcherSpec {
     private static Dispatcher instance;
 
     /**
+     * Properties
+     */
+    private final Function<Command, ExecutionResult> _commandExecutor;
+
+    /**
      * TODO: Write JavaDoc
      */
     private Dispatcher() {
+        this._commandExecutor = command -> {
+            ExecutionResult result = getDecisionEngine().performCommand(command);
+
+            // Handle shutdown
+            if (result.isShutdownSignal()) {
+                // Shutdown both engines
+                this.getDecisionEngine().shutdown();
+                this.getTranslationEngine().shutdown();
+                // Demand application to close
+                ApplicationContext.getPrimaryStage().close();
+                return result;
+            }
+
+            // If not, gracefully falls through to displaying result
+            getTranslationEngine().displayResult(result);
+            return result;
+        };
     }
 
     /**
@@ -38,11 +62,7 @@ public class Dispatcher implements DispatcherSpec {
         this.getTranslationEngine().initialise();
 
         // Add command handler to translation engine
-        this.getTranslationEngine().setCommandExecutionHandler(command -> {
-            ExecutionResult result = getDecisionEngine().performCommand(command);
-            getTranslationEngine().displayResult(result);
-            return null;
-        });
+        this.getTranslationEngine().setCommandExecutionHandler(this._commandExecutor);
     }
 
     @Override public void start() {
@@ -51,8 +71,10 @@ public class Dispatcher implements DispatcherSpec {
         ParameterList initialParams = ParameterList.emptyList();
         Command initialCommand = new Command(initialInstruction, initialParams);
 
-        ExecutionResult result = getDecisionEngine().performCommand(initialCommand);
-        getTranslationEngine().displayResult(result);
+        this._commandExecutor.andThen(result -> {
+            this.getTranslationEngine().displayResult(result);
+            return null;
+        }).apply(initialCommand);
     }
 
     @Override public TranslationEngineSpec getTranslationEngine() {

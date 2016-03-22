@@ -1,7 +1,7 @@
 package skeleton;
 
-import logic.ExecutionResult;
 import shared.Command;
+import shared.ExecutionResult;
 import storage.Task;
 
 public interface DecisionEngineSpec {
@@ -13,5 +13,7 @@ public interface DecisionEngineSpec {
     ExecutionResult performCommand(Command cmd);
 
     TaskSchedulerSpec getTaskScheduler();
+
+    void shutdown();
 
 }

@@ -8,24 +8,26 @@ public class Instruction {
      * Types
      */
     public enum Type {
-        // TYPE_NAME ( isAllQuantifiable, doesRequireQuantifier )
-        ADD          ( false,             false),
-        EDIT         ( false,             true),
-        DISPLAY      ( true,              false),
-        DELETE       ( true,              true),
-        SEARCH       ( false,             false),
-        EXIT         ( false,             false),
+        // TYPE_NAME ( keyword,   isAllQuantifiable, doesRequireQuantifier )
+        ADD          ( "add",     false,             false),
+        EDIT         ( "edit",    false,             true),
+        DISPLAY      ( "display", true,              false),
+        DELETE       ( "delete" , true,              true),
+        SEARCH       ( "search",  false,             false),
+        EXIT         ( "exit",    false,             false),
 
         // Special types
-        INVALID     (false, false),
-        UNRECOGNISED(false, false);
+        INVALID     (null, false, false),
+        UNRECOGNISED(null, false, false);
 
         // Type properties
         final boolean isAllQuantifiable;
         final boolean doesRequireQuantifier;
+        public final String keyword;
 
         // Type constructor
-        Type(boolean uniQuantifiable, boolean requireQuantifier) {
+        Type(String key, boolean uniQuantifiable, boolean requireQuantifier) {
+            keyword = key;
             isAllQuantifiable = uniQuantifiable;
             doesRequireQuantifier = requireQuantifier;
         }
@@ -119,34 +121,13 @@ public class Instruction {
         instruction = instruction.trim().toLowerCase();
 
         // Search through the instruction in the definitions
-        switch (instruction) {
-            // Create a new task
-            case "add":
-                return Type.ADD;
-
-            // Update an existing task
-            case "edit":
-                return Type.EDIT;
-
-            // List out all tasks
-            case "display":
-                return Type.DISPLAY;
-
-            // Delete a task
-            case "delete":
-                return Type.DELETE;
-
-            // Searching
-            case "search":
-            case "find":
-                return Type.SEARCH;
-
-            // Terminate
-            case "exit":
-                return Type.EXIT;
-            default:
-                return Type.UNRECOGNISED;
+        for (Type type : Type.values()) {
+            if (type.keyword.equals(instruction)) {
+                return type;
+            }
         }
+
+        return Type.UNRECOGNISED;
     }
 
     public boolean hasAllQuantifier() {

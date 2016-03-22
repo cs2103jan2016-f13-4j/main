@@ -119,8 +119,7 @@ public class DecisionEngine implements DecisionEngineSpec {
 
         // handle exit command here, without creating a task unnecessarily
         if (cmd.getInstruction().getType() == Instruction.Type.EXIT) {
-            ApplicationContext.getPrimaryStage().close();
-            return null;
+            return ExecutionResult.shutdownSignal();
         }
 
         // Prepare final execution result to be returned
@@ -156,6 +155,11 @@ public class DecisionEngine implements DecisionEngineSpec {
     @Override
     public TaskSchedulerSpec getTaskScheduler() {
         return TaskScheduler.getInstance();
+    }
+
+    @Override
+    public void shutdown() {
+        // TODO: stub
     }
 
     @Override
