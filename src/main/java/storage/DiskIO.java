@@ -28,7 +28,7 @@ public class DiskIO {
     }
 
     private String _fileName;
-    private final String DEFAULT_FILE_NAME = "tmp/ToDoData.csv";
+    private final String DEFAULT_FILE_NAME = "data/ToDoData.csv";
 
     private DiskIO() {
         this._fileName = this.DEFAULT_FILE_NAME;
