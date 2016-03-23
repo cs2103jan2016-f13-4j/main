@@ -99,35 +99,20 @@ public class DecisionEngine implements DecisionEngineSpec {
         assert command.hasInstruction(Command.Instruction.SEARCH);
 
         // PowerSearching!
-        String query = command.getParameter(Command.ParamName.SEARCH_QUERY);
-        String[] words = query.split("\\s+");
-        StringBuilder patternBuilder = new StringBuilder();
-        patternBuilder.append("\\b(?:");
-
-        for (int i = 0; i < words.length; i++) {
-            String word = words[i];
-            if (i != 0) {
-                patternBuilder.append("|");
-            }
-
-            for (int j = 0; j < word.length(); j++) {
-                patternBuilder.append("\\w*");
-                patternBuilder.append(word.charAt(j));
-            }
-            patternBuilder.append("\\w*"); // At the end too
-        }
-
-        patternBuilder.append(")\\b");
-        Pattern pattern = Pattern.compile(patternBuilder.toString());
+        Pattern pattern = buildPowerSearchPattern(command);
 
         List<Task> foundTask = this.getTaskCollection().getAll()
                 .stream()
                 .filter(item -> {
+                    // Match with task name first
                     Matcher m = pattern.matcher(item.getTaskName());
                     if (m.find()) return true;
 
+                    // If doesn't match with task name, try to match
+                    // with description ONLY IF it's not null
                     if (item.getDescription() == null) return false;
                     m = pattern.matcher(item.getDescription());
+
                     return m.find();
                 })
                 .collect(Collectors.toList());
@@ -189,6 +174,37 @@ public class DecisionEngine implements DecisionEngineSpec {
     @Override
     public CollectionSpec<Task> getTaskCollection() {
         return TaskCollection.getInstance();
+    }
+
+    private static Pattern buildPowerSearchPattern(Command command) {
+        String query = command.getParameter(Command.ParamName.SEARCH_QUERY);
+        // Split the query into words
+        String[] words = query.split("\\s+");
+
+        // Begin building pattern by signalling that we are looking for
+        // a word that contains the characters
+        StringBuilder patternBuilder = new StringBuilder();
+        patternBuilder.append("\\b(?:");
+
+        // In that particular order. We achieve this by inserting
+        // greedy word (\w*) pattern, slotted between the characters of
+        // each of the query word
+        for (int i = 0; i < words.length; i++) {
+            String word = words[i];
+            if (i != 0) {
+                patternBuilder.append("|");
+            }
+
+            for (int j = 0; j < word.length(); j++) {
+                patternBuilder.append("\\w*");
+                patternBuilder.append(word.charAt(j));
+            }
+            patternBuilder.append("\\w*"); // At the end too
+        }
+
+        // Conclude the pattern
+        patternBuilder.append(")\\b");
+        return Pattern.compile(patternBuilder.toString());
     }
 
 }
