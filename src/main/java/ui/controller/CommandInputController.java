@@ -27,12 +27,13 @@ import java.util.regex.Pattern;
 public class CommandInputController {
     private static final double PADDING_HORZ_COMMAND_INPUT = 12.0;
     private static final double PADDING_VERT_COMMAND_INPUT = 18.0;
+    private static final int DELAY_HIGHLIGHT = 250;
 
     /**
      * Highlighting patterns
      */
     private static final String[] INSTRUCTIONS = new String[] {
-            "add", "display", "delete", "edit", "exit"
+            "add", "display", "delete", "edit", "mark", "exit"
             };
     private static final String PATTERN_INSTRUCTION = "^\\b(" + String.join("|", INSTRUCTIONS) + ")\\b";
     private static final Pattern PATTERN_INPUT = Pattern.compile(
@@ -68,7 +69,7 @@ public class CommandInputController {
         // Set highlighting
         EventStream<?> richChanges = this._inputField.richChanges();
         richChanges
-                .successionEnds(Duration.ofMillis(500))
+                .successionEnds(Duration.ofMillis(DELAY_HIGHLIGHT))
                 .supplyTask(this::computeHighlightingAsync)
                 .awaitLatest(richChanges)
                 .filterMap(t -> {
@@ -133,7 +134,7 @@ public class CommandInputController {
         StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
         while (matcher.find()) {
             String styleClass =
-                    matcher.group("INST") != null ? "keyword" : null;
+                    matcher.group("INST") != null ? matcher.group("INST") : null;
             assert styleClass != null; /* never happens */
             spansBuilder.add(Collections.emptyList(), matcher.start() - lastKeywordEnd);
             spansBuilder.add(Collections.singleton(styleClass), matcher.end() - matcher.start());
