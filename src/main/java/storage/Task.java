@@ -8,7 +8,7 @@ public class Task implements Comparable<Task> {
      * Constants
      */
     private final int NUMBER_OF_ATTRIBUTES_TO_SERIALIZE = 5;
-    private final String CSV_DELIMITER = ", ";
+    private final String CSV_DELIMITER = "\", \"";
 
     /**
      * Properties
@@ -161,6 +161,22 @@ public class Task implements Comparable<Task> {
      */
     public void setId(Integer id) {
         this._id = id;
+    }
+
+    public void setTaskName(String taskname) {
+        this._taskName = taskname;
+    }
+
+    public void setDescription(String description) {
+        this._description = description;
+    }
+
+    public void setStartTime(LocalDateTime start) {
+        this._startTime = start;
+    }
+
+    public void setEndTime(LocalDateTime end) {
+        this._endTime = end;
     }
 
     public void setPriority(Priority priority) {

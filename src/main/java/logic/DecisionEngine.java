@@ -5,9 +5,9 @@ import shared.ExecutionResult;
 import shared.ViewType;
 import skeleton.CollectionSpec;
 import skeleton.DecisionEngineSpec;
-import skeleton.TaskSchedulerSpec;
+import skeleton.SchedulerSpec;
+import storage.Storage;
 import storage.Task;
-import storage.TaskCollection;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,52 +37,92 @@ public class DecisionEngine implements DecisionEngineSpec {
     }
 
     /**
+     * checks whether the supplied command is completely defined (name, start time, end time, etc)
+     * this information may then be used to decide if the Scheduler should be called
+     *
+     * @param cmd
+     * @return
+     */
+    boolean isCommandComplete(Command cmd) {
+        boolean hasName = cmd.hasParameter(Command.ParamName.TASK_NAME);
+        boolean hasStart = cmd.hasParameter(Command.ParamName.TASK_START);
+        boolean hasEnd = cmd.hasParameter(Command.ParamName.TASK_END);
+
+        boolean isComplete = hasName && hasStart && hasEnd;
+        return isComplete;
+    }
+
+    boolean isCommmandQuery(Command cmd) {
+        return cmd.hasParameter(Command.ParamName.SEARCH_QUERY);
+    }
+
+    /**
      * creates a Task from a specified command object when it makes sense
      * we should blow up when creating a Task doesn't really make sense
      * @param cmd
      * @return
      */
-    protected Task createTask(Command command) {
-        String taskName = command.getParameter(Command.ParamName.TASK_NAME);
-        assert taskName != null; // Command validity should have already been handled by CommandParser
+    protected Task createTask(Command cmd) {
+        // initialisation
+        String name = null;
+        LocalDateTime from = null;
+        LocalDateTime to = null;
 
-        // Description is optional
-        String taskDescription = command.getParameter(Command.ParamName.TASK_DESCRIPTION);
+        // for each command parameter, check if it was supplied
+        // if so, extract the value and set the appropriate reference above to point to the extracted value
+        if (cmd.hasParameter(Command.ParamName.TASK_NAME)) {
+            name = cmd.getParameter(Command.ParamName.TASK_NAME);
+        }
+        if (cmd.hasParameter(Command.ParamName.TASK_START)) {
+            from = cmd.getParameter(Command.ParamName.TASK_START);
+        }
+        if (cmd.hasParameter(Command.ParamName.TASK_END)) {
+            to = cmd.getParameter(Command.ParamName.TASK_END);
+        }
 
-        // Same for the dates
-        LocalDateTime taskStart = command.getParameter(Command.ParamName.TASK_START);
-        LocalDateTime taskEnd   = command.getParameter(Command.ParamName.TASK_END);
-
-        return new Task(null, taskName, taskDescription, taskStart, taskEnd);
+        // we now build the Task object for adding into the store
+        return new Task(null, name, "", from, to);
     }
 
-    protected ExecutionResult handleAdd(Command command) {
-        assert command.hasInstruction(Command.Instruction.ADD);
+    protected ExecutionResult displayAllTasks() {
+        List<Task> listToDisplay = this.getTaskCollection().getAll();
+        return new ExecutionResult(ViewType.TASK_LIST, listToDisplay);
+    }
 
-        Task taskToAdd = this.createTask(command);
+
+    protected ExecutionResult handleAdd(Command cmd) {
+        assert cmd.hasInstruction(Command.Instruction.ADD);
+
+        Task taskToAdd = this.createTask(cmd);
         this.getTaskCollection().add(taskToAdd);
 
-        return this.handleDisplay(command);
+        return this.displayAllTasks();
     }
 
     protected ExecutionResult handleEdit(Command command) {
         assert command.hasInstruction(Command.Instruction.EDIT);
 
-        Integer id = command.getIndex();
-        assert id != null; // This should already be handled at Parser
+        Integer index = command.getIndex();
+        assert index != null;
+        Task task = this.getTaskCollection().get(index);
 
-        Task updatedTask = this.createTask(command);
-        updatedTask.setId(id);
-        this.getTaskCollection().edit(id, updatedTask);
+        // check which parameters have changed
+        if (command.hasParameter(Command.ParamName.TASK_NAME)) {
+            task.setTaskName(command.getParameter(Command.ParamName.TASK_NAME));
+        }
+        if (command.hasParameter(Command.ParamName.TASK_START)) {
+            task.setStartTime(command.getParameter(Command.ParamName.TASK_START));
+        }
+        if (command.hasParameter(Command.ParamName.TASK_END)) {
+            task.setEndTime(command.getParameter(Command.ParamName.TASK_END));
+        }
 
-        return this.handleDisplay(command);
+        return this.displayAllTasks();
     }
 
-    protected ExecutionResult handleDisplay(Command command) {
-        assert command.hasInstruction(Command.Instruction.DISPLAY);
-
-        List<Task> listToDisplay = this.getTaskCollection().getAll();
-        return new ExecutionResult(ViewType.TASK_LIST, listToDisplay);
+    protected ExecutionResult handleDisplay(Command cmd) {
+        assert cmd.hasInstruction(Command.Instruction.DISPLAY);
+        return this.displayAllTasks();
     }
 
     protected ExecutionResult handleDelete(Command command) {
@@ -92,7 +132,7 @@ public class DecisionEngine implements DecisionEngineSpec {
         assert id != null;
 
         this.getTaskCollection().remove(id);
-        return this.handleDisplay(command);
+        return this.displayAllTasks();
     }
 
     protected ExecutionResult handleSearch(Command command) {
@@ -160,10 +200,9 @@ public class DecisionEngine implements DecisionEngineSpec {
         return result;
     }
 
-
     @Override
-    public TaskSchedulerSpec getTaskScheduler() {
-        return TaskScheduler.getInstance();
+    public SchedulerSpec getTaskScheduler() {
+        return Scheduler.getInstance();
     }
 
     @Override
@@ -173,7 +212,7 @@ public class DecisionEngine implements DecisionEngineSpec {
 
     @Override
     public CollectionSpec<Task> getTaskCollection() {
-        return TaskCollection.getInstance();
+        return Storage.getInstance();
     }
 
     private static Pattern buildPowerSearchPattern(Command command) {
