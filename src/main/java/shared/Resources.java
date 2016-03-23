@@ -1,6 +1,7 @@
 package shared;
 
 import javafx.fxml.FXMLLoader;
+import javafx.scene.image.Image;
 import javafx.util.Pair;
 
 import java.io.IOException;
@@ -81,5 +82,11 @@ public class Resources {
         String cssPath = String.format("%s%s%s",
                 STRING_PATH_STYLESHEETS, stylesheet, STRING_EXTENSION_STYLESHEETS);
         return this._classLoader.getResource(cssPath).toExternalForm();
+    }
+
+    public Image getImage(String imageName) {
+        String imagePath = "images/" + imageName;
+        String imageFullPath = this._classLoader.getResource(imagePath).toExternalForm();
+        return new Image(imageFullPath);
     }
 }
