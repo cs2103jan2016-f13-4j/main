@@ -9,6 +9,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import exception.ExceptionHandler;
 import storage.Task.Priority;
 
 /**
@@ -36,11 +37,10 @@ public class TaskPriorityComparatorTest {
                 LocalDateTime.of(2016, 3, 8, 23, 59));
         lowPriorityTask.setPriority(Priority.LOW);
 
-        Storage storage = Storage.getInstance();
-        storage.save(mediumPriorityTask);
-        storage.save(lowPriorityTask);
-        storage.save(highPriorityTask);
-        List<Task> taskList = storage.getAll();
+        this.storage_.save(mediumPriorityTask);
+        this.storage_.save(lowPriorityTask);
+        this.storage_.save(highPriorityTask);
+        List<Task> taskList = this.storage_.getAll();
 
         // sort
         Collections.sort(taskList, new TaskPriorityComparator());
@@ -58,11 +58,10 @@ public class TaskPriorityComparatorTest {
                 LocalDateTime.of(2016, 3, 8, 23, 59));
         Task laterEndTask = new Task(null, "submit project manual", null, LocalDateTime.of(2016, 3, 7, 12, 30),
                 LocalDateTime.of(2016, 3, 9, 7, 00));
-        Storage storage = Storage.getInstance();
-        storage.save(middleEndTask);
-        storage.save(laterEndTask);
-        storage.save(earlierEndTask);
-        List<Task> taskList = storage.getAll();
+        this.storage_.save(middleEndTask);
+        this.storage_.save(laterEndTask);
+        this.storage_.save(earlierEndTask);
+        List<Task> taskList = this.storage_.getAll();
 
         // sort
         Collections.sort(taskList, new TaskPriorityComparator());
@@ -72,4 +71,34 @@ public class TaskPriorityComparatorTest {
         assertEquals(middleEndTask, taskList.get(1));
         assertEquals(laterEndTask, taskList.get(2));
     }
+
+    @Test public void Tasks_with_same_priorites_and_same_end_dates_but_different_creation_times_are_ordered_correctly() {
+
+        try {
+            Task earlierCreationTask = new Task(null, "submit progress report", null,
+                    LocalDateTime.of(2016, 3, 9, 12, 30), LocalDateTime.of(2016, 3, 9, 13, 00));
+            Thread.sleep(3000); // sleep for 3 seconds
+            Task middleCreationTask = new Task(null, "marketing pitch", null, LocalDateTime.of(2016, 3, 8, 12, 30),
+                    LocalDateTime.of(2016, 3, 9, 13, 00));
+            Thread.sleep(3000); // sleep for 3 seconds
+            Task laterCreationTask = new Task(null, "sales meeting", null, LocalDateTime.of(2016, 3, 7, 12, 30),
+                    LocalDateTime.of(2016, 3, 9, 13, 00));
+
+            this.storage_.save(middleCreationTask);
+            this.storage_.save(laterCreationTask);
+            this.storage_.save(earlierCreationTask);
+            List<Task> taskList = this.storage_.getAll();
+
+            // sort
+            Collections.sort(taskList, new TaskPriorityComparator());
+
+            // check that task with the earliest creation time comes first
+            assertEquals(earlierCreationTask, taskList.get(0));
+
+        } catch (InterruptedException e) {
+            ExceptionHandler.handle(e);
+        }
+
+    }
+
 }
