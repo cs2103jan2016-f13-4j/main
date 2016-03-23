@@ -18,6 +18,9 @@ import exception.ExceptionHandler;
  */
 public class DiskIO {
 
+    /**
+     * Properties
+     */
     private static final DiskIO instance = new DiskIO();
 
     public static DiskIO getInstance() {
@@ -68,7 +71,7 @@ public class DiskIO {
 
     public ArrayList<String> write(ArrayList<String> taskStrings) {
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(new File(this._fileName), true));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(this._fileName));
             for (String taskString : taskStrings) {
                 writer.write(taskString);
                 writer.newLine();
