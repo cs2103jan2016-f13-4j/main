@@ -160,8 +160,6 @@ public class Storage implements CollectionSpec<Task> {
      * @param index
      *            the index whose associated Task is to be returned
      * @return the Task to which the specified index is mapped
-     * @throws PrimaryKeyNotFoundException
-     *             if the TreeMap contains no mapping for the index
      */
     @Override public Task get(int index) {
         // check if TreeMap contains the key that is queried
