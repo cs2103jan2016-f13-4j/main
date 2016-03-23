@@ -1,6 +1,5 @@
 package storage;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,11 +13,11 @@ import exception.ExceptionHandler;
 import exception.PrimaryKeyNotFoundException;
 import skeleton.CollectionSpec;
 
-public class TaskCollection implements CollectionSpec<Task> {
+public class Storage implements CollectionSpec<Task> {
 
-    private static final TaskCollection instance = new TaskCollection();
+    private static final Storage instance = new Storage();
 
-    public static TaskCollection getInstance() {
+    public static Storage getInstance() {
         return instance;
     }
 
@@ -30,18 +29,13 @@ public class TaskCollection implements CollectionSpec<Task> {
 
     private DiskIO diskIO_;
 
-    private TaskCollection() {
+    private Storage() {
         this.taskData_ = new TreeMap<>();
         this.startTimeTree_ = new TreeMap<>();
         this.endTimeTree_ = new TreeMap<>();
-        this.diskIO_ = new DiskIO(this);
-        // load data from disk when initializing TaskCollection
-        // if there is no existing file, create new file
-        try {
-            this.diskIO_.read();
-        } catch (IOException e) {
-            ExceptionHandler.handle(e);
-        }
+
+        this.diskIO_ = DiskIO.getInstance();
+        this.readFromDisk();
     }
 
     // ----------------------------------------------------------------------------------------
@@ -91,14 +85,13 @@ public class TaskCollection implements CollectionSpec<Task> {
         return task.getId();
     }
 
-    /**
-     * Writes all Task data currently stored in the TreeMap.
-     * 
-     * @return list of Tasks that was written to disk
-     * @throws IOException
-     */
-    public List<Task> writeToDisk() throws IOException {
-        return this.diskIO_.write();
+    public void writeToDisk() {
+        List<Task> taskList = this.getAll();
+        ArrayList<String> taskStrings = new ArrayList<String>();
+        for (Task task : taskList) {
+            taskStrings.add(task.encodeTaskToString());
+        }
+        this.diskIO_.write(taskStrings);
     }
 
     private void addTaskToStartTimeTree(boolean isNewTask, Task newTask, Task oldTask) {
@@ -170,10 +163,15 @@ public class TaskCollection implements CollectionSpec<Task> {
      * @throws PrimaryKeyNotFoundException
      *             if the TreeMap contains no mapping for the index
      */
-    @Override public Task get(int index) throws PrimaryKeyNotFoundException {
+    @Override public Task get(int index) {
         // check if TreeMap contains the key that is queried
         if (!this.taskData_.containsKey(index)) {
-            throw new PrimaryKeyNotFoundException(index);
+            try {
+                throw new PrimaryKeyNotFoundException(index);
+            } catch (PrimaryKeyNotFoundException e) {
+                // TODO Auto-generated catch block
+                ExceptionHandler.handle(e);
+            }
         }
         // key exists, retrieve Task corresponding to key
         return this.taskData_.get(index);
@@ -235,6 +233,16 @@ public class TaskCollection implements CollectionSpec<Task> {
         // TODO: Check if ID does not exist
 
         return this.taskData_.remove(id);
+    }
+
+    public void removeAll() {
+        this.removeAllFromTreeMap(this.taskData_);
+        this.removeAllFromTreeMap(this.startTimeTree_);
+        this.removeAllFromTreeMap(this.endTimeTree_);
+    }
+
+    private void removeAllFromTreeMap(TreeMap<?, ?> treeMap) {
+        treeMap.clear();
     }
 
     // ----------------------------------------------------------------------------------------
@@ -349,6 +357,10 @@ public class TaskCollection implements CollectionSpec<Task> {
         return resultList;
     }
 
+    public TreeMap<Integer, Task> getDataTree() {
+        return taskData_;
+    }
+
     public TreeMap<LocalDateTime, List<Task>> getStartTimeTree() {
         return startTimeTree_;
     }
@@ -373,4 +385,21 @@ public class TaskCollection implements CollectionSpec<Task> {
         diskIO_ = diskIO;
     }
 
+    // ----------------------------------------------------------------------------------------
+    //
+    // VI. Read from file Method
+    //
+    // ----------------------------------------------------------------------------------------
+
+    public void readFromDisk() {
+        ArrayList<String> taskStrings = this.diskIO_.read();
+        for (String taskString : taskStrings) {
+            Task currTask = new Task(null, null, null, null, null);
+            currTask.decodeTaskFromString(taskString);
+            // Set null id to indicate this is a new task to be added, not
+            // an update
+            currTask.setId(null);
+            this.save(currTask);
+        }
+    }
 }

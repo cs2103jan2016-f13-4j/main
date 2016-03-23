@@ -8,7 +8,7 @@ public class Task implements Comparable<Task> {
      * Constants
      */
     private final int NUMBER_OF_ATTRIBUTES_TO_SERIALIZE = 5;
-    private final String CSV_DELIMITER = ", ";
+    private final String CSV_DELIMITER = "\", \"";
 
     /**
      * Properties
@@ -48,7 +48,20 @@ public class Task implements Comparable<Task> {
      *
      */
     public enum Priority {
-        LOW, MEDIUM, HIGH
+        // We want Tasks with high priority to appear nearer the start of the
+        // list
+        LOW(3), MEDIUM(2), HIGH(1); // assign the smallest numeric value to
+                                    // "high"
+
+        private final int PRIORITY_VALUE;
+
+        Priority(int priority) {
+            this.PRIORITY_VALUE = priority;
+        }
+
+        private int getPriorityValue() {
+            return this.PRIORITY_VALUE;
+        }
     };
 
     public String encodeTaskToString() {
@@ -102,7 +115,15 @@ public class Task implements Comparable<Task> {
     }
 
     @Override public int compareTo(Task o) {
-        return this.getId().compareTo(o.getId());
+        // return this.getId().compareTo(o.getId());
+        if (this.getPriority().getPriorityValue() < o.getPriority().getPriorityValue()) {
+            return -1;
+        } else if (this.getPriority().getPriorityValue() > o.getPriority().getPriorityValue()) {
+            return 1;
+        } else {
+            // TODO: Priority are equal, compare number of days to deadline
+            return 0;
+        }
     }
 
     @Override public boolean equals(Object o) {
