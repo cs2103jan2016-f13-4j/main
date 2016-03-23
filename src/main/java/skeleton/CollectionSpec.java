@@ -12,7 +12,7 @@ public interface CollectionSpec<T> {
 
     T remove(int index);
 
-    T get(int index) throws PrimaryKeyNotFoundException;
+    T get(int index);
 
     List<T> getAll();
 
