@@ -1,6 +1,8 @@
 package logic;
 
-import shared.*;
+import shared.Command;
+import shared.ExecutionResult;
+import shared.ViewType;
 import skeleton.CollectionSpec;
 import skeleton.DecisionEngineSpec;
 import skeleton.TaskSchedulerSpec;
@@ -9,6 +11,8 @@ import storage.TaskCollection;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class DecisionEngine implements DecisionEngineSpec {
@@ -94,12 +98,38 @@ public class DecisionEngine implements DecisionEngineSpec {
     protected ExecutionResult handleSearch(Command command) {
         assert command.hasInstruction(Command.Instruction.SEARCH);
 
-        final String query = command.getParameter(Command.ParamName.SEARCH_QUERY);
+        // PowerSearching!
+        String query = command.getParameter(Command.ParamName.SEARCH_QUERY);
+        String[] words = query.split("\\s+");
+        StringBuilder patternBuilder = new StringBuilder();
+        patternBuilder.append("\\b(?:");
+
+        for (int i = 0; i < words.length; i++) {
+            String word = words[i];
+            if (i != 0) {
+                patternBuilder.append("|");
+            }
+
+            for (int j = 0; j < word.length(); j++) {
+                patternBuilder.append("\\w*");
+                patternBuilder.append(word.charAt(j));
+            }
+            patternBuilder.append("\\w*"); // At the end too
+        }
+
+        patternBuilder.append(")\\b");
+        Pattern pattern = Pattern.compile(patternBuilder.toString());
+
         List<Task> foundTask = this.getTaskCollection().getAll()
                 .stream()
-                .filter(item ->
-                        item.getTaskName().contains(query)
-                        && item.getDescription().contains(query))
+                .filter(item -> {
+                    Matcher m = pattern.matcher(item.getTaskName());
+                    if (m.find()) return true;
+
+                    if (item.getDescription() == null) return false;
+                    m = pattern.matcher(item.getDescription());
+                    return m.find();
+                })
                 .collect(Collectors.toList());
 
         return new ExecutionResult(ViewType.TASK_LIST, foundTask);
