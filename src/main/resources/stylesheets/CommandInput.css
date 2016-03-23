@@ -36,5 +36,6 @@
 .param {
     -fx-font-family: "Lato";
     -fx-font-style: italic;
+    -fx-fill: #979797;
 }
 
