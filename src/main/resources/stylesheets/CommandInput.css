@@ -3,6 +3,39 @@
     visibility: hidden;
 }
 
-.red {
-    -fx-text-fill: #fa4646;
+.add {
+    -fx-fill: #46aae2;
+    -fx-font-weight: bold;
 }
+
+.delete {
+    -fx-fill: #fa4646;
+    -fx-font-weight: bold;
+}
+
+.display {
+    -fx-fill: #e78012;
+    -fx-font-weight: bold;
+}
+
+.edit {
+    -fx-fill: #a93bcf;
+    -fx-font-weight: bold;
+}
+
+.exit {
+    -fx-fill: #66af94;
+    -fx-font-weight: bold;
+}
+
+.mark {
+    -fx-fill: #49bb00;
+    -fx-font-weight: bold;
+}
+
+.param {
+    -fx-font-family: "Lato";
+    -fx-font-style: italic;
+    -fx-fill: #979797;
+}
+

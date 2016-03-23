@@ -25,7 +25,6 @@ public class TranslationEngine implements TranslationEngineSpec {
      * Properties
      */
     private Function<Command, ExecutionResult> _commandExecutionHandler;
-    private VisualIndexMapper _indexMapper;
 
     /**
      * Private constructor
@@ -83,6 +82,8 @@ public class TranslationEngine implements TranslationEngineSpec {
                 // Convert list
                 List<Pair<Integer, Task>> visualTaskList =
                         VisualIndexMapper.getInstance().translateRawToVisual(result.getData());
+                // Update mapper with list
+                VisualIndexMapper.getInstance().updateList(result.getData());
                 View view = new TextListView(visualTaskList);
                 this.getUserInterface().render(view);
                 break;
@@ -101,8 +102,7 @@ public class TranslationEngine implements TranslationEngineSpec {
         Command command = this.getCommandParser().parse(commandString);
 
         if (command.getInstruction().getIndex() != null) {
-            assert this._indexMapper != null;
-            this._indexMapper.translateVisualToRaw(command);
+            VisualIndexMapper.getInstance().translateVisualToRaw(command);
         }
 
         // Schedule for displaying

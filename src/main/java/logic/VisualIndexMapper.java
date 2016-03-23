@@ -5,6 +5,7 @@ import shared.Command;
 import storage.Task;
 
 import java.util.List;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -13,22 +14,35 @@ public class VisualIndexMapper {
 
     private static final VisualIndexMapper instance = new VisualIndexMapper();
 
-    private List<Task> _itemsList;
+    private TreeMap<Integer, Task> _itemsMap;
 
     public static VisualIndexMapper getInstance() {
         return instance;
     }
 
-    private VisualIndexMapper() {}
+    private VisualIndexMapper() {
+        this._itemsMap = new TreeMap<>();
+    }
 
     public void updateList(List<Task> list) {
-        this._itemsList = list;
+        // Clear old items
+        this._itemsMap.clear();
+
+        // Populate new map
+        IntStream.range(0, list.size())
+                .forEach(index -> {
+                    this._itemsMap.put(
+                            getVisualIndexFromArrayIndex(index),
+                            list.get(index));
+                });
     }
 
     public void translateVisualToRaw(Command command) {
+        assert this._itemsMap.isEmpty() == false;
         int visualIndex = command.getInstruction().getIndex();
-        Task item = this._itemsList.get(getArrayIndexFromVisualIndex(visualIndex));
+        Task item = this._itemsMap.get(visualIndex);
         int rawIndex = item.getId();
+        // FIXME: Might be null
         command.getInstruction().setIndex(rawIndex);
     }
 
@@ -42,4 +56,7 @@ public class VisualIndexMapper {
         return visualIndex - 1;
     }
 
+    private static int getVisualIndexFromArrayIndex(int arrayIndex) {
+        return arrayIndex + 1;
+    }
 }
