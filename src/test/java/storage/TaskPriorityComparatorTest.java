@@ -94,11 +94,35 @@ public class TaskPriorityComparatorTest {
 
             // check that task with the earliest creation time comes first
             assertEquals(earlierCreationTask, taskList.get(0));
+            assertEquals(middleCreationTask, taskList.get(1));
+            assertEquals(laterCreationTask, taskList.get(2));
 
         } catch (InterruptedException e) {
             ExceptionHandler.handle(e);
         }
 
+    }
+
+    @Test public void Tasks_with_same_priority_end_times_and_creation_times_are_sorted_correctly() {
+        Task taskIndex1 = new Task(null, "report submission", null, LocalDateTime.of(2016, 3, 8, 14, 30),
+                LocalDateTime.of(2016, 3, 8, 17, 00));
+        Task taskIndex2 = new Task(null, "sales team meeting", null, LocalDateTime.of(2016, 3, 8, 12, 00),
+                LocalDateTime.of(2016, 3, 8, 17, 00));
+        Task taskIndex3 = new Task(null, "submit v0.1", null, LocalDateTime.of(2016, 3, 7, 12, 30),
+                LocalDateTime.of(2016, 3, 8, 17, 00));
+
+        this.storage_.save(taskIndex1);
+        this.storage_.save(taskIndex2);
+        this.storage_.save(taskIndex3);
+        List<Task> taskList = this.storage_.getAll();
+
+        // sort
+        Collections.sort(taskList, new TaskPriorityComparator());
+
+        // check that task with index 1 comes first
+        assertEquals(taskIndex1, taskList.get(0));
+        assertEquals(taskIndex2, taskList.get(1));
+        assertEquals(taskIndex3, taskList.get(2));
     }
 
 }
