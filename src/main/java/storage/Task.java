@@ -184,6 +184,22 @@ public class Task implements Comparable<Task> {
         this._id = id;
     }
 
+    public void setTaskName(String taskname) {
+        this._taskName = taskname;
+    }
+
+    public void setDescription(String description) {
+        this._description = description;
+    }
+
+    public void setStartTime(LocalDateTime start) {
+        this._startTime = start;
+    }
+
+    public void setEndTime(LocalDateTime end) {
+        this._endTime = end;
+    }
+
     public void setPriority(Priority priority) {
         this._priority = priority;
     }
