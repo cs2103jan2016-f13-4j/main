@@ -40,6 +40,7 @@ public class DecisionEngineTest {
         this.decisionEngine = DecisionEngine.getInstance();
     }
 
+    /*
     @Test
     public void testCreateTask() {
         ParameterList complete1 = new ParameterList();
@@ -66,5 +67,6 @@ public class DecisionEngineTest {
         assertEquals(task1, expected1);
         assertEquals(task2, expected2);
     }
+    */
 
 }
