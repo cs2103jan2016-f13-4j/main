@@ -6,17 +6,12 @@ import java.util.LinkedHashMap;
 
 public class Command {
 
+    /**
+     * Types
+     */
     public enum Instruction {
-        ADD,
-        DISPLAY,
-        MARK,
-        EDIT,
-        SEARCH,
-        DELETE,
-        EXIT,
-
-        UNRECOGNISED,
-        INVALID;
+        ADD, DISPLAY, MARK, EDIT, SEARCH, DELETE, EXIT,
+        UNRECOGNISED, INVALID;
     }
 
     public enum ParamType {
@@ -36,12 +31,23 @@ public class Command {
         }
     }
 
+    /**
+     * Properties
+     */
     private Instruction _instruction;
     private Integer _index;
     private boolean _isUniversallyQuantified;
     private LinkedHashMap<ParamName, Object> _parameters;
 
+    /**
+     * Constructs a command with the given instruction, index OR quantifier.
+     * @param instruction
+     * @param index
+     * @param isUniversallyQuantified
+     */
     public Command(Instruction instruction, Integer index, boolean isUniversallyQuantified) {
+        assert index == null || !isUniversallyQuantified; // Cannot both have index and universal quantifier
+
         this._instruction = instruction;
         this._index = index;
         this._isUniversallyQuantified = isUniversallyQuantified;

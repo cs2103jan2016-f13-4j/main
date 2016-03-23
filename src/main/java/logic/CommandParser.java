@@ -162,7 +162,7 @@ public class CommandParser implements CommandParserSpec {
         return command;
     }
 
-    LinkedHashMap<String, String> splitCommand(String rawCommandString) {
+    private static LinkedHashMap<String, String> splitCommand(String rawCommandString) {
         // Prepare linked hash map for storing command words
         LinkedHashMap<String, String> commandComponents = new LinkedHashMap<>();
 
