@@ -7,6 +7,7 @@ import skeleton.SchedulerSpec;
 import storage.Task;
 import storage.Storage;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -129,32 +130,52 @@ public class DecisionEngine implements DecisionEngineSpec {
         return new Task(null, name, "", from, to);
     }
 
+    protected ExecutionResult displayAllTasks(Command cmd) {
+        assert cmd.getInstruction().getType() == Instruction.Type.DISPLAY;
+
+        List<Task> listToDisplay = this.getTaskCollection().getAll();
+        return new ExecutionResult(ViewType.TASK_LIST, listToDisplay);
+    }
+
+
     protected ExecutionResult handleAdd(Command cmd) {
         assert cmd.getInstruction().getType() == Instruction.Type.ADD;
 
         Task taskToAdd = this.createTask(cmd);
         this.getTaskCollection().add(taskToAdd);
 
-        return this.handleDisplay(cmd);
+        return this.displayAllTasks(cmd);
     }
 
     protected ExecutionResult handleEdit(Command cmd) {
         assert cmd.getInstruction().getType() == Instruction.Type.EDIT;
 
-        int id = cmd.getInstruction().getIndex();
-        Task updatedTask = this.createTask(cmd);
-        updatedTask.setId(id);
-        this.getTaskCollection().edit(id, updatedTask);
+        ParameterList params = cmd.getParameters();
 
-        return this.handleDisplay(cmd);
+        int id = cmd.getInstruction().getIndex();
+        Task task = this.getTaskCollection().get(id);
+
+        // check which parameters have changed
+        if (params.hasParameterNamed(ParameterName.NAME)) {
+            task.setTaskName((String) params.getParameter(ParameterName.NAME).getValue());
+        }
+        if (params.hasParameterNamed(ParameterName.DATE_FROM)) {
+            task.setStartTime((LocalDateTime) params.getParameter(ParameterName.DATE_FROM).getValue());
+        }
+        if (params.hasParameterNamed(ParameterName.DATE_TO)) {
+            task.setEndTime((LocalDateTime) params.getParameter(ParameterName.DATE_TO).getValue());
+        }
+
+        return this.displayAllTasks(cmd);
     }
 
     protected ExecutionResult handleDisplay(Command cmd) {
-        assert cmd.getInstruction().getType() == Instruction.Type.DISPLAY;
+        assert cmd.getInstruction().getType() == Instruction.Type.EDIT;
 
-        List<Task> listToDisplay = this.getTaskCollection().getAll();
-        return new ExecutionResult(ViewType.TASK_LIST, listToDisplay);
+        return this.displayAllTasks(cmd);
     }
+
+
 
     protected ExecutionResult handleDelete(Command cmd) {
         assert cmd.getInstruction().getType() == Instruction.Type.DELETE;
@@ -162,7 +183,7 @@ public class DecisionEngine implements DecisionEngineSpec {
         int id = cmd.getInstruction().getIndex();
         this.getTaskCollection().remove(id);
 
-        return this.handleDisplay(cmd);
+        return this.displayAllTasks(cmd);
     }
 
     protected ExecutionResult handleSearch(Command cmd) {
