@@ -10,7 +10,7 @@ public class Command {
      * Types
      */
     public enum Instruction {
-        ADD, DISPLAY, MARK, EDIT, SEARCH, DELETE, EXIT,
+        ADD, DISPLAY, MARK, EDIT, SEARCH, UNDO, DELETE, EXIT,
         UNRECOGNISED, INVALID;
     }
 
