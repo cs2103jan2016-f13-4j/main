@@ -49,6 +49,9 @@ public class CommandInputController {
         this.initializeHandlers();
     }
 
+    /**
+     * Sets up all the different highlighting patterns to be shown by the command input field.
+     */
     private void initializeHighlighters() {
         // Prepare the hash map for dealing with finding a command reset instruction
         this._instructionStyleClassMap = new LinkedHashMap<>();
@@ -87,6 +90,10 @@ public class CommandInputController {
         );
     }
 
+    /**
+     * Sets up all the event handlers that will be called upon when
+     * the command input field is being interacted with.
+     */
     private void initializeHandlers() {
         // Set handlers
         this._inputField.setOnKeyPressed(event -> {
@@ -120,6 +127,9 @@ public class CommandInputController {
                 .subscribe(this::applyHighlighting);
     }
 
+    /**
+     * Put the appropriate elements in place, visually.
+     */
     private void initializeLayout() {
         String stylesheet = Resources.getInstance().getStylesheet("CommandInput");
         this._inputField.getStylesheets().add(stylesheet);
@@ -134,6 +144,9 @@ public class CommandInputController {
         AnchorPane.setBottomAnchor(this._inputField, 0.0);
     }
 
+    /**
+     * Starts up or instantiates all the required components
+     */
     private void initializeComponents() {
         this._executor = Executors.newSingleThreadExecutor();
         this._inputField = new StyleClassedTextArea();
@@ -212,14 +225,27 @@ public class CommandInputController {
         return spansBuilder.create();
     }
 
+    /**
+     * TODO: Write JavaDoc
+     * @param highlighting
+     */
     private void applyHighlighting(StyleSpans<Collection<String>> highlighting) {
         this._inputField.setStyleSpans(0, highlighting);
     }
 
+    /**
+     * Performs the concluding actions before the application concludes.
+     */
     public void cleanUp() {
         this._executor.shutdown();
     }
 
+    /**
+     * Create a RegExp pattern in String form to recognise all the instructions
+     * laid out by the {@link CommandParser}.
+     * @param instructions
+     * @return
+     */
     private static String buildInstructionHighlightPattern(List<String> instructions) {
         StringBuilder patternBuilder = new StringBuilder();
         patternBuilder.append("^\\b(");
