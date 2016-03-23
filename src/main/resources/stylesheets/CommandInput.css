@@ -3,6 +3,7 @@
     visibility: hidden;
 }
 
-.red {
-    -fx-text-fill: #fa4646;
+.keyword {
+    -fx-fill: #fa4646;
+    -fx-font-weight: bold;
 }

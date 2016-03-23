@@ -18,6 +18,8 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by maianhvu on 19/03/2016.
@@ -26,28 +28,60 @@ public class CommandInputController {
     private static final double PADDING_HORZ_COMMAND_INPUT = 12.0;
     private static final double PADDING_VERT_COMMAND_INPUT = 18.0;
 
+    /**
+     * Highlighting patterns
+     */
+    private static final String[] INSTRUCTIONS = new String[] {
+            "add", "display", "delete", "edit", "exit"
+            };
+    private static final String PATTERN_INSTRUCTION = "^\\b(" + String.join("|", INSTRUCTIONS) + ")\\b";
+    private static final Pattern PATTERN_INPUT = Pattern.compile(
+            "(?<INST>" + PATTERN_INSTRUCTION + ")"
+    );
+
     @FXML
     private AnchorPane _commandInputContainer;
     private StyleClassedTextArea _inputField;
     private Function<String, Void> _inputSubmissionHandler;
 
-//    private final String[] _keywordsInstruction;
-//    private ExecutorService _executor;
-
-    public CommandInputController() {
-        super();
-
-//        this._executor = Executors.newSingleThreadExecutor();
-//        this._keywordsInstruction = (String[]) Arrays.stream(Instruction.Type.values())
-//                .filter(type -> type.keyword != null)
-//                .map(type -> type.keyword)
-//                .toArray();
-    }
-
+    private ExecutorService _executor;
 
     @FXML public void initialize() {
-        this._inputField = new StyleClassedTextArea();
+        this.initializeComponents();
+        this.initializeLayout();
+        this.initializeHandlers();
+    }
 
+    private void initializeHandlers() {
+        // Set handlers
+        this._inputField.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                assert _inputSubmissionHandler != null;
+                // Throw event handler up to UserInterface
+                _inputSubmissionHandler.apply(_inputField.getText());
+                // Clear the field
+                _inputField.clear();
+                event.consume();
+            }
+        });
+
+        // Set highlighting
+        EventStream<?> richChanges = this._inputField.richChanges();
+        richChanges
+                .successionEnds(Duration.ofMillis(500))
+                .supplyTask(this::computeHighlightingAsync)
+                .awaitLatest(richChanges)
+                .filterMap(t -> {
+                    if (t.isSuccess()) {
+                        return Optional.of(t.get());
+                    } else {
+                        return Optional.empty();
+                    }
+                })
+                .subscribe(this::applyHighlighting);
+    }
+
+    private void initializeLayout() {
         String stylesheet = Resources.getInstance().getStylesheet("CommandInput");
         this._inputField.getStylesheets().add(stylesheet);
 
@@ -59,37 +93,11 @@ public class CommandInputController {
         AnchorPane.setRightAnchor(this._inputField, PADDING_HORZ_COMMAND_INPUT);
         AnchorPane.setTopAnchor(this._inputField, PADDING_VERT_COMMAND_INPUT);
         AnchorPane.setBottomAnchor(this._inputField, 0.0);
+    }
 
-        // Set handlers
-        this._inputField.setOnKeyPressed(event -> {
-
-            if (event.getCode() == KeyCode.ENTER) {
-                assert _inputSubmissionHandler != null;
-                // Throw event handler up to UserInterface
-                _inputSubmissionHandler.apply(_inputField.getText());
-                // Clear the field
-                _inputField.clear();
-                event.consume();
-            } else {
-
-            }
-        });
-
-        // Set highlighting
-//        EventStream<?> richChanges = this._inputField.richChanges();
-//        richChanges
-//                .successionEnds(Duration.ofMillis(500))
-//                .supplyTask(this::computeHighlightingAsync)
-//                .awaitLatest(richChanges)
-//                .filterMap(t -> {
-//                    if (t.isSuccess()) {
-//                        return Optional.of(t.get());
-//                    } else {
-//                        return Optional.empty();
-//                    }
-//                })
-//                .subscribe(this::applyHighlighting);
-
+    private void initializeComponents() {
+        this._executor = Executors.newSingleThreadExecutor();
+        this._inputField = new StyleClassedTextArea();
         this._commandInputContainer.getChildren().add(this._inputField);
     }
 
@@ -110,31 +118,29 @@ public class CommandInputController {
                 return computeHighlighting(text);
             }
         };
-//        this._executor.execute(task);
+        this._executor.execute(task);
         return task;
     }
 
-    private StyleSpans<Collection<String>> computeHighlighting(String text) {
-        StyleSpansBuilder<Collection<String>> spansBuilder =
-                new StyleSpansBuilder<>();
-
-        int firstWordStart = 0;
-        int firstWordEnd = text.indexOf(' ');
-        String instruction = text.substring(firstWordStart, firstWordEnd);
-
-        boolean match = false;
-        for (String keyword : Collections.singleton("Hello")) {
-            if (instruction.equals(keyword)) {
-                match = true;
-                break;
-            }
+    /**
+     * TODO: Write JavaDoc
+     * @param text
+     * @return
+     */
+    private static StyleSpans<Collection<String>> computeHighlighting(String text) {
+        Matcher matcher = PATTERN_INPUT.matcher(text);
+        int lastKeywordEnd = 0;
+        StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
+        while (matcher.find()) {
+            String styleClass =
+                    matcher.group("INST") != null ? "keyword" : null;
+            assert styleClass != null; /* never happens */
+            spansBuilder.add(Collections.emptyList(), matcher.start() - lastKeywordEnd);
+            spansBuilder.add(Collections.singleton(styleClass), matcher.end() - matcher.start());
+            lastKeywordEnd = matcher.end();
         }
 
-        if (match) {
-            spansBuilder.add(Collections.singleton("red"), firstWordEnd - firstWordStart);
-        }
-
-        spansBuilder.add(Collections.emptyList(), text.length() - firstWordEnd);
+        spansBuilder.add(Collections.emptyList(), text.length() - lastKeywordEnd);
         return spansBuilder.create();
     }
 
@@ -143,6 +149,6 @@ public class CommandInputController {
     }
 
     public void cleanUp() {
-//        this._executor.shutdown();
+        this._executor.shutdown();
     }
 }
