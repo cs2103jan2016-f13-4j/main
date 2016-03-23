@@ -115,30 +115,7 @@ public class Task implements Comparable<Task> {
     }
 
     @Override public int compareTo(Task o) {
-        if (this.getPriority().getPriorityValue() < o.getPriority().getPriorityValue()) {
-            return -1;
-        } else if (this.getPriority().getPriorityValue() > o.getPriority().getPriorityValue()) {
-            return 1;
-        } else {
-            // TODO: Priority are equal, compare number of days to deadline
-            if (this.getEndTime().isBefore(o.getEndTime())) {
-                return -1;
-            } else if (this.getEndTime().isAfter(o.getEndTime())) {
-                return 1;
-            } else {
-                // TODO: Priority and end times are equal, compare number of
-                // days since creation of Task
-                if (this.getCreationTime().isBefore(o.getCreationTime())) {
-                    // more days since creation means the Task is more urgent
-                    return -1;
-                } else if (this.getCreationTime().isAfter(o.getCreationTime())) {
-                    return 1;
-                }
-                // Priority, end time and creation time are equal
-                // Order by Task ID
-                return this.getId().compareTo(o.getId());
-            }
-        }
+        return this.getId().compareTo(o.getId());
     }
 
     @Override public boolean equals(Object o) {
