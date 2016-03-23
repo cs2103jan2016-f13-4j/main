@@ -108,22 +108,22 @@ public class DecisionEngine implements DecisionEngineSpec {
     protected Task createTask(Command cmd) {
         ParameterList params = cmd.getParameters();
 
+        // initialisation
+        String name = null;
+        LocalDateTime from = null;
+        LocalDateTime to = null;
 
-        // extract all the essential information out of the command
-        // the asserts ensure that we blow up if any error was made
-        // during the creation of the Command object in the Command Parser
-        ParameterValue nameRaw = params.getParameter(ParameterName.NAME);
-        assert (nameRaw.getValue() instanceof String);
-        String name = (String) nameRaw.getValue();
-
-        ParameterValue fromRaw = params.getParameter(ParameterName.DATE_FROM);
-        assert (fromRaw.getValue() instanceof LocalDateTime);
-        LocalDateTime from = (LocalDateTime) fromRaw.getValue();
-
-        ParameterValue toRaw = params.getParameter(ParameterName.DATE_TO);
-        assert (toRaw.getValue() instanceof LocalDateTime);
-        LocalDateTime to = (LocalDateTime) toRaw.getValue();
-
+        // for each command parameter, check if it was supplied
+        // if so, extract the value and set the appropriate reference above to point to the extracted value
+        if (params.hasParameterNamed(ParameterName.NAME)) {
+            name = (String) params.getParameter(ParameterName.NAME).getValue();
+        }
+        if (params.hasParameterNamed(ParameterName.DATE_FROM)) {
+            from = (LocalDateTime) params.getParameter(ParameterName.DATE_FROM).getValue();
+        }
+        if (params.hasParameterNamed(ParameterName.DATE_TO)) {
+            to = (LocalDateTime) params.getParameter(ParameterName.DATE_TO).getValue();
+        }
 
         // we now build the Task object for adding into the store
         return new Task(null, name, "", from, to);
