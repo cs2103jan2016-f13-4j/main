@@ -32,3 +32,9 @@
     -fx-fill: #49bb00;
     -fx-font-weight: bold;
 }
+
+.param {
+    -fx-font-family: "Lato";
+    -fx-font-style: italic;
+}
+

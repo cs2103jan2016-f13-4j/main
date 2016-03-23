@@ -36,8 +36,10 @@ public class CommandInputController {
             "add", "display", "delete", "edit", "mark", "exit"
             };
     private static final String PATTERN_INSTRUCTION = "^\\b(" + String.join("|", INSTRUCTIONS) + ")\\b";
+    private static final String PATTERN_PARAMETER = "\\b\\w+:";
     private static final Pattern PATTERN_INPUT = Pattern.compile(
             "(?<INST>" + PATTERN_INSTRUCTION + ")"
+            + "|(?<PARAM>" + PATTERN_PARAMETER + ")"
     );
 
     @FXML
@@ -57,9 +59,14 @@ public class CommandInputController {
         // Set handlers
         this._inputField.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ENTER) {
+
                 assert _inputSubmissionHandler != null;
+
                 // Throw event handler up to UserInterface
-                _inputSubmissionHandler.apply(_inputField.getText());
+                String rawCommand = _inputField.getText();
+                System.out.println(rawCommand);
+                _inputSubmissionHandler.apply(rawCommand);
+
                 // Clear the field
                 _inputField.clear();
                 event.consume();
@@ -132,12 +139,26 @@ public class CommandInputController {
         Matcher matcher = PATTERN_INPUT.matcher(text);
         int lastKeywordEnd = 0;
         StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
+
+        String instructionClass = null;
         while (matcher.find()) {
-            String styleClass =
-                    matcher.group("INST") != null ? matcher.group("INST") : null;
-            assert styleClass != null; /* never happens */
+            // Fill in previous non-highlighted part
             spansBuilder.add(Collections.emptyList(), matcher.start() - lastKeywordEnd);
-            spansBuilder.add(Collections.singleton(styleClass), matcher.end() - matcher.start());
+
+            // Highlight instruction
+            if (instructionClass == null && matcher.group("INST") != null) {
+                instructionClass = matcher.group("INST");
+                spansBuilder.add(Collections.singleton(instructionClass), matcher.end() - matcher.start());
+            }
+            // Highlight parameters
+            else if (matcher.group("PARAM") != null) {
+                Collection<String> classes = new ArrayList<>();
+                classes.add("param");
+                if (instructionClass != null) {
+                    classes.add("param__" + instructionClass);
+                }
+                spansBuilder.add(classes, matcher.end() - matcher.start());
+            }
             lastKeywordEnd = matcher.end();
         }
 
