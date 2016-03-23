@@ -37,11 +37,12 @@ public class VisualIndexMapperTest {
     public void Mapper_transforms_visual_command_into_raw_command() {
         getMapper().updateList(buildTaskList());
         Command deleteCommand = new Command(
-                new Instruction(Instruction.Type.DELETE, 1),
-                ParameterList.emptyList()
+                Command.Instruction.DELETE,
+                1,
+                false
         );
         getMapper().translateVisualToRaw(deleteCommand);
-        assertThat(deleteCommand.getInstruction().getIndex(), is(equalTo(51)));
+        assertThat(deleteCommand.getIndex(), is(equalTo(51)));
     }
 
     private static List<Task> buildTaskList() {
