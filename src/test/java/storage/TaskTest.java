@@ -10,7 +10,7 @@ import org.junit.Test;
 
 /**
  * 
- * @author Huiyie
+ * @@author Chng Hui Yie
  *
  */
 

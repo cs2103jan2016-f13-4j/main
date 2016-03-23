@@ -20,7 +20,7 @@ import exception.ExceptionHandler;
 
 /**
  *
- * @author Huiyie
+ * @@author Chng Hui Yie
  *
  */
 public class DiskIOTest {
