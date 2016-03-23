@@ -35,7 +35,7 @@ public class Storage implements CollectionSpec<Task> {
         this.endTimeTree_ = new TreeMap<>();
 
         this.diskIO_ = DiskIO.getInstance();
-        this.readFromDisk();
+        // this.readFromDisk();
     }
 
     // ----------------------------------------------------------------------------------------
