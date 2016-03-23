@@ -40,7 +40,7 @@ public class Task implements Comparable<Task> {
             this.PRIORITY_VALUE = priority;
         }
 
-        private int getPriorityValue() {
+        public int getPriorityValue() {
             return this.PRIORITY_VALUE;
         }
     };
