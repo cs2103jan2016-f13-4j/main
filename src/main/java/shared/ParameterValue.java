@@ -8,9 +8,8 @@ import java.time.LocalDateTime;
 public class ParameterValue {
     private Object value_ = null;
 
-    // to make this class symmetric to the ParameterName enum, we disallow direct
-    // construction and require a factory class method (called parseParamValue)
-    private ParameterValue(Object value) {
+    // CAUTION: no checks made for appropriate type of value
+    public ParameterValue(Object value) {
         this.value_ = value;
     }
 
@@ -18,7 +17,7 @@ public class ParameterValue {
         return this.value_;
     }
 
-    // factory method to create a ParameterValue object
+    // factory method to create a ParameterValue object, ensures the name is correct
     public static ParameterValue parseParamValue(String strToParse, ParameterName associatedName) {
         assert strToParse != null;
         assert associatedName != null;
