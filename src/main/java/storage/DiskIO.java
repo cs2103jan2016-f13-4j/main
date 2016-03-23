@@ -24,7 +24,7 @@ public class DiskIO {
         return instance;
     }
 
-/**
+    /**
      * Properties
      */
 
@@ -33,7 +33,15 @@ public class DiskIO {
 
     private DiskIO() {
         this._fileName = this.DEFAULT_FILE_NAME;
+        createDirectory();
+    }
 
+    public void setFileName(String fileName) {
+        this._fileName = fileName;
+        createDirectory();
+    }
+
+    public void createDirectory() {
         // Try to create directory
         File folder = new File(this._fileName).getParentFile();
         folder.mkdirs();

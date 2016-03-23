@@ -140,6 +140,7 @@ public class DiskIOTest {
         taskStrings.add(taskString1);
         taskStrings.add(taskString2);
 
+        this._diskIO.setFileName("tmp/ToDoData.csv");
         this._diskIO.write(taskStrings);
 
         BufferedReader reader = new BufferedReader(new FileReader("tmp/ToDoData.csv"));
