@@ -18,16 +18,18 @@ import exception.ExceptionHandler;
  */
 public class DiskIO {
 
+<<<<<<< 140ccfa5ec8db7155d3dfcefdc3dd1bf03b66c59
     private static final DiskIO instance = new DiskIO();
 
     public static DiskIO getInstance() {
         return instance;
     }
 
-/**
+=======
+    /**
      * Properties
      */
-
+>>>>>>> add new Command syntax
     private String _fileName;
     private final String DEFAULT_FILE_NAME = "tmp/ToDoData.csv";
 

@@ -10,10 +10,19 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 
+/**
+ * @@author Mai Anh Vu
+ */
 public class VisualIndexMapper {
 
+    /**
+     * Singleton instance
+     */
     private static final VisualIndexMapper instance = new VisualIndexMapper();
 
+    /**
+     * Properties
+     */
     private TreeMap<Integer, Task> _itemsMap;
 
     public static VisualIndexMapper getInstance() {
@@ -39,21 +48,17 @@ public class VisualIndexMapper {
 
     public void translateVisualToRaw(Command command) {
         assert this._itemsMap.isEmpty() == false;
-        int visualIndex = command.getInstruction().getIndex();
+        int visualIndex = command.getIndex();
         Task item = this._itemsMap.get(visualIndex);
         int rawIndex = item.getId();
         // FIXME: Might be null
-        command.getInstruction().setIndex(rawIndex);
+        command.setIndex(rawIndex);
     }
 
     public List<Pair<Integer, Task>> translateRawToVisual(List<Task> rawList) {
         return IntStream.range(0, rawList.size())
                 .mapToObj(index -> new Pair<>(index + 1, rawList.get(index)))
                 .collect(Collectors.toList());
-    }
-
-    private static int getArrayIndexFromVisualIndex(int visualIndex) {
-        return visualIndex - 1;
     }
 
     private static int getVisualIndexFromArrayIndex(int arrayIndex) {

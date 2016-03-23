@@ -2,19 +2,19 @@ package ui.controller;
 
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.scene.control.ScrollBar;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.text.Font;
 import org.fxmisc.richtext.StyleClassedTextArea;
 import org.fxmisc.richtext.StyleSpans;
 import org.fxmisc.richtext.StyleSpansBuilder;
 import org.reactfx.EventStream;
-import shared.Instruction;
 import shared.Resources;
 
 import java.time.Duration;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Function;
@@ -22,7 +22,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Created by maianhvu on 19/03/2016.
+ * @@author Mai Anh Vu
  */
 public class CommandInputController {
     private static final double PADDING_HORZ_COMMAND_INPUT = 12.0;
@@ -64,7 +64,6 @@ public class CommandInputController {
 
                 // Throw event handler up to UserInterface
                 String rawCommand = _inputField.getText();
-                System.out.println(rawCommand);
                 _inputSubmissionHandler.apply(rawCommand);
 
                 // Clear the field
