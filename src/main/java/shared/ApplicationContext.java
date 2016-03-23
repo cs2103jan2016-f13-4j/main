@@ -2,6 +2,9 @@ package shared;
 
 import javafx.stage.Stage;
 
+/**
+ * @@author Mai Anh Vu
+ */
 public class ApplicationContext {
 
     /**

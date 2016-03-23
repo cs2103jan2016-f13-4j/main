@@ -1,44 +1,97 @@
 package shared;
 
-import javafx.util.Pair;
+import exception.ExceptionHandler;
 
+import java.util.LinkedHashMap;
+
+/**
+ * @author Thenaesh Elango
+ */
 public class Command {
 
     /**
-     * Constants
+     * Types
      */
-    private static final Instruction INSTRUCTION_COMMAND_INITIAL = new Instruction(Instruction.Type.DISPLAY);
-    private static final ParameterList PARAMETERS_COMMAND_INITIAL = null;
+    public enum Instruction {
+        ADD, DISPLAY, MARK, EDIT, SEARCH, UNDO, DELETE, EXIT,
+        UNRECOGNISED, INVALID;
+    }
+
+    public enum ParamType {
+        STRING, INTEGER, DATE, DOUBLE
+    }
+
+    public enum ParamName {
+        TASK_NAME(ParamType.STRING),
+        TASK_DESCRIPTION(ParamType.STRING),
+        TASK_START(ParamType.DATE),
+        TASK_END(ParamType.DATE),
+        SEARCH_QUERY(ParamType.STRING);
+
+        public final ParamType type;
+        ParamName(ParamType t) {
+            type = t;
+        }
+    }
 
     /**
      * Properties
      */
-    private final Instruction instruction_;
-    private final ParameterList parameters_;
+    private Instruction _instruction;
+    private Integer _index;
+    private boolean _isUniversallyQuantified;
+    private LinkedHashMap<ParamName, Object> _parameters;
 
     /**
-     * Constructs a command based on the supplied type and parameters
+     * Constructs a command with the given instruction, index OR quantifier.
      * @param instruction
-     * @param parameters
+     * @param index
+     * @param isUniversallyQuantified
      */
-    public Command(Instruction instruction, ParameterList parameters) {
-        this.instruction_ = instruction;
-        this.parameters_ = parameters;
+    public Command(Instruction instruction, Integer index, boolean isUniversallyQuantified) {
+        assert index == null || !isUniversallyQuantified; // isUniversallyQuantified => (index == null)
+
+        this._instruction = instruction;
+        this._index = index;
+        this._isUniversallyQuantified = isUniversallyQuantified;
+        this._parameters = new LinkedHashMap<>();
     }
 
-    /**
-     * Constructs the first command to be executed by the application stack
-     * @return the required initial command
-     */
-    public static Command getInitialCommand() {
-        return new Command(INSTRUCTION_COMMAND_INITIAL, PARAMETERS_COMMAND_INITIAL);
+    public void setIndex(int index) {
+        this._index = index;
+    }
+
+    public Integer getIndex() {
+        return this._index;
+    }
+
+    public boolean isUniversallyQuantified() {
+        return this._isUniversallyQuantified;
     }
 
     public Instruction getInstruction() {
-        return this.instruction_;
+        return this._instruction;
     }
 
-    public ParameterList getParameters() {
-        return this.parameters_;
+    public void setParameter(ParamName name, Object value) {
+        this._parameters.put(name, value);
+    }
+
+    public <T> T getParameter(ParamName name) {
+        try {
+            return (T) this._parameters.get(name);
+        } catch (ClassCastException e) {
+            ExceptionHandler.handle(e);
+            assert false; // We don't want this to happen
+            return null;
+        }
+    }
+
+    public boolean hasInstruction(Instruction instruction) {
+        return this._instruction == instruction;
+    }
+
+    public boolean hasParameter(ParamName name) {
+        return this._parameters.containsKey(name);
     }
 }

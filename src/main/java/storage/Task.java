@@ -2,13 +2,16 @@ package storage;
 
 import java.time.LocalDateTime;
 
+/**
+ * @@author Chng Hui Yie
+ */
 public class Task implements Comparable<Task> {
 
     /**
      * Constants
      */
     private final int NUMBER_OF_ATTRIBUTES_TO_SERIALIZE = 5;
-    private final String CSV_DELIMITER = ", ";
+    private final String CSV_DELIMITER = "\", \"";
 
     /**
      * Properties
@@ -21,6 +24,29 @@ public class Task implements Comparable<Task> {
     private final LocalDateTime _creationTime;
     private boolean _isCompleted;
     private Priority _priority;
+
+    /**
+     * Priority types
+     * 
+     * @author Huiyie
+     *
+     */
+    public enum Priority {
+        // We want Tasks with high priority to appear nearer the start of the
+        // list
+        LOW(3), MEDIUM(2), HIGH(1); // assign the smallest numeric value to
+                                    // "high"
+
+        private final int PRIORITY_VALUE;
+
+        Priority(int priority) {
+            this.PRIORITY_VALUE = priority;
+        }
+
+        public int getPriorityValue() {
+            return this.PRIORITY_VALUE;
+        }
+    };
 
     /**
      * TODO: Write JavaDoc
@@ -37,19 +63,9 @@ public class Task implements Comparable<Task> {
         this._description = description;
         this._startTime = startTime;
         this._endTime = endTime;
-
+        this._priority = Priority.LOW; // default priority is set to low
         this._creationTime = LocalDateTime.now();
     }
-
-    /**
-     * Priority types
-     * 
-     * @author Huiyie
-     *
-     */
-    public enum Priority {
-        LOW, MEDIUM, HIGH
-    };
 
     public String encodeTaskToString() {
         StringBuilder sb = new StringBuilder();
@@ -161,6 +177,22 @@ public class Task implements Comparable<Task> {
      */
     public void setId(Integer id) {
         this._id = id;
+    }
+
+    public void setTaskName(String taskname) {
+        this._taskName = taskname;
+    }
+
+    public void setDescription(String description) {
+        this._description = description;
+    }
+
+    public void setStartTime(LocalDateTime start) {
+        this._startTime = start;
+    }
+
+    public void setEndTime(LocalDateTime end) {
+        this._endTime = end;
     }
 
     public void setPriority(Priority priority) {

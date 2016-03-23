@@ -4,6 +4,9 @@ import java.util.List;
 
 import exception.PrimaryKeyNotFoundException;
 
+/**
+ * @@author Mai Anh Vu
+ */
 public interface CollectionSpec<T> {
 
     int add(T item);
@@ -12,7 +15,7 @@ public interface CollectionSpec<T> {
 
     T remove(int index);
 
-    T get(int index) throws PrimaryKeyNotFoundException;
+    T get(int index);
 
     List<T> getAll();
 

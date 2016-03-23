@@ -6,6 +6,9 @@ import logic.Dispatcher;
 import shared.ApplicationContext;
 import skeleton.DispatcherSpec;
 
+/**
+ * @@author Mai Anh Vu
+ */
 public class Launcher extends Application {
 
     public static void main(String[] args) {

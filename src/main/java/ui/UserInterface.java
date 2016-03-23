@@ -1,14 +1,12 @@
 package ui;
 
-import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.input.KeyCode;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Pair;
-import org.fxmisc.richtext.StyleClassedTextArea;
 import shared.ApplicationContext;
 import shared.Resources;
 import skeleton.UserInterfaceSpec;
@@ -20,7 +18,7 @@ import ui.view.View;
 import java.util.function.Function;
 
 /**
- * @author maianhvu
+ * @@author Mai Anh Vu
  */
 public class UserInterface implements UserInterfaceSpec {
 
@@ -28,9 +26,9 @@ public class UserInterface implements UserInterfaceSpec {
      * Constants
      */
     private static final String[] SOURCES_FONT = {
-            "Lato-Bold.ttf",
-            "Lato-Italic.ttf",
-            "Lato-Regular.ttf"
+            "Lato-Bold",
+            "Lato-Italic",
+            "Lato-Regular"
     };
     private static final double SIZE_FONT_DEFAULT = 16.0;
     private static final String STYLE_CLASS_CONTAINER_MAIN = "container--main";
@@ -47,6 +45,7 @@ public class UserInterface implements UserInterfaceSpec {
     private Stage _primaryStage;
     private BorderPane _rootView;
     private HeaderController _headerController;
+    private CommandInputController _commandInputController;
 
     private AnchorPane _mainContainer;
 
@@ -66,9 +65,10 @@ public class UserInterface implements UserInterfaceSpec {
     @Override public void initialize() {
         // Set primary stage
         this._primaryStage = ApplicationContext.getPrimaryStage();
+        this._primaryStage.getIcons().add(Resources.getInstance().getImage("mom.png"));
         assert (this._primaryStage == null);
 
-        //this.initializeFonts();
+        this.initializeFonts();
 
         this.setRootView();
         this.registerHeader();
@@ -78,12 +78,12 @@ public class UserInterface implements UserInterfaceSpec {
 
     private void initializeFonts() {
         for (String font : SOURCES_FONT) {
-            Font.loadFont(Resources.getFontUrl(font), SIZE_FONT_DEFAULT);
+            Font.loadFont(Resources.getInstance().getFontUrl(font), SIZE_FONT_DEFAULT);
         }
     }
 
     private void setRootView() {
-        this._rootView = Resources.getComponent("Window");
+        this._rootView = Resources.getInstance().getComponent("Window");
 
         this._primaryStage.setScene(new Scene(this._rootView));
         this._primaryStage.setTitle("Your MOM");
@@ -114,7 +114,7 @@ public class UserInterface implements UserInterfaceSpec {
 
     private void registerHeader() {
         Pair<AnchorPane, HeaderController> headerMetadata =
-                Resources.getComponentAndController("HeaderWrapper");
+                Resources.getInstance().getComponentAndController("HeaderWrapper");
 
         AnchorPane headerWrapper = headerMetadata.getKey();
         this._headerController = headerMetadata.getValue();
@@ -126,26 +126,17 @@ public class UserInterface implements UserInterfaceSpec {
         assert (this._commandInputHandler != null);
 
         Pair<AnchorPane, CommandInputController> inputMetadata =
-                Resources.getComponentAndController("CommandInputWrapper");
+                Resources.getInstance().getComponentAndController("CommandInputWrapper");
 
         assert inputMetadata != null;
 
         AnchorPane commandInputWrapper = inputMetadata.getKey();
         this._rootView.setBottom(commandInputWrapper);
 
-        CommandInputController controller = inputMetadata.getValue();
-        final StyleClassedTextArea inputField = controller.getInputField();
-        inputField.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) {
-                // Push command
-                String rawCommand = inputField.getText();
-                _commandInputHandler.apply(rawCommand);
-
-                // Clear text and prevent event from trickling down
-                inputField.clear();
-                event.consume();
-            }
-        });
+        this._commandInputController = inputMetadata.getValue();
+        this._commandInputController.setInputSubmissionHandler(
+                rawCommand -> this._commandInputHandler.apply(rawCommand)
+        );
     }
 
     private void registerViewContainer() {
@@ -161,6 +152,12 @@ public class UserInterface implements UserInterfaceSpec {
         // TODO: Account for similar controller, only update data
         this._mainContainer.getChildren().clear();
         this._mainContainer.getChildren().add(view.getComponent());
+    }
+
+    @Override
+    public void cleanUp() {
+        // Trickle down to controller
+        this._commandInputController.cleanUp();
     }
 
     private void setTitle(String title) {

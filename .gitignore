@@ -17,6 +17,9 @@ local.properties
 .settings/
 .loadpath
 
+# Data Directory
+data/
+
 # External tool builders
 .externalToolBuilders/
 
@@ -41,3 +44,6 @@ local.properties
 *.ipr
 *.iws
 .idea/
+
+###Collate###
+**/collated/

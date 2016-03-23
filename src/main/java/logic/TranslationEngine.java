@@ -2,11 +2,11 @@ package logic;
 
 import javafx.util.Pair;
 import shared.Command;
+import shared.ExecutionResult;
 import skeleton.CommandParserSpec;
 import skeleton.TranslationEngineSpec;
 import skeleton.UserInterfaceSpec;
 import storage.Task;
-import ui.view.TaskListView;
 import ui.UserInterface;
 import ui.view.TextListView;
 import ui.view.View;
@@ -14,8 +14,10 @@ import ui.view.View;
 import java.util.List;
 import java.util.function.Function;
 
+/**
+ * @@author Mai Anh Vu
+ */
 public class TranslationEngine implements TranslationEngineSpec {
-
     /**
      * Singleton instance
      */
@@ -24,8 +26,7 @@ public class TranslationEngine implements TranslationEngineSpec {
     /**
      * Properties
      */
-    private Function<Command, Void> _commandExecutionHandler;
-    private VisualIndexMapper _indexMapper;
+    private Function<Command, ExecutionResult> _commandExecutionHandler;
 
     /**
      * Private constructor
@@ -45,7 +46,7 @@ public class TranslationEngine implements TranslationEngineSpec {
         return instance;
     }
 
-    @Override public void setCommandExecutionHandler(Function<Command, Void> handler) {
+    @Override public void setCommandExecutionHandler(Function<Command, ExecutionResult> handler) {
         assert (handler != null);
         this._commandExecutionHandler = handler;
     }
@@ -73,16 +74,27 @@ public class TranslationEngine implements TranslationEngineSpec {
      * @param result
      */
     @Override public void displayResult(ExecutionResult result) {
+        if (result.isShutdownSignal()) {
+            // Do not display shutdown signal
+            return;
+        }
 
         switch (result.getViewType()) {
             case TASK_LIST:
                 // Convert list
                 List<Pair<Integer, Task>> visualTaskList =
-                        VisualIndexMapper.getInstance().translateRawToVisual((List<Task>) result.getData());
+                        getVisualIndexMapper().translateRawToVisual(result.getData());
+                // Update mapper with list
+                VisualIndexMapper.getInstance().updateList(result.getData());
                 View view = new TextListView(visualTaskList);
                 this.getUserInterface().render(view);
                 break;
         }
+    }
+
+    @Override
+    public void shutdown() {
+        this.getUserInterface().cleanUp();
     }
 
     private void translateCommand(String commandString) {
@@ -91,12 +103,15 @@ public class TranslationEngine implements TranslationEngineSpec {
 
         Command command = this.getCommandParser().parse(commandString);
 
-        if (command.getInstruction().getIndex() != null) {
-            assert this._indexMapper != null;
-            this._indexMapper.translateVisualToRaw(command);
+        if (command.getIndex() != null) {
+            VisualIndexMapper.getInstance().translateVisualToRaw(command);
         }
 
-        this._commandExecutionHandler.apply(command);
+        // Schedule for displaying
+        this._commandExecutionHandler.andThen(result -> {
+            this.displayResult(result);
+            return null;
+        }).apply(command);
     }
 
     @Override public UserInterfaceSpec getUserInterface() {
@@ -105,6 +120,10 @@ public class TranslationEngine implements TranslationEngineSpec {
 
     @Override public CommandParserSpec getCommandParser() {
         return CommandParser.getInstance();
+    }
+
+    private static VisualIndexMapper getVisualIndexMapper() {
+        return VisualIndexMapper.getInstance();
     }
 
 }

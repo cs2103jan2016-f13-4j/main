@@ -1,3 +1,4 @@
+/* @@author Mai Anh Vu */
 .wrapper {
     -fx-background-color: #f7f7f7;
 }
@@ -18,7 +19,7 @@
     -fx-font-family: "Lato";
 }
 
-.command-input__field .scroll-bar:horizontal:disabled {
+.command-input__field .scroll-bar {
     -fx-opacity: 0;
 }
 
