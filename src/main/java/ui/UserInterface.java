@@ -17,7 +17,7 @@ import ui.view.View;
 import java.util.function.Function;
 
 /**
- * @author maianhvu
+ * @@author Mai Anh Vu
  */
 public class UserInterface implements UserInterfaceSpec {
 

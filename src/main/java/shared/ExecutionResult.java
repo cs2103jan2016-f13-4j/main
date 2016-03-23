@@ -3,7 +3,7 @@ package shared;
 import exception.ExceptionHandler;
 
 /**
- * Created by maianhvu on 20/03/2016.
+ * @@author Mai Anh Vu
  */
 public class ExecutionResult {
     /**

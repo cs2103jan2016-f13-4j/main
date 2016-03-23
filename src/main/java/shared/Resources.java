@@ -7,6 +7,9 @@ import javafx.util.Pair;
 import java.io.IOException;
 import java.net.URL;
 
+/**
+ * @@author Mai Anh Vu
+ */
 public class Resources {
     /**
      * Constants

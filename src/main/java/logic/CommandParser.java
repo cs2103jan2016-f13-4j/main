@@ -12,6 +12,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * @@author Mai Anh Vu
+ */
 public class CommandParser implements CommandParserSpec {
 
     private static final Pattern PATTERN_COMMAND_PARSER = Pattern.compile(
