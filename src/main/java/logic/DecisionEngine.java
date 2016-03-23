@@ -90,10 +90,10 @@ public class DecisionEngine implements DecisionEngineSpec {
     }
 
 
-    protected ExecutionResult handleAdd(Command cmd) {
-        assert cmd.hasInstruction(Command.Instruction.ADD);
+    protected ExecutionResult handleAdd(Command command) {
+        assert command.hasInstruction(Command.Instruction.ADD);
 
-        Task taskToAdd = this.createTask(cmd);
+        Task taskToAdd = this.createTask(command);
         this.getTaskCollection().add(taskToAdd);
 
         return this.displayAllTasks();
@@ -120,8 +120,8 @@ public class DecisionEngine implements DecisionEngineSpec {
         return this.displayAllTasks();
     }
 
-    protected ExecutionResult handleDisplay(Command cmd) {
-        assert cmd.hasInstruction(Command.Instruction.DISPLAY);
+    protected ExecutionResult handleDisplay(Command command) {
+        assert command.hasInstruction(Command.Instruction.DISPLAY);
         return this.displayAllTasks();
     }
 
@@ -160,6 +160,13 @@ public class DecisionEngine implements DecisionEngineSpec {
         return new ExecutionResult(ViewType.TASK_LIST, foundTask);
     }
 
+    protected ExecutionResult handleUndo(Command command) {
+        assert command.hasInstruction(Command.Instruction.UNDO);
+
+        return this.displayAllTasks();
+    }
+
+
     @Override public ExecutionResult performCommand(Command command) {
 
         // this sort of nonsense should have been handled in the front end
@@ -191,6 +198,8 @@ public class DecisionEngine implements DecisionEngineSpec {
             case SEARCH:
                 result = this.handleSearch(command);
                 break;
+            case UNDO:
+                break;
             default:
                 // if we reach this point, LTA Command Parser has failed in his duty
                 // and awaits court martial
@@ -214,6 +223,7 @@ public class DecisionEngine implements DecisionEngineSpec {
     public CollectionSpec<Task> getTaskCollection() {
         return Storage.getInstance();
     }
+
 
     private static Pattern buildPowerSearchPattern(Command command) {
         String query = command.getParameter(Command.ParamName.SEARCH_QUERY);
