@@ -28,7 +28,7 @@ public class DiskIO {
     }
 
     private String _fileName;
-    private final String DEFAULT_FILE_NAME = "tmp/ToDoData.csv";
+    private final String DEFAULT_FILE_NAME = "data/ToDoData.csv";
 
     private DiskIO() {
         this._fileName = this.DEFAULT_FILE_NAME;
@@ -59,7 +59,7 @@ public class DiskIO {
 
     public ArrayList<String> write(ArrayList<String> taskStrings) {
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(new File(this._fileName), true));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(this._fileName));
             for (String taskString : taskStrings) {
                 writer.write(taskString);
                 writer.newLine();

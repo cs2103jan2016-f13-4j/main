@@ -17,6 +17,9 @@ local.properties
 .settings/
 .loadpath
 
+# Data Directory
+data/
+
 # External tool builders
 .externalToolBuilders/
 

@@ -13,7 +13,7 @@ public class Command {
      * Types
      */
     public enum Instruction {
-        ADD, DISPLAY, MARK, EDIT, SEARCH, DELETE, EXIT,
+        ADD, DISPLAY, MARK, EDIT, SEARCH, UNDO, DELETE, EXIT,
         UNRECOGNISED, INVALID;
     }
 
@@ -49,7 +49,7 @@ public class Command {
      * @param isUniversallyQuantified
      */
     public Command(Instruction instruction, Integer index, boolean isUniversallyQuantified) {
-        assert index == null || !isUniversallyQuantified; // Cannot both have index and universal quantifier
+        assert index == null || !isUniversallyQuantified; // isUniversallyQuantified => (index == null)
 
         this._instruction = instruction;
         this._index = index;
