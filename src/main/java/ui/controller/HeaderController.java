@@ -5,7 +5,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 
 /**
- * Created by maianhvu on 20/03/2016.
+ * @@author Mai Anh Vu
  */
 public class HeaderController {
     @FXML public ImageView _iconView;

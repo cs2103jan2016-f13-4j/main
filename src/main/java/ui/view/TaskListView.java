@@ -15,7 +15,7 @@ import storage.Task;
 import java.util.List;
 
 /**
- * Created by maianhvu on 21/03/2016.
+ * @@author Antonius Satrio Triatmoko
  */
 public class TaskListView extends View {
 

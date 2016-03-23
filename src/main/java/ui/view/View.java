@@ -2,6 +2,9 @@ package ui.view;
 
 import javafx.scene.Node;
 
+/**
+ * @@author Mai Anh Vu
+ */
 public abstract class View {
 
     /**

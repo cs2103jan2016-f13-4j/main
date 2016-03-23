@@ -1,14 +1,20 @@
 package logic;
 
-import exception.InvalidParameterException;
 import javafx.util.Pair;
-import shared.*;
+import shared.Command;
+import shared.StringParser;
 import skeleton.CommandParserSpec;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * @@author Mai Anh Vu
+ */
 public class CommandParser implements CommandParserSpec {
 
     private static final Pattern PATTERN_COMMAND_PARSER = Pattern.compile(
@@ -45,7 +51,7 @@ public class CommandParser implements CommandParserSpec {
     /**
      * Properties
      */
-    private final HashMap<String, Command.Instruction> _instructionMap;
+    private final LinkedHashMap<String, Command.Instruction> _instructionMap;
 
     /**
      * TODO: Write JavaDoc
@@ -54,8 +60,8 @@ public class CommandParser implements CommandParserSpec {
         this._instructionMap = constructInstructionMap();
     }
 
-    private HashMap<String, Command.Instruction> constructInstructionMap() {
-        HashMap<String, Command.Instruction> instructionMap = new HashMap<>();
+    public static LinkedHashMap<String, Command.Instruction> constructInstructionMap() {
+        LinkedHashMap<String, Command.Instruction> instructionMap = new LinkedHashMap<>();
         Arrays.asList(InstructionKeywords.values()).stream()
                 .forEach(definition -> {
                     Arrays.asList(definition.keywords).stream()

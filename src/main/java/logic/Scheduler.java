@@ -3,7 +3,7 @@ package logic;
 import skeleton.SchedulerSpec;
 
 /**
- * Created by maianhvu on 20/03/2016.
+ * @@author Thenaesh Elango
  */
 public class Scheduler implements SchedulerSpec {
     private static final Scheduler instance = new Scheduler();

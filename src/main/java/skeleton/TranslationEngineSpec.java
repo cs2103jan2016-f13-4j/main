@@ -5,6 +5,9 @@ import shared.ExecutionResult;
 
 import java.util.function.Function;
 
+/**
+ * @@author Mai Anh Vu
+ */
 public interface TranslationEngineSpec {
     UserInterfaceSpec getUserInterface();
 

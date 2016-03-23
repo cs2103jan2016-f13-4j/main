@@ -5,7 +5,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Created by maianhvu on 20/03/2016.
+ * @@author Mai Anh Vu
  */
 public class StringParser {
     // we don't want this class to be instantiated

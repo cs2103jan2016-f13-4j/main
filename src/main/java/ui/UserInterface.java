@@ -1,6 +1,7 @@
 package ui;
 
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Font;
@@ -16,7 +17,7 @@ import ui.view.View;
 import java.util.function.Function;
 
 /**
- * @author maianhvu
+ * @@author Mai Anh Vu
  */
 public class UserInterface implements UserInterfaceSpec {
 
@@ -63,9 +64,10 @@ public class UserInterface implements UserInterfaceSpec {
     @Override public void initialize() {
         // Set primary stage
         this._primaryStage = ApplicationContext.getPrimaryStage();
+        this._primaryStage.getIcons().add(Resources.getInstance().getImage("mom.png"));
         assert (this._primaryStage == null);
 
-        //this.initializeFonts();
+        this.initializeFonts();
 
         this.setRootView();
         this.registerHeader();

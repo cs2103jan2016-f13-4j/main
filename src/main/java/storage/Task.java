@@ -2,6 +2,9 @@ package storage;
 
 import java.time.LocalDateTime;
 
+/**
+ * @@author Chng Hui Yie
+ */
 public class Task implements Comparable<Task> {
 
     /**

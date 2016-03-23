@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Created by maianhvu on 22/03/2016.
+ * @@author Mai Anh Vu
  */
 public class TextListView extends View {
 

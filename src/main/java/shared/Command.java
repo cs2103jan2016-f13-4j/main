@@ -4,6 +4,9 @@ import exception.ExceptionHandler;
 
 import java.util.LinkedHashMap;
 
+/**
+ * @author Thenaesh Elango
+ */
 public class Command {
 
     /**

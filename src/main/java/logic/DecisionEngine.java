@@ -15,6 +15,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+/**
+ * @@author Thenaesh Elango
+ */
 public class DecisionEngine implements DecisionEngineSpec {
     /**
      * Singleton instance
