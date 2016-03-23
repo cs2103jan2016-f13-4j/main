@@ -1,14 +1,11 @@
 package ui;
 
-import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Pair;
-import org.fxmisc.richtext.StyleClassedTextArea;
 import shared.ApplicationContext;
 import shared.Resources;
 import skeleton.UserInterfaceSpec;

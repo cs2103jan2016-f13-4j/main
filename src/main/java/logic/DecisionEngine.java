@@ -38,70 +38,63 @@ public class DecisionEngine implements DecisionEngineSpec {
      * @param cmd
      * @return
      */
-    protected Task createTask(Command cmd) {
-        ParameterList params = cmd.getParameters();
+    protected Task createTask(Command command) {
+        String taskName = command.getParameter(Command.ParamName.TASK_NAME);
+        assert taskName != null; // Command validity should have already been handled by CommandParser
 
+        // Description is optional
+        String taskDescription = command.getParameter(Command.ParamName.TASK_DESCRIPTION);
 
-        // extract all the essential information out of the command
-        // the asserts ensure that we blow up if any error was made
-        // during the creation of the Command object in the Command Parser
-        ParameterValue nameRaw = params.getParameter(ParameterName.NAME);
-        assert (nameRaw.getValue() instanceof String);
-        String name = (String) nameRaw.getValue();
+        // Same for the dates
+        LocalDateTime taskStart = command.getParameter(Command.ParamName.TASK_START);
+        LocalDateTime taskEnd   = command.getParameter(Command.ParamName.TASK_END);
 
-        ParameterValue fromRaw = params.getParameter(ParameterName.DATE_FROM);
-        assert (fromRaw.getValue() instanceof LocalDateTime);
-        LocalDateTime from = (LocalDateTime) fromRaw.getValue();
-
-        ParameterValue toRaw = params.getParameter(ParameterName.DATE_TO);
-        assert (toRaw.getValue() instanceof LocalDateTime);
-        LocalDateTime to = (LocalDateTime) toRaw.getValue();
-
-
-        // we now build the Task object for adding into the store
-        return new Task(null, name, "", from, to);
+        return new Task(null, taskName, taskDescription, taskStart, taskEnd);
     }
 
-    protected ExecutionResult handleAdd(Command cmd) {
-        assert cmd.getInstruction().getType() == Instruction.Type.ADD;
+    protected ExecutionResult handleAdd(Command command) {
+        assert command.hasInstruction(Command.Instruction.ADD);
 
-        Task taskToAdd = this.createTask(cmd);
+        Task taskToAdd = this.createTask(command);
         this.getTaskCollection().add(taskToAdd);
 
-        return this.handleDisplay(cmd);
+        return this.handleDisplay(command);
     }
 
-    protected ExecutionResult handleEdit(Command cmd) {
-        assert cmd.getInstruction().getType() == Instruction.Type.EDIT;
+    protected ExecutionResult handleEdit(Command command) {
+        assert command.hasInstruction(Command.Instruction.EDIT);
 
-        int id = cmd.getInstruction().getIndex();
-        Task updatedTask = this.createTask(cmd);
+        Integer id = command.getIndex();
+        assert id != null; // This should already be handled at Parser
+
+        Task updatedTask = this.createTask(command);
         updatedTask.setId(id);
         this.getTaskCollection().edit(id, updatedTask);
 
-        return this.handleDisplay(cmd);
+        return this.handleDisplay(command);
     }
 
-    protected ExecutionResult handleDisplay(Command cmd) {
-        assert cmd.getInstruction().getType() == Instruction.Type.DISPLAY;
+    protected ExecutionResult handleDisplay(Command command) {
+        assert command.hasInstruction(Command.Instruction.DISPLAY);
 
         List<Task> listToDisplay = this.getTaskCollection().getAll();
         return new ExecutionResult(ViewType.TASK_LIST, listToDisplay);
     }
 
-    protected ExecutionResult handleDelete(Command cmd) {
-        assert cmd.getInstruction().getType() == Instruction.Type.DELETE;
+    protected ExecutionResult handleDelete(Command command) {
+        assert command.hasInstruction(Command.Instruction.DELETE);
 
-        int id = cmd.getInstruction().getIndex();
+        Integer id = command.getIndex();
+        assert id != null;
+
         this.getTaskCollection().remove(id);
-
-        return this.handleDisplay(cmd);
+        return this.handleDisplay(command);
     }
 
-    protected ExecutionResult handleSearch(Command cmd) {
-        assert cmd.getInstruction().getType() == Instruction.Type.SEARCH;
+    protected ExecutionResult handleSearch(Command command) {
+        assert command.hasInstruction(Command.Instruction.SEARCH);
 
-        final String query = (String) cmd.getParameters().getParameter(ParameterName.QUERY).getValue();
+        final String query = command.getParameter(Command.ParamName.SEARCH_QUERY);
         List<Task> foundTask = this.getTaskCollection().getAll()
                 .stream()
                 .filter(item ->
@@ -112,13 +105,14 @@ public class DecisionEngine implements DecisionEngineSpec {
         return new ExecutionResult(ViewType.TASK_LIST, foundTask);
     }
 
-    @Override public ExecutionResult performCommand(Command cmd) {
+    @Override public ExecutionResult performCommand(Command command) {
 
         // this sort of nonsense should have been handled in the front end
-        assert (cmd.getInstruction().getType() != Instruction.Type.UNRECOGNISED);
+        assert !command.hasInstruction(Command.Instruction.INVALID);
+        assert !command.hasInstruction(Command.Instruction.UNRECOGNISED);
 
         // handle exit command here, without creating a task unnecessarily
-        if (cmd.getInstruction().getType() == Instruction.Type.EXIT) {
+        if (command.hasInstruction(Command.Instruction.EXIT)) {
             return ExecutionResult.shutdownSignal();
         }
 
@@ -126,21 +120,21 @@ public class DecisionEngine implements DecisionEngineSpec {
         ExecutionResult result = null;
 
         // all the standard commands
-        switch (cmd.getInstruction().getType()) {
+        switch (command.getInstruction()) {
             case ADD:
-                result = this.handleAdd(cmd);
+                result = this.handleAdd(command);
                 break;
             case EDIT:
-                result = this.handleEdit(cmd);
+                result = this.handleEdit(command);
                 break;
             case DISPLAY:
-                result = this.handleDisplay(cmd);
+                result = this.handleDisplay(command);
                 break;
             case DELETE:
-                result = this.handleDelete(cmd);
+                result = this.handleDelete(command);
                 break;
             case SEARCH:
-                result = this.handleSearch(cmd);
+                result = this.handleSearch(command);
                 break;
             default:
                 // if we reach this point, LTA Command Parser has failed in his duty

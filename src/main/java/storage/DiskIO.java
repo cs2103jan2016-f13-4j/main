@@ -11,11 +11,14 @@ import java.util.List;
 /**
  * Handles reading from and writing to disk.
  * 
- * @author Huiyie
+ * @@author Chng Hui Yie
  *
  */
 public class DiskIO {
 
+    /**
+     * Properties
+     */
     private String _fileName;
     private final TaskCollection _taskCollection;
     private final String DEFAULT_FILE_NAME = "tmp/ToDoData.csv";

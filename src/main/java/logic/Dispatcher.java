@@ -66,15 +66,11 @@ public class Dispatcher implements DispatcherSpec {
     }
 
     @Override public void start() {
-        // Build initial command
-        Instruction initialInstruction = new Instruction(Instruction.Type.DISPLAY);
-        ParameterList initialParams = ParameterList.emptyList();
-        Command initialCommand = new Command(initialInstruction, initialParams);
-
+        // Execute and display the result of the initial command
         this._commandExecutor.andThen(result -> {
             this.getTranslationEngine().displayResult(result);
             return null;
-        }).apply(initialCommand);
+        }).apply(constructInitialCommand());
     }
 
     @Override public TranslationEngineSpec getTranslationEngine() {
@@ -83,6 +79,14 @@ public class Dispatcher implements DispatcherSpec {
 
     @Override public DecisionEngineSpec getDecisionEngine() {
         return DecisionEngine.getInstance();
+    }
+
+    private static Command constructInitialCommand() {
+        Command.Instruction instruction = Command.Instruction.DISPLAY;
+        Integer index = null;
+        boolean isUniversallyQuantified = true;
+
+        return new Command(instruction, index, isUniversallyQuantified);
     }
 
 }

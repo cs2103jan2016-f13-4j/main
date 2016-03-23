@@ -14,8 +14,10 @@ import ui.view.View;
 import java.util.List;
 import java.util.function.Function;
 
+/**
+ * @@author Mai Anh Vu
+ */
 public class TranslationEngine implements TranslationEngineSpec {
-
     /**
      * Singleton instance
      */
@@ -81,7 +83,7 @@ public class TranslationEngine implements TranslationEngineSpec {
             case TASK_LIST:
                 // Convert list
                 List<Pair<Integer, Task>> visualTaskList =
-                        VisualIndexMapper.getInstance().translateRawToVisual(result.getData());
+                        getVisualIndexMapper().translateRawToVisual(result.getData());
                 // Update mapper with list
                 VisualIndexMapper.getInstance().updateList(result.getData());
                 View view = new TextListView(visualTaskList);
@@ -101,7 +103,7 @@ public class TranslationEngine implements TranslationEngineSpec {
 
         Command command = this.getCommandParser().parse(commandString);
 
-        if (command.getInstruction().getIndex() != null) {
+        if (command.getIndex() != null) {
             VisualIndexMapper.getInstance().translateVisualToRaw(command);
         }
 
@@ -118,6 +120,10 @@ public class TranslationEngine implements TranslationEngineSpec {
 
     @Override public CommandParserSpec getCommandParser() {
         return CommandParser.getInstance();
+    }
+
+    private static VisualIndexMapper getVisualIndexMapper() {
+        return VisualIndexMapper.getInstance();
     }
 
 }
