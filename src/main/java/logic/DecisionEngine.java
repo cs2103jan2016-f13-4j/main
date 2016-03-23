@@ -1,18 +1,15 @@
 package logic;
 
-import shared.Command;
-import shared.ExecutionResult;
-import shared.ViewType;
+import shared.*;
 import skeleton.CollectionSpec;
 import skeleton.DecisionEngineSpec;
-import skeleton.TaskSchedulerSpec;
+import skeleton.SchedulerSpec;
 import storage.Task;
-import storage.TaskCollection;
+import storage.Storage;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class DecisionEngine implements DecisionEngineSpec {
@@ -36,135 +33,37 @@ public class DecisionEngine implements DecisionEngineSpec {
         // TODO: stub
     }
 
-    /**
-     * creates a Task from a specified command object when it makes sense
-     * we should blow up when creating a Task doesn't really make sense
-     * @param cmd
-     * @return
-     */
-    protected Task createTask(Command command) {
-        String taskName = command.getParameter(Command.ParamName.TASK_NAME);
-        assert taskName != null; // Command validity should have already been handled by CommandParser
 
-        // Description is optional
-        String taskDescription = command.getParameter(Command.ParamName.TASK_DESCRIPTION);
-
-        // Same for the dates
-        LocalDateTime taskStart = command.getParameter(Command.ParamName.TASK_START);
-        LocalDateTime taskEnd   = command.getParameter(Command.ParamName.TASK_END);
-
-        return new Task(null, taskName, taskDescription, taskStart, taskEnd);
-    }
-
-    protected ExecutionResult handleAdd(Command command) {
-        assert command.hasInstruction(Command.Instruction.ADD);
-
-        Task taskToAdd = this.createTask(command);
-        this.getTaskCollection().add(taskToAdd);
-
-        return this.handleDisplay(command);
-    }
-
-    protected ExecutionResult handleEdit(Command command) {
-        assert command.hasInstruction(Command.Instruction.EDIT);
-
-        Integer id = command.getIndex();
-        assert id != null; // This should already be handled at Parser
-
-        Task updatedTask = this.createTask(command);
-        updatedTask.setId(id);
-        this.getTaskCollection().edit(id, updatedTask);
-
-        return this.handleDisplay(command);
-    }
-
-    protected ExecutionResult handleDisplay(Command command) {
-        assert command.hasInstruction(Command.Instruction.DISPLAY);
-
-        List<Task> listToDisplay = this.getTaskCollection().getAll();
-        return new ExecutionResult(ViewType.TASK_LIST, listToDisplay);
-    }
-
-    protected ExecutionResult handleDelete(Command command) {
-        assert command.hasInstruction(Command.Instruction.DELETE);
-
-        Integer id = command.getIndex();
-        assert id != null;
-
-        this.getTaskCollection().remove(id);
-        return this.handleDisplay(command);
-    }
-
-    protected ExecutionResult handleSearch(Command command) {
-        assert command.hasInstruction(Command.Instruction.SEARCH);
-
-        // PowerSearching!
-        String query = command.getParameter(Command.ParamName.SEARCH_QUERY);
-        String[] words = query.split("\\s+");
-        StringBuilder patternBuilder = new StringBuilder();
-        patternBuilder.append("\\b(?:");
-
-        for (int i = 0; i < words.length; i++) {
-            String word = words[i];
-            if (i != 0) {
-                patternBuilder.append("|");
-            }
-
-            for (int j = 0; j < word.length(); j++) {
-                patternBuilder.append("\\w*");
-                patternBuilder.append(word.charAt(j));
-            }
-            patternBuilder.append("\\w*"); // At the end too
-        }
-
-        patternBuilder.append(")\\b");
-        Pattern pattern = Pattern.compile(patternBuilder.toString());
-
-        List<Task> foundTask = this.getTaskCollection().getAll()
-                .stream()
-                .filter(item -> {
-                    Matcher m = pattern.matcher(item.getTaskName());
-                    if (m.find()) return true;
-
-                    if (item.getDescription() == null) return false;
-                    m = pattern.matcher(item.getDescription());
-                    return m.find();
-                })
-                .collect(Collectors.toList());
-
-        return new ExecutionResult(ViewType.TASK_LIST, foundTask);
-    }
-
-    @Override public ExecutionResult performCommand(Command command) {
+    @Override public ExecutionResult performCommand(Command cmd) {
 
         // this sort of nonsense should have been handled in the front end
-        assert !command.hasInstruction(Command.Instruction.INVALID);
-        assert !command.hasInstruction(Command.Instruction.UNRECOGNISED);
+        assert (cmd.getInstruction().getType() != Instruction.Type.UNRECOGNISED);
 
         // handle exit command here, without creating a task unnecessarily
-        if (command.hasInstruction(Command.Instruction.EXIT)) {
-            return ExecutionResult.shutdownSignal();
+        if (cmd.getInstruction().getType() == Instruction.Type.EXIT) {
+            ApplicationContext.getPrimaryStage().close();
+            return null;
         }
 
         // Prepare final execution result to be returned
         ExecutionResult result = null;
 
         // all the standard commands
-        switch (command.getInstruction()) {
+        switch (cmd.getInstruction().getType()) {
             case ADD:
-                result = this.handleAdd(command);
+                result = this.handleAdd(cmd);
                 break;
             case EDIT:
-                result = this.handleEdit(command);
+                result = this.handleEdit(cmd);
                 break;
             case DISPLAY:
-                result = this.handleDisplay(command);
+                result = this.handleDisplay(cmd);
                 break;
             case DELETE:
-                result = this.handleDelete(command);
+                result = this.handleDelete(cmd);
                 break;
             case SEARCH:
-                result = this.handleSearch(command);
+                result = this.handleSearch(cmd);
                 break;
             default:
                 // if we reach this point, LTA Command Parser has failed in his duty
@@ -176,9 +75,135 @@ public class DecisionEngine implements DecisionEngineSpec {
     }
 
 
+    /**
+     * checks whether the supplied command is completely defined (name, start time, end time, etc)
+     * this information may then be used to decide if the Scheduler should be called
+     *
+     * @param cmd
+     * @return
+     */
+    boolean isCommandComplete(Command cmd) {
+        ParameterList params = cmd.getParameters();
+
+        boolean hasName = params.hasParameterNamed(ParameterName.NAME);
+        boolean hasStart = params.hasParameterNamed(ParameterName.DATE_FROM);
+        boolean hasEnd = params.hasParameterNamed(ParameterName.DATE_TO);
+
+        boolean isComplete = hasName && hasStart && hasEnd;
+        return isComplete;
+    }
+
+    boolean isCommmandQuery(Command cmd) {
+        ParameterList params = cmd.getParameters();
+
+        return params.hasParameterNamed(ParameterName.QUERY);
+    }
+
+
+    /**
+     * creates a Task from a specified command object when it makes sense
+     * we should blow up when creating a Task doesn't really make sense
+     * @param cmd
+     * @return
+     */
+    protected Task createTask(Command cmd) {
+        ParameterList params = cmd.getParameters();
+
+        // initialisation
+        String name = null;
+        LocalDateTime from = null;
+        LocalDateTime to = null;
+
+        // for each command parameter, check if it was supplied
+        // if so, extract the value and set the appropriate reference above to point to the extracted value
+        if (params.hasParameterNamed(ParameterName.NAME)) {
+            name = (String) params.getParameter(ParameterName.NAME).getValue();
+        }
+        if (params.hasParameterNamed(ParameterName.DATE_FROM)) {
+            from = (LocalDateTime) params.getParameter(ParameterName.DATE_FROM).getValue();
+        }
+        if (params.hasParameterNamed(ParameterName.DATE_TO)) {
+            to = (LocalDateTime) params.getParameter(ParameterName.DATE_TO).getValue();
+        }
+
+        // we now build the Task object for adding into the store
+        return new Task(null, name, "", from, to);
+    }
+
+    protected ExecutionResult displayAllTasks(Command cmd) {
+        assert cmd.getInstruction().getType() == Instruction.Type.DISPLAY;
+
+        List<Task> listToDisplay = this.getTaskCollection().getAll();
+        return new ExecutionResult(ViewType.TASK_LIST, listToDisplay);
+    }
+
+
+    protected ExecutionResult handleAdd(Command cmd) {
+        assert cmd.getInstruction().getType() == Instruction.Type.ADD;
+
+        Task taskToAdd = this.createTask(cmd);
+        this.getTaskCollection().add(taskToAdd);
+
+        return this.displayAllTasks(cmd);
+    }
+
+    protected ExecutionResult handleEdit(Command cmd) {
+        assert cmd.getInstruction().getType() == Instruction.Type.EDIT;
+
+        ParameterList params = cmd.getParameters();
+
+        int id = cmd.getInstruction().getIndex();
+        Task task = this.getTaskCollection().get(id);
+
+        // check which parameters have changed
+        if (params.hasParameterNamed(ParameterName.NAME)) {
+            task.setTaskName((String) params.getParameter(ParameterName.NAME).getValue());
+        }
+        if (params.hasParameterNamed(ParameterName.DATE_FROM)) {
+            task.setStartTime((LocalDateTime) params.getParameter(ParameterName.DATE_FROM).getValue());
+        }
+        if (params.hasParameterNamed(ParameterName.DATE_TO)) {
+            task.setEndTime((LocalDateTime) params.getParameter(ParameterName.DATE_TO).getValue());
+        }
+
+        return this.displayAllTasks(cmd);
+    }
+
+    protected ExecutionResult handleDisplay(Command cmd) {
+        assert cmd.getInstruction().getType() == Instruction.Type.EDIT;
+
+        return this.displayAllTasks(cmd);
+    }
+
+
+
+    protected ExecutionResult handleDelete(Command cmd) {
+        assert cmd.getInstruction().getType() == Instruction.Type.DELETE;
+
+        int id = cmd.getInstruction().getIndex();
+        this.getTaskCollection().remove(id);
+
+        return this.displayAllTasks(cmd);
+    }
+
+    protected ExecutionResult handleSearch(Command cmd) {
+        assert cmd.getInstruction().getType() == Instruction.Type.SEARCH;
+
+        final String query = (String) cmd.getParameters().getParameter(ParameterName.QUERY).getValue();
+        List<Task> foundTask = this.getTaskCollection().getAll()
+                .stream()
+                .filter(item ->
+                        item.getTaskName().contains(query)
+                        && item.getDescription().contains(query))
+                .collect(Collectors.toList());
+
+        return new ExecutionResult(ViewType.TASK_LIST, foundTask);
+    }
+
+
     @Override
-    public TaskSchedulerSpec getTaskScheduler() {
-        return TaskScheduler.getInstance();
+    public SchedulerSpec getTaskScheduler() {
+        return Scheduler.getInstance();
     }
 
     @Override
@@ -188,7 +213,7 @@ public class DecisionEngine implements DecisionEngineSpec {
 
     @Override
     public CollectionSpec<Task> getTaskCollection() {
-        return TaskCollection.getInstance();
+        return Storage.getInstance();
     }
 
 }
