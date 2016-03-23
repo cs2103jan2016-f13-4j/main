@@ -23,25 +23,6 @@ public class Task implements Comparable<Task> {
     private Priority _priority;
 
     /**
-     * TODO: Write JavaDoc
-     * 
-     * @param id
-     * @param taskName
-     * @param description
-     * @param startTime
-     * @param endTime
-     */
-    public Task(Integer id, String taskName, String description, LocalDateTime startTime, LocalDateTime endTime) {
-        this._id = id;
-        this._taskName = taskName;
-        this._description = description;
-        this._startTime = startTime;
-        this._endTime = endTime;
-
-        this._creationTime = LocalDateTime.now();
-    }
-
-    /**
      * Priority types
      * 
      * @author Huiyie
@@ -63,6 +44,25 @@ public class Task implements Comparable<Task> {
             return this.PRIORITY_VALUE;
         }
     };
+
+    /**
+     * TODO: Write JavaDoc
+     * 
+     * @param id
+     * @param taskName
+     * @param description
+     * @param startTime
+     * @param endTime
+     */
+    public Task(Integer id, String taskName, String description, LocalDateTime startTime, LocalDateTime endTime) {
+        this._id = id;
+        this._taskName = taskName;
+        this._description = description;
+        this._startTime = startTime;
+        this._endTime = endTime;
+        this._priority = Priority.LOW; // default priority is set to low
+        this._creationTime = LocalDateTime.now();
+    }
 
     public String encodeTaskToString() {
         StringBuilder sb = new StringBuilder();
@@ -115,14 +115,29 @@ public class Task implements Comparable<Task> {
     }
 
     @Override public int compareTo(Task o) {
-        // return this.getId().compareTo(o.getId());
         if (this.getPriority().getPriorityValue() < o.getPriority().getPriorityValue()) {
             return -1;
         } else if (this.getPriority().getPriorityValue() > o.getPriority().getPriorityValue()) {
             return 1;
         } else {
             // TODO: Priority are equal, compare number of days to deadline
-            return 0;
+            if (this.getEndTime().isBefore(o.getEndTime())) {
+                return -1;
+            } else if (this.getEndTime().isAfter(o.getEndTime())) {
+                return 1;
+            } else {
+                // TODO: Priority and end times are equal, compare number of
+                // days since creation of Task
+                if (this.getCreationTime().isBefore(o.getCreationTime())) {
+                    // more days since creation means the Task is more urgent
+                    return -1;
+                } else if (this.getCreationTime().isAfter(o.getCreationTime())) {
+                    return 1;
+                }
+                // Priority, end time and creation time are equal
+                // Order by Task ID
+                return this.getId().compareTo(o.getId());
+            }
         }
     }
 
