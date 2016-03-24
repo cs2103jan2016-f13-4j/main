@@ -8,6 +8,7 @@ import skeleton.TranslationEngineSpec;
 import skeleton.UserInterfaceSpec;
 import storage.Task;
 import ui.UserInterface;
+import ui.view.TaskListView;
 import ui.view.TextListView;
 import ui.view.View;
 
@@ -86,7 +87,7 @@ public class TranslationEngine implements TranslationEngineSpec {
                         getVisualIndexMapper().translateRawToVisual(result.getData());
                 // Update mapper with list
                 VisualIndexMapper.getInstance().updateList(result.getData());
-                View view = new TextListView(visualTaskList);
+                View view = new TaskListView(visualTaskList);
                 this.getUserInterface().render(view);
                 break;
         }

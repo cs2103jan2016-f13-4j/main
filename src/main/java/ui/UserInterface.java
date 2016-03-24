@@ -140,8 +140,7 @@ public class UserInterface implements UserInterfaceSpec {
     }
 
     private void registerViewContainer() {
-        Pair<AnchorPane,TaskListController>  pr = Resources.getComponentAndController("TaskList");
-        this._mainContainer = pr.getKey();//new AnchorPane();
+        this._mainContainer = new AnchorPane();
         this._mainContainer.getStyleClass().add(STYLE_CLASS_CONTAINER_MAIN);
         this._rootView.setCenter(this._mainContainer);
     }

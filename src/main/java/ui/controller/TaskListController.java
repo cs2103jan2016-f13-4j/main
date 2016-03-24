@@ -18,4 +18,17 @@ public class TaskListController {
     @FXML private void ininitialize() {
 
     }
+
+    public ObservableList<Pair<Integer,Task>> getObservableList() {
+        return this._taskList;
+    }
+
+    public void setObservableList(ObservableList<Pair<Integer,Task>> list) {
+        this._taskList = list;
+
+    }
+
+    public void linkViewandList() {
+        this._displayList.setItems(this._taskList);
+    }
 }
