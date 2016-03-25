@@ -12,6 +12,7 @@ import shared.Resources;
 import skeleton.UserInterfaceSpec;
 import ui.controller.CommandInputController;
 import ui.controller.HeaderController;
+import ui.controller.TaskListController;
 import ui.view.View;
 
 import java.util.function.Function;
