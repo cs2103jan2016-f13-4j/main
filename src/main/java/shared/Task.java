@@ -24,6 +24,7 @@ public class Task implements Comparable<Task> {
     private final LocalDateTime _creationTime;
     private boolean _isCompleted;
     private Priority _priority;
+    private boolean _isDeleted;
 
     /**
      * Priority types
@@ -65,6 +66,7 @@ public class Task implements Comparable<Task> {
         this._endTime = endTime;
         this._priority = Priority.LOW; // default priority is set to low
         this._creationTime = LocalDateTime.now();
+        this._isDeleted = false;
     }
 
     // copy ctor, used to construct an identical copy in the clone method
@@ -182,9 +184,16 @@ public class Task implements Comparable<Task> {
         return this._isCompleted;
     }
 
+    public boolean isDeleted() {
+        return this._isDeleted;
+    }
     /**
      * Setters
      */
+    public void setDeletedStatus(boolean isDeleted) {
+        this._isDeleted = isDeleted;
+    }
+
     public void setId(Integer id) {
         this._id = id;
     }
