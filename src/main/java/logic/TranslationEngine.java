@@ -6,7 +6,7 @@ import shared.ExecutionResult;
 import skeleton.CommandParserSpec;
 import skeleton.TranslationEngineSpec;
 import skeleton.UserInterfaceSpec;
-import storage.Task;
+import shared.Task;
 import ui.UserInterface;
 import ui.view.TextListView;
 import ui.view.View;

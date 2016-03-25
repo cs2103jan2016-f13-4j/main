@@ -1,5 +1,7 @@
 package storage;
 
+import shared.Task;
+
 import java.util.Comparator;
 
 /**

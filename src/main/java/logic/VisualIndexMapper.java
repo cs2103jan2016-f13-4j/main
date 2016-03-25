@@ -2,7 +2,7 @@ package logic;
 
 import javafx.util.Pair;
 import shared.Command;
-import storage.Task;
+import shared.Task;
 
 import java.util.List;
 import java.util.TreeMap;

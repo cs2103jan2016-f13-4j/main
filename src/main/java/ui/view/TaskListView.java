@@ -9,8 +9,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.Pair;
 import shared.Resources;
-import shared.ViewType;
-import storage.Task;
+import shared.Task;
 
 import java.util.List;
 

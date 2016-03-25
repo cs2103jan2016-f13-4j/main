@@ -7,10 +7,11 @@ import skeleton.CollectionSpec;
 import skeleton.DecisionEngineSpec;
 import skeleton.SchedulerSpec;
 import storage.Storage;
-import storage.Task;
+import shared.Task;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -20,12 +21,16 @@ import java.util.stream.Collectors;
  */
 public class DecisionEngine implements DecisionEngineSpec {
     /**
-     * Singleton instance
+     * Singleton instance and constructor
      */
     private static DecisionEngine instance;
-
     private DecisionEngine() {
     }
+
+    /**
+     * instance fields
+     */
+    private Stack<Command> commandHistory = new Stack<>();// used by the undo operation
 
     public static DecisionEngine getInstance() {
         if (instance == null) {
@@ -166,6 +171,11 @@ public class DecisionEngine implements DecisionEngineSpec {
     protected ExecutionResult handleUndo(Command command) {
         assert command.hasInstruction(Command.Instruction.UNDO);
 
+        // fail silently for now if there are no commands to undo
+        if (!this.commandHistory.empty()) {
+            Command cmdToUndo = this.commandHistory.pop();
+        }
+
         return this.displayAllTasks();
     }
 
@@ -202,12 +212,16 @@ public class DecisionEngine implements DecisionEngineSpec {
                 result = this.handleSearch(command);
                 break;
             case UNDO:
+                result = this.handleUndo(command);
                 break;
             default:
                 // if we reach this point, LTA Command Parser has failed in his duty
                 // and awaits court martial
                 assert false;
         }
+
+        // add command to history stack to allow for undoing the operation
+        this.commandHistory.push(command);
 
         return result;
     }

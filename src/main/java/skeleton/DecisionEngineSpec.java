@@ -2,7 +2,7 @@ package skeleton;
 
 import shared.Command;
 import shared.ExecutionResult;
-import storage.Task;
+import shared.Task;
 
 public interface DecisionEngineSpec {
 

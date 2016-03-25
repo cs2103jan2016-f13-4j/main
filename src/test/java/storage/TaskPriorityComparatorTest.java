@@ -10,7 +10,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import exception.ExceptionHandler;
-import storage.Task.Priority;
+import shared.Task;
+import shared.Task.Priority;
 
 /**
  * 
