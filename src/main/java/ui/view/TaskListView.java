@@ -15,15 +15,18 @@ import ui.controller.TaskListController;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @@author Antonius Satrio Triatmoko
  */
 public class TaskListView extends View {
-
+    private final int MAXIMUM_DISPLAY_SIZE = 6;
     private ObservableList _observableList;
     private TaskListController _listControl ;
+    private List<Pair<Integer,Task>> _displayList;
+    private int _viewIndex;
     /**
      * Constructs a new view containing the provided data
      *
@@ -34,7 +37,8 @@ public class TaskListView extends View {
     }
 
     @Override protected void buildContent() {
-        _observableList  = FXCollections.observableArrayList((List<Pair<Integer,Task>>)this.getData());
+        _displayList =  constructDisplayList();
+        _observableList  = FXCollections.observableArrayList(_displayList);
         ListView listView = Resources.getInstance().getComponent("TaskList");
         listView.setItems(this._observableList);
         listView.setCellFactory(list -> new Item());
@@ -78,5 +82,20 @@ public class TaskListView extends View {
                 this.setGraphic(this._container);
             }
         }
+    }
+
+    private List<Pair<Integer,Task>> constructDisplayList(){
+        List<Pair<Integer,Task>> temp = new ArrayList<Pair<Integer, Task>>();
+        List<Pair<Integer,Task>> viewData = (List<Pair<Integer,Task>>)this.getData();
+
+        if(viewData.size() > MAXIMUM_DISPLAY_SIZE){
+            for(int i = 0; i < MAXIMUM_DISPLAY_SIZE ; i++ ){
+                temp.add(viewData.get(i));
+            }
+            return temp;
+        } else {
+            return viewData;
+        }
+
     }
 }
