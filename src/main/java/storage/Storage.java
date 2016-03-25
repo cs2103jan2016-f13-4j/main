@@ -57,10 +57,10 @@ public class Storage implements CollectionSpec<Task> {
      */
     public int save(Task task) {
         // TODO: Check for potential time clashes
-        boolean isNewTask = false;
+        boolean isNewTask = (task.getId() == null);
+        boolean isDeleted = task.isDeleted();
 
-        if (task.getId() == null) {
-            isNewTask = true;
+        if (isNewTask) {
 
             // TODO: Extract magic constant
             int newIndex = 1;
@@ -73,7 +73,7 @@ public class Storage implements CollectionSpec<Task> {
             task.setId(newIndex);
         }
 
-        if (!isNewTask) {
+        if (!(isNewTask || isDeleted)) {
             // extract the old Task entry from the tree
             Task oldTask = this.taskData_.get(task.getId());
             this.addTaskToStartTimeTree(isNewTask, task, oldTask);
