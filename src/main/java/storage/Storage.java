@@ -73,7 +73,7 @@ public class Storage implements CollectionSpec<Task> {
             task.setId(newIndex);
         }
 
-        if (!(isNewTask || isDeleted)) {
+        if (!isNewTask) {
             // extract the old Task entry from the tree
             Task oldTask = this.taskData_.get(task.getId());
             this.addTaskToStartTimeTree(isNewTask, task, oldTask);
@@ -190,9 +190,6 @@ public class Storage implements CollectionSpec<Task> {
      * Returns the full (unfiltered) list of Tasks when no TaskDescriptor is
      * specified
      * 
-     * @param taskDescriptor
-     *            the TaskDescriptor that determines the criteria for entry
-     *            match
      * @return results which is a list of filtered Tasks that matches
      *         TaskDescriptor if one is specified, else results is the full list
      *         of Tasks stored in TreeMap
