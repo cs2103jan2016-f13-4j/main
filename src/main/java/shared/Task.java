@@ -67,6 +67,16 @@ public class Task implements Comparable<Task> {
         this._creationTime = LocalDateTime.now();
     }
 
+    // copy ctor, used to construct an identical copy in the clone method
+    private Task(Task o) {
+        this(o._id, o._taskName, o._description, o._startTime, o._endTime);
+    }
+
+    @Override
+    public Task clone() {
+        return new Task(this);
+    }
+
     public String encodeTaskToString() {
         StringBuilder sb = new StringBuilder();
         String[] attributesArr = this.taskAttributesToStringArray();
