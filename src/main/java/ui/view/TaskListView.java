@@ -21,11 +21,19 @@ import java.util.List;
  * @@author Antonius Satrio Triatmoko
  */
 public class TaskListView extends View {
+    /**
+     * Constants
+     */
     private final int MAXIMUM_DISPLAY_SIZE = 6;
+
+    /**
+     * Properties
+     */
     private ObservableList _observableList;
     private TaskListController _listControl ;
     private List<Pair<Integer,Task>> _displayList;
     private int _viewIndex;
+
     /**
      * Constructs a new view containing the provided data
      *

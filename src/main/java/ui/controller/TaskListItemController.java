@@ -4,7 +4,8 @@ package ui.controller;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.util.Pair;
-import storage.Task;
+import shared.Task;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -16,7 +17,7 @@ public class TaskListItemController {
     @FXML private Label _taskNameLabel;
     @FXML private Label _timeLabel;
 
-    private Pair<Integer,Task> _data;
+    private Pair<Integer, Task> _data;
     private final static String DATE_FORMAT = "EE";
     private DateTimeFormatter _timeFormat = DateTimeFormatter.ofPattern(DATE_FORMAT);
 
