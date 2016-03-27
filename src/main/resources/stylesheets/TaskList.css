@@ -1,0 +1,8 @@
+.list--task {
+    -fx-background-insets: 0;
+}
+
+.list-cell {
+    -fx-padding: 0;
+    -fx-background-color: white;
+}

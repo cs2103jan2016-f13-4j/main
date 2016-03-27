@@ -46,6 +46,7 @@ public class TaskListView extends View {
     @Override protected void buildContent() {
         _displayList =  constructDisplayList();
         _observableList  = FXCollections.observableArrayList(_displayList);
+
         ListView listView = Resources.getInstance().getComponent("TaskList");
         listView.setItems(this._observableList);
         listView.setCellFactory(list -> new Item());
