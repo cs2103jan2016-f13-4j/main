@@ -296,7 +296,7 @@ public class DecisionEngine implements DecisionEngineSpec {
 
         // Conclude the pattern
         patternBuilder.append(")\\b");
-        return Pattern.compile(patternBuilder.toString());
+        return Pattern.compile(patternBuilder.toString(), Pattern.CASE_INSENSITIVE);
     }
 
 }
