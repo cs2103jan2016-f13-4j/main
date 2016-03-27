@@ -149,6 +149,7 @@ public class Task implements Comparable<Task> {
                 isDecodingSpecialValue = true;
                 continue;
             }
+            System.out.printf("[%d] = %s\t%s\n", i, line.charAt(i), isDecodingSpecialValue);
             if (line.charAt(i) == '"' && isDecodingSpecialValue) {
                 // Fake quotes
                 if (i > 0 && line.charAt(i-1) == '\\') { continue; }
@@ -158,18 +159,19 @@ public class Task implements Comparable<Task> {
                 specialValue = specialValue.replace("\\\\", "\\");
                 taskValues.add(specialValue);
 
-                begin = i+2;
+                begin = i + 2;
+                i += 1;
                 isDecodingSpecialValue = false;
                 continue;
             }
-            if (line.charAt(i) == DELIMITER_CSV) {
+            if (line.charAt(i) == DELIMITER_CSV && !isDecodingSpecialValue) {
                 String value = line.substring(begin, i);
                 taskValues.add(value);
                 begin = i+1;
             }
         }
         // Account for last leftover value
-        if (begin < line.length()) {
+        if (begin < line.length() && begin >= 0) {
             taskValues.add(line.substring(begin));
         }
 
