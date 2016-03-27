@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import exception.ExceptionHandler;
 
@@ -69,7 +70,7 @@ public class DiskIO {
         return taskStrings;
     }
 
-    public ArrayList<String> write(ArrayList<String> taskStrings) {
+    public List<String> write(List<String> taskStrings) {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(this._fileName));
             for (String taskString : taskStrings) {
