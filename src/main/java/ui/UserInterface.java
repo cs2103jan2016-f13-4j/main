@@ -1,7 +1,6 @@
 package ui;
 
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Font;
@@ -12,7 +11,6 @@ import shared.Resources;
 import skeleton.UserInterfaceSpec;
 import ui.controller.CommandInputController;
 import ui.controller.HeaderController;
-import ui.controller.TaskListController;
 import ui.view.View;
 
 import java.util.function.Function;
@@ -62,7 +60,8 @@ public class UserInterface implements UserInterfaceSpec {
     /**
      * TODO: Write JavaDoc
      */
-    @Override public void initialize() {
+    @Override
+    public void initialize() {
         // Set primary stage
         this._primaryStage = ApplicationContext.getPrimaryStage();
         this._primaryStage.getIcons().add(Resources.getInstance().getImage("mom.png"));
@@ -93,7 +92,8 @@ public class UserInterface implements UserInterfaceSpec {
     /**
      * TODO: Write JavaDoc
      */
-    @Override public void show() {
+    @Override
+    public void show() {
         // Make sure stage and command input handler are both set
         assert (this._primaryStage != null);
         assert (this._commandInputHandler != null);
@@ -108,7 +108,8 @@ public class UserInterface implements UserInterfaceSpec {
      *
      * @param onCommandInput
      */
-    @Override public void setOnCommandInputHandler(Function<String, Void> onCommandInput) {
+    @Override
+    public void setOnCommandInputHandler(Function<String, Void> onCommandInput) {
         this._commandInputHandler = onCommandInput;
     }
 
@@ -145,7 +146,8 @@ public class UserInterface implements UserInterfaceSpec {
         this._rootView.setCenter(this._mainContainer);
     }
 
-    @Override public void render(View view) {
+    @Override
+    public void render(View view) {
         assert this._mainContainer != null;
         assert view != null;
         // TODO: Account for similar controller, only update data
@@ -159,7 +161,8 @@ public class UserInterface implements UserInterfaceSpec {
         this._commandInputController.cleanUp();
     }
 
-    private void setTitle(String title) {
+    @Override
+    public void setHeader(String title) {
         this._headerController.setHeader(title);
     }
 }

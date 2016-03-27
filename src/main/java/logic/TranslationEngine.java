@@ -82,13 +82,23 @@ public class TranslationEngine implements TranslationEngineSpec {
 
         switch (result.getViewType()) {
             case TASK_LIST:
-                // Convert list
+                // Convert list to one with visual IDs only
                 List<Pair<Integer, Task>> visualTaskList =
                         getVisualIndexMapper().translateRawToVisual(result.getData());
+
                 // Update mapper with list
                 VisualIndexMapper.getInstance().updateList(result.getData());
                 View view = new TaskListView(visualTaskList);
                 this.getUserInterface().render(view);
+
+                // Set title
+                String title = "Here are all the things you should do today!";
+                if (visualTaskList.isEmpty()) {
+                    title = "You have got nothing left to do! Have something in mind?" +
+                            " Add a new to-do by typing add name:\"<thing to do>\" and press Enter!";
+                }
+                this.getUserInterface().setHeader(title);
+
                 break;
         }
     }
