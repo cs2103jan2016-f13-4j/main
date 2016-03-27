@@ -15,7 +15,7 @@ public class TaskListController {
 
     private ObservableList<Pair<Integer, Task>> _taskList;
 
-    @FXML private void ininitialize() {
+    @FXML private void initialize() {
 
     }
 

@@ -81,10 +81,15 @@ public class TaskListView extends View {
             } else {
                 int index = item.getKey();
                 Task task = item.getValue();
-                LocalDateTime st = task.getStartTime();
+                LocalDateTime startTime = task.getStartTime();
                 this._indexLabel.setText(Integer.toString(index));
                 this._nameLabel.setText(task.getTaskName());
-                this._dateLabel.setText(_df.format(st)); // TODO: stub
+
+                // Optional date time to support floating tasks
+                this._dateLabel.setText(startTime != null ?
+                        _df.format(startTime) :
+                        ""
+                ); // TODO: stub
 
                 this.setGraphic(this._container);
             }

@@ -30,23 +30,25 @@ public class TaskListItemController {
         _data = pTask;
     }
 
-    public void constructDisplay(){
-        assert (_data != null);
-
-
-
-        Task t = _data.getValue();
-        LocalDateTime startTime = t.getStartTime();
-        LocalDateTime endTime = t.getEndTime();
-        _timeFormat = DateTimeFormatter.ofPattern(DATE_FORMAT);
-
-        String day = startTime.format(_timeFormat);
-        String id = _data.getKey().toString();
-        String tName = t.getTaskName();
-
-        _indexLabel.setText(id);
-        _taskNameLabel.setText(tName);
-        _timeLabel.setText(day);
-
-    }
+//    public void constructDisplay(){
+//        assert (_data != null);
+//
+//        Task t = _data.getValue();
+//        LocalDateTime startTime = t.getStartTime();
+//        LocalDateTime endTime = t.getEndTime();
+//        _timeFormat = DateTimeFormatter.ofPattern(DATE_FORMAT);
+//
+//        String id = _data.getKey().toString();
+//        String tName = t.getTaskName();
+//
+//        String day = "";
+//        if (startTime != null) {
+//            day = startTime.format(_timeFormat);
+//        }
+//
+//        _indexLabel.setText(id);
+//        _taskNameLabel.setText(tName);
+//        _timeLabel.setText(day);
+//
+//    }
 }
