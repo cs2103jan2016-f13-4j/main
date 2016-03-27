@@ -102,11 +102,6 @@ public class TranslationEngine implements TranslationEngineSpec {
                             " Add a new to-do by typing add name:\"<thing to do>\" and press Enter!";
                 }
 
-                // XXX: Debug
-                if (this._lastCommand != null) {
-                    System.out.println(this._lastCommand.getInstruction());
-                }
-
                 // Account for search queries
                 if (this._lastCommand != null &&
                         this._lastCommand.hasInstruction(Command.Instruction.SEARCH)) {

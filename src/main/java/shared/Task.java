@@ -149,7 +149,6 @@ public class Task implements Comparable<Task> {
                 isDecodingSpecialValue = true;
                 continue;
             }
-            System.out.printf("[%d] = %s\t%s\n", i, line.charAt(i), isDecodingSpecialValue);
             if (line.charAt(i) == '"' && isDecodingSpecialValue) {
                 // Fake quotes
                 if (i > 0 && line.charAt(i-1) == '\\') { continue; }
