@@ -152,6 +152,20 @@ public class DecisionEngine implements DecisionEngineSpec {
     protected ExecutionResult handleDelete(Command command) {
         assert command.hasInstruction(Command.Instruction.DELETE);
 
+        // Handle case where delete is aggregate
+        // TODO: Make this undo-able
+        if (command.isUniversallyQuantified()) {
+            // For undoing
+//            this.getTaskCollection().getAll().stream()
+//                    .map(Task::clone)
+//                    .forEach(task -> task.setDeletedStatus(true));
+            // Temporary
+            this.getTaskCollection().getAll().stream()
+                    .mapToInt(Task::getId)
+                    .forEach(this.getTaskCollection()::remove);
+            return this.displayAllTasks();
+        }
+
         Integer id = command.getIndex();
         assert id != null;
 
