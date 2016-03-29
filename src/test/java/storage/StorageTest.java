@@ -4,17 +4,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import exception.ExceptionHandler;
 import shared.Task;
 
 /**
@@ -100,26 +96,9 @@ public class StorageTest {
 
     }
 
-    @Test public void Write_to_disk_method_in_TaskCollection_works_correctly() {
-        File expectedFile = new File("tmp/Expected.csv");
-        BufferedWriter writer;
-
-        String taskString1 = "\"1\", \"marketing pitch\", \"client XYZ\", \"2016-03-09T14:30\", \"2016-03-09T16:30\"";
-        String taskString2 = "\"2\", \"sales meeting\", \"client ABC\", \"2016-03-11T12:00\", \"2016-03-11T14:30\"";
-        ArrayList<String> taskStrings = new ArrayList<String>();
-        taskStrings.add(taskString1);
-        taskStrings.add(taskString2);
-        try {
-            writer = new BufferedWriter(new FileWriter(expectedFile));
-            for (String taskString : taskStrings) {
-                writer.write(taskString);
-
-                writer.newLine();
-            }
-            writer.close();
-        } catch (IOException e) {
-            ExceptionHandler.handle(e);
-        }
+    @Test public void Write_to_disk_method_works_correctly() {
+        File actualFile = new File("tmp/ToDoData.csv");
+        this._storage.getDiskIO().setFileName("tmp/ToDoData.csv");
 
         Task task1 = new Task(null, "marketing pitch", "client XYZ", LocalDateTime.of(2016, 3, 9, 14, 30),
                 LocalDateTime.of(2016, 3, 9, 16, 30));
@@ -129,7 +108,6 @@ public class StorageTest {
         this._storage.save(task2);
         this._storage.writeToDisk();
 
-        File actualFile = new File("tmp/ToDoData.csv");
         // check that file gets created when writeToFile() is called
         assertTrue(actualFile.isFile());
 

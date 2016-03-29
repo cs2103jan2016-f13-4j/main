@@ -98,9 +98,9 @@ public class DiskIOTest {
     }
 
     @Test public void Read_function_extracts_tasks_data_from_file() {
-        String taskString1 = "\"1\", \"marketing pitch\", \"client FGH\", \"2016-03-04T10:00\", \"2016-03-04T12:00\"";
-        String taskString2 = "\"2\", \"sales meeting\", \"client IJK\", \"2016-03-05T11:30\", \"2016-03-05T13:30\"";
-        String taskString3 = "\"3\", \"sales meeting\", \"internal\", \"2016-03-06T09:30\", \"2016-03-06T11:30\"";
+        String taskString1 = "1,marketing pitch,client FGH,2016-03-04T10:00,2016-03-04T12:00";
+        String taskString2 = "2,sales meeting,client IJK,2016-03-05T11:30,2016-03-05T13:30";
+        String taskString3 = "3,sales meeting,internal,2016-03-06T09:30,2016-03-06T11:30";
 
         ArrayList<String> taskStrings = new ArrayList<String>();
         taskStrings.add(taskString1);
@@ -135,8 +135,8 @@ public class DiskIOTest {
 
     @Test public void Write_function_writes_data_into_file_correctly() throws IOException {
 
-        String taskString1 = "\"1\", \"marketing pitch\", \"client XYZ\", \"2016-03-09T14:30\", \"2016-03-09T16:30\"";
-        String taskString2 = "\"2\", \"sales meeting\", \"client ABC\", \"2016-03-11T12:00\", \"2016-03-11T14:30\"";
+        String taskString1 = "1,marketing pitch,client XYZ,2016-03-09T14:30,2016-03-09T16:30";
+        String taskString2 = "2,sales meeting,client ABC,2016-03-11T12:00,2016-03-11T14:30";
         ArrayList<String> taskStrings = new ArrayList<String>();
         taskStrings.add(taskString1);
         taskStrings.add(taskString2);
@@ -145,10 +145,8 @@ public class DiskIOTest {
         this._diskIO.write(taskStrings);
 
         BufferedReader reader = new BufferedReader(new FileReader("tmp/ToDoData.csv"));
-        assertEquals("\"1\", \"marketing pitch\", \"client XYZ\", \"2016-03-09T14:30\", \"2016-03-09T16:30\"",
-                reader.readLine());
-        assertEquals("\"2\", \"sales meeting\", \"client ABC\", \"2016-03-11T12:00\", \"2016-03-11T14:30\"",
-                reader.readLine());
+        assertEquals("1,marketing pitch,client XYZ,2016-03-09T14:30,2016-03-09T16:30", reader.readLine());
+        assertEquals("2,sales meeting,client ABC,2016-03-11T12:00,2016-03-11T14:30", reader.readLine());
         reader.close();
     }
 

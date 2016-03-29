@@ -101,8 +101,6 @@ public class Task implements Comparable<Task> {
     public String[] taskAttributesToStringArray() {
         String[] attributesArr = new String[this.NUMBER_OF_ATTRIBUTES_TO_SERIALIZE];
 
-        // wrap strings in quotes
-
         attributesArr[0] = this._id.toString(); // int value, does not contain
                                                 // special characters
 
@@ -141,9 +139,6 @@ public class Task implements Comparable<Task> {
         // Convert all quotes to backslash quote
         attribute = attribute.replace("\"", "\\\"");
 
-        // Convert all commas to backslash comma
-        attribute = attribute.replace(",", "\\,");
-
         return attribute;
     }
 
@@ -154,7 +149,7 @@ public class Task implements Comparable<Task> {
     // ----------------------------------------------------------------------------------------
 
     public void decodeTaskFromString(String line) {
-        ArrayList<String> taskStringList = new ArrayList<String>();
+        ArrayList<String> taskAttributesList = new ArrayList<String>();
         int start = 0;
         String tempTaskString = "";
 
@@ -166,15 +161,18 @@ public class Task implements Comparable<Task> {
             // attribute
             if (startChar != '\"' && endChar == ',' && line.charAt(end - 1) != '\\') {
                 tempTaskString = line.substring(start, end);
-                taskStringList.add(tempTaskString);
+                taskAttributesList.add(tempTaskString);
                 start = end + 1;
                 end = end + 2;
             }
             // Case 2: Substring is enclosed with quotes, is not the last
             // attribute
-            else if (startChar == '\"' && endChar == '\"' && line.charAt(end + 1) == ',') {
+            else if (startChar == '\"'
+                    && ((endChar == '\"' && line.charAt(end - 1) == '\\' && line.charAt(end - 2) == '\\')
+                            || (endChar == '\"' && line.charAt(end - 1) != '\\'))
+                    && line.charAt(end + 1) == ',') {
                 tempTaskString = line.substring(start, end + 1);
-                taskStringList.add(tempTaskString);
+                taskAttributesList.add(tempTaskString);
                 start = end + 2;
                 end = end + 3;
             }
@@ -182,30 +180,33 @@ public class Task implements Comparable<Task> {
             else if ((startChar != '\"' && end == line.length() - 1)
                     || (startChar == '\"' && endChar == '\"' && end == line.length() - 1)) {
                 tempTaskString = line.substring(start);
-                taskStringList.add(tempTaskString);
+                taskAttributesList.add(tempTaskString);
             }
         }
 
-        // check the number of attributes decoded and added into the ArrayList
+        checkNumberOfDecodedAttributes(taskAttributesList);
+
+        // get rid of extra backslashes that were added in during the Task
+        // encoding process
+        taskAttributesList = removeAdditionalBackslashes(taskAttributesList);
+
+        assignDecodedValuesToAttributes(taskAttributesList);
+    }
+
+    public void checkNumberOfDecodedAttributes(ArrayList<String> taskAttributesList) {
         try {
-            if (taskStringList.size() != 5) {
+            if (taskAttributesList.size() != 5) {
                 throw new IllegalArgumentException();
             }
         } catch (IllegalArgumentException e) {
             ExceptionHandler.handle(e);
         }
+    }
 
-        // get rid of extra backslashes that were added in during the Task
-        // encoding process
-        taskStringList = removeAdditionalBackslashes(taskStringList);
-
-        // assign values to attributes
-        for (int i = 0; i < 5; i++) {
-            String tempAttribute = taskStringList.get(i);
-            // if attribute value is surrounded by quotes, remove them
-            if (tempAttribute.charAt(0) == '\"' && tempAttribute.charAt(tempAttribute.length() - 1) == '\"') {
-                tempAttribute = tempAttribute.substring(1, tempAttribute.length() - 1);
-            }
+    public void assignDecodedValuesToAttributes(ArrayList<String> taskAttributesList) {
+        for (int i = 0; i < this.NUMBER_OF_ATTRIBUTES_TO_SERIALIZE; i++) {
+            String tempAttribute = taskAttributesList.get(i);
+            tempAttribute = removeSurroundingQuotes(tempAttribute);
 
             switch (i) {
             case 0:
@@ -236,12 +237,16 @@ public class Task implements Comparable<Task> {
             // Convert backslash quote to quote
             attribute = attribute.replace("\\\"", "\"");
 
-            // Convert backslash comma to comma
-            attribute = attribute.replace("\\,", ",");
-
             processedList.add(attribute);
         }
         return processedList;
+    }
+
+    public String removeSurroundingQuotes(String attributeString) {
+        if (attributeString.charAt(0) == '\"' && attributeString.charAt(attributeString.length() - 1) == '\"') {
+            attributeString = attributeString.substring(1, attributeString.length() - 1);
+        }
+        return attributeString;
     }
 
     @Override public int compareTo(Task o) {

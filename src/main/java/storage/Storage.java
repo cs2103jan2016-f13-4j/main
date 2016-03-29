@@ -391,7 +391,10 @@ public class Storage implements CollectionSpec<Task> {
     // ----------------------------------------------------------------------------------------
 
     public void readFromDisk() {
-        ArrayList<String> taskStrings = this.diskIO_.read();
+        readFromDisk(this.diskIO_.read());
+    }
+
+    public void readFromDisk(ArrayList<String> taskStrings) {
         for (String taskString : taskStrings) {
             Task currTask = new Task(null, null, null, null, null);
             currTask.decodeTaskFromString(taskString);

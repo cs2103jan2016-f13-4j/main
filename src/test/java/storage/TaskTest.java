@@ -44,7 +44,7 @@ public class TaskTest {
         String specialTaskString = specialTask.encodeTaskToString();
 
         String expected = "123,"
-                + "\"A task with comma\\, and \\\"quotes\\\"\\, and \\\"comma\\, within quotes\\\"\\, and backslash before quote\\\\\\\"\",Random description,2016-03-09T23:59,2016-03-11T12:00";
+                + "\"A task with comma, and \\\"quotes\\\", and \\\"comma, within quotes\\\", and backslash before quote\\\\\\\"\",Random description,2016-03-09T23:59,2016-03-11T12:00";
 
         assertEquals(expected, specialTaskString);
     }
@@ -61,7 +61,7 @@ public class TaskTest {
         // Convert all backslashes to double backslashes
         // Convert all quotes to backslash quote
         // Convert all commas to backslash comma
-        String encodedSpecialString = "A task with comma\\, and \\\"quotes\\\"\\, and \\\"comma\\, within quotes\\\"\\, and backslash before quote\\\\\\\"";
+        String encodedSpecialString = "A task with comma, and \\\"quotes\\\", and \\\"comma, within quotes\\\", and backslash before quote\\\\\\\"";
 
         String taskString = "123,\"" + encodedSpecialString + "\",Random description,"
                 + LocalDateTime.of(2016, 3, 10, 12, 00).toString() + ","
