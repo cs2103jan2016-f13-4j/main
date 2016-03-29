@@ -18,16 +18,22 @@ import shared.Task;
 
 public class TaskTest {
 
+    // ----------------------------------------------------------------------------------------
+    //
+    // I. Encoding To String Tests
+    //
+    // ----------------------------------------------------------------------------------------
+
     @Test public void Task_is_encoded_correctly() {
         Task task1 = new Task(1, "proposal", "client ABC", LocalDateTime.of(2016, 3, 6, 14, 30),
                 LocalDateTime.of(2016, 3, 8, 14, 30));
         String taskString = task1.encodeTaskToString();
-        String[] taskStringArr = taskString.split(", ");
-        assertEquals("\"" + "1" + "\"", taskStringArr[0]);
-        assertEquals("\"" + "proposal" + "\"", taskStringArr[1]);
-        assertEquals("\"" + "client ABC" + "\"", taskStringArr[2]);
-        assertEquals("\"" + LocalDateTime.of(2016, 3, 6, 14, 30).toString() + "\"", taskStringArr[3]);
-        assertEquals("\"" + LocalDateTime.of(2016, 3, 8, 14, 30).toString() + "\"", taskStringArr[4]);
+        String[] taskStringArr = taskString.split(",");
+        assertEquals("1", taskStringArr[0]);
+        assertEquals("proposal", taskStringArr[1]);
+        assertEquals("client ABC", taskStringArr[2]);
+        assertEquals(LocalDateTime.of(2016, 3, 6, 14, 30).toString(), taskStringArr[3]);
+        assertEquals(LocalDateTime.of(2016, 3, 8, 14, 30).toString(), taskStringArr[4]);
     }
 
     @Test public void Task_with_special_characters_still_encode_correctly() {
@@ -37,12 +43,17 @@ public class TaskTest {
                 LocalDateTime.of(2016, 3, 11, 12, 00));
         String specialTaskString = specialTask.encodeTaskToString();
 
-        String expected = "" + "\"123\", "
-                + "\"A task with comma, and \"quotes\", and \"comma, within quotes\", and backslash before quote\\\"\", "
-                + "\"Random description\", " + "\"2016-03-09T23:59\", \"2016-03-11T12:00\"";
+        String expected = "123,"
+                + "\"A task with comma, and \"quotes\", and \"comma, within quotes\", and backslash before quote\\\"\",Random description,2016-03-09T23:59,2016-03-11T12:00";
 
         assertEquals(expected, specialTaskString);
     }
+
+    // ----------------------------------------------------------------------------------------
+    //
+    // II. Decoding From String Tests
+    //
+    // ----------------------------------------------------------------------------------------
 
     @Test public void Task_with_special_characters_still_decode_correctly() {
         String specialString = "A task with comma, and \"quotes\", and \"comma, within quotes\", and backslash before quote\\\"";
@@ -74,6 +85,12 @@ public class TaskTest {
         assertEquals(LocalDateTime.parse("2016-03-09t14:30:00"), task4.getStartTime());
         assertEquals(LocalDateTime.parse("2016-03-09t15:30:00"), task4.getEndTime());
     }
+
+    // ----------------------------------------------------------------------------------------
+    //
+    // III. Set ID Test
+    //
+    // ----------------------------------------------------------------------------------------
 
     @Test public void SetId_method_successfully_assign_ID_to_Task() {
         // create Task with null ID

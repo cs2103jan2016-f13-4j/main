@@ -74,8 +74,7 @@ public class Task implements Comparable<Task> {
         this(o._id, o._taskName, o._description, o._startTime, o._endTime);
     }
 
-    @Override
-    public Task clone() {
+    @Override public Task clone() {
         return new Task(this);
     }
 
@@ -84,7 +83,7 @@ public class Task implements Comparable<Task> {
         String[] attributesArr = this.taskAttributesToStringArray();
         // the last attribute will be appended outside the loop
         for (int i = 0; i < attributesArr.length - 1; i++) {
-            sb.append(attributesArr[i]).append(", ");
+            sb.append(attributesArr[i]).append(",");
         }
         sb.append(attributesArr[attributesArr.length - 1]);
         return sb.toString();
@@ -94,12 +93,34 @@ public class Task implements Comparable<Task> {
         String[] attributesArr = new String[this.NUMBER_OF_ATTRIBUTES_TO_SERIALIZE];
 
         // wrap strings in quotes
-        attributesArr[0] = "\"" + this._id.toString() + "\"";
-        attributesArr[1] = "\"" + this._taskName + "\"";
-        attributesArr[2] = "\"" + this._description + "\"";
-        attributesArr[3] = "\"" + this._startTime.toString() + "\"";
-        attributesArr[4] = "\"" + this._endTime.toString() + "\"";
+
+        attributesArr[0] = this._id.toString(); // int value, does not contain
+                                                // special characters
+
+        if (checkContainsSpecialCharacters(this._taskName)) {
+            attributesArr[1] = "\"" + this._taskName + "\"";
+        } else {
+            attributesArr[1] = this._taskName;
+        }
+
+        if (checkContainsSpecialCharacters(this._description)) {
+            attributesArr[2] = "\"" + this._description + "\"";
+        } else {
+            attributesArr[2] = this._description;
+        }
+
+        // LocalDateTime does not contain special characters
+        attributesArr[3] = this._startTime.toString();
+        attributesArr[4] = this._endTime.toString();
         return attributesArr;
+    }
+
+    public boolean checkContainsSpecialCharacters(String attribute) {
+        if (attribute.contains(",") || attribute.contains("\"")) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public void decodeTaskFromString(String line) {
@@ -187,6 +208,7 @@ public class Task implements Comparable<Task> {
     public boolean isDeleted() {
         return this._isDeleted;
     }
+
     /**
      * Setters
      */
