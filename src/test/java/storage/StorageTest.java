@@ -264,4 +264,29 @@ public class StorageTest {
         assertTrue(this._storage.getEndTimeTree().get(this.TASK_3_END).contains(newTask));
     }
 
+    // ----------------------------------------------------------------------------------------
+    //
+    // VII. Read From Disk Method Tests
+    //
+    // ----------------------------------------------------------------------------------------
+
+    @Test public void Read_from_disk_method_works_correctly() {
+        String taskString1 = "1,marketing pitch,client XYZ,2016-03-09T14:30,2016-03-09T16:30";
+        String taskString2 = "2,sales meeting,client ABC,2016-03-11T12:00,2016-03-11T14:30";
+        ArrayList<String> taskStrings = new ArrayList<String>();
+        taskStrings.add(taskString1);
+        taskStrings.add(taskString2);
+
+        this._storage.removeAll();
+        this._storage.readFromDisk(taskStrings);
+        assertEquals((Integer) 1, this._storage.get(1).getId());
+        assertEquals("marketing pitch", this._storage.get(1).getTaskName());
+        assertEquals(LocalDateTime.parse("2016-03-09T14:30"), this._storage.get(1).getStartTime());
+        assertEquals(LocalDateTime.parse("2016-03-09T16:30"), this._storage.get(1).getEndTime());
+        assertEquals((Integer) 2, this._storage.get(2).getId());
+        assertEquals("sales meeting", this._storage.get(2).getTaskName());
+        assertEquals(LocalDateTime.parse("2016-03-11T12:00"), this._storage.get(2).getStartTime());
+        assertEquals(LocalDateTime.parse("2016-03-11T14:30"), this._storage.get(2).getEndTime());
+    }
+
 }
