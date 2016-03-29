@@ -1,7 +1,10 @@
 package ui;
 
 import javafx.scene.Scene;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Font;
@@ -47,7 +50,7 @@ public class UserInterface implements UserInterfaceSpec {
     private HeaderController _headerController;
     private CommandInputController _commandInputController;
 
-    private AnchorPane _mainContainer;
+    private ScrollPane _mainContainer;
 
     private UserInterface() {
     }
@@ -140,7 +143,7 @@ public class UserInterface implements UserInterfaceSpec {
     }
 
     private void registerViewContainer() {
-        this._mainContainer = new AnchorPane();
+        this._mainContainer = new ScrollPane();
         this._mainContainer.getStyleClass().add(STYLE_CLASS_CONTAINER_MAIN);
         this._rootView.setCenter(this._mainContainer);
     }
@@ -148,18 +151,30 @@ public class UserInterface implements UserInterfaceSpec {
     @Override public void render(View view) {
         assert this._mainContainer != null;
         assert view != null;
-        // TODO: Account for similar controller, only update data
-        this._mainContainer.getChildren().clear();
-        this._mainContainer.getChildren().add(view.getComponent());
+        this._mainContainer.setContent(view.getComponent());
+        this._mainContainer.getContent().requestFocus();
+        createKeyboardEvent();
+
     }
 
-    @Override
-    public void cleanUp() {
+    @Override public void cleanUp() {
         // Trickle down to controller
         this._commandInputController.cleanUp();
     }
 
     private void setTitle(String title) {
         this._headerController.setHeader(title);
+    }
+
+    public void createKeyboardEvent(){
+        this._mainContainer.setOnKeyPressed(ke->allowNodeTraversing(ke));{
+
+        };
+    }
+
+    public void allowNodeTraversing(KeyEvent ke){
+        if(ke.getCode() == KeyCode.ALPHANUMERIC){
+            this._rootView.getBottom().getStyleClass().requestFocus();
+        }
     }
 }
