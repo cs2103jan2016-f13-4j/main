@@ -1,6 +1,9 @@
 package shared;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+
+import exception.ExceptionHandler;
 
 /**
  * @@author Chng Hui Yie
@@ -11,7 +14,7 @@ public class Task implements Comparable<Task> {
      * Constants
      */
     private final int NUMBER_OF_ATTRIBUTES_TO_SERIALIZE = 5;
-    private final String CSV_DELIMITER = "\", \"";
+    private final String CSV_DELIMITER = ",";
 
     /**
      * Properties
@@ -78,6 +81,12 @@ public class Task implements Comparable<Task> {
         return new Task(this);
     }
 
+    // ----------------------------------------------------------------------------------------
+    //
+    // Methods for encoding Task to String
+    //
+    // ----------------------------------------------------------------------------------------
+
     public String encodeTaskToString() {
         StringBuilder sb = new StringBuilder();
         String[] attributesArr = this.taskAttributesToStringArray();
@@ -98,13 +107,14 @@ public class Task implements Comparable<Task> {
                                                 // special characters
 
         if (checkContainsSpecialCharacters(this._taskName)) {
-            attributesArr[1] = "\"" + this._taskName + "\"";
+            attributesArr[1] = "\"" + escapeSpecialCharacters(this._taskName) + "\"";
+
         } else {
             attributesArr[1] = this._taskName;
         }
 
         if (checkContainsSpecialCharacters(this._description)) {
-            attributesArr[2] = "\"" + this._description + "\"";
+            attributesArr[2] = "\"" + escapeSpecialCharacters(this._description) + "\"";
         } else {
             attributesArr[2] = this._description;
         }
@@ -116,38 +126,122 @@ public class Task implements Comparable<Task> {
     }
 
     public boolean checkContainsSpecialCharacters(String attribute) {
-        if (attribute.contains(",") || attribute.contains("\"")) {
+        // special characters are comma, quote and backslash
+        if (attribute.contains(",") || attribute.contains("\"") || attribute.contains("\\")) {
             return true;
         } else {
             return false;
         }
     }
 
-    public void decodeTaskFromString(String line) {
-        // use comma as separator
-        String[] taskStringArr = line.split(this.CSV_DELIMITER);
+    public String escapeSpecialCharacters(String attribute) {
+        // Convert all backslashes to double backslashes
+        attribute = attribute.replace("\\", "\\\\");
 
-        if (taskStringArr.length != 5) {
-            throw new IllegalArgumentException();
+        // Convert all quotes to backslash quote
+        attribute = attribute.replace("\"", "\\\"");
+
+        // Convert all commas to backslash comma
+        attribute = attribute.replace(",", "\\,");
+
+        return attribute;
+    }
+
+    // ----------------------------------------------------------------------------------------
+    //
+    // Methods for decoding Task from String
+    //
+    // ----------------------------------------------------------------------------------------
+
+    public void decodeTaskFromString(String line) {
+        ArrayList<String> taskStringList = new ArrayList<String>();
+        int start = 0;
+        String tempTaskString = "";
+
+        for (int end = 1; end < line.length(); end++) {
+            char startChar = line.charAt(start);
+            char endChar = line.charAt(end);
+
+            // Case 1: Substring is not enclosed with quotes, is not the last
+            // attribute
+            if (startChar != '\"' && endChar == ',' && line.charAt(end - 1) != '\\') {
+                tempTaskString = line.substring(start, end);
+                taskStringList.add(tempTaskString);
+                start = end + 1;
+                end = end + 2;
+            }
+            // Case 2: Substring is enclosed with quotes, is not the last
+            // attribute
+            else if (startChar == '\"' && endChar == '\"' && line.charAt(end + 1) == ',') {
+                tempTaskString = line.substring(start, end + 1);
+                taskStringList.add(tempTaskString);
+                start = end + 2;
+                end = end + 3;
+            }
+            // Case 3: Substring is the last attribute
+            else if ((startChar != '\"' && end == line.length() - 1)
+                    || (startChar == '\"' && endChar == '\"' && end == line.length() - 1)) {
+                tempTaskString = line.substring(start);
+                taskStringList.add(tempTaskString);
+            }
         }
 
-        // use substring to remove surrounding quotes
-        // first array element has the ending quote removed due to the chosen
-        // delimiter
-        this._id = Integer.parseInt(taskStringArr[0].substring(1, taskStringArr[0].length()));
+        // check the number of attributes decoded and added into the ArrayList
+        try {
+            if (taskStringList.size() != 5) {
+                throw new IllegalArgumentException();
+            }
+        } catch (IllegalArgumentException e) {
+            ExceptionHandler.handle(e);
+        }
 
-        // second array element has both starting and ending quotes removed
-        this._taskName = taskStringArr[1];
+        // get rid of extra backslashes that were added in during the Task
+        // encoding process
+        taskStringList = removeAdditionalBackslashes(taskStringList);
 
-        // third array element has both starting and ending quotes removed
-        this._description = taskStringArr[2];
+        // assign values to attributes
+        for (int i = 0; i < 5; i++) {
+            String tempAttribute = taskStringList.get(i);
+            // if attribute value is surrounded by quotes, remove them
+            if (tempAttribute.charAt(0) == '\"' && tempAttribute.charAt(tempAttribute.length() - 1) == '\"') {
+                tempAttribute = tempAttribute.substring(1, tempAttribute.length() - 1);
+            }
 
-        // fourth array element has both starting and ending quotes removed
-        this._startTime = LocalDateTime.parse(taskStringArr[3]);
+            switch (i) {
+            case 0:
+                this._id = Integer.parseInt(tempAttribute);
+                break;
+            case 1:
+                this._taskName = tempAttribute;
+                break;
+            case 2:
+                this._description = tempAttribute;
+                break;
+            case 3:
+                this._startTime = LocalDateTime.parse(tempAttribute);
+                break;
+            case 4:
+                this._endTime = LocalDateTime.parse(tempAttribute);
+                break;
+            }
+        }
+    }
 
-        // fifth array element has the starting quote removed
-        this._endTime = LocalDateTime.parse(taskStringArr[4].substring(0, taskStringArr[4].length() - 1));
+    public ArrayList<String> removeAdditionalBackslashes(ArrayList<String> unprocessedList) {
+        ArrayList<String> processedList = new ArrayList<String>();
+        for (String attribute : unprocessedList) {
+            // Convert double backslashes to backslash
+            attribute = attribute.replace("\\\\", "\\");
 
+            // Convert backslash quote to quote
+            attribute = attribute.replace("\\\"", "\"");
+
+            // Convert backslash comma to comma
+            attribute = attribute.replace("\\,", ",");
+
+            processedList.add(attribute);
+        }
+        return processedList;
     }
 
     @Override public int compareTo(Task o) {
