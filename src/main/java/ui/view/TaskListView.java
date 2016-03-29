@@ -24,12 +24,10 @@ import java.util.List;
  * @@author Antonius Satrio Triatmoko
  */
 public class TaskListView extends View {
-    private final int MAXIMUM_DISPLAY_SIZE = 10;
 
     private ObservableList _observableList;
     private TaskListController _listControl ;
     private List<Pair<Integer,Task>> _displayList;
-    private int _viewIndex;
     /**
      * Constructs a new view containing the provided data
      *
@@ -37,12 +35,11 @@ public class TaskListView extends View {
      */
     public TaskListView(List<Pair<Integer,Task>> data) {
         super(data);
-        this._viewIndex = 0;
     }
 
     @Override protected void buildContent() {
-        _displayList =  constructDisplayList();
-        _observableList  = FXCollections.observableArrayList(_displayList);
+       this._displayList =  (List<Pair<Integer,Task>>) this.getData();
+        this._observableList  = FXCollections.observableArrayList(this._displayList);
         ListView listView = Resources.getInstance().getComponent("TaskList");
         listView.setItems(this._observableList);
         listView.setCellFactory(list -> new Item());
@@ -105,6 +102,7 @@ public class TaskListView extends View {
     }
 
     //helper Function
+    /*
     public List<Pair<Integer,Task>> constructDisplayList(){
         List<Pair<Integer,Task>> temp = new ArrayList<Pair<Integer, Task>>();
         List<Pair<Integer,Task>> viewData = (List<Pair<Integer,Task>>)this.getData();
@@ -121,16 +119,6 @@ public class TaskListView extends View {
         }
 
     }
+    */
 
-    public void setObservableValue(List<Pair<Integer,Task>> list){
-        this._observableList = FXCollections.observableArrayList(list);
-    }
-
-    public void incrementViewIndex(){
-        this._viewIndex++;
-    }
-
-    public void decrementViewIndex(){
-        this._viewIndex--;
-    }
 }

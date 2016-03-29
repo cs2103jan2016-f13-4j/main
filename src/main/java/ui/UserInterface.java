@@ -173,8 +173,7 @@ public class UserInterface implements UserInterfaceSpec {
     }
 
     public void allowNodeTraversing(KeyEvent ke){
-        if(ke.getCode() == KeyCode.ALPHANUMERIC){
-            this._rootView.getBottom().getStyleClass().requestFocus();
-        }
+        System.out.println(ke.getCode().toString());
+
     }
 }
