@@ -23,53 +23,11 @@ public class StorageTest {
 
     private Storage _storage;
 
-    private final String TASK_1_NAME = "homework";
-    private final String TASK_1_DESCRIPTION = "cs2103t";
-    private final LocalDateTime TASK_1_START = LocalDateTime.of(2016, 3, 4, 14, 30);
-    private final LocalDateTime TASK_1_END = LocalDateTime.of(2016, 3, 5, 14, 30);
-    private Task task1_;
-
-    private final String TASK_2_NAME = "assignment";
-    private final String TASK_2_DESCRIPTION = "cs3230";
-    private final LocalDateTime TASK_2_START = LocalDateTime.of(2016, 3, 5, 14, 30);
-    private final LocalDateTime TASK_2_END = LocalDateTime.of(2016, 3, 6, 14, 30);
-    private Task task2_;
-
-    private final String TASK_3_NAME = "tutorial";
-    private final String TASK_3_DESCRIPTION = "nm2101";
-    private final LocalDateTime TASK_3_START = LocalDateTime.of(2016, 3, 6, 14, 30);
-    private final LocalDateTime TASK_3_END = LocalDateTime.of(2016, 3, 7, 14, 30);
-    private Task task3_;
-
-    private final String TASK_4_NAME = "tutorial";
-    private final String TASK_4_DESCRIPTION = "nm2101";
-    private final LocalDateTime TASK_4_START = LocalDateTime.of(2016, 3, 7, 14, 30);
-    private final LocalDateTime TASK_4_END = LocalDateTime.of(2016, 3, 8, 14, 30);
-    private Task task4_;
-
-    private final String TASK_5_NAME = "tutorial";
-    private final String TASK_5_DESCRIPTION = "nm2101";
-    private final LocalDateTime TASK_5_START = LocalDateTime.of(2016, 3, 8, 14, 30);
-    private final LocalDateTime TASK_5_END = LocalDateTime.of(2016, 3, 9, 14, 30);
-    private Task task5_;
-
     @Before public void setUp() {
         this._storage = Storage.getInstance();
 
         // Clear all pre-existing data in TaskCollection
         this._storage.removeAll();
-
-        this.task1_ = new Task(null, this.TASK_1_NAME, this.TASK_1_DESCRIPTION, this.TASK_1_START, this.TASK_1_END);
-        this.task2_ = new Task(null, this.TASK_2_NAME, this.TASK_2_DESCRIPTION, this.TASK_2_START, this.TASK_2_END);
-        this.task3_ = new Task(null, this.TASK_3_NAME, this.TASK_3_DESCRIPTION, this.TASK_3_START, this.TASK_3_END);
-        this.task4_ = new Task(null, this.TASK_4_NAME, this.TASK_4_DESCRIPTION, this.TASK_4_START, this.TASK_4_END);
-        this.task5_ = new Task(null, this.TASK_5_NAME, this.TASK_5_DESCRIPTION, this.TASK_5_START, this.TASK_5_END);
-
-        this._storage.save(this.task1_);
-        this._storage.save(this.task2_);
-        this._storage.save(this.task3_);
-        this._storage.save(this.task4_);
-        this._storage.save(this.task5_);
     }
 
     // ----------------------------------------------------------------------------------------
@@ -79,20 +37,22 @@ public class StorageTest {
     // ----------------------------------------------------------------------------------------
 
     @Test public void Save_returns_correct_Task_ID() {
-        int returnedID = this._storage.save(this.task1_);
+        int returnedID = this._storage.save(new Task(null, "marketing pitch", "client XYZ",
+                LocalDateTime.of(2016, 3, 9, 14, 30), LocalDateTime.of(2016, 3, 9, 16, 30)));
         assertEquals(1, returnedID);
     }
 
     @Test public void Save_sets_ID_when_ID_is_null() {
         // create Task with null value as ID
-        Task taskNullID = new Task(null, this.TASK_1_NAME, this.TASK_1_DESCRIPTION, this.TASK_1_START, this.TASK_1_END);
+        Task taskNullID = new Task(null, "assignment", "cs3230", LocalDateTime.of(2016, 3, 4, 14, 30),
+                LocalDateTime.of(2016, 3, 5, 14, 30));
 
-        // the next assigned ID will be 6
+        // the next assigned ID will be 1
         this._storage.save(taskNullID);
-        assertEquals(this.TASK_1_NAME, this._storage.get(6).getTaskName());
-        assertEquals(this.TASK_1_DESCRIPTION, this._storage.get(6).getDescription());
-        assertEquals(this.TASK_1_START, this._storage.get(6).getStartTime());
-        assertEquals(this.TASK_1_END, this._storage.get(6).getEndTime());
+        assertEquals("assignment", this._storage.get(1).getTaskName());
+        assertEquals("cs3230", this._storage.get(1).getDescription());
+        assertEquals(LocalDateTime.of(2016, 3, 4, 14, 30), this._storage.get(1).getStartTime());
+        assertEquals(LocalDateTime.of(2016, 3, 5, 14, 30), this._storage.get(1).getEndTime());
 
     }
 
@@ -125,9 +85,18 @@ public class StorageTest {
     // ----------------------------------------------------------------------------------------
 
     @Test public void Get_returns_correct_Task() {
+        Task task3 = new Task(null, "sales training", "HR", LocalDateTime.of(2016, 3, 10, 14, 30),
+                LocalDateTime.of(2016, 3, 10, 16, 30));
+        Task task4 = new Task(null, "meeting to discuss proposal", "sales team", LocalDateTime.of(2016, 3, 11, 12, 00),
+                LocalDateTime.of(2016, 3, 11, 14, 30));
+        this._storage.save(task3);
+        this._storage.save(task4);
+        task3.setId(1);
+        task4.setId(2);
+
         Task returnedTask;
         returnedTask = this._storage.get(1);
-        assertEquals(this.task1_, returnedTask);
+        assertEquals(task3, returnedTask);
 
     }
 
@@ -138,13 +107,18 @@ public class StorageTest {
     // ----------------------------------------------------------------------------------------
 
     @Test public void Get_all_method_with_null_parameter_returns_list_correctly() {
-        ArrayList<Task> expectedTaskList = new ArrayList<>();
-        expectedTaskList.add(this.task1_);
-        expectedTaskList.add(this.task2_);
-        expectedTaskList.add(this.task3_);
-        expectedTaskList.add(this.task4_);
-        expectedTaskList.add(this.task5_);
+        Task task5 = new Task(null, "tutorial", "nm2101", LocalDateTime.of(2016, 3, 7, 14, 30),
+                LocalDateTime.of(2016, 3, 8, 14, 30));
+        Task task6 = new Task(null, "essay submission", "nm3238", LocalDateTime.of(2016, 3, 8, 12, 00),
+                LocalDateTime.of(2016, 3, 9, 15, 30));
+        this._storage.save(task5);
+        this._storage.save(task6);
+        task5.setId(1);
+        task6.setId(2);
 
+        ArrayList<Task> expectedTaskList = new ArrayList<>();
+        expectedTaskList.add(task5);
+        expectedTaskList.add(task6);
         // assert that expected and actual ArrayLists are equal
         assertEquals(expectedTaskList, this._storage.getAll());
     }
@@ -156,12 +130,26 @@ public class StorageTest {
     // ----------------------------------------------------------------------------------------
 
     public void Remove_deletes_correct_Task() {
-        Task actualTask = this._storage.remove(1);
-        this.task1_.setId(1);
-        assertEquals(this.task1_, actualTask);
+        Task task7 = new Task(null, "minor project", "cs1020", LocalDateTime.of(2016, 3, 7, 14, 30),
+                LocalDateTime.of(2016, 3, 8, 14, 30));
+        Task task8 = new Task(null, "major project", "cs2102", LocalDateTime.of(2016, 3, 8, 12, 00),
+                LocalDateTime.of(2016, 3, 9, 15, 30));
+        this._storage.save(task7);
+        this._storage.save(task8);
+
+        Task originalTask = this._storage.remove(1);
+        task7.setId(1);
+        assertEquals(task7, originalTask);
     }
 
     @Test public void Remove_all_clears_all_data() {
+        Task task9 = new Task(null, "assignment 3", "cs3223", LocalDateTime.of(2016, 3, 10, 14, 30),
+                LocalDateTime.of(2016, 3, 12, 12, 00));
+        Task task10 = new Task(null, "homework", "ma1101r", LocalDateTime.of(2016, 3, 8, 12, 00),
+                LocalDateTime.of(2016, 3, 10, 15, 30));
+        this._storage.save(task9);
+        this._storage.save(task10);
+
         this._storage.removeAll();
         assertEquals(0, this._storage.getDataTree().size());
         assertEquals(0, this._storage.getStartTimeTree().size());
@@ -174,54 +162,96 @@ public class StorageTest {
     //
     // ----------------------------------------------------------------------------------------
 
+    public ArrayList<Task> Set_up_for_search_by_time_range_tests() {
+        ArrayList<Task> taskList = new ArrayList<Task>();
+
+        String TASK_1_NAME = "homework";
+        String TASK_1_DESCRIPTION = "cs2103t";
+        LocalDateTime TASK_1_START = LocalDateTime.of(2016, 3, 4, 10, 00);
+        LocalDateTime TASK_1_END = LocalDateTime.of(2016, 3, 5, 12, 30);
+        Task TASK_1 = new Task(null, TASK_1_NAME, TASK_1_DESCRIPTION, TASK_1_START, TASK_1_END);
+        this._storage.save(TASK_1);
+        TASK_1.setId(1);
+        taskList.add(TASK_1);
+
+        String TASK_2_NAME = "assignment";
+        String TASK_2_DESCRIPTION = "cs3230";
+        LocalDateTime TASK_2_START = LocalDateTime.of(2016, 3, 5, 13, 30);
+        LocalDateTime TASK_2_END = LocalDateTime.of(2016, 3, 6, 13, 30);
+        Task TASK_2 = new Task(null, TASK_2_NAME, TASK_2_DESCRIPTION, TASK_2_START, TASK_2_END);
+        this._storage.save(TASK_2);
+        TASK_2.setId(2);
+        taskList.add(TASK_2);
+
+        String TASK_3_NAME = "essay submission";
+        String TASK_3_DESCRIPTION = "nm2101";
+        LocalDateTime TASK_3_START = LocalDateTime.of(2016, 3, 6, 14, 30);
+        LocalDateTime TASK_3_END = LocalDateTime.of(2016, 3, 7, 14, 30);
+        Task TASK_3 = new Task(null, TASK_3_NAME, TASK_3_DESCRIPTION, TASK_3_START, TASK_3_END);
+        this._storage.save(TASK_3);
+        TASK_3.setId(3);
+        taskList.add(TASK_3);
+
+        String TASK_4_NAME = "tutorial";
+        String TASK_4_DESCRIPTION = "nm2213";
+        LocalDateTime TASK_4_START = LocalDateTime.of(2016, 3, 7, 15, 30);
+        LocalDateTime TASK_4_END = LocalDateTime.of(2016, 3, 8, 16, 30);
+        Task TASK_4 = new Task(null, TASK_4_NAME, TASK_4_DESCRIPTION, TASK_4_START, TASK_4_END);
+        this._storage.save(TASK_4);
+        TASK_4.setId(4);
+        taskList.add(TASK_4);
+
+        String TASK_5_NAME = "project report";
+        String TASK_5_DESCRIPTION = "cs2102";
+        LocalDateTime TASK_5_START = LocalDateTime.of(2016, 3, 8, 17, 30);
+        LocalDateTime TASK_5_END = LocalDateTime.of(2016, 3, 9, 19, 30);
+        Task TASK_5 = new Task(null, TASK_5_NAME, TASK_5_DESCRIPTION, TASK_5_START, TASK_5_END);
+        this._storage.save(TASK_5);
+        TASK_5.setId(5);
+        taskList.add(TASK_5);
+
+        return taskList;
+    }
+
     @Test public void Searching_by_start_before_returns_list_correctly() {
-        ArrayList<Task> expectedTaskList = new ArrayList<Task>();
-        expectedTaskList.add(this.task1_);
-        expectedTaskList.add(this.task2_);
-        expectedTaskList.add(this.task3_);
+        ArrayList<Task> fullTaskList = Set_up_for_search_by_time_range_tests();
+        ArrayList<Task> expectedTaskList = new ArrayList<Task>(fullTaskList.subList(0, 3));
 
         // assert that expected results and actual search results are the same
-        assertEquals(expectedTaskList, this._storage.searchstartBefore(this.TASK_3_START));
+        assertEquals(expectedTaskList, this._storage.searchstartBefore(LocalDateTime.of(2016, 3, 6, 14, 30)));
     }
 
     @Test public void Searching_by_start_after_returns_list_correctly() {
-        ArrayList<Task> expectedTaskList = new ArrayList<Task>();
-        expectedTaskList.add(this.task3_);
-        expectedTaskList.add(this.task4_);
-        expectedTaskList.add(this.task5_);
+        ArrayList<Task> fullTaskList = Set_up_for_search_by_time_range_tests();
+        ArrayList<Task> expectedTaskList = new ArrayList<Task>(fullTaskList.subList(2, 5));
 
         // assert that expected results and actual search results are the same
-        assertEquals(expectedTaskList, this._storage.searchStartAfter(this.TASK_3_START));
+        assertEquals(expectedTaskList, this._storage.searchStartAfter(LocalDateTime.of(2016, 3, 6, 14, 30)));
     }
 
     @Test public void Searching_by_end_before_returns_list_correctly() {
-        ArrayList<Task> expectedTaskList = new ArrayList<Task>();
-        expectedTaskList.add(this.task1_);
-        expectedTaskList.add(this.task2_);
-        expectedTaskList.add(this.task3_);
+        ArrayList<Task> fullTaskList = Set_up_for_search_by_time_range_tests();
+        ArrayList<Task> expectedTaskList = new ArrayList<Task>(fullTaskList.subList(0, 3));
 
         // assert that expected results and actual search results are the same
-        assertEquals(expectedTaskList, this._storage.searchEndBefore(this.TASK_3_END));
+        assertEquals(expectedTaskList, this._storage.searchEndBefore(LocalDateTime.of(2016, 3, 7, 14, 30)));
     }
 
     @Test public void Searching_by_end_after_returns_list_correctly() {
-        ArrayList<Task> expectedTaskList = new ArrayList<Task>();
-        expectedTaskList.add(this.task3_);
-        expectedTaskList.add(this.task4_);
-        expectedTaskList.add(this.task5_);
+        ArrayList<Task> fullTaskList = Set_up_for_search_by_time_range_tests();
+        ArrayList<Task> expectedTaskList = new ArrayList<Task>(fullTaskList.subList(2, 5));
 
         // assert that expected results and actual search results are the same
-        assertEquals(expectedTaskList, this._storage.searchEndAfter(this.TASK_3_END));
+        assertEquals(expectedTaskList, this._storage.searchEndAfter(LocalDateTime.of(2016, 3, 7, 14, 30)));
     }
 
     @Test public void Searching_by_date_time_range_returns_list_correctly() {
-        ArrayList<Task> expectedTaskList = new ArrayList<Task>();
-        expectedTaskList.add(this.task2_);
-        expectedTaskList.add(this.task3_);
-        expectedTaskList.add(this.task4_);
+        ArrayList<Task> fullTaskList = Set_up_for_search_by_time_range_tests();
+        ArrayList<Task> expectedTaskList = new ArrayList<Task>(fullTaskList.subList(1, 4));
 
         // assert that expected results and actual search results are the same
-        assertEquals(expectedTaskList, this._storage.searchByDateTimeRange(this.TASK_3_START, this.TASK_3_END));
+        assertEquals(expectedTaskList, this._storage.searchByDateTimeRange(LocalDateTime.of(2016, 3, 5, 13, 30),
+                LocalDateTime.of(2016, 3, 8, 16, 30)));
     }
 
     // ----------------------------------------------------------------------------------------
@@ -231,37 +261,45 @@ public class StorageTest {
     // ----------------------------------------------------------------------------------------
 
     @Test public void Task_entry_in_tree_gets_shifted_when_start_time_changes() {
-        // check that the list initially contains the old task
-        assertTrue(this._storage.getStartTimeTree().get(this.TASK_1_START).contains(this.task1_));
+        ArrayList<Task> fullTaskList = Set_up_for_search_by_time_range_tests();
+        Task task1 = fullTaskList.get(0);
 
-        Task newTask = new Task(1, this.TASK_1_NAME, this.TASK_1_DESCRIPTION, this.TASK_2_START, this.TASK_1_END);
+        // check that the list initially contains the old task
+        assertTrue(this._storage.getStartTimeTree().get(LocalDateTime.of(2016, 3, 4, 10, 00)).contains(task1));
+
+        Task editedTask1 = new Task(1, "homework", "cs2103t", LocalDateTime.of(2016, 3, 5, 00, 00),
+                LocalDateTime.of(2016, 3, 5, 12, 30));
         // edit the start time of task1
-        this._storage.save(newTask);
+        this._storage.save(editedTask1);
 
         // check that the list corresponding to the old start time no longer
         // contains the task
-        assertFalse(this._storage.getStartTimeTree().get(this.TASK_1_START).contains(this.task1_));
+        assertFalse(this._storage.getStartTimeTree().get(LocalDateTime.of(2016, 3, 4, 10, 00)).contains(task1));
 
         // check that the list corresponding to the new start time now contains
         // the updated task
-        assertTrue(this._storage.getStartTimeTree().get(this.TASK_2_START).contains(newTask));
+        assertTrue(this._storage.getStartTimeTree().get(LocalDateTime.of(2016, 3, 5, 00, 00)).contains(editedTask1));
     }
 
     @Test public void Task_entry_in_tree_gets_shifted_when_end_time_changes() {
-        // check that the list initially contains the old task
-        assertTrue(this._storage.getEndTimeTree().get(this.TASK_2_END).contains(this.task2_));
+        ArrayList<Task> fullTaskList = Set_up_for_search_by_time_range_tests();
+        Task task2 = fullTaskList.get(1);
 
-        Task newTask = new Task(2, this.TASK_2_NAME, this.TASK_2_DESCRIPTION, this.TASK_2_START, this.TASK_3_END);
+        // check that the list initially contains the old task
+        assertTrue(this._storage.getEndTimeTree().get(LocalDateTime.of(2016, 3, 6, 13, 30)).contains(task2));
+
+        Task editedTask2 = new Task(2, "assignment", "cs3230", LocalDateTime.of(2016, 3, 5, 13, 30),
+                LocalDateTime.of(2016, 3, 6, 00, 30));
         // edit the end time of task2
-        this._storage.save(newTask);
+        this._storage.save(editedTask2);
 
         // check that the list corresponding to the old end time no longer
         // contains the task
-        assertFalse(this._storage.getEndTimeTree().get(this.TASK_2_END).contains(this.task2_));
+        assertFalse(this._storage.getEndTimeTree().get(LocalDateTime.of(2016, 3, 6, 13, 30)).contains(task2));
 
         // check that the list corresponding to the new end time now contains
         // the updated task
-        assertTrue(this._storage.getEndTimeTree().get(this.TASK_3_END).contains(newTask));
+        assertTrue(this._storage.getEndTimeTree().get(LocalDateTime.of(2016, 3, 6, 00, 30)).contains(editedTask2));
     }
 
     // ----------------------------------------------------------------------------------------
