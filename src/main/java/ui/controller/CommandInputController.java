@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
  */
 public class CommandInputController {
     private static final double PADDING_HORZ_COMMAND_INPUT = 12.0;
-    private static final double PADDING_VERT_COMMAND_INPUT = 18.0;
+    private static final double PADDING_VERT_COMMAND_INPUT = 17.0;
     private static final int DELAY_HIGHLIGHT = 250;
 
     @FXML

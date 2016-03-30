@@ -1,5 +1,6 @@
 .list--task {
     -fx-background-insets: 0;
+    -fx-background-color: transparent;
 }
 
 .list-cell {
