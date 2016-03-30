@@ -95,7 +95,7 @@ public class CommandParser implements CommandParserSpec {
         // Prepare the instruction and the parameter list
         Command.Instruction instruction = null;
         Integer index = null;
-        boolean isUniversallyQuantified = true;
+        boolean isUniversallyQuantified = false;
         List<Pair<Command.ParamName, Object>> parameters = new ArrayList<>();
 
         // Split the command into discrete chunks
@@ -116,7 +116,12 @@ public class CommandParser implements CommandParserSpec {
                 }
 
                 // Try to parse quantifier
-                if (value == null) continue;
+                if (value == null) {
+                    if (instruction == Command.Instruction.DISPLAY) {
+                        isUniversallyQuantified = true;
+                    }
+                    continue;
+                }
 
                 if (value.trim().toLowerCase().equals(KEYWORD_UNIVERSAL_QUANTIFIER)) {
                     isUniversallyQuantified = true;
