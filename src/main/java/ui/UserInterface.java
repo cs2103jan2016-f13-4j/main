@@ -153,6 +153,7 @@ public class UserInterface implements UserInterfaceSpec {
         // TODO: Account for similar controller, only update data
         this._mainContainer.getChildren().clear();
         this._mainContainer.getChildren().add(view.getComponent());
+        this._commandInputController.setKeyInputInterceptor(view.getKeyInputInterceptor());
     }
 
     @Override

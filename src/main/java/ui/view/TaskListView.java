@@ -2,12 +2,15 @@ package ui.view;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.Pair;
+import shared.ApplicationContext;
 import shared.Resources;
 import shared.Task;
 import ui.controller.TaskListController;
@@ -16,6 +19,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * @@author Antonius Satrio Triatmoko
@@ -110,5 +114,18 @@ public class TaskListView extends View {
             return viewData;
         }
 
+    }
+
+    @Override public Function<KeyEvent, Boolean> getKeyInputInterceptor() {
+        return (event -> {
+            if (!event.getCode().isArrowKey()) {
+                return false;
+            }
+
+            // TODO: Handle event here
+            System.out.println(event.getCode());
+            event.consume();
+            return true;
+        });
     }
 }
