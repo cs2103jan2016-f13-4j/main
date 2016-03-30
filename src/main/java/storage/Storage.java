@@ -396,8 +396,7 @@ public class Storage implements CollectionSpec<Task> {
 
     public void readFromDisk(ArrayList<String> taskStrings) {
         for (String taskString : taskStrings) {
-            Task currTask = new Task(null, null, null, null, null);
-            currTask.decodeTaskFromString(taskString);
+            Task currTask = Task.decodeTaskFromString(taskString);
             // Set null id to indicate this is a new task to be added, not
             // an update
             currTask.setId(null);

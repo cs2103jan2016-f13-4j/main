@@ -67,22 +67,20 @@ public class TaskTest {
                 + LocalDateTime.of(2016, 3, 10, 12, 00).toString() + ","
                 + LocalDateTime.of(2016, 3, 11, 22, 30).toString();
 
-        Task decodedTask = new Task(null, null, null, null, null);
         // decode the task string and check if the task attributes are equal to
         // what we expect
-        decodedTask.decodeTaskFromString(taskString);
+        Task task3 = Task.decodeTaskFromString(taskString);
 
-        assertSame(123, decodedTask.getId());
-        assertEquals(specialString, decodedTask.getTaskName());
-        assertEquals("Random description", decodedTask.getDescription());
-        assertEquals(LocalDateTime.of(2016, 3, 10, 12, 00), decodedTask.getStartTime());
-        assertEquals(LocalDateTime.of(2016, 3, 11, 22, 30), decodedTask.getEndTime());
+        assertSame(123, task3.getId());
+        assertEquals(specialString, task3.getTaskName());
+        assertEquals("Random description", task3.getDescription());
+        assertEquals(LocalDateTime.of(2016, 3, 10, 12, 00), task3.getStartTime());
+        assertEquals(LocalDateTime.of(2016, 3, 11, 22, 30), task3.getEndTime());
     }
 
     @Test public void Decoded_Task_has_correct_attributes_assigned() {
-        Task task4 = new Task(null, null, null, null, null);
         String taskString = "88,marketing pitch,to microsoft,2016-03-09t14:30:00,2016-03-09t15:30:00";
-        task4.decodeTaskFromString(taskString);
+        Task task4 = Task.decodeTaskFromString(taskString);
 
         assertSame(88, task4.getId());
         assertEquals("marketing pitch", task4.getTaskName());

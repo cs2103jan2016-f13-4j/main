@@ -13,7 +13,7 @@ public class Task implements Comparable<Task> {
     /**
      * Constants
      */
-    private final int NUMBER_OF_ATTRIBUTES_TO_SERIALIZE = 5;
+    private final static int NUMBER_OF_ATTRIBUTES_TO_SERIALIZE = 5;
     private final String CSV_DELIMITER = ",";
 
     /**
@@ -62,14 +62,20 @@ public class Task implements Comparable<Task> {
      * @param endTime
      */
     public Task(Integer id, String taskName, String description, LocalDateTime startTime, LocalDateTime endTime) {
+        // default priority is set to low
+        this(id, taskName, description, startTime, endTime, Priority.LOW, LocalDateTime.now(), false);
+    }
+
+    private Task(Integer id, String taskName, String description, LocalDateTime startTime, LocalDateTime endTime,
+            Priority priority, LocalDateTime creationTime, boolean isDeleted) {
         this._id = id;
         this._taskName = taskName;
         this._description = description;
         this._startTime = startTime;
         this._endTime = endTime;
-        this._priority = Priority.LOW; // default priority is set to low
-        this._creationTime = LocalDateTime.now();
-        this._isDeleted = false;
+        this._priority = priority;
+        this._creationTime = creationTime;
+        this._isDeleted = isDeleted;
     }
 
     // copy ctor, used to construct an identical copy in the clone method
@@ -148,7 +154,7 @@ public class Task implements Comparable<Task> {
     //
     // ----------------------------------------------------------------------------------------
 
-    public void decodeTaskFromString(String line) {
+    public static Task decodeTaskFromString(String line) {
         ArrayList<String> taskAttributesList = new ArrayList<String>();
         int start = 0;
         String tempTaskString = "";
@@ -190,10 +196,10 @@ public class Task implements Comparable<Task> {
         // encoding process
         taskAttributesList = removeAdditionalBackslashes(taskAttributesList);
 
-        assignDecodedValuesToAttributes(taskAttributesList);
+        return assignDecodedValuesToAttributes(taskAttributesList);
     }
 
-    public void checkNumberOfDecodedAttributes(ArrayList<String> taskAttributesList) {
+    public static void checkNumberOfDecodedAttributes(ArrayList<String> taskAttributesList) {
         try {
             if (taskAttributesList.size() != 5) {
                 throw new IllegalArgumentException();
@@ -203,32 +209,39 @@ public class Task implements Comparable<Task> {
         }
     }
 
-    public void assignDecodedValuesToAttributes(ArrayList<String> taskAttributesList) {
-        for (int i = 0; i < this.NUMBER_OF_ATTRIBUTES_TO_SERIALIZE; i++) {
+    public static Task assignDecodedValuesToAttributes(ArrayList<String> taskAttributesList) {
+        Integer id = null;
+        String taskName = null;
+        String description = null;
+        LocalDateTime startTime = null;
+        LocalDateTime endTime = null;
+
+        for (int i = 0; i < NUMBER_OF_ATTRIBUTES_TO_SERIALIZE; i++) {
             String tempAttribute = taskAttributesList.get(i);
             tempAttribute = removeSurroundingQuotes(tempAttribute);
 
             switch (i) {
             case 0:
-                this._id = Integer.parseInt(tempAttribute);
+                id = Integer.parseInt(tempAttribute);
                 break;
             case 1:
-                this._taskName = tempAttribute;
+                taskName = tempAttribute;
                 break;
             case 2:
-                this._description = tempAttribute;
+                description = tempAttribute;
                 break;
             case 3:
-                this._startTime = LocalDateTime.parse(tempAttribute);
+                startTime = LocalDateTime.parse(tempAttribute);
                 break;
             case 4:
-                this._endTime = LocalDateTime.parse(tempAttribute);
+                endTime = LocalDateTime.parse(tempAttribute);
                 break;
             }
         }
+        return new Task(id, taskName, description, startTime, endTime);
     }
 
-    public ArrayList<String> removeAdditionalBackslashes(ArrayList<String> unprocessedList) {
+    public static ArrayList<String> removeAdditionalBackslashes(ArrayList<String> unprocessedList) {
         ArrayList<String> processedList = new ArrayList<String>();
         for (String attribute : unprocessedList) {
             // Convert double backslashes to backslash
@@ -242,7 +255,7 @@ public class Task implements Comparable<Task> {
         return processedList;
     }
 
-    public String removeSurroundingQuotes(String attributeString) {
+    public static String removeSurroundingQuotes(String attributeString) {
         if (attributeString.charAt(0) == '\"' && attributeString.charAt(attributeString.length() - 1) == '\"') {
             attributeString = attributeString.substring(1, attributeString.length() - 1);
         }
