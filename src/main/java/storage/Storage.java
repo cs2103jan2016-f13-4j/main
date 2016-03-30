@@ -167,16 +167,21 @@ public class Storage implements CollectionSpec<Task> {
      */
     @Override public Task get(int index) {
         // check if TreeMap contains the key that is queried
-        if (!this.taskData_.containsKey(index)) {
+        // check if the Task entry has already been deleted
+        if (!this.taskData_.containsKey(index) || this.taskData_.get(index).isDeleted()) {
             try {
                 throw new PrimaryKeyNotFoundException(index);
             } catch (PrimaryKeyNotFoundException e) {
                 // TODO Auto-generated catch block
                 ExceptionHandler.handle(e);
             }
+            return null;
         }
+
         // key exists, retrieve Task corresponding to key
-        return this.taskData_.get(index);
+        else {
+            return this.taskData_.get(index);
+        }
     }
 
     // ----------------------------------------------------------------------------------------
@@ -195,8 +200,14 @@ public class Storage implements CollectionSpec<Task> {
      *         of Tasks stored in TreeMap
      */
     @Override public List<Task> getAll() {
-        ArrayList<Task> results = new ArrayList<>(this.taskData_.values());
-        return results;
+        ArrayList<Task> unfilteredResults = new ArrayList<>(this.taskData_.values());
+        ArrayList<Task> filteredResults = new ArrayList<>();
+        for (int i = 0; i < unfilteredResults.size(); i++) {
+            if (!unfilteredResults.get(i).isDeleted()) {
+                filteredResults.add(unfilteredResults.get(i));
+            }
+        }
+        return filteredResults;
     }
 
     @Override public String getStoragePath() {
@@ -221,7 +232,7 @@ public class Storage implements CollectionSpec<Task> {
     }
 
     /**
-     * Removes the mapping for this index from TreeMap if present
+     * TODO
      * 
      * @param id
      *            index for which mapping should be removed
@@ -230,10 +241,22 @@ public class Storage implements CollectionSpec<Task> {
      */
     @Override public Task remove(int id) {
         // TODO: Check if ID does not exist
-
-        return this.taskData_.remove(id);
+        if (!this.taskData_.containsKey(id)) {
+            try {
+                throw new PrimaryKeyNotFoundException(id);
+            } catch (PrimaryKeyNotFoundException e) {
+                // TODO Auto-generated catch block
+                ExceptionHandler.handle(e);
+            }
+            return null;
+        }
+        this.taskData_.get(id).setDeletedStatus(true);
+        return this.taskData_.get(id);
     }
 
+    /**
+     * Reset this instance of storage
+     */
     public void removeAll() {
         this.removeAllFromTreeMap(this.taskData_);
         this.removeAllFromTreeMap(this.startTimeTree_);

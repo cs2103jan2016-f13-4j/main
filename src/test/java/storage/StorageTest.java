@@ -2,6 +2,8 @@ package storage;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -129,7 +131,7 @@ public class StorageTest {
     //
     // ----------------------------------------------------------------------------------------
 
-    public void Remove_deletes_correct_Task() {
+    @Test public void Remove_deletes_correct_Task() {
         Task task7 = new Task(null, "minor project", "cs1020", LocalDateTime.of(2016, 3, 7, 14, 30),
                 LocalDateTime.of(2016, 3, 8, 14, 30));
         Task task8 = new Task(null, "major project", "cs2102", LocalDateTime.of(2016, 3, 8, 12, 00),
@@ -137,9 +139,32 @@ public class StorageTest {
         this._storage.save(task7);
         this._storage.save(task8);
 
-        Task originalTask = this._storage.remove(1);
-        task7.setId(1);
-        assertEquals(task7, originalTask);
+        // check that task7 was deleted
+        Task deletedTask = this._storage.remove(1);
+        assertEquals(task7, deletedTask);
+        // check that isDeleted flag has been change to true
+        assertEquals(true, deletedTask.isDeleted());
+
+        // check that get() returns null
+        assertNull(this._storage.get(1));
+        assertNotNull(this._storage.get(2));
+
+        // check that getAll() does not return the deleted Task, but keeps the
+        // undeleted Task
+        ArrayList<Task> taskList = new ArrayList<Task>(this._storage.getAll());
+        assertFalse(taskList.contains(task7));
+        assertTrue(taskList.contains(task8));
+    }
+
+    @Test public void Removing_invalid_index_returns_null_value() {
+        Task task7 = new Task(null, "minor project", "cs1020", LocalDateTime.of(2016, 3, 7, 14, 30),
+                LocalDateTime.of(2016, 3, 8, 14, 30));
+        Task task8 = new Task(null, "major project", "cs2102", LocalDateTime.of(2016, 3, 8, 12, 00),
+                LocalDateTime.of(2016, 3, 9, 15, 30));
+        this._storage.save(task7);
+        this._storage.save(task8);
+
+        assertNull(this._storage.remove(3));
     }
 
     @Test public void Remove_all_clears_all_data() {
