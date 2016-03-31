@@ -1,6 +1,9 @@
 package ui.view;
 
 import javafx.scene.Node;
+import javafx.scene.input.KeyEvent;
+
+import java.util.function.Function;
 
 /**
  * @@author Mai Anh Vu
@@ -36,5 +39,9 @@ public abstract class View {
     public Node getComponent() {
         assert this._component != null;
         return this._component;
+    }
+
+    public Function<KeyEvent, Boolean> getKeyInputInterceptor() {
+        return (event -> false);
     }
 }

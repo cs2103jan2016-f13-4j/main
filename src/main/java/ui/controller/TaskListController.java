@@ -4,7 +4,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 import javafx.util.Pair;
-import storage.Task;
+import shared.Task;
 
 /**
  * Created by Tio on 3/23/2016.
@@ -15,7 +15,7 @@ public class TaskListController {
 
     private ObservableList<Pair<Integer, Task>> _taskList;
 
-    @FXML private void ininitialize() {
+    @FXML private void initialize() {
 
     }
 

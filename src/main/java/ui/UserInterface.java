@@ -1,10 +1,6 @@
 package ui;
 
 import javafx.scene.Scene;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.image.Image;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Font;
@@ -15,7 +11,6 @@ import shared.Resources;
 import skeleton.UserInterfaceSpec;
 import ui.controller.CommandInputController;
 import ui.controller.HeaderController;
-import ui.controller.TaskListController;
 import ui.view.View;
 
 import java.util.function.Function;
@@ -50,7 +45,7 @@ public class UserInterface implements UserInterfaceSpec {
     private HeaderController _headerController;
     private CommandInputController _commandInputController;
 
-    private ScrollPane _mainContainer;
+    private AnchorPane _mainContainer;
 
     private UserInterface() {
     }
@@ -65,7 +60,8 @@ public class UserInterface implements UserInterfaceSpec {
     /**
      * TODO: Write JavaDoc
      */
-    @Override public void initialize() {
+    @Override
+    public void initialize() {
         // Set primary stage
         this._primaryStage = ApplicationContext.getPrimaryStage();
         this._primaryStage.getIcons().add(Resources.getInstance().getImage("mom.png"));
@@ -96,7 +92,8 @@ public class UserInterface implements UserInterfaceSpec {
     /**
      * TODO: Write JavaDoc
      */
-    @Override public void show() {
+    @Override
+    public void show() {
         // Make sure stage and command input handler are both set
         assert (this._primaryStage != null);
         assert (this._commandInputHandler != null);
@@ -111,7 +108,8 @@ public class UserInterface implements UserInterfaceSpec {
      *
      * @param onCommandInput
      */
-    @Override public void setOnCommandInputHandler(Function<String, Void> onCommandInput) {
+    @Override
+    public void setOnCommandInputHandler(Function<String, Void> onCommandInput) {
         this._commandInputHandler = onCommandInput;
     }
 
@@ -143,37 +141,29 @@ public class UserInterface implements UserInterfaceSpec {
     }
 
     private void registerViewContainer() {
-        this._mainContainer = new ScrollPane();
+        this._mainContainer = new AnchorPane();
         this._mainContainer.getStyleClass().add(STYLE_CLASS_CONTAINER_MAIN);
         this._rootView.setCenter(this._mainContainer);
     }
 
-    @Override public void render(View view) {
+    @Override
+    public void render(View view) {
         assert this._mainContainer != null;
         assert view != null;
-        this._mainContainer.setContent(view.getComponent());
-        this._mainContainer.getContent().requestFocus();
-        createKeyboardEvent();
-
+        // TODO: Account for similar controller, only update data
+        this._mainContainer.getChildren().clear();
+        this._mainContainer.getChildren().add(view.getComponent());
+        this._commandInputController.setKeyInputInterceptor(view.getKeyInputInterceptor());
     }
 
-    @Override public void cleanUp() {
+    @Override
+    public void cleanUp() {
         // Trickle down to controller
         this._commandInputController.cleanUp();
     }
 
-    private void setTitle(String title) {
+    @Override
+    public void setHeader(String title) {
         this._headerController.setHeader(title);
-    }
-
-    public void createKeyboardEvent(){
-        this._mainContainer.setOnKeyPressed(ke->allowNodeTraversing(ke));{
-
-        };
-    }
-
-    public void allowNodeTraversing(KeyEvent ke){
-        System.out.println(ke.getCode().toString());
-
     }
 }

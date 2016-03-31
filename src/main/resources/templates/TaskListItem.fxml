@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.shape.Line?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="48.0" prefWidth="410.0" styleClass="item__container" stylesheets="@../stylesheets/TaskListItem.css" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.controller.TaskListItemController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="48.0" prefWidth="410.0" styleClass="item__container" stylesheets="@../stylesheets/TaskListItem.css" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <Label fx:id="_indexLabel" layoutX="14.0" layoutY="16.0" styleClass="item__index" text="88" AnchorPane.bottomAnchor="16.0" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="15.0" />
       <Label fx:id="_taskNameLabel" layoutX="36.0" layoutY="15.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="17.0" prefWidth="280.0" styleClass="item__name" text="Label" AnchorPane.bottomAnchor="16.0" AnchorPane.leftAnchor="36.0" AnchorPane.topAnchor="15.0" />

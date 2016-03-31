@@ -3,10 +3,9 @@ package ui.view;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.Pair;
-import storage.Task;
+import shared.Task;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @@author Mai Anh Vu

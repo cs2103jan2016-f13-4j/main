@@ -2,7 +2,7 @@ package ui.view;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -10,24 +10,34 @@ import javafx.scene.control.ListView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.Pair;
+import shared.ApplicationContext;
 import shared.Resources;
-import shared.ViewType;
-import storage.Task;
+import shared.Task;
 import ui.controller.TaskListController;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * @@author Antonius Satrio Triatmoko
  */
 public class TaskListView extends View {
+    /**
+     * Constants
+     */
+    private final int MAXIMUM_DISPLAY_SIZE = 6;
 
+    /**
+     * Properties
+     */
     private ObservableList _observableList;
     private TaskListController _listControl ;
     private List<Pair<Integer,Task>> _displayList;
+    private int _viewIndex;
+
     /**
      * Constructs a new view containing the provided data
      *
@@ -38,8 +48,9 @@ public class TaskListView extends View {
     }
 
     @Override protected void buildContent() {
-       this._displayList =  (List<Pair<Integer,Task>>) this.getData();
-        this._observableList  = FXCollections.observableArrayList(this._displayList);
+        _displayList =  constructDisplayList();
+        _observableList  = FXCollections.observableArrayList(_displayList);
+
         ListView listView = Resources.getInstance().getComponent("TaskList");
         listView.setItems(this._observableList);
         listView.setCellFactory(list -> new Item());
@@ -47,11 +58,10 @@ public class TaskListView extends View {
         this.setComponent(listView);
     }
 
-
-    public  class Item extends ListCell<Pair<Integer, Task>> {
+    public static class Item extends ListCell<Pair<Integer, Task>> {
         private static final String STRING_NAME_TEMPLATE = "TaskListItem";
         private static final String STRING_DATE_PATTERN = "EE";
-        private static final String STRING_DATE_NULL = "";
+
         @FXML private AnchorPane _container;
         @FXML private Label _indexLabel;
         @FXML private Label _nameLabel;
@@ -76,49 +86,46 @@ public class TaskListView extends View {
             } else {
                 int index = item.getKey();
                 Task task = item.getValue();
-
+                LocalDateTime startTime = task.getStartTime();
                 this._indexLabel.setText(Integer.toString(index));
                 this._nameLabel.setText(task.getTaskName());
-                constructTime(task);
+
+                // Optional date time to support floating tasks
+                this._dateLabel.setText(startTime != null ?
+                        _df.format(startTime) :
+                        ""
+                ); // TODO: stub
 
                 this.setGraphic(this._container);
             }
         }
-
-        private void constructTime(Task tsk) {
-            LocalDateTime st = tsk.getStartTime();
-            if(hasNoTime(tsk)){
-                this._dateLabel.setText(STRING_DATE_NULL);
-            } else {
-                this._dateLabel.setText(st.format(_df));
-            }
-
-        }
-
-        private boolean hasNoTime(Task tsk){
-            return tsk.getStartTime() == null && tsk.getEndTime() == null;
-
-        }
     }
 
-    //helper Function
-    /*
-    public List<Pair<Integer,Task>> constructDisplayList(){
-        List<Pair<Integer,Task>> temp = new ArrayList<Pair<Integer, Task>>();
-        List<Pair<Integer,Task>> viewData = (List<Pair<Integer,Task>>)this.getData();
-        int dataSize = viewData.size();
-        int windowStart = this._viewIndex * MAXIMUM_DISPLAY_SIZE;
-        if(viewData.size() - windowStart > MAXIMUM_DISPLAY_SIZE){
-            for(int i = windowStart; i < MAXIMUM_DISPLAY_SIZE + windowStart ; i++ ){
+    private List<Pair<Integer,Task>> constructDisplayList(){
+        List<Pair<Integer,Task>> temp = new ArrayList<>();
+        List<Pair<Integer,Task>> viewData = this.getData();
+
+        if(viewData.size() > MAXIMUM_DISPLAY_SIZE){
+            for(int i = 0; i < MAXIMUM_DISPLAY_SIZE ; i++ ){
                 temp.add(viewData.get(i));
             }
             return temp;
         } else {
-
-                return viewData;
+            return viewData;
         }
 
     }
-    */
 
+    @Override public Function<KeyEvent, Boolean> getKeyInputInterceptor() {
+        return (event -> {
+            if (!event.getCode().isArrowKey()) {
+                return false;
+            }
+
+            // TODO: Handle event here
+            System.out.println(event.getCode());
+            event.consume();
+            return true;
+        });
+    }
 }

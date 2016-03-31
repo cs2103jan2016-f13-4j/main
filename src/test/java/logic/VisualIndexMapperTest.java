@@ -3,7 +3,7 @@ package logic;
 import javafx.util.Pair;
 import org.junit.Test;
 import shared.Command;
-import storage.Task;
+import shared.Task;
 
 import java.time.LocalDateTime;
 import java.util.List;

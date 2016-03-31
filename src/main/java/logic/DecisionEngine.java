@@ -7,10 +7,12 @@ import skeleton.CollectionSpec;
 import skeleton.DecisionEngineSpec;
 import skeleton.SchedulerSpec;
 import storage.Storage;
-import storage.Task;
+import shared.Task;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Stack;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -20,12 +22,16 @@ import java.util.stream.Collectors;
  */
 public class DecisionEngine implements DecisionEngineSpec {
     /**
-     * Singleton instance
+     * Singleton instance and constructor
      */
     private static DecisionEngine instance;
-
     private DecisionEngine() {
     }
+
+    /**
+     * instance fields
+     */
+    private Stack<Function<Void, Void>> inverseOperations = new Stack<>(); // used for undoing
 
     public static DecisionEngine getInstance() {
         if (instance == null) {
@@ -97,7 +103,14 @@ public class DecisionEngine implements DecisionEngineSpec {
         assert command.hasInstruction(Command.Instruction.ADD);
 
         Task taskToAdd = this.createTask(command);
-        this.getTaskCollection().add(taskToAdd);
+
+        final int id = this.getTaskCollection().add(taskToAdd);
+
+        // add the corresponding undo operation
+        this.inverseOperations.push(v -> {
+            this.getTaskCollection().remove(id);
+            return (Void) null;
+        });
 
         return this.displayAllTasks();
     }
@@ -108,6 +121,8 @@ public class DecisionEngine implements DecisionEngineSpec {
         Integer index = command.getIndex();
         assert index != null;
         Task task = this.getTaskCollection().get(index);
+
+        final Task originalTaskCopy = task.clone();
 
         // check which parameters have changed
         if (command.hasParameter(Command.ParamName.TASK_NAME)) {
@@ -120,6 +135,12 @@ public class DecisionEngine implements DecisionEngineSpec {
             task.setEndTime(command.getParameter(Command.ParamName.TASK_END));
         }
 
+        // add corresponding undo operation
+        this.inverseOperations.push(v -> {
+            this.getTaskCollection().edit(index, originalTaskCopy);
+            return (Void) null;
+        });
+
         return this.displayAllTasks();
     }
 
@@ -131,8 +152,35 @@ public class DecisionEngine implements DecisionEngineSpec {
     protected ExecutionResult handleDelete(Command command) {
         assert command.hasInstruction(Command.Instruction.DELETE);
 
+        // Handle case where delete is aggregate
+        // TODO: Make this undo-able
+        if (command.isUniversallyQuantified()) {
+            // For undoing
+//            this.getTaskCollection().getAll().stream()
+//                    .map(Task::clone)
+//                    .forEach(task -> task.setDeletedStatus(true));
+            // Temporary
+            this.getTaskCollection().getAll().stream()
+                    .mapToInt(Task::getId)
+                    .forEach(this.getTaskCollection()::remove);
+            return this.displayAllTasks();
+        }
+
         Integer id = command.getIndex();
         assert id != null;
+
+        Task deletedTask = this.getTaskCollection().get(id).clone();
+        deletedTask.setDeletedStatus(true);
+
+        // add the corresponding undo operation
+        /*
+        this.inverseOperations.push(v -> {
+            this.getTaskCollection().add(deletedTask);
+            return (Void) null;
+        });
+        */
+        // TODO: Find a better solution than this
+        this.inverseOperations.clear();
 
         this.getTaskCollection().remove(id);
         return this.displayAllTasks();
@@ -165,6 +213,11 @@ public class DecisionEngine implements DecisionEngineSpec {
 
     protected ExecutionResult handleUndo(Command command) {
         assert command.hasInstruction(Command.Instruction.UNDO);
+
+        // attempt an undo only if the undo stack is not empty
+        if (!this.inverseOperations.isEmpty()) {
+            this.inverseOperations.pop().apply(null);
+        }
 
         return this.displayAllTasks();
     }
@@ -202,6 +255,7 @@ public class DecisionEngine implements DecisionEngineSpec {
                 result = this.handleSearch(command);
                 break;
             case UNDO:
+                result = this.handleUndo(command);
                 break;
             default:
                 // if we reach this point, LTA Command Parser has failed in his duty
@@ -256,7 +310,7 @@ public class DecisionEngine implements DecisionEngineSpec {
 
         // Conclude the pattern
         patternBuilder.append(")\\b");
-        return Pattern.compile(patternBuilder.toString());
+        return Pattern.compile(patternBuilder.toString(), Pattern.CASE_INSENSITIVE);
     }
 
 }
