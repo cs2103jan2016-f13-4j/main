@@ -127,14 +127,26 @@ public class Task implements Comparable<Task> {
         }
 
         // LocalDateTime does not contain special characters
-        attributesArr[3] = this._startTime.toString();
-        attributesArr[4] = this._endTime.toString();
+        if (this._startTime == null) {
+            attributesArr[3] = "";
+        } else {
+            attributesArr[3] = this._startTime.toString();
+        }
+
+        if (this._endTime == null) {
+            attributesArr[4] = "";
+        } else {
+            attributesArr[4] = this._endTime.toString();
+        }
+
         return attributesArr;
     }
 
     public boolean checkContainsSpecialCharacters(String attribute) {
         // special characters are comma, quote and backslash
-        if (attribute.contains(",") || attribute.contains("\"") || attribute.contains("\\")) {
+        if (attribute == null || attribute == "") {
+            return false;
+        } else if (attribute.contains(",") || attribute.contains("\"") || attribute.contains("\\")) {
             return true;
         } else {
             return false;
@@ -219,7 +231,7 @@ public class Task implements Comparable<Task> {
         LocalDateTime startTime = null;
         LocalDateTime endTime = null;
 
-        for (int i = 0; i < NUMBER_OF_ATTRIBUTES_TO_SERIALIZE; i++) {
+        for (int i = 0; i < taskAttributesList.size(); i++) {
             String tempAttribute = taskAttributesList.get(i);
             tempAttribute = removeSurroundingQuotes(tempAttribute);
 
@@ -234,10 +246,14 @@ public class Task implements Comparable<Task> {
                 description = tempAttribute;
                 break;
             case 3:
-                startTime = LocalDateTime.parse(tempAttribute);
+                if (tempAttribute != "") {
+                    startTime = LocalDateTime.parse(tempAttribute);
+                }
                 break;
             case 4:
-                endTime = LocalDateTime.parse(tempAttribute);
+                if (tempAttribute != "") {
+                    endTime = LocalDateTime.parse(tempAttribute);
+                }
                 break;
             }
         }
