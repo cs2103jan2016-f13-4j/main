@@ -14,7 +14,6 @@ public class Task implements Comparable<Task> {
     /**
      * Constants
      */
-    private static final int NUMBER_OF_ATTRIBUTES_TO_SERIALIZE = 5;
     private static final char DELIMITER_CSV = ',';
 
     /**
