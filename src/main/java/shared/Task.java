@@ -2,16 +2,18 @@ package shared;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
+import exception.ExceptionHandler;
 
 /**
  * @@author Chng Hui Yie
  */
 public class Task implements Comparable<Task> {
 
-    private static final char DELIMITER_CSV = ',';
+    /**
+     * Constants
+     */
+    private static final int NUMBER_OF_ATTRIBUTES_TO_SERIALIZE = 5;
+    private static final String CSV_DELIMITER = ",";
 
     /**
      * Properties
@@ -63,8 +65,20 @@ public class Task implements Comparable<Task> {
      * @param endTime
      */
     public Task(Integer id, String taskName, String description, LocalDateTime startTime, LocalDateTime endTime) {
-        this(id, taskName, description, LocalDateTime.now(), startTime, endTime, Priority.LOW);
-        this._isDeleted = false;
+        // default priority is set to low
+        this(id, taskName, description, startTime, endTime, Priority.LOW, LocalDateTime.now(), false);
+    }
+
+    private Task(Integer id, String taskName, String description, LocalDateTime startTime, LocalDateTime endTime,
+            Priority priority, LocalDateTime creationTime, boolean isDeleted) {
+        this._id = id;
+        this._taskName = taskName;
+        this._description = description;
+        this._startTime = startTime;
+        this._endTime = endTime;
+        this._priority = priority;
+        this._creationTime = creationTime;
+        this._isDeleted = isDeleted;
     }
 
     // copy ctor, used to construct an identical copy in the clone method
@@ -72,110 +86,183 @@ public class Task implements Comparable<Task> {
         this(o._id, o._taskName, o._description, o._startTime, o._endTime);
     }
 
-    private Task(Integer id, String taskName, String description, LocalDateTime creationTime, LocalDateTime startTime,
-            LocalDateTime endTime, Priority priority) {
-        this._id = id;
-        this._taskName = taskName;
-        this._description = description;
-        this._creationTime = creationTime;
-        this._startTime = startTime;
-        this._endTime = endTime;
-        this._priority = priority;
-    }
-
     @Override public Task clone() {
         return new Task(this);
     }
 
+    // ----------------------------------------------------------------------------------------
+    //
+    // Methods for encoding Task to String
+    //
+    // ----------------------------------------------------------------------------------------
+
     public String encodeTaskToString() {
-        return String.join(Character.toString(DELIMITER_CSV), this.taskAttributesToStringArray());
-    }
-
-    private Object[] attributesToSerialize() {
-        return new Object[] { this._id, this._taskName, this._description, this._creationTime, this._startTime,
-                this._endTime, this._priority };
-    }
-
-    private String sanitise(Object attribute) {
-        // Empty or null objects are treated similarly
-        if (attribute == null) {
-            return "";
+        StringBuilder sb = new StringBuilder();
+        String[] attributesArr = this.taskAttributesToStringArray();
+        // the last attribute will be appended outside the loop
+        for (int i = 0; i < attributesArr.length - 1; i++) {
+            sb.append(attributesArr[i]).append(",");
         }
-
-        // Convert the object to String
-        String sanitised = attribute.toString();
-
-        // Detect presence of commas
-        if (sanitised.contains(Character.toString(DELIMITER_CSV))) {
-            // Sanitise backslashes
-            sanitised = sanitised.replace("\\", "\\\\");
-            // Sanitise quotes
-            sanitised = sanitised.replace("\"", "\\\"");
-            // Has space, wrap around quotes
-            sanitised = String.format("\"%s\"", sanitised);
-        }
-
-        return sanitised;
+        sb.append(attributesArr[attributesArr.length - 1]);
+        return sb.toString();
     }
 
     public String[] taskAttributesToStringArray() {
-        // Sanitise data
-        return Arrays.stream(this.attributesToSerialize()).map(this::sanitise).collect(Collectors.toList())
-                .toArray(new String[] {});
+        String[] attributesArr = new String[this.NUMBER_OF_ATTRIBUTES_TO_SERIALIZE];
+
+        attributesArr[0] = this._id.toString(); // int value, does not contain
+                                                // special characters
+
+        if (checkContainsSpecialCharacters(this._taskName)) {
+            attributesArr[1] = "\"" + escapeSpecialCharacters(this._taskName) + "\"";
+
+        } else {
+            attributesArr[1] = this._taskName;
+        }
+
+        if (checkContainsSpecialCharacters(this._description)) {
+            attributesArr[2] = "\"" + escapeSpecialCharacters(this._description) + "\"";
+        } else {
+            attributesArr[2] = this._description;
+        }
+
+        // LocalDateTime does not contain special characters
+        attributesArr[3] = this._startTime.toString();
+        attributesArr[4] = this._endTime.toString();
+        return attributesArr;
     }
 
+    public boolean checkContainsSpecialCharacters(String attribute) {
+        // special characters are comma, quote and backslash
+        if (attribute.contains(",") || attribute.contains("\"") || attribute.contains("\\")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public String escapeSpecialCharacters(String attribute) {
+        // Convert all backslashes to double backslashes
+        attribute = attribute.replace("\\", "\\\\");
+
+        // Convert all quotes to backslash quote
+        attribute = attribute.replace("\"", "\\\"");
+
+        return attribute;
+    }
+
+    // ----------------------------------------------------------------------------------------
+    //
+    // Methods for decoding Task from String
+    //
+    // ----------------------------------------------------------------------------------------
+
     public static Task decodeTaskFromString(String line) {
-        // Begin dynamic decoding
-        List<String> taskValues = new ArrayList<>();
+        ArrayList<String> taskAttributesList = new ArrayList<String>();
+        int start = 0;
+        String tempTaskString = "";
 
-        int begin = 0;
-        boolean isDecodingSpecialValue = false;
-        for (int i = 0; i < line.length(); i++) {
-            if (i == begin && line.charAt(i) == '"') {
-                isDecodingSpecialValue = true;
-                continue;
+        for (int end = 1; end < line.length(); end++) {
+            char startChar = line.charAt(start);
+            char endChar = line.charAt(end);
+
+            // Case 1: Substring is not enclosed with quotes, is not the last
+            // attribute
+            if (startChar != '\"' && endChar == ',' && line.charAt(end - 1) != '\\') {
+                tempTaskString = line.substring(start, end);
+                taskAttributesList.add(tempTaskString);
+                start = end + 1;
+                end = end + 2;
             }
-            if (line.charAt(i) == '"' && isDecodingSpecialValue) {
-                // Fake quotes
-                if (i > 0 && line.charAt(i - 1) == '\\') {
-                    continue;
-                }
-
-                String specialValue = line.substring(begin + 1, i);
-                specialValue = specialValue.replace("\\\"", "\"");
-                specialValue = specialValue.replace("\\\\", "\\");
-                taskValues.add(specialValue);
-
-                begin = i + 2;
-                i += 1;
-                isDecodingSpecialValue = false;
-                continue;
+            // Case 2: Substring is enclosed with quotes, is not the last
+            // attribute
+            else if (startChar == '\"'
+                    && ((endChar == '\"' && line.charAt(end - 1) == '\\' && line.charAt(end - 2) == '\\')
+                            || (endChar == '\"' && line.charAt(end - 1) != '\\'))
+                    && line.charAt(end + 1) == ',') {
+                tempTaskString = line.substring(start, end + 1);
+                taskAttributesList.add(tempTaskString);
+                start = end + 2;
+                end = end + 3;
             }
-            if (line.charAt(i) == DELIMITER_CSV && !isDecodingSpecialValue) {
-                String value = line.substring(begin, i);
-                taskValues.add(value);
-                begin = i + 1;
+            // Case 3: Substring is the last attribute
+            else if ((startChar != '\"' && end == line.length() - 1)
+                    || (startChar == '\"' && endChar == '\"' && end == line.length() - 1)) {
+                tempTaskString = line.substring(start);
+                taskAttributesList.add(tempTaskString);
             }
         }
-        // Account for last leftover value
-        if (begin < line.length() && begin >= 0) {
-            taskValues.add(line.substring(begin));
+
+        checkNumberOfDecodedAttributes(taskAttributesList);
+
+        // get rid of extra backslashes that were added in during the Task
+        // encoding process
+        taskAttributesList = removeAdditionalBackslashes(taskAttributesList);
+
+        return assignDecodedValuesToAttributes(taskAttributesList);
+    }
+
+    public static void checkNumberOfDecodedAttributes(ArrayList<String> taskAttributesList) {
+        try {
+            if (taskAttributesList.size() != 5) {
+                throw new IllegalArgumentException();
+            }
+        } catch (IllegalArgumentException e) {
+            ExceptionHandler.handle(e);
         }
+    }
 
-        // Begin decoding values
-        int id = Integer.parseInt(taskValues.get(0));
-        String taskName = taskValues.get(1);
-        String description = taskValues.get(2);
-        LocalDateTime creationTime = LocalDateTime.parse(taskValues.get(3));
-        LocalDateTime startTime = taskValues.get(4).trim().isEmpty() ? null : LocalDateTime.parse(taskValues.get(4));
-        LocalDateTime endTime = taskValues.get(5).trim().isEmpty() ? null : LocalDateTime.parse(taskValues.get(5));
+    public static Task assignDecodedValuesToAttributes(ArrayList<String> taskAttributesList) {
+        Integer id = null;
+        String taskName = null;
+        String description = null;
+        LocalDateTime startTime = null;
+        LocalDateTime endTime = null;
 
-        int priorityValue = Integer.parseInt(taskValues.get(6));
-        final Priority[] priority = new Priority[] { Priority.LOW };
-        Arrays.stream(Priority.values()).filter(p -> p.getPriorityValue() == priorityValue).findFirst()
-                .ifPresent(p -> priority[0] = p);
+        for (int i = 0; i < NUMBER_OF_ATTRIBUTES_TO_SERIALIZE; i++) {
+            String tempAttribute = taskAttributesList.get(i);
+            tempAttribute = removeSurroundingQuotes(tempAttribute);
 
-        return new Task(id, taskName, description, creationTime, startTime, endTime, priority[0]);
+            switch (i) {
+            case 0:
+                id = Integer.parseInt(tempAttribute);
+                break;
+            case 1:
+                taskName = tempAttribute;
+                break;
+            case 2:
+                description = tempAttribute;
+                break;
+            case 3:
+                startTime = LocalDateTime.parse(tempAttribute);
+                break;
+            case 4:
+                endTime = LocalDateTime.parse(tempAttribute);
+                break;
+            }
+        }
+        return new Task(id, taskName, description, startTime, endTime);
+    }
+
+    public static ArrayList<String> removeAdditionalBackslashes(ArrayList<String> unprocessedList) {
+        ArrayList<String> processedList = new ArrayList<String>();
+        for (String attribute : unprocessedList) {
+            // Convert double backslashes to backslash
+            attribute = attribute.replace("\\\\", "\\");
+
+            // Convert backslash quote to quote
+            attribute = attribute.replace("\\\"", "\"");
+
+            processedList.add(attribute);
+        }
+        return processedList;
+    }
+
+    public static String removeSurroundingQuotes(String attributeString) {
+        if (attributeString.charAt(0) == '\"' && attributeString.charAt(attributeString.length() - 1) == '\"') {
+            attributeString = attributeString.substring(1, attributeString.length() - 1);
+        }
+        return attributeString;
     }
 
     @Override public int compareTo(Task o) {
