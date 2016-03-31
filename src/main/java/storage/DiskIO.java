@@ -79,7 +79,6 @@ public class DiskIO {
             }
             writer.close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             ExceptionHandler.handle(e);
         }
         return taskStrings;
@@ -91,7 +90,6 @@ public class DiskIO {
             try {
                 file.createNewFile();
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 ExceptionHandler.handle(e);
             }
         }

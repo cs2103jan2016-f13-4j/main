@@ -104,12 +104,12 @@ public class DecisionEngine implements DecisionEngineSpec {
 
         Task taskToAdd = this.createTask(command);
 
-        final int id = this.getTaskCollection().add(taskToAdd);
+        final int id = this.getTaskCollection().save(taskToAdd);
 
         // add the corresponding undo operation
         this.inverseOperations.push(v -> {
             this.getTaskCollection().remove(id);
-            return (Void) null;
+            return null;
         });
 
         return this.displayAllTasks();
@@ -137,8 +137,8 @@ public class DecisionEngine implements DecisionEngineSpec {
 
         // add corresponding undo operation
         this.inverseOperations.push(v -> {
-            this.getTaskCollection().edit(index, originalTaskCopy);
-            return (Void) null;
+            this.getTaskCollection().save(originalTaskCopy);
+            return null;
         });
 
         return this.displayAllTasks();
