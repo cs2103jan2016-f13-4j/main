@@ -13,7 +13,6 @@ import java.util.stream.IntStream;
 
 import exception.ExceptionHandler;
 import exception.PrimaryKeyNotFoundException;
-import shared.Command;
 import shared.Task;
 import skeleton.CollectionSpec;
 
@@ -95,7 +94,6 @@ public class Storage implements CollectionSpec<Task> {
             task.setId(index + 1);
             return task;
         }).map(Task::encodeTaskToString).collect(Collectors.toList());
-
         this.getDiskIO().write(tasksToWrite);
     }
 
@@ -123,6 +121,7 @@ public class Storage implements CollectionSpec<Task> {
             }
             return null;
         }
+
         // key exists, retrieve Task corresponding to key
         return this._taskData.get(index);
     }
@@ -214,7 +213,7 @@ public class Storage implements CollectionSpec<Task> {
 
     // ----------------------------------------------------------------------------------------
     //
-    // VI. Read from file Method
+    // VI. Read From Disk Method
     //
     // ----------------------------------------------------------------------------------------
 

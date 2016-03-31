@@ -1,14 +1,5 @@
 package logic;
 
-import shared.Command;
-import shared.ExecutionResult;
-import shared.ViewType;
-import skeleton.CollectionSpec;
-import skeleton.DecisionEngineSpec;
-import skeleton.SchedulerSpec;
-import storage.Storage;
-import shared.Task;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Stack;
@@ -16,6 +7,15 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import shared.Command;
+import shared.ExecutionResult;
+import shared.Task;
+import shared.ViewType;
+import skeleton.CollectionSpec;
+import skeleton.DecisionEngineSpec;
+import skeleton.SchedulerSpec;
+import storage.Storage;
 
 /**
  * @@author Thenaesh Elango
@@ -25,13 +25,16 @@ public class DecisionEngine implements DecisionEngineSpec {
      * Singleton instance and constructor
      */
     private static DecisionEngine instance;
+
     private DecisionEngine() {
     }
 
     /**
      * instance fields
      */
-    private Stack<Function<Void, Void>> inverseOperations = new Stack<>(); // used for undoing
+    private Stack<Function<Void, Void>> inverseOperations = new Stack<>(); // used
+                                                                           // for
+                                                                           // undoing
 
     public static DecisionEngine getInstance() {
         if (instance == null) {
@@ -41,13 +44,14 @@ public class DecisionEngine implements DecisionEngineSpec {
         return instance;
     }
 
-    @Override  public void initialise() {
+    @Override public void initialise() {
         Storage.getInstance().readFromDisk();
     }
 
     /**
-     * checks whether the supplied command is completely defined (name, start time, end time, etc)
-     * this information may then be used to decide if the Scheduler should be called
+     * checks whether the supplied command is completely defined (name, start
+     * time, end time, etc) this information may then be used to decide if the
+     * Scheduler should be called
      *
      * @param cmd
      * @return
@@ -66,8 +70,9 @@ public class DecisionEngine implements DecisionEngineSpec {
     }
 
     /**
-     * creates a Task from a specified command object when it makes sense
-     * we should blow up when creating a Task doesn't really make sense
+     * creates a Task from a specified command object when it makes sense we
+     * should blow up when creating a Task doesn't really make sense
+     * 
      * @param cmd
      * @return
      */
@@ -78,7 +83,8 @@ public class DecisionEngine implements DecisionEngineSpec {
         LocalDateTime to = null;
 
         // for each command parameter, check if it was supplied
-        // if so, extract the value and set the appropriate reference above to point to the extracted value
+        // if so, extract the value and set the appropriate reference above to
+        // point to the extracted value
         if (cmd.hasParameter(Command.ParamName.TASK_NAME)) {
             name = cmd.getParameter(Command.ParamName.TASK_NAME);
         }
@@ -97,7 +103,6 @@ public class DecisionEngine implements DecisionEngineSpec {
         List<Task> listToDisplay = this.getTaskCollection().getAll();
         return new ExecutionResult(ViewType.TASK_LIST, listToDisplay);
     }
-
 
     protected ExecutionResult handleAdd(Command command) {
         assert command.hasInstruction(Command.Instruction.ADD);
@@ -156,9 +161,9 @@ public class DecisionEngine implements DecisionEngineSpec {
         // TODO: Make this undo-able
         if (command.isUniversallyQuantified()) {
             // For undoing
-//            this.getTaskCollection().getAll().stream()
-//                    .map(Task::clone)
-//                    .forEach(task -> task.setDeletedStatus(true));
+            // this.getTaskCollection().getAll().stream()
+            // .map(Task::clone)
+            // .forEach(task -> task.setDeletedStatus(true));
             // Temporary
             this.getTaskCollection().getAll().stream()
                     .mapToInt(Task::getId)
@@ -174,11 +179,9 @@ public class DecisionEngine implements DecisionEngineSpec {
 
         // add the corresponding undo operation
         /*
-        this.inverseOperations.push(v -> {
-            this.getTaskCollection().add(deletedTask);
-            return (Void) null;
-        });
-        */
+         * this.inverseOperations.push(v -> {
+         * this.getTaskCollection().add(deletedTask); return (Void) null; });
+         */
         // TODO: Find a better solution than this
         this.inverseOperations.clear();
 
@@ -192,21 +195,20 @@ public class DecisionEngine implements DecisionEngineSpec {
         // PowerSearching!
         Pattern pattern = buildPowerSearchPattern(command);
 
-        List<Task> foundTask = this.getTaskCollection().getAll()
-                .stream()
-                .filter(item -> {
-                    // Match with task name first
-                    Matcher m = pattern.matcher(item.getTaskName());
-                    if (m.find()) return true;
+        List<Task> foundTask = this.getTaskCollection().getAll().stream().filter(item -> {
+            // Match with task name first
+            Matcher m = pattern.matcher(item.getTaskName());
+            if (m.find())
+                return true;
 
-                    // If doesn't match with task name, try to match
-                    // with description ONLY IF it's not null
-                    if (item.getDescription() == null) return false;
-                    m = pattern.matcher(item.getDescription());
+            // If doesn't match with task name, try to match
+            // with description ONLY IF it's not null
+            if (item.getDescription() == null)
+                return false;
+            m = pattern.matcher(item.getDescription());
 
-                    return m.find();
-                })
-                .collect(Collectors.toList());
+            return m.find();
+        }).collect(Collectors.toList());
 
         return new ExecutionResult(ViewType.TASK_LIST, foundTask);
     }
@@ -221,7 +223,6 @@ public class DecisionEngine implements DecisionEngineSpec {
 
         return this.displayAllTasks();
     }
-
 
     @Override public ExecutionResult performCommand(Command command) {
 
@@ -239,48 +240,44 @@ public class DecisionEngine implements DecisionEngineSpec {
 
         // all the standard commands
         switch (command.getInstruction()) {
-            case ADD:
-                result = this.handleAdd(command);
-                break;
-            case EDIT:
-                result = this.handleEdit(command);
-                break;
-            case DISPLAY:
-                result = this.handleDisplay(command);
-                break;
-            case DELETE:
-                result = this.handleDelete(command);
-                break;
-            case SEARCH:
-                result = this.handleSearch(command);
-                break;
-            case UNDO:
-                result = this.handleUndo(command);
-                break;
-            default:
-                // if we reach this point, LTA Command Parser has failed in his duty
-                // and awaits court martial
-                assert false;
+        case ADD:
+            result = this.handleAdd(command);
+            break;
+        case EDIT:
+            result = this.handleEdit(command);
+            break;
+        case DISPLAY:
+            result = this.handleDisplay(command);
+            break;
+        case DELETE:
+            result = this.handleDelete(command);
+            break;
+        case SEARCH:
+            result = this.handleSearch(command);
+            break;
+        case UNDO:
+            result = this.handleUndo(command);
+            break;
+        default:
+            // if we reach this point, LTA Command Parser has failed in his duty
+            // and awaits court martial
+            assert false;
         }
 
         return result;
     }
 
-    @Override
-    public SchedulerSpec getTaskScheduler() {
+    @Override public SchedulerSpec getTaskScheduler() {
         return Scheduler.getInstance();
     }
 
-    @Override
-    public void shutdown() {
+    @Override public void shutdown() {
         Storage.getInstance().writeToDisk();
     }
 
-    @Override
-    public CollectionSpec<Task> getTaskCollection() {
+    @Override public CollectionSpec<Task> getTaskCollection() {
         return Storage.getInstance();
     }
-
 
     private static Pattern buildPowerSearchPattern(Command command) {
         String query = command.getParameter(Command.ParamName.SEARCH_QUERY);
