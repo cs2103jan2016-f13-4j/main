@@ -13,7 +13,6 @@ import java.util.stream.IntStream;
 
 import exception.ExceptionHandler;
 import exception.PrimaryKeyNotFoundException;
-import shared.Command;
 import shared.Task;
 import skeleton.CollectionSpec;
 
@@ -96,14 +95,11 @@ public class Storage implements CollectionSpec<Task> {
         List<Task> allTask = this.getAll();
 
         // Keep internal index serial
-        List<String> tasksToWrite = IntStream.range(0, allTask.size())
-                .mapToObj(index -> {
-                    Task task = allTask.get(index);
-                    task.setId(index + 1);
-                    return task;
-                })
-                .map(Task::encodeTaskToString)
-                .collect(Collectors.toList());
+        List<String> tasksToWrite = IntStream.range(0, allTask.size()).mapToObj(index -> {
+            Task task = allTask.get(index);
+            task.setId(index + 1);
+            return task;
+        }).map(Task::encodeTaskToString).collect(Collectors.toList());
         this.diskIO_.write(tasksToWrite);
     }
 

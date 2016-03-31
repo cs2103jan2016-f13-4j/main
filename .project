@@ -15,20 +15,14 @@
 			<arguments>
 			</arguments>
 		</buildCommand>
-		<buildCommand>
-			<name>org.zeroturnaround.eclipse.rebelXmlBuilder</name>
-			<arguments>
-			</arguments>
-		</buildCommand>
 	</buildSpec>
 	<natures>
 		<nature>org.eclipse.buildship.core.gradleprojectnature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
-		<nature>org.zeroturnaround.eclipse.jrebelNature</nature>
 	</natures>
 	<filteredResources>
 		<filter>
-			<id>1458288020736</id>
+			<id>1459393410801</id>
 			<name></name>
 			<type>26</type>
 			<matcher>
@@ -37,7 +31,7 @@
 			</matcher>
 		</filter>
 		<filter>
-			<id>1458288020753</id>
+			<id>1459393410804</id>
 			<name></name>
 			<type>26</type>
 			<matcher>
