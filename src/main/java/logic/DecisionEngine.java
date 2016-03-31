@@ -42,7 +42,7 @@ public class DecisionEngine implements DecisionEngineSpec {
     }
 
     @Override  public void initialise() {
-        //Storage.getInstance().readFromDisk();
+        Storage.getInstance().readFromDisk();
     }
 
     /**
@@ -273,7 +273,7 @@ public class DecisionEngine implements DecisionEngineSpec {
 
     @Override
     public void shutdown() {
-        //Storage.getInstance().writeToDisk();
+        Storage.getInstance().writeToDisk();
     }
 
     @Override
