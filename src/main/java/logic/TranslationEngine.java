@@ -116,6 +116,12 @@ public class TranslationEngine implements TranslationEngineSpec {
                     }
                 }
 
+                // Account for adding new task
+                if(this._lastCommand != null &&
+                       this._lastCommand.hasInstruction(Command.Instruction.ADD)){
+
+                }
+
                 this.getUserInterface().setHeader(title);
 
                 break;

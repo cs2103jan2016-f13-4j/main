@@ -12,11 +12,13 @@ public class ExecutionResult {
     private ViewType _viewType;
     private Object _data;
     private boolean _isShutdownSignal;
+    private String _errorMessage;
 
-    public ExecutionResult(ViewType viewType, Object data) {
+    public ExecutionResult(ViewType viewType, Object data, String error) {
         this._viewType = viewType;
         this._data = data;
         this._isShutdownSignal = false;
+        this._errorMessage = error;
     }
 
     public ViewType getViewType() {
@@ -45,5 +47,9 @@ public class ExecutionResult {
             ExceptionHandler.handle(e);
             return null;
         }
+    }
+
+    public String getErrorMessage(){
+        return this._errorMessage;
     }
 }
