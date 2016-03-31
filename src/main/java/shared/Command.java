@@ -1,8 +1,8 @@
 package shared;
 
-import exception.ExceptionHandler;
-
 import java.util.LinkedHashMap;
+
+import exception.ExceptionHandler;
 
 /**
  * @author Thenaesh Elango
@@ -13,8 +13,7 @@ public class Command {
      * Types
      */
     public enum Instruction {
-        ADD, DISPLAY, MARK, EDIT, SEARCH, UNDO, DELETE, EXIT,
-        UNRECOGNISED, INVALID;
+        ADD, DISPLAY, MARK, EDIT, SEARCH, UNDO, DELETE, EXIT, UNRECOGNISED, INVALID;
     }
 
     public enum ParamType {
@@ -22,13 +21,11 @@ public class Command {
     }
 
     public enum ParamName {
-        TASK_NAME(ParamType.STRING),
-        TASK_DESCRIPTION(ParamType.STRING),
-        TASK_START(ParamType.DATE),
-        TASK_END(ParamType.DATE),
-        SEARCH_QUERY(ParamType.STRING);
+        TASK_NAME(ParamType.STRING), TASK_DESCRIPTION(ParamType.STRING), TASK_START(ParamType.DATE), TASK_END(
+                ParamType.DATE), SEARCH_QUERY(ParamType.STRING);
 
         public final ParamType type;
+
         ParamName(ParamType t) {
             type = t;
         }
@@ -44,12 +41,14 @@ public class Command {
 
     /**
      * Constructs a command with the given instruction, index OR quantifier.
+     * 
      * @param instruction
      * @param index
      * @param isUniversallyQuantified
      */
     public Command(Instruction instruction, Integer index, boolean isUniversallyQuantified) {
-        assert index == null || !isUniversallyQuantified; // isUniversallyQuantified => (index == null)
+        assert index == null || !isUniversallyQuantified; // isUniversallyQuantified
+                                                          // => (index == null)
 
         this._instruction = instruction;
         this._index = index;
@@ -77,7 +76,7 @@ public class Command {
         this._parameters.put(name, value);
     }
 
-    public <T> T getParameter(ParamName name) {
+    @SuppressWarnings("unchecked") public <T> T getParameter(ParamName name) {
         try {
             return (T) this._parameters.get(name);
         } catch (ClassCastException e) {

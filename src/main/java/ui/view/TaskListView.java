@@ -1,8 +1,13 @@
 package ui.view;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -10,16 +15,9 @@ import javafx.scene.control.ListView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.Pair;
-import shared.ApplicationContext;
 import shared.Resources;
 import shared.Task;
 import ui.controller.TaskListController;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Function;
 
 /**
  * @@author Antonius Satrio Triatmoko
@@ -34,8 +32,8 @@ public class TaskListView extends View {
      * Properties
      */
     private ObservableList _observableList;
-    private TaskListController _listControl ;
-    private List<Pair<Integer,Task>> _displayList;
+    private TaskListController _listControl;
+    private List<Pair<Integer, Task>> _displayList;
     private int _viewIndex;
 
     /**
@@ -43,13 +41,13 @@ public class TaskListView extends View {
      *
      * @param data
      */
-    public TaskListView(List<Pair<Integer,Task>> data) {
+    public TaskListView(List<Pair<Integer, Task>> data) {
         super(data);
     }
 
     @Override protected void buildContent() {
-        _displayList =  constructDisplayList();
-        _observableList  = FXCollections.observableArrayList(_displayList);
+        _displayList = constructDisplayList();
+        _observableList = FXCollections.observableArrayList(_displayList);
 
         ListView listView = Resources.getInstance().getComponent("TaskList");
         listView.setItems(this._observableList);
@@ -91,22 +89,20 @@ public class TaskListView extends View {
                 this._nameLabel.setText(task.getTaskName());
 
                 // Optional date time to support floating tasks
-                this._dateLabel.setText(startTime != null ?
-                        _df.format(startTime) :
-                        ""
-                ); // TODO: stub
+                this._dateLabel.setText(startTime != null ? _df.format(startTime) : ""); // TODO:
+                                                                                         // stub
 
                 this.setGraphic(this._container);
             }
         }
     }
 
-    private List<Pair<Integer,Task>> constructDisplayList(){
-        List<Pair<Integer,Task>> temp = new ArrayList<>();
-        List<Pair<Integer,Task>> viewData = this.getData();
+    private List<Pair<Integer, Task>> constructDisplayList() {
+        List<Pair<Integer, Task>> temp = new ArrayList<>();
+        List<Pair<Integer, Task>> viewData = this.getData();
 
-        if(viewData.size() > MAXIMUM_DISPLAY_SIZE){
-            for(int i = 0; i < MAXIMUM_DISPLAY_SIZE ; i++ ){
+        if (viewData.size() > MAXIMUM_DISPLAY_SIZE) {
+            for (int i = 0; i < MAXIMUM_DISPLAY_SIZE; i++) {
                 temp.add(viewData.get(i));
             }
             return temp;

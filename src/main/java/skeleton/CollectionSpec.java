@@ -2,8 +2,6 @@ package skeleton;
 
 import java.util.List;
 
-import exception.PrimaryKeyNotFoundException;
-
 /**
  * @@author Mai Anh Vu
  */
