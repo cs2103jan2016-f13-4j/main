@@ -119,7 +119,12 @@ public class TranslationEngine implements TranslationEngineSpec {
                 // Account for adding new task
                 if(this._lastCommand != null &&
                        this._lastCommand.hasInstruction(Command.Instruction.ADD)){
-
+                    if(result.getErrorMessage() == null){
+                        title = String.format("Successfully added %s to the list.",
+                                (String)this._lastCommand.getParameter(Command.ParamName.TASK_NAME));
+                    } else {
+                        title = result.getErrorMessage();
+                    }
                 }
 
                 this.getUserInterface().setHeader(title);

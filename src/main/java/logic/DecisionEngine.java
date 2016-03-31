@@ -95,7 +95,7 @@ public class DecisionEngine implements DecisionEngineSpec {
 
     protected ExecutionResult displayAllTasks() {
         List<Task> listToDisplay = this.getTaskCollection().getAll();
-        return new ExecutionResult(ViewType.TASK_LIST, listToDisplay);
+        return new ExecutionResult(ViewType.TASK_LIST, listToDisplay,null);
     }
 
 
@@ -208,7 +208,7 @@ public class DecisionEngine implements DecisionEngineSpec {
                 })
                 .collect(Collectors.toList());
 
-        return new ExecutionResult(ViewType.TASK_LIST, foundTask);
+        return new ExecutionResult(ViewType.TASK_LIST, foundTask, null);
     }
 
     protected ExecutionResult handleUndo(Command command) {
