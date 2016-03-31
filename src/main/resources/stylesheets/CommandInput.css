@@ -1,8 +1,11 @@
 /* @@author Mai Anh Vu */
-
 .command-input__field .scroll-bar {
     -fx-opacity: 0;
     visibility: hidden;
+}
+
+.command-input__field {
+    -fx-font-size: 12pt;
 }
 
 /*******************************************

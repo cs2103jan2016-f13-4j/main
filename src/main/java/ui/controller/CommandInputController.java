@@ -3,6 +3,7 @@ package ui.controller;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.Pair;
 import logic.CommandParser;
@@ -26,13 +27,14 @@ import java.util.regex.Pattern;
  */
 public class CommandInputController {
     private static final double PADDING_HORZ_COMMAND_INPUT = 12.0;
-    private static final double PADDING_VERT_COMMAND_INPUT = 18.0;
+    private static final double PADDING_VERT_COMMAND_INPUT = 17.0;
     private static final int DELAY_HIGHLIGHT = 250;
 
     @FXML
     private AnchorPane _commandInputContainer;
     private StyleClassedTextArea _inputField;
     private Function<String, Void> _inputSubmissionHandler;
+    private Function<KeyEvent, Boolean> _interceptor;
 
     private ExecutorService _executor;
 
@@ -97,6 +99,12 @@ public class CommandInputController {
     private void initializeHandlers() {
         // Set handlers
         this._inputField.setOnKeyPressed(event -> {
+
+            if (this._interceptor.apply(event)) {
+                event.consume();
+                return;
+            }
+
             if (event.getCode() == KeyCode.ENTER) {
 
                 assert _inputSubmissionHandler != null;
@@ -160,6 +168,10 @@ public class CommandInputController {
      */
     public void setInputSubmissionHandler(Function<String, Void> handler) {
         this._inputSubmissionHandler = handler;
+    }
+
+    public void setKeyInputInterceptor(Function<KeyEvent, Boolean> interceptor) {
+        this._interceptor = interceptor;
     }
 
     private Task<StyleSpans<Collection<String>>> computeHighlightingAsync() {

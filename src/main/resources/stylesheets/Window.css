@@ -1,11 +1,19 @@
 /* @@author Mai Anh Vu */
-.wrapper {
-    -fx-background-color: #f7f7f7;
+.window {
+    -fx-background-color: #fe9d1d;
+}
+
+.sub-container {
+    -fx-background-color: transparent;
 }
 
 .header__label {
     -fx-font-family: "Lato";
     -fx-font-style: italic;
+}
+
+.command-input__wrapper {
+    -fx-background-color: #ff9100;
 }
 
 .command-input__container {
@@ -21,9 +29,5 @@
 
 .command-input__field .scroll-bar {
     -fx-opacity: 0;
-}
-
-.container--main {
-    -fx-background-color: #fff;
 }
 

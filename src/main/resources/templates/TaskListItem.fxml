@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- @@author Mai Anh Vu -->
+
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.shape.Line?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="48.0" prefWidth="420.0" styleClass="item__container" stylesheets="@../stylesheets/TaskListItem.css" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="48.0" prefWidth="410.0" styleClass="item__container" stylesheets="@../stylesheets/TaskListItem.css" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Label fx:id="indexLabel" layoutX="14.0" layoutY="16.0" styleClass="item__index" text="88" AnchorPane.bottomAnchor="16.0" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="15.0" />
-      <Label fx:id="nameLabel" layoutX="36.0" layoutY="15.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="17.0" prefWidth="280.0" styleClass="item__name" text="Label" AnchorPane.bottomAnchor="16.0" AnchorPane.leftAnchor="36.0" AnchorPane.topAnchor="15.0" />
-      <Label fx:id="dateLabel" alignment="CENTER_RIGHT" layoutX="339.0" layoutY="15.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="16.0" prefWidth="64.0" styleClass="item__date" text="Label" textAlignment="RIGHT" AnchorPane.bottomAnchor="16.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="15.0" />
+      <Label fx:id="_indexLabel" layoutX="14.0" layoutY="16.0" styleClass="item__index" text="88" AnchorPane.bottomAnchor="16.0" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="15.0" />
+      <Label fx:id="_taskNameLabel" layoutX="36.0" layoutY="15.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="17.0" prefWidth="280.0" styleClass="item__name" text="Label" AnchorPane.bottomAnchor="16.0" AnchorPane.leftAnchor="36.0" AnchorPane.topAnchor="15.0" />
+      <Label fx:id="_timeLabel" alignment="CENTER_RIGHT" layoutX="339.0" layoutY="15.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="16.0" prefWidth="64.0" styleClass="item__date" text="Label" textAlignment="RIGHT" AnchorPane.bottomAnchor="16.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="15.0" />
       <Line endX="408.0" layoutY="48.0" startX="12.0" stroke="#f0f0f0" />
    </children>
 </AnchorPane>

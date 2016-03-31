@@ -8,9 +8,12 @@ import java.util.List;
 import java.util.NavigableMap;
 import java.util.NavigableSet;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import exception.ExceptionHandler;
 import exception.PrimaryKeyNotFoundException;
+import shared.Command;
 import shared.Task;
 import skeleton.CollectionSpec;
 
@@ -90,12 +93,18 @@ public class Storage implements CollectionSpec<Task> {
     }
 
     public void writeToDisk() {
-        List<Task> taskList = this.getAll();
-        ArrayList<String> taskStrings = new ArrayList<String>();
-        for (Task task : taskList) {
-            taskStrings.add(task.encodeTaskToString());
-        }
-        this.diskIO_.write(taskStrings);
+        List<Task> allTask = this.getAll();
+
+        // Keep internal index serial
+        List<String> tasksToWrite = IntStream.range(0, allTask.size())
+                .mapToObj(index -> {
+                    Task task = allTask.get(index);
+                    task.setId(index + 1);
+                    return task;
+                })
+                .map(Task::encodeTaskToString)
+                .collect(Collectors.toList());
+        this.diskIO_.write(tasksToWrite);
     }
 
     private void addTaskToStartTimeTree(boolean isNewTask, Task newTask, Task oldTask) {
@@ -108,6 +117,10 @@ public class Storage implements CollectionSpec<Task> {
     private void processOldTaskInStartTimeTree(Task newTask, Task oldTask) {
         // if oldTask has startTime, then oldTask currently exists in
         // startTimeTree
+        if (oldTask == null) {
+            return;
+        }
+
         if (oldTask.getStartTime() != null) {
             // remove oldTask from startTimeTree
             this.startTimeTree_.get(oldTask.getStartTime()).remove(oldTask);
@@ -135,6 +148,10 @@ public class Storage implements CollectionSpec<Task> {
 
     private void processOldTaskInEndTimeTree(Task newTask, Task oldTask) {
         // if oldTask has endTime, then oldTask currently exists in endTimeTree
+        if (oldTask == null) {
+            return;
+        }
+
         if (oldTask.getEndTime() != null) {
             this.endTimeTree_.get(oldTask.getEndTime()).remove(oldTask);
         }
@@ -422,7 +439,6 @@ public class Storage implements CollectionSpec<Task> {
             Task currTask = Task.decodeTaskFromString(taskString);
             // Set null id to indicate this is a new task to be added, not
             // an update
-            currTask.setId(null);
             this.save(currTask);
         }
     }
