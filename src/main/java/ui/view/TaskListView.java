@@ -60,7 +60,7 @@ public class TaskListView extends View {
 
     public static class Item extends ListCell<Pair<Integer, Task>> {
         private static final String STRING_NAME_TEMPLATE = "TaskListItem";
-        private static final String STRING_DATE_PATTERN = "EE";
+        private static final String STRING_DATE_PATTERN = "EE ha";
 
         @FXML private AnchorPane _container;
         @FXML private Label _indexLabel;
@@ -149,7 +149,6 @@ public class TaskListView extends View {
     @Override public Function<KeyEvent, Boolean> getKeyInputInterceptor() {
         return (event -> {
 
-            // TODO: Handle event here
             if (event.getCode().equals(KeyCode.UP) && canScrollUp()) {
                 this._viewIndex--;
             } else if (event.getCode().equals(KeyCode.DOWN) && canScrollDown()) {
