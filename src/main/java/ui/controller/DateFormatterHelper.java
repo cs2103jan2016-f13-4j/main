@@ -73,23 +73,32 @@ public class DateFormatterHelper {
         int taskYear = ldt.getYear();
         int taskDayOfYear = ldt.getDayOfYear();
 
-        // special case
-        if( curDayOfYear- taskDayOfYear == 364 || curDayOfYear - taskDayOfYear == 365){
-            return true;
+        if (curYear == taskYear){
+            return (taskDayOfYear -  curDayOfYear) == 1;
+        } else {
+            return (taskYear - curYear == 1) && ( taskDayOfYear == 1 && (curDayOfYear == 365) || (curDayOfYear == 366));
         }
 
-        return (curYear == taskYear) && ((taskDayOfYear -  curDayOfYear) == 1);
+
     }
 
-    /**
-    private boolean isYesterday(LocalDateTime ldt){
-        assert(isStillSameWeek(ldt));
+
+    public boolean isYesterday(LocalDateTime ldt) {
+       // assert(isStillSameWeek(ldt));
         int curYear = this._now.getYear();
         int curDayOfYear = this._now.getDayOfYear();
         int taskYear = ldt.getYear();
         int taskDayOfYear = ldt.getDayOfYear();
+
+        if(curYear == taskYear){
+            return (curYear == taskYear) && ((curDayOfYear - taskDayOfYear) == 1);
+        } else {
+            return (curYear - taskYear == 1) && ( curDayOfYear == 1 && (taskDayOfYear == 365 || taskDayOfYear == 366));
+        }
+
+
     }
-     **/
+
     /**
     private boolean isStillSameWeek(LocalDateTime ldt){
             int dayMaxValue = DayOfWeek.SUNDAY.getValue();
