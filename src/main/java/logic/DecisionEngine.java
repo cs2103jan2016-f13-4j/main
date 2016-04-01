@@ -152,19 +152,19 @@ public class DecisionEngine implements DecisionEngineSpec {
     protected ExecutionResult handleDelete(Command command) {
         assert command.hasInstruction(Command.Instruction.DELETE);
 
-        // Handle case where delete is aggregate
-        // TODO: Make this undo-able
-        if (command.isUniversallyQuantified()) {
-            // For undoing
+//        // Handle case where delete is aggregate
+//        // TODO: Make this undo-able
+//        if (command.isUniversallyQuantified()) {
+//            // For undoing
 //            this.getTaskCollection().getAll().stream()
 //                    .map(Task::clone)
 //                    .forEach(task -> task.setDeletedStatus(true));
-            // Temporary
-            this.getTaskCollection().getAll().stream()
-                    .mapToInt(Task::getId)
-                    .forEach(this.getTaskCollection()::remove);
-            return this.displayAllTasks();
-        }
+//            // Temporary
+//            this.getTaskCollection().getAll().stream()
+//                    .mapToInt(Task::getId)
+//                    .forEach(this.getTaskCollection()::remove);
+//            return this.displayAllTasks();
+//        }
 
         Integer id = command.getIndex();
         assert id != null;
@@ -173,14 +173,10 @@ public class DecisionEngine implements DecisionEngineSpec {
         deletedTask.setDeletedStatus(true);
 
         // add the corresponding undo operation
-        /*
         this.inverseOperations.push(v -> {
-            this.getTaskCollection().add(deletedTask);
+            this.getTaskCollection().undelete(id);
             return (Void) null;
         });
-        */
-        // TODO: Find a better solution than this
-        this.inverseOperations.clear();
 
         this.getTaskCollection().remove(id);
         return this.displayAllTasks();
