@@ -174,6 +174,18 @@ public class Storage implements CollectionSpec<Task> {
         return this._taskData.get(id);
     }
 
+    @Override public void undelete(int id) {
+        if (!(this._taskData.containsKey(id) && this._taskData.get(id).isDeleted())) {
+            try {
+                throw new PrimaryKeyNotFoundException(id);
+            } catch (PrimaryKeyNotFoundException e) {
+                ExceptionHandler.handle(e);
+            }
+        }
+
+        this._taskData.get(id).setDeletedStatus(false);
+    }
+
     /**
      * Clears all the Tasks from storage.
      */

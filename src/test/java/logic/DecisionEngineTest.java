@@ -1,5 +1,6 @@
 package logic;
 
+import static org.junit.Assert.*;
 import org.junit.*;
 
 import shared.*;
@@ -8,7 +9,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 
 /**
- * Created by thenaesh on 3/22/16.
+ * @@author Thenaesh Elango
  */
 public class DecisionEngineTest {
     private DecisionEngine decisionEngine;
@@ -37,33 +38,25 @@ public class DecisionEngineTest {
         this.decisionEngine = DecisionEngine.getInstance();
     }
 
-    /*
     @Test
     public void testCreateTask() {
-        ParameterList complete1 = new ParameterList();
-        complete1.addParameter(ParameterName.NAME, new ParameterValue(name1));
-        complete1.addParameter(ParameterName.DATE_FROM, new ParameterValue(testDate1));
-        complete1.addParameter(ParameterName.DATE_TO, new ParameterValue(testDate2));
+        Command fullAdd = new Command(Command.Instruction.ADD, null, true);
+        fullAdd.setParameter(Command.ParamName.TASK_NAME, name1);
+        fullAdd.setParameter(Command.ParamName.TASK_START, testDate1);
+        fullAdd.setParameter(Command.ParamName.TASK_END, testDate2);
 
-        ParameterList incomplete1 = new ParameterList();
-        incomplete1.addParameter(ParameterName.NAME, new ParameterValue(name2));
-        incomplete1.addParameter(ParameterName.DATE_FROM, new ParameterValue(testDate2));
-        incomplete1.addParameter(ParameterName.DATE_TO, new ParameterValue(testDate3));
+        Command partialAdd = new Command(Command.Instruction.ADD, null, true);
+        partialAdd.setParameter(Command.ParamName.TASK_NAME, name2);
 
-
-        Command cmdAddComplete = new Command(new Instruction(Instruction.Type.ADD), complete1);
-        Command cmdAddIncomplete = new Command(new Instruction(Instruction.Type.ADD), incomplete1);
-
-        Task task1 = this.decisionEngine.createTask(cmdAddComplete);
+        Task task1 = this.decisionEngine.createTask(fullAdd);
         task1.setId(specialTestID);
         Task expected1 = new Task(specialTestID, name1, null, testDate1, testDate2);
-        Task task2 = this.decisionEngine.createTask(cmdAddIncomplete);
+        Task task2 = this.decisionEngine.createTask(partialAdd);
         task2.setId(specialTestID);
         Task expected2 = new Task(specialTestID, name2, null, testDate2, testDate3);
 
         assertEquals(task1, expected1);
         assertEquals(task2, expected2);
     }
-    */
 
 }

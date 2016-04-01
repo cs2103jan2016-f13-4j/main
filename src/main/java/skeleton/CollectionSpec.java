@@ -13,5 +13,7 @@ public interface CollectionSpec<T> {
 
     T get(int index);
 
+    void undelete(int index);
+
     List<T> getAll();
 }
