@@ -29,7 +29,7 @@ public class UserInterface implements UserInterfaceSpec {
             "Lato-Regular"
     };
     private static final double SIZE_FONT_DEFAULT = 16.0;
-    private static final String STYLE_CLASS_CONTAINER_MAIN = "container--main";
+    private static final String STYLE_CLASS_CONTAINER_MAIN = "sub-container";
 
     /**
      * Singleton instance
@@ -62,16 +62,16 @@ public class UserInterface implements UserInterfaceSpec {
      */
     @Override
     public void initialize() {
+        assert (ApplicationContext.mainContext().getPrimaryStage() != null);
+
         // Set primary stage
-        this._primaryStage = ApplicationContext.getPrimaryStage();
+        this._primaryStage = ApplicationContext.mainContext().getPrimaryStage();
         this._primaryStage.getIcons().add(Resources.getInstance().getImage("mom.png"));
-        assert (this._primaryStage == null);
 
         this.initializeFonts();
 
         this.setRootView();
         this.registerHeader();
-        this.registerCommandInput();
         this.registerViewContainer();
     }
 
@@ -111,6 +111,7 @@ public class UserInterface implements UserInterfaceSpec {
     @Override
     public void setOnCommandInputHandler(Function<String, Void> onCommandInput) {
         this._commandInputHandler = onCommandInput;
+        this.registerCommandInput();
     }
 
     private void registerHeader() {

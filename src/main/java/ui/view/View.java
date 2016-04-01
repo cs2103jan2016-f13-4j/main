@@ -33,6 +33,7 @@ public abstract class View {
     protected abstract void buildContent();
 
     protected void setComponent(Node component) {
+        component.setId("component--main");
         this._component = component;
     }
 

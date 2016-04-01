@@ -33,6 +33,7 @@ public class ExecutionResult {
         this._data = null;
         this._isShutdownSignal = isShutdown;
     }
+
     public static ExecutionResult shutdownSignal() {
         return new ExecutionResult(true);
     }
@@ -40,7 +41,8 @@ public class ExecutionResult {
     public boolean isShutdownSignal() {
         return this._isShutdownSignal;
     }
-    public <T> T getData() {
+
+    @SuppressWarnings("unchecked") public <T> T getData() {
         try {
             return (T) this._data;
         } catch (ClassCastException e) {

@@ -2,22 +2,18 @@ package skeleton;
 
 import java.util.List;
 
-import exception.PrimaryKeyNotFoundException;
-
 /**
  * @@author Mai Anh Vu
  */
 public interface CollectionSpec<T> {
 
-    int add(T item);
-
-    boolean edit(int index, T item);
+    int save(T item);
 
     T remove(int index);
 
     T get(int index);
 
-    List<T> getAll();
+    void undelete(int index);
 
-    String getStoragePath();
+    List<T> getAll();
 }

@@ -14,7 +14,6 @@ public class Task implements Comparable<Task> {
     /**
      * Constants
      */
-    private static final int NUMBER_OF_ATTRIBUTES_TO_SERIALIZE = 5;
     private static final char DELIMITER_CSV = ',';
 
     /**
@@ -52,7 +51,9 @@ public class Task implements Comparable<Task> {
             return this.PRIORITY_VALUE;
         }
 
-        @Override public String toString() { return Integer.toString(PRIORITY_VALUE); }
+        @Override public String toString() {
+            return Integer.toString(PRIORITY_VALUE);
+        }
     };
 
     /**
@@ -65,8 +66,7 @@ public class Task implements Comparable<Task> {
      * @param endTime
      */
     public Task(Integer id, String taskName, String description, LocalDateTime startTime, LocalDateTime endTime) {
-        this(id, taskName, description, LocalDateTime.now(), startTime, endTime, Priority.LOW);
-        this._isDeleted = false;
+        this(id, taskName, description, LocalDateTime.now(), startTime, endTime, Priority.LOW, false);
     }
 
     // copy ctor, used to construct an identical copy in the clone method
@@ -75,7 +75,7 @@ public class Task implements Comparable<Task> {
     }
 
     private Task(Integer id, String taskName, String description, LocalDateTime creationTime, LocalDateTime startTime,
-                 LocalDateTime endTime, Priority priority) {
+            LocalDateTime endTime, Priority priority, boolean isDeleted) {
         this._id = id;
         this._taskName = taskName;
         this._description = description;
@@ -85,28 +85,23 @@ public class Task implements Comparable<Task> {
         this._priority = priority;
     }
 
-    @Override
-    public Task clone() {
+    @Override public Task clone() {
         return new Task(this);
     }
 
+    // ----------------------------------------------------------------------------------------
+    //
+    // Methods for encoding Task to String
+    //
+    // ----------------------------------------------------------------------------------------
+
     public String encodeTaskToString() {
-        return String.join(
-                Character.toString(DELIMITER_CSV),
-                this.taskAttributesToStringArray()
-        );
+        return String.join(Character.toString(DELIMITER_CSV), this.taskAttributesToStringArray());
     }
 
     private Object[] attributesToSerialize() {
-        return new Object[] {
-                this._id,
-                this._taskName,
-                this._description,
-                this._creationTime,
-                this._startTime,
-                this._endTime,
-                this._priority
-        };
+        return new Object[] { this._id, this._taskName, this._description, this._creationTime, this._startTime,
+                this._endTime, this._priority };
     }
 
     private String sanitise(Object attribute) {
@@ -133,9 +128,8 @@ public class Task implements Comparable<Task> {
 
     public String[] taskAttributesToStringArray() {
         // Sanitise data
-        return Arrays.stream(this.attributesToSerialize())
-                .map(this::sanitise)
-                .collect(Collectors.toList()).toArray(new String[] {});
+        return Arrays.stream(this.attributesToSerialize()).map(this::sanitise).collect(Collectors.toList())
+                .toArray(new String[] {});
     }
 
     public static Task decodeTaskFromString(String line) {
@@ -151,9 +145,11 @@ public class Task implements Comparable<Task> {
             }
             if (line.charAt(i) == '"' && isDecodingSpecialValue) {
                 // Fake quotes
-                if (i > 0 && line.charAt(i-1) == '\\') { continue; }
+                if (i > 0 && line.charAt(i - 1) == '\\') {
+                    continue;
+                }
 
-                String specialValue = line.substring(begin+1, i);
+                String specialValue = line.substring(begin + 1, i);
                 specialValue = specialValue.replace("\\\"", "\"");
                 specialValue = specialValue.replace("\\\\", "\\");
                 taskValues.add(specialValue);
@@ -166,7 +162,7 @@ public class Task implements Comparable<Task> {
             if (line.charAt(i) == DELIMITER_CSV && !isDecodingSpecialValue) {
                 String value = line.substring(begin, i);
                 taskValues.add(value);
-                begin = i+1;
+                begin = i + 1;
             }
         }
         // Account for last leftover value
@@ -179,17 +175,15 @@ public class Task implements Comparable<Task> {
         String taskName = taskValues.get(1);
         String description = taskValues.get(2);
         LocalDateTime creationTime = LocalDateTime.parse(taskValues.get(3));
-        LocalDateTime startTime = taskValues.get(4).trim().isEmpty() ?
-                null : LocalDateTime.parse(taskValues.get(4));
-        LocalDateTime endTime = taskValues.get(5).trim().isEmpty() ?
-                null : LocalDateTime.parse(taskValues.get(5));
+        LocalDateTime startTime = taskValues.get(4).trim().isEmpty() ? null : LocalDateTime.parse(taskValues.get(4));
+        LocalDateTime endTime = taskValues.get(5).trim().isEmpty() ? null : LocalDateTime.parse(taskValues.get(5));
 
         int priorityValue = Integer.parseInt(taskValues.get(6));
         final Priority[] priority = new Priority[] { Priority.LOW };
-        Arrays.stream(Priority.values()).filter(p -> p.getPriorityValue() == priorityValue)
-                .findFirst().ifPresent(p -> priority[0] = p);
+        Arrays.stream(Priority.values()).filter(p -> p.getPriorityValue() == priorityValue).findFirst()
+                .ifPresent(p -> priority[0] = p);
 
-        return new Task(id, taskName, description, creationTime, startTime, endTime, priority[0]);
+        return new Task(id, taskName, description, creationTime, startTime, endTime, priority[0], false);
     }
 
     @Override public int compareTo(Task o) {
@@ -250,6 +244,7 @@ public class Task implements Comparable<Task> {
     public boolean isDeleted() {
         return this._isDeleted;
     }
+
     /**
      * Setters
      */

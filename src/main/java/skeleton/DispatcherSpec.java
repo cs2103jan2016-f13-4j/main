@@ -12,4 +12,6 @@ public interface DispatcherSpec {
     void initialise();
 
     void start();
+
+    void shutdown();
 }

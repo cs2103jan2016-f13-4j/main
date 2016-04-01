@@ -1,5 +1,8 @@
 package logic;
 
+import java.util.List;
+import java.util.function.Function;
+
 import javafx.util.Pair;
 import shared.Command;
 import shared.ExecutionResult;
@@ -10,11 +13,6 @@ import skeleton.UserInterfaceSpec;
 import ui.UserInterface;
 import ui.view.TaskListView;
 import ui.view.View;
-
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.function.Function;
 
 /**
  * @@author Mai Anh Vu
@@ -50,16 +48,12 @@ public class TranslationEngine implements TranslationEngineSpec {
         return instance;
     }
 
-    @Override
-    public void setCommandExecutionHandler(Function<Command, ExecutionResult> handler) {
+    @Override public void setCommandExecutionHandler(Function<Command, ExecutionResult> handler) {
         assert (handler != null);
         this._commandExecutionHandler = handler;
     }
 
-    @Override
-    public void initialise() {
-        assert (this._commandExecutionHandler != null);
-
+    @Override public void initialise() {
         // Create input handler
         Function<String, Void> commandInputHandler = commandString -> {
             // Translate the raw command string given
@@ -79,89 +73,49 @@ public class TranslationEngine implements TranslationEngineSpec {
      *
      * @param result
      */
-    @Override
-    public void displayResult(ExecutionResult result) {
+    @Override public void displayResult(ExecutionResult result) {
         if (result.isShutdownSignal()) {
             // Do not display shutdown signal
             return;
         }
 
         switch (result.getViewType()) {
-            case TASK_LIST:
-                // Convert list to one with visual IDs only
-                List<Pair<Integer, Task>> visualTaskList =
-                        getVisualIndexMapper().translateRawToVisual(result.getData());
+        case TASK_LIST:
+            // Convert list to one with visual IDs only
+            List<Pair<Integer, Task>> visualTaskList = getVisualIndexMapper().translateRawToVisual(result.getData());
 
-                // Update mapper with list
-                VisualIndexMapper.getInstance().updateList(result.getData());
-                View view = new TaskListView(visualTaskList);
-                this.getUserInterface().render(view);
+            // Update mapper with list
+            VisualIndexMapper.getInstance().updateList(result.getData());
+            View view = new TaskListView(visualTaskList);
+            this.getUserInterface().render(view);
 
-                // Set title
-                String title = "Here are all the things you should do today!";
+            // Set title
+            String title = "Here are all the things you should do today!";
+            if (visualTaskList.isEmpty()) {
+                title = "You have got nothing left to do! Have something in mind?"
+                        + " Add a new to-do by typing add name:\"<thing to do>\" and press Enter!";
+            }
+
+            // Account for search queries
+            if (this._lastCommand != null && this._lastCommand.hasInstruction(Command.Instruction.SEARCH)) {
                 if (visualTaskList.isEmpty()) {
-                    title = "You have got nothing left to do! Have something in mind?" +
-                            " Add a new to-do by typing add name:\"<thing to do>\" and press Enter!";
+                    title = "No to-do with the query \""
+                            + this._lastCommand.getParameter(Command.ParamName.SEARCH_QUERY) + "\" was found!";
+                } else {
+                    title = String.format("Found %d items matching search query \"%s\"!", visualTaskList.size(),
+                            this._lastCommand.getParameter(Command.ParamName.SEARCH_QUERY));
                 }
+            }
 
-                // Account for search queries
-                if (this._lastCommand != null &&
-                        this._lastCommand.hasInstruction(Command.Instruction.SEARCH)) {
-                    if (visualTaskList.isEmpty()) {
-                        title = "No to-do with the query \"" +
-                                this._lastCommand.getParameter(Command.ParamName.SEARCH_QUERY) +
-                                "\" was found!";
-                    } else {
-                        title = String.format("Found %d items matching search query \"%s\"!",
-                                visualTaskList.size(),
-                                this._lastCommand.getParameter(Command.ParamName.SEARCH_QUERY));
-                    }
-                }
+            this.getUserInterface().setHeader(title);
 
-                // Account for adding new task
-                if(this._lastCommand != null &&
-                       this._lastCommand.hasInstruction(Command.Instruction.ADD)){
-                    if(result.getErrorMessage() == null){
-                        title = String.format("Successfully added %s to the list.",
-                                (String)this._lastCommand.getParameter(Command.ParamName.TASK_NAME));
-                    } else {
-                        title = result.getErrorMessage();
-                    }
-                }
-
-                //Account for editing existing task
-                if(this._lastCommand != null &&
-                        this._lastCommand.hasInstruction(Command.Instruction.EDIT)){
-                    if(result.getErrorMessage() == null){
-
-                        title = String.format("The following changes have been made to task number %d: ",
-                                                this._lastCommand.getIndex());
-                        if(this._lastCommand.getParameter(Command.ParamName.TASK_NAME) != null){
-                            title.concat("Task Name");
-                        }
-
-                        if(this._lastCommand.getParameter(Command.ParamName.TASK_DESCRIPTION) != null){
-                            title.concat(" Task Desrciption");
-                        }
-
-                        if(this._lastCommand.getParameter(Command.ParamName.TASK_START) != null){
-                            title.concat(" Task Starting Time");
-                        }
-
-                        if(this._lastCommand.getParameter(Command.ParamName.TASK_END) != null){
-                            title.concat(" Task Ending Time");
-                        }
-                    }
-
-                }
-                this.getUserInterface().setHeader(title);
-
-                break;
+            break;
+        default:
+            break;
         }
     }
 
-    @Override
-    public void shutdown() {
+    @Override public void shutdown() {
         this.getUserInterface().cleanUp();
     }
 
@@ -185,13 +139,11 @@ public class TranslationEngine implements TranslationEngineSpec {
         }).apply(command);
     }
 
-    @Override
-    public UserInterfaceSpec getUserInterface() {
+    @Override public UserInterfaceSpec getUserInterface() {
         return UserInterface.getInstance();
     }
 
-    @Override
-    public CommandParserSpec getCommandParser() {
+    @Override public CommandParserSpec getCommandParser() {
         return CommandParser.getInstance();
     }
 
