@@ -10,7 +10,7 @@ import shared.ApplicationContext;
 import shared.Resources;
 import skeleton.UserInterfaceSpec;
 import ui.controller.CommandInputController;
-import ui.controller.InfoPanelController;
+import ui.controller.HeaderController;
 import ui.view.View;
 
 import java.util.function.Function;
@@ -42,7 +42,7 @@ public class UserInterface implements UserInterfaceSpec {
     private Function<String, Void> _commandInputHandler;
     private Stage _primaryStage;
     private BorderPane _rootView;
-    private InfoPanelController _infoPanelController;
+    private HeaderController _headerController;
     private CommandInputController _commandInputController;
 
     private AnchorPane _mainContainer;
@@ -71,7 +71,7 @@ public class UserInterface implements UserInterfaceSpec {
         this.initializeFonts();
 
         this.setRootView();
-        this.registerInfoPanel();
+        this.registerHeader();
         this.registerViewContainer();
     }
 
@@ -114,14 +114,14 @@ public class UserInterface implements UserInterfaceSpec {
         this.registerCommandInput();
     }
 
-    private void registerInfoPanel() {
-        Pair<AnchorPane, InfoPanelController> headerMetadata =
-                Resources.getInstance().getComponentAndController("InfoPanelWrapper");
+    private void registerHeader() {
+        Pair<AnchorPane, HeaderController> headerMetadata =
+                Resources.getInstance().getComponentAndController("HeaderWrapper");
 
         AnchorPane headerWrapper = headerMetadata.getKey();
-        this._infoPanelController = headerMetadata.getValue();
+        this._headerController = headerMetadata.getValue();
 
-        this._rootView.setRight(headerWrapper);
+        this._rootView.setTop(headerWrapper);
     }
 
     private void registerCommandInput() {
@@ -133,7 +133,7 @@ public class UserInterface implements UserInterfaceSpec {
         assert inputMetadata != null;
 
         AnchorPane commandInputWrapper = inputMetadata.getKey();
-        this._rootView.setTop(commandInputWrapper);
+        this._rootView.setBottom(commandInputWrapper);
 
         this._commandInputController = inputMetadata.getValue();
         this._commandInputController.setInputSubmissionHandler(
@@ -144,7 +144,7 @@ public class UserInterface implements UserInterfaceSpec {
     private void registerViewContainer() {
         this._mainContainer = new AnchorPane();
         this._mainContainer.getStyleClass().add(STYLE_CLASS_CONTAINER_MAIN);
-        this._rootView.setLeft(this._mainContainer);
+        this._rootView.setCenter(this._mainContainer);
     }
 
     @Override
@@ -165,6 +165,6 @@ public class UserInterface implements UserInterfaceSpec {
 
     @Override
     public void setHeader(String title) {
-//        this._infoPanelController.setHeader(title);
+        this._headerController.setHeader(title);
     }
 }
