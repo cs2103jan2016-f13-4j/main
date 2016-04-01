@@ -1,8 +1,8 @@
 package storage;
 
-import shared.Task;
-
 import java.util.Comparator;
+
+import shared.Task;
 
 /**
  * 
@@ -11,32 +11,37 @@ import java.util.Comparator;
  */
 public class TaskPriorityComparator implements Comparator<Task> {
 
-    @Override public int compare(Task o1, Task o2) {
+    private static TaskPriorityComparator instance = new TaskPriorityComparator();
 
-        // Compare priority value
-        if (o1.getPriority().getPriorityValue() > o2.getPriority().getPriorityValue()) {
-            return 1;
-        } else if (o1.getPriority().getPriorityValue() < o2.getPriority().getPriorityValue()) {
-            return -1;
-        } else {
-            // Priority are equal, compare number of days to deadline
-            if (o1.getEndTime().isAfter(o2.getEndTime())) {
-                return 1;
-            } else if (o1.getEndTime().isBefore(o2.getEndTime())) {
-                return -1;
-            } else {
-                // Priority and deadline are equal, compare number of days since
-                // task creation
-                if (o1.getCreationTime().isAfter(o2.getCreationTime())) {
-                    return 1;
-                } else if (o1.getCreationTime().isBefore(o2.getCreationTime())) {
-                    return -1;
-                } else {
-                    // Priority, end time and creation time are all equal
-                    // Order by Task ID
-                    return o1.getId().compareTo(o2.getId());
-                }
-            }
+    public static TaskPriorityComparator getInstance() {
+        return instance;
+    }
+
+    @Override public int compare(Task task1, Task task2) {
+        int priorityComparison = task1.getPriority().compareTo(task2.getPriority());
+        if (priorityComparison != 0) return priorityComparison;
+
+        // Start time comparison
+        if (task1.getStartTime() == null ^ task2.getStartTime() == null) {
+            if (task1.getStartTime() == null) return -1;
+            if (task2.getStartTime() == null) return 1;
         }
+
+        if (task1.getStartTime() != null && task2.getStartTime() != null) {
+            return task1.getStartTime().compareTo(task2.getStartTime());
+        }
+
+        // End time comparison
+        if (task1.getEndTime() == null ^ task2.getEndTime() == null) {
+            if (task1.getEndTime() == null) return -1;
+            if (task2.getEndTime() == null) return 1;
+        }
+
+        if (task1.getEndTime() != null && task2.getEndTime() != null) {
+            return task1.getEndTime().compareTo(task2.getEndTime());
+        }
+
+        // Creation time comparision
+        return task1.getCreationTime().compareTo(task2.getCreationTime());
     }
 }

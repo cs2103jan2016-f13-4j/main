@@ -16,6 +16,7 @@ import skeleton.CollectionSpec;
 import skeleton.DecisionEngineSpec;
 import skeleton.SchedulerSpec;
 import storage.Storage;
+import storage.TaskPriorityComparator;
 
 /**
  * @@author Thenaesh Elango
@@ -100,7 +101,9 @@ public class DecisionEngine implements DecisionEngineSpec {
     }
 
     protected ExecutionResult displayAllTasks() {
-        List<Task> listToDisplay = this.getTaskCollection().getAll();
+        List<Task> listToDisplay = this.getTaskCollection().getAll().stream()
+                .sorted(TaskPriorityComparator.getInstance()).collect(Collectors.toList());
+
         return new ExecutionResult(ViewType.TASK_LIST, listToDisplay);
     }
 
