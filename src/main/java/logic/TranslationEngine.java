@@ -11,6 +11,8 @@ import ui.UserInterface;
 import ui.view.TaskListView;
 import ui.view.View;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.function.Function;
 
@@ -127,6 +129,31 @@ public class TranslationEngine implements TranslationEngineSpec {
                     }
                 }
 
+                //Account for editing existing task
+                if(this._lastCommand != null &&
+                        this._lastCommand.hasInstruction(Command.Instruction.EDIT)){
+                    if(result.getErrorMessage() == null){
+
+                        title = String.format("The following changes have been made to task number %d: ",
+                                                this._lastCommand.getIndex());
+                        if(this._lastCommand.getParameter(Command.ParamName.TASK_NAME) != null){
+                            title.concat("Task Name");
+                        }
+
+                        if(this._lastCommand.getParameter(Command.ParamName.TASK_DESCRIPTION) != null){
+                            title.concat(" Task Desrciption");
+                        }
+
+                        if(this._lastCommand.getParameter(Command.ParamName.TASK_START) != null){
+                            title.concat(" Task Starting Time");
+                        }
+
+                        if(this._lastCommand.getParameter(Command.ParamName.TASK_END) != null){
+                            title.concat(" Task Ending Time");
+                        }
+                    }
+
+                }
                 this.getUserInterface().setHeader(title);
 
                 break;
