@@ -63,24 +63,24 @@ public class DateFormatterHelper {
 
         return (curYear == taskYear) && ( curDayOfYear == taskDayOfYear);
     }
-/**
-    private boolean isTommorrow(LocalDateTime ldt){
 
-        assert(isStillSameWeek(ldt));
+    public boolean isTommorrow(LocalDateTime ldt){
+
+        //assert(isStillSameWeek(ldt));
 
         int curYear = this._now.getYear();
         int curDayOfYear = this._now.getDayOfYear();
         int taskYear = ldt.getYear();
         int taskDayOfYear = ldt.getDayOfYear();
-        // special case
 
-        if( curDayOfYear- taskDayOfYear == 364){
+        // special case
+        if( curDayOfYear- taskDayOfYear == 364 || curDayOfYear - taskDayOfYear == 365){
             return true;
         }
 
         return (curYear == taskYear) && ((taskDayOfYear -  curDayOfYear) == 1);
     }
- **/
+
     /**
     private boolean isYesterday(LocalDateTime ldt){
         assert(isStillSameWeek(ldt));
@@ -109,5 +109,9 @@ public class DateFormatterHelper {
         }
     }
      **/
+    // help in testing, to be deceprated.
+    public void setNow(LocalDateTime newLdt){
+        this._now = newLdt;
+    }
 
 }
