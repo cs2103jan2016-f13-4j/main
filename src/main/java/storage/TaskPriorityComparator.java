@@ -23,8 +23,8 @@ public class TaskPriorityComparator implements Comparator<Task> {
 
         // Start time comparison
         if (task1.getStartTime() == null ^ task2.getStartTime() == null) {
-            if (task1.getStartTime() == null) return -1;
-            if (task2.getStartTime() == null) return 1;
+            if (task1.getStartTime() == null) return 1;
+            if (task2.getStartTime() == null) return -1;
         }
 
         if (task1.getStartTime() != null && task2.getStartTime() != null) {
@@ -33,8 +33,8 @@ public class TaskPriorityComparator implements Comparator<Task> {
 
         // End time comparison
         if (task1.getEndTime() == null ^ task2.getEndTime() == null) {
-            if (task1.getEndTime() == null) return -1;
-            if (task2.getEndTime() == null) return 1;
+            if (task1.getEndTime() == null) return 1;
+            if (task2.getEndTime() == null) return -1;
         }
 
         if (task1.getEndTime() != null && task2.getEndTime() != null) {
