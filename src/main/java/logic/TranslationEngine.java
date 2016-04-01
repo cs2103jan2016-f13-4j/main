@@ -54,8 +54,6 @@ public class TranslationEngine implements TranslationEngineSpec {
     }
 
     @Override public void initialise() {
-        assert (this._commandExecutionHandler != null);
-
         // Create input handler
         Function<String, Void> commandInputHandler = commandString -> {
             // Translate the raw command string given

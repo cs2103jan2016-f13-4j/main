@@ -95,6 +95,26 @@ public class TaskListView extends View {
                 this.setGraphic(this._container);
             }
         }
+
+        @Override public boolean equals(Object o) {
+            if (o == null) return false;
+            if (this == o) return true;
+
+            if (o instanceof Pair) {
+                Pair<Integer, Task> data = (Pair<Integer,Task>) o;
+                if (!data.getKey().toString().equals(this._indexLabel.getText())) return false;
+                if (!data.getValue().getTaskName().equals(this._nameLabel.getText())) return false;
+                return true;
+            } else if (o instanceof Item) {
+                Item otherCell = (Item) o;
+                if (!this._indexLabel.getText().equals(otherCell._indexLabel.getText())) return false;
+                if (!this._nameLabel.getText().equals(otherCell._nameLabel.getText())) return false;
+                if (!this._dateLabel.getText().equals(otherCell._dateLabel.getText())) return false;
+                return true;
+            } else {
+                return false;
+            }
+        }
     }
 
     private List<Pair<Integer, Task>> constructDisplayList() {

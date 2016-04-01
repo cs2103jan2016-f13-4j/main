@@ -62,16 +62,16 @@ public class UserInterface implements UserInterfaceSpec {
      */
     @Override
     public void initialize() {
+        assert (ApplicationContext.mainContext().getPrimaryStage() != null);
+
         // Set primary stage
-        this._primaryStage = ApplicationContext.getPrimaryStage();
+        this._primaryStage = ApplicationContext.mainContext().getPrimaryStage();
         this._primaryStage.getIcons().add(Resources.getInstance().getImage("mom.png"));
-        assert (this._primaryStage == null);
 
         this.initializeFonts();
 
         this.setRootView();
         this.registerInfoPanel();
-        this.registerCommandInput();
         this.registerViewContainer();
     }
 
@@ -111,6 +111,7 @@ public class UserInterface implements UserInterfaceSpec {
     @Override
     public void setOnCommandInputHandler(Function<String, Void> onCommandInput) {
         this._commandInputHandler = onCommandInput;
+        this.registerCommandInput();
     }
 
     private void registerInfoPanel() {

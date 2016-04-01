@@ -1,5 +1,24 @@
 package ui.controller;
 
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.fxmisc.richtext.StyleClassedTextArea;
+import org.fxmisc.richtext.StyleSpans;
+import org.fxmisc.richtext.StyleSpansBuilder;
+import org.reactfx.EventStream;
+
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.input.KeyCode;
@@ -7,31 +26,19 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.Pair;
 import logic.CommandParser;
-import org.fxmisc.richtext.StyleClassedTextArea;
-import org.fxmisc.richtext.StyleSpans;
-import org.fxmisc.richtext.StyleSpansBuilder;
-import org.reactfx.EventStream;
 import shared.Command;
 import shared.Resources;
-
-import java.time.Duration;
-import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * @@author Mai Anh Vu
  */
 public class CommandInputController {
+    private static final String ID_COMMAND_INPUT = "command-input";
     private static final double PADDING_HORZ_COMMAND_INPUT = 12.0;
     private static final double PADDING_VERT_COMMAND_INPUT = 17.0;
     private static final int DELAY_HIGHLIGHT = 250;
 
-    @FXML
-    private AnchorPane _commandInputContainer;
+    @FXML private AnchorPane _commandInputContainer;
     private StyleClassedTextArea _inputField;
     private Function<String, Void> _inputSubmissionHandler;
     private Function<KeyEvent, Boolean> _interceptor;
@@ -52,10 +59,12 @@ public class CommandInputController {
     }
 
     /**
-     * Sets up all the different highlighting patterns to be shown by the command input field.
+     * Sets up all the different highlighting patterns to be shown by the
+     * command input field.
      */
     private void initializeHighlighters() {
-        // Prepare the hash map for dealing with finding a command reset instruction
+        // Prepare the hash map for dealing with finding a command reset
+        // instruction
         this._instructionStyleClassMap = new LinkedHashMap<>();
 
         // Get keyword data from Command Parser
@@ -65,8 +74,10 @@ public class CommandInputController {
         List<String> highlightList = new ArrayList<>();
 
         instructionMap.entrySet().stream()
-                // Turn into a pair of instruction keyword and the style class applied to it
-                // based on the instruction's original keyword. Refer to the CommandParser
+                // Turn into a pair of instruction keyword and the style class
+                // applied to it
+                // based on the instruction's original keyword. Refer to the
+                // CommandParser
                 // for the keywords
                 .map(entry -> {
                     String instruction = entry.getKey();
@@ -77,24 +88,20 @@ public class CommandInputController {
 
                     return new Pair<>(instruction, styleClass);
                 })
-                // Point each of this keyword to the correct class and store them
+                // Point each of this keyword to the correct class and store
+                // them
                 // inside a Hash Map for easy referral later
-                .forEach(pair -> this._instructionStyleClassMap.put(
-                        pair.getKey(),
-                        pair.getValue())
-                );
+                .forEach(pair -> this._instructionStyleClassMap.put(pair.getKey(), pair.getValue()));
 
         // Create the instruction highlight pattern
         String instructionPattern = buildInstructionHighlightPattern(highlightList);
 
-        this._highlightPattern = Pattern.compile(
-                "(?<INST>" + instructionPattern + ")"
-        );
+        this._highlightPattern = Pattern.compile("(?<INST>" + instructionPattern + ")");
     }
 
     /**
-     * Sets up all the event handlers that will be called upon when
-     * the command input field is being interacted with.
+     * Sets up all the event handlers that will be called upon when the command
+     * input field is being interacted with.
      */
     private void initializeHandlers() {
         // Set handlers
@@ -121,18 +128,14 @@ public class CommandInputController {
 
         // Set highlighting
         EventStream<?> richChanges = this._inputField.richChanges();
-        richChanges
-                .successionEnds(Duration.ofMillis(DELAY_HIGHLIGHT))
-                .supplyTask(this::computeHighlightingAsync)
-                .awaitLatest(richChanges)
-                .filterMap(t -> {
+        richChanges.successionEnds(Duration.ofMillis(DELAY_HIGHLIGHT)).supplyTask(this::computeHighlightingAsync)
+                .awaitLatest(richChanges).filterMap(t -> {
                     if (t.isSuccess()) {
                         return Optional.of(t.get());
                     } else {
                         return Optional.empty();
                     }
-                })
-                .subscribe(this::applyHighlighting);
+                }).subscribe(this::applyHighlighting);
     }
 
     /**
@@ -158,6 +161,10 @@ public class CommandInputController {
     private void initializeComponents() {
         this._executor = Executors.newSingleThreadExecutor();
         this._inputField = new StyleClassedTextArea();
+
+        // Set an ID to the input field for easy reference
+        this._inputField.setId(ID_COMMAND_INPUT);
+
         this._commandInputContainer.getChildren().add(this._inputField);
     }
 
@@ -177,8 +184,7 @@ public class CommandInputController {
     private Task<StyleSpans<Collection<String>>> computeHighlightingAsync() {
         String text = this._inputField.getText();
         Task<StyleSpans<Collection<String>>> task = new Task<StyleSpans<Collection<String>>>() {
-            @Override
-            protected StyleSpans<Collection<String>> call() throws Exception {
+            @Override protected StyleSpans<Collection<String>> call() throws Exception {
                 return computeHighlighting(text);
             }
         };
@@ -188,6 +194,7 @@ public class CommandInputController {
 
     /**
      * TODO: Write JavaDoc
+     * 
      * @param text
      * @return
      */
@@ -214,20 +221,17 @@ public class CommandInputController {
                 }
 
                 // Fill in the classes
-                spansBuilder.add(
-                        classes,
-                        matcher.end() - matcher.start()
-                );
+                spansBuilder.add(classes, matcher.end() - matcher.start());
             }
             // Highlight parameters
-//            else if (matcher.group("PARAM") != null) {
-//                Collection<String> classes = new ArrayList<>();
-//                classes.add("param");
-//                if (instructionClass != null) {
-//                    classes.add("param__" + instructionClass);
-//                }
-//                spansBuilder.add(classes, matcher.end() - matcher.start());
-//            }
+            // else if (matcher.group("PARAM") != null) {
+            // Collection<String> classes = new ArrayList<>();
+            // classes.add("param");
+            // if (instructionClass != null) {
+            // classes.add("param__" + instructionClass);
+            // }
+            // spansBuilder.add(classes, matcher.end() - matcher.start());
+            // }
 
             // Increase last keyword end to the end of the current word
             lastKeywordEnd = matcher.end();
@@ -239,6 +243,7 @@ public class CommandInputController {
 
     /**
      * TODO: Write JavaDoc
+     * 
      * @param highlighting
      */
     private void applyHighlighting(StyleSpans<Collection<String>> highlighting) {
@@ -255,6 +260,7 @@ public class CommandInputController {
     /**
      * Create a RegExp pattern in String form to recognise all the instructions
      * laid out by the {@link CommandParser}.
+     * 
      * @param instructions
      * @return
      */
@@ -262,7 +268,8 @@ public class CommandInputController {
         StringBuilder patternBuilder = new StringBuilder();
         patternBuilder.append("^\\b(");
         for (int i = 0; i < instructions.size(); i++) {
-            if (i != 0) patternBuilder.append("|");
+            if (i != 0)
+                patternBuilder.append("|");
             patternBuilder.append(instructions.get(i));
         }
         patternBuilder.append(")\\b");

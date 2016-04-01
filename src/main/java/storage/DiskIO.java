@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import exception.ExceptionHandler;
+import javafx.application.Application;
+import shared.ApplicationContext;
 
 /**
  * Handles reading from and writing to disk.
@@ -33,11 +35,15 @@ public class DiskIO {
      */
 
     private String _fileName;
-    private final String DEFAULT_FILE_NAME = "data/ToDoData.csv";
+    private static final String FILE_NAME_DEFAULT = "data/ToDoData.csv";
+    private static final String FILE_NAME_TESTING = "tmp/ToDoData.csv";
 
     private DiskIO() {
-        this._fileName = this.DEFAULT_FILE_NAME;
-        createDirectory();
+        // Select DiskIO reading/writing file based on testing mode
+        this._fileName = ApplicationContext.mainContext().isTestingMode() ?
+                FILE_NAME_TESTING : FILE_NAME_DEFAULT;
+
+        this.createDirectory();
     }
 
     public void setFileName(String fileName) {

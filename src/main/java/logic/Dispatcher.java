@@ -28,11 +28,13 @@ public class Dispatcher implements DispatcherSpec {
 
             // Handle shutdown
             if (result.isShutdownSignal()) {
+
                 // Shutdown both engines
-                this.getDecisionEngine().shutdown();
-                this.getTranslationEngine().shutdown();
+                this.shutdown();
+
                 // Demand application to close
-                ApplicationContext.getPrimaryStage().close();
+                ApplicationContext.mainContext().getPrimaryStage().close();
+
                 return result;
             }
 
@@ -40,6 +42,12 @@ public class Dispatcher implements DispatcherSpec {
             getTranslationEngine().displayResult(result);
             return result;
         };
+    }
+
+    @Override
+    public void shutdown() {
+        this.getDecisionEngine().shutdown();
+        this.getTranslationEngine().shutdown();
     }
 
     /**
