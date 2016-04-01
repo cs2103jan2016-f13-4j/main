@@ -26,9 +26,10 @@ public class DateFormatterHelper {
         this.updateCurrentTime();
         this._dateFormat = DateTimeFormatter.ofPattern(DATE_FORMAT);
     }
-
+    /**
     public String getDateDisplay(Task task) {
         updateCurrentTime();
+        // obtain necessary data for
 
         assert task != null;
         // check the task date
@@ -47,49 +48,66 @@ public class DateFormatterHelper {
         }
         return "";
     }
-
+    **/
     private void updateCurrentTime() {
         _now = LocalDateTime.now();
     }
 
-    private boolean isToday(Task task) {
+    public boolean isToday(LocalDateTime ldt) {
+    //    assert(isStillSameWeek(ldt));
+
         int curYear = this._now.getYear();
         int curDayOfYear = this._now.getDayOfYear();
-        int taskYear = task.getStartTime().getYear();
-        int taskDayOfYear = task.getStartTime().getDayOfYear();
+        int taskYear = ldt.getYear();
+        int taskDayOfYear = ldt.getDayOfYear();
 
         return (curYear == taskYear) && ( curDayOfYear == taskDayOfYear);
     }
+/**
+    private boolean isTommorrow(LocalDateTime ldt){
 
-    private boolean isTommorow(Task task){
+        assert(isStillSameWeek(ldt));
+
         int curYear = this._now.getYear();
         int curDayOfYear = this._now.getDayOfYear();
-        int taskYear = task.getStartTime().getYear();
-        int taskDayOfYear = task.getStartTime().getDayOfYear();
+        int taskYear = ldt.getYear();
+        int taskDayOfYear = ldt.getDayOfYear();
+        // special case
+
+        if( curDayOfYear- taskDayOfYear == 364){
+            return true;
+        }
 
         return (curYear == taskYear) && ((taskDayOfYear -  curDayOfYear) == 1);
     }
-
-    private boolean isYesterday(Task task){
+ **/
+    /**
+    private boolean isYesterday(LocalDateTime ldt){
+        assert(isStillSameWeek(ldt));
         int curYear = this._now.getYear();
         int curDayOfYear = this._now.getDayOfYear();
-        int taskYear = task.getStartTime().getYear();
-        int taskDayOfYear = task.getStartTime().getDayOfYear();
+        int taskYear = ldt.getYear();
+        int taskDayOfYear = ldt.getDayOfYear();
     }
-
-    private boolean isStillSameWeek(Task task){
-
+     **/
+    /**
+    private boolean isStillSameWeek(LocalDateTime ldt){
+            int dayMaxValue = DayOfWeek.SUNDAY.getValue();
         // if today is sunday,
-        if(_now.getDayOfWeek().equals(DayOfWeek.SUNDAY)){
-            return false;
-        } else { // else if today is still weekday,
             int curYear = this._now.getYear();
             int curDayOfYear = this._now.getDayOfYear();
-            int taskYear = task.getStartTime().getYear();
-            int taskDayOfYear = task.getStartTime().getDayOfYear();
             int curDayValue = this._now.getDayOfWeek().getValue();
-            return
+            int taskYear = ldt.getYear();
+            int taskDayOfYear = ldt.getDayOfYear();
+            int taskdayValue = ldt.getDayOfWeek().getValue();
+            int dayValueDifference = dayMaxValue - curDayValue;
+
+        if( curYear == taskYear){
+             return (Math.abs(curDayOfYear - taskDayOfYear) <=7 ) && (()||())
+        } else {
+
         }
     }
+     **/
 
 }
