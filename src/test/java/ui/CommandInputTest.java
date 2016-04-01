@@ -9,7 +9,6 @@ import static org.testfx.matcher.control.ListViewMatchers.hasListCell;
 
 import java.io.File;
 
-import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Test;
 import org.testfx.framework.junit.ApplicationTest;
@@ -72,11 +71,8 @@ public class CommandInputTest extends ApplicationTest {
         write("exit").push(KeyCode.ENTER);
     }
 
-    @After public void tearDown() throws Exception {
-        new File("tmp/ToDoData.csv").delete();
-    }
-
     @AfterClass public static void tearDownAfterClass() throws Exception {
         IntegerationTestHelper.shutdownTestApplication();
+        new File("tmp/ToDoData.csv").delete();
     }
 }

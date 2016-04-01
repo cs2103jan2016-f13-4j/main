@@ -1,11 +1,11 @@
 package shared;
 
+import java.io.IOException;
+import java.net.URL;
+
 import javafx.fxml.FXMLLoader;
 import javafx.scene.image.Image;
 import javafx.util.Pair;
-
-import java.io.IOException;
-import java.net.URL;
 
 /**
  * @@author Mai Anh Vu
@@ -43,7 +43,8 @@ public class Resources {
     /**
      * Builds a JavaFX view from the specified FXML template.
      *
-     * @param template the template name (without extension)
+     * @param template
+     *            the template name (without extension)
      *
      * @return null if template not found
      */
@@ -62,7 +63,11 @@ public class Resources {
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getTemplateUrl(template));
-            return new Pair<>(loader.load(), loader.getController());
+
+            T component = loader.load();
+            C controller = loader.getController();
+
+            return new Pair<>(component, controller);
         } catch (IOException e) {
             e.printStackTrace();
             return null;
@@ -76,14 +81,12 @@ public class Resources {
     }
 
     public String getFontUrl(String font) {
-        String fontPath = String.format("%s%s%s",
-                STRING_PATH_FONTS, font, STRING_EXTENSION_FONTS);
+        String fontPath = String.format("%s%s%s", STRING_PATH_FONTS, font, STRING_EXTENSION_FONTS);
         return this._classLoader.getResource(fontPath).toExternalForm();
     }
 
     public String getStylesheet(String stylesheet) {
-        String cssPath = String.format("%s%s%s",
-                STRING_PATH_STYLESHEETS, stylesheet, STRING_EXTENSION_STYLESHEETS);
+        String cssPath = String.format("%s%s%s", STRING_PATH_STYLESHEETS, stylesheet, STRING_EXTENSION_STYLESHEETS);
         return this._classLoader.getResource(cssPath).toExternalForm();
     }
 
