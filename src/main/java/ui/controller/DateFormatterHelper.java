@@ -14,10 +14,11 @@ public class DateFormatterHelper {
     private final String IN_WEEK_FORMAT = "EE";
     private final String DATE_FORMAT = "dd/MM";
     private final String HOUR_FORMAT = "ha";
-    private final String DATE_YESTERDAY = "YTD";
-    private final String DATE_TODAY = "TDY";
-    private final String DATE_TOMMOROW = "TMR";
-    private final String DATE_SAME_WEEK = "This %s";
+    private final String DATE_YESTERDAY = "Yesterday";
+    private final String DATE_TODAY = "Today";
+    private final String DATE_TOMMOROW = "Tomorrow";
+    private final String DATE_NEXT_WEEK = "Next %s";
+
     /**attribute **/
     private LocalDateTime _now;
     private DateTimeFormatter _inWeekFormat;
@@ -33,21 +34,25 @@ public class DateFormatterHelper {
 
     public String getDateDisplay(LocalDateTime ldt) {
         updateCurrentTime();
-
         String title = "";
-        if(isToday(ldt)){
-            title = DATE_TODAY;
-        } else if (isTommorrow(ldt)){
-            title = DATE_TOMMOROW;
-        } else if (isYesterday(ldt)) {
-            title = DATE_YESTERDAY;
-        } else if (isSameWeek(ldt)){
-            title = ldt.format(_inWeekFormat);
-        } else {
-            title = ldt.format(_otherDateFormat);
-        }
 
-        System.out.println(title);
+        if(ldt != null) {
+
+            if (isToday(ldt)) {
+                title = DATE_TODAY;
+            } else if (isTomorrow(ldt)) {
+                title = DATE_TOMMOROW;
+            } else if (isYesterday(ldt)) {
+                title = DATE_YESTERDAY;
+            } else if (isSameWeek(ldt)) {
+                title = ldt.format(_inWeekFormat);
+            } else if (isNextWeek(ldt)){
+                title = String.format(DATE_NEXT_WEEK,ldt.format(_inWeekFormat));
+            } else {
+                title = ldt.format(_otherDateFormat);
+            }
+
+        }
         return title;
     }
 
@@ -66,7 +71,7 @@ public class DateFormatterHelper {
         return (curYear == taskYear) && (curDayOfYear == taskDayOfYear);
     }
 
-    boolean isTommorrow(LocalDateTime ldt){
+    boolean isTomorrow(LocalDateTime ldt){
 
 
         int curYear = this._now.getYear();
@@ -125,6 +130,38 @@ public class DateFormatterHelper {
         }
 
         return false;
+    }
+
+    boolean isNextWeek(LocalDateTime ldt){
+        int sunday = DayOfWeek.SUNDAY.getValue();
+
+        int curYear = this._now.getYear();
+        int curDayOfYear = this._now.getDayOfYear();
+        int curDayValue = this._now.getDayOfWeek().getValue();
+
+        int taskYear = ldt.getYear();
+        int taskDayOfYear = ldt.getDayOfYear();
+        int curNewWeekDistance = sunday - curDayValue;
+
+        int maxRange = curNewWeekDistance + 6;
+
+        int dayValueDifference;
+
+        if(curYear == taskYear) {
+            dayValueDifference = taskDayOfYear - curDayOfYear;
+
+            if(dayValueDifference > 0) {
+                return (dayValueDifference > curNewWeekDistance) && ( dayValueDifference <= maxRange);
+            }
+        } else if (taskYear > curYear) {
+            int carryOver = dayYearValue(curYear);
+            dayValueDifference = carryOver + taskDayOfYear - curDayOfYear;
+
+            return (dayValueDifference > curNewWeekDistance) && (dayValueDifference <= maxRange);
+        }
+
+        return false;
+
     }
 
     // help in testing, to be deceprated.

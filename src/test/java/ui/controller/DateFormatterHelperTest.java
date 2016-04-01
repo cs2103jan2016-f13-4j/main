@@ -23,8 +23,7 @@ public class DateFormatterHelperTest {
         this._dfh = new DateFormatterHelper();
     }
 
-    @Test
-    public void Helper_Return_Expected_Same_Day_Test() {
+    @Test public void Helper_Return_Expected_Same_Day_Test() {
         LocalDateTime ldt =  LocalDateTime.now();
         LocalDateTime notNow = LocalDateTime.of(2016,12,12,12,12);
         assertTrue(this._dfh.isToday(ldt));
@@ -33,31 +32,29 @@ public class DateFormatterHelperTest {
         assertTrue(this._dfh.isToday(ldt));
     }
 
-    @Test
-    public void Helper_Return_Expected_Day_Are_Tommorrow_Test(){
+    @Test public void Helper_Return_Expected_Day_Are_Tommorrow_Test(){
         // test for same day. tommorrow, and yesterday
         LocalDateTime ldt = LocalDateTime.now();
-        assertFalse(this._dfh.isTommorrow(ldt));
+        assertFalse(this._dfh.isTomorrow(ldt));
         ldt = ldt.plusDays(1);
-        assertTrue(this._dfh.isTommorrow(ldt));
+        assertTrue(this._dfh.isTomorrow(ldt));
         ldt = ldt.minusDays(2);
-        assertFalse(this._dfh.isTommorrow(ldt));
+        assertFalse(this._dfh.isTomorrow(ldt));
 
         // test for different years
         ldt = LocalDateTime.of(2016,12,31,12,12);
         this._dfh.setNow(ldt);
         ldt = ldt.plusDays(1);
-        assertTrue(this._dfh.isTommorrow(ldt));
+        assertTrue(this._dfh.isTomorrow(ldt));
 
         // test for different month :
         ldt = ldt.of(2016,11,30,12,12);
         this._dfh.setNow(ldt);
         ldt = ldt.plusDays(1);
-        assertTrue(this._dfh.isTommorrow(ldt));
+        assertTrue(this._dfh.isTomorrow(ldt));
     }
 
-    @Test
-    public void Helper_Return_Expected_Days_Are_Yesterday_Test(){
+    @Test public void Helper_Return_Expected_Days_Are_Yesterday_Test(){
         LocalDateTime ldt = LocalDateTime.now();
         assertFalse(this._dfh.isYesterday(ldt));
         ldt = ldt.minusDays(1);
@@ -72,8 +69,7 @@ public class DateFormatterHelperTest {
         assertTrue(this._dfh.isYesterday(ldt));;
     }
 
-    @Test
-    public void Helper_Return_Expected_Days_Are_Same_Week(){
+    @Test public void Helper_Return_Expected_Days_Are_Same_Week(){
         LocalDateTime ldt = LocalDateTime.of(2016,3,31,12,00);
         this._dfh.setNow(ldt);
         ldt = ldt.plusDays(1);
@@ -98,15 +94,26 @@ public class DateFormatterHelperTest {
         assertTrue(this._dfh.isSameWeek(ldt));
         ldt = ldt.minusDays(5);
         assertTrue(this._dfh.isSameWeek(ldt));
+
     }
-    @Test
-    public void Helper_Get_Display_Test(){
+
+    @Test public void Helper_Days_Are_Next_Week(){
+        LocalDateTime ldt = LocalDateTime.of(2016,12,31,12,12);
+        this._dfh.setNow(ldt);
+        ldt = ldt.plusDays(2);
+        assertTrue(this._dfh.isNextWeek(ldt));
+        ldt = ldt.plusDays(6);
+        assertFalse(this._dfh.isNextWeek(ldt));
+        ldt = ldt.minusDays(14);
+        assertFalse(this._dfh.isNextWeek(ldt));
+    }
+    @Test public void Helper_Get_Display_Test(){
         LocalDateTime ldt = LocalDateTime.now();
-        assertTrue(this._dfh.getDateDisplay(ldt).equals("TDY"));
+        assertTrue(this._dfh.getDateDisplay(ldt).equals("Today"));
         ldt = ldt.plusDays(1);
-        assertTrue(this._dfh.getDateDisplay(ldt).equals("TMR"));
+        assertTrue(this._dfh.getDateDisplay(ldt).equals("Tomorrow"));
         ldt = ldt.minusDays(2);
-        assertTrue(this._dfh.getDateDisplay(ldt).equals("YTD"));
+        assertTrue(this._dfh.getDateDisplay(ldt).equals("Yesterday"));
 
     }
 

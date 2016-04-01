@@ -18,6 +18,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.util.Pair;
 import shared.Resources;
 import shared.Task;
+import ui.controller.DateFormatterHelper;
 import ui.controller.TaskListController;
 
 /**
@@ -36,6 +37,7 @@ public class TaskListView extends View {
     private TaskListController _listControl;
     private List<Pair<Integer, Task>> _displayList;
     private int _viewIndex;
+
 
     /**
      * Constructs a new view containing the provided data
@@ -66,7 +68,7 @@ public class TaskListView extends View {
         @FXML private Label _indexLabel;
         @FXML private Label _nameLabel;
         @FXML private Label _dateLabel;
-        private DateTimeFormatter _df = DateTimeFormatter.ofPattern(STRING_DATE_PATTERN);
+        private DateFormatterHelper _dateRenderer = new DateFormatterHelper();
 
         public Item() {
             super();
@@ -91,7 +93,7 @@ public class TaskListView extends View {
                 this._nameLabel.setText(task.getTaskName());
 
                 // Optional date time to support floating tasks
-                this._dateLabel.setText(startTime != null ? _df.format(startTime) : ""); // TODO:
+                this._dateLabel.setText(_dateRenderer.getDateDisplay(startTime)); // TODO:
                                                                                          // stub
 
                 this.setGraphic(this._container);
