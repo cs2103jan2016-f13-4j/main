@@ -11,7 +11,8 @@ import java.time.format.DateTimeFormatter;
  */
 public class DateFormatterHelper {
     /**Constant**/
-    private final String DATE_FORMAT = "EE";
+    private final String IN_WEEK_FORMAT = "EE";
+    private final String DATE_FORMAT = "dd/MM";
     private final String HOUR_FORMAT = "ha";
     private final String DATE_YESTERDAY = "YTD";
     private final String DATE_TODAY = "TDY";
@@ -19,54 +20,54 @@ public class DateFormatterHelper {
     private final String DATE_SAME_WEEK = "This %s";
     /**attribute **/
     private LocalDateTime _now;
-    private DateTimeFormatter _dateFormat;
+    private DateTimeFormatter _inWeekFormat;
+    private DateTimeFormatter _otherDateFormat;
     private DateTimeFormatter _timeFormat;
 
     public DateFormatterHelper() {
         this.updateCurrentTime();
-        this._dateFormat = DateTimeFormatter.ofPattern(DATE_FORMAT);
+        this._inWeekFormat = DateTimeFormatter.ofPattern(IN_WEEK_FORMAT);
+        this._otherDateFormat = DateTimeFormatter.ofPattern(DATE_FORMAT);
+        this._timeFormat = DateTimeFormatter.ofPattern(HOUR_FORMAT);
     }
-    /**
-    public String getDateDisplay(Task task) {
-        updateCurrentTime();
-        // obtain necessary data for
 
-        assert task != null;
-        // check the task date
-        if(isSameWeek()){
-            if(isToday()){
-                return DATE_TODAY;
-            } else if (isTommorow()){
-                return DATE_TOMMOROW;
-            } else if (isYesterday()){
-                return DATE_YESTERDAY;
-            } else {
-                // return this + dayString
-            }
+    public String getDateDisplay(LocalDateTime ldt) {
+        updateCurrentTime();
+
+        String title = "";
+        if(isToday(ldt)){
+            title = DATE_TODAY;
+        } else if (isTommorrow(ldt)){
+            title = DATE_TOMMOROW;
+        } else if (isYesterday(ldt)) {
+            title = DATE_YESTERDAY;
+        } else if (isSameWeek(ldt)){
+            title = ldt.format(_inWeekFormat);
         } else {
-            //return date;
+            title = ldt.format(_otherDateFormat);
         }
-        return "";
+
+        System.out.println(title);
+        return title;
     }
-    **/
+
     private void updateCurrentTime() {
         _now = LocalDateTime.now();
     }
 
-    public boolean isToday(LocalDateTime ldt) {
-    //    assert(isStillSameWeek(ldt));
+    boolean isToday(LocalDateTime ldt) {
+
 
         int curYear = this._now.getYear();
         int curDayOfYear = this._now.getDayOfYear();
         int taskYear = ldt.getYear();
         int taskDayOfYear = ldt.getDayOfYear();
 
-        return (curYear == taskYear) && ( curDayOfYear == taskDayOfYear);
+        return (curYear == taskYear) && (curDayOfYear == taskDayOfYear);
     }
 
-    public boolean isTommorrow(LocalDateTime ldt){
+    boolean isTommorrow(LocalDateTime ldt){
 
-        //assert(isStillSameWeek(ldt));
 
         int curYear = this._now.getYear();
         int curDayOfYear = this._now.getDayOfYear();
@@ -76,15 +77,15 @@ public class DateFormatterHelper {
         if (curYear == taskYear){
             return (taskDayOfYear -  curDayOfYear) == 1;
         } else {
-            return (taskYear - curYear == 1) && ( taskDayOfYear == 1 && (curDayOfYear == 365) || (curDayOfYear == 366));
+            return (taskYear - curYear == 1) && ( taskDayOfYear == 1 && (curDayOfYear == 365 || curDayOfYear == 366));
         }
 
 
     }
 
 
-    public boolean isYesterday(LocalDateTime ldt) {
-       // assert(isStillSameWeek(ldt));
+     boolean isYesterday(LocalDateTime ldt) {
+
         int curYear = this._now.getYear();
         int curDayOfYear = this._now.getDayOfYear();
         int taskYear = ldt.getYear();
@@ -99,28 +100,58 @@ public class DateFormatterHelper {
 
     }
 
-    /**
-    private boolean isStillSameWeek(LocalDateTime ldt){
-            int dayMaxValue = DayOfWeek.SUNDAY.getValue();
-        // if today is sunday,
-            int curYear = this._now.getYear();
-            int curDayOfYear = this._now.getDayOfYear();
-            int curDayValue = this._now.getDayOfWeek().getValue();
-            int taskYear = ldt.getYear();
-            int taskDayOfYear = ldt.getDayOfYear();
-            int taskdayValue = ldt.getDayOfWeek().getValue();
-            int dayValueDifference = dayMaxValue - curDayValue;
 
+     boolean isSameWeek(LocalDateTime ldt){
+
+        int curYear = this._now.getYear();
+        int curDayOfYear = this._now.getDayOfYear();
+        int curDayValue = this._now.getDayOfWeek().getValue();
+
+        int taskYear = ldt.getYear();
+        int taskDayOfYear = ldt.getDayOfYear();
+        int taskDayValue = ldt.getDayOfWeek().getValue();
+
+        int dayValueDifference = taskDayValue - curDayValue;
+        //System.out.println(dayValueDifference);
         if( curYear == taskYear){
-             return (Math.abs(curDayOfYear - taskDayOfYear) <=7 ) && (()||())
+            //System.out.println(taskDayOfYear - curDayOfYear);
+             return  taskDayOfYear - curDayOfYear  == dayValueDifference;
         } else {
-
+            if (taskYear - curYear == 1){
+                return (curDayOfYear + dayValueDifference) % dayYearValue(curYear) == taskDayOfYear;
+            } else if(curYear - taskYear == 1){
+                return (taskDayOfYear - dayValueDifference) % dayYearValue(taskYear) == curDayOfYear;
+            }
         }
+
+        return false;
     }
-     **/
+
     // help in testing, to be deceprated.
     public void setNow(LocalDateTime newLdt){
         this._now = newLdt;
+    }
+
+    private boolean isLeapYear(int year){
+
+        if(year%4 == 0) {
+            if(year%100 == 0){
+                if(year%400 == 0){
+                    return true;
+                }
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private int dayYearValue(int year){
+        if(isLeapYear(year)){
+            return 366;
+        } else {
+            return 365;
+        }
     }
 
 }
