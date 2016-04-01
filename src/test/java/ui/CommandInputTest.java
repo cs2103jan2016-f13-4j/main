@@ -75,4 +75,8 @@ public class CommandInputTest extends ApplicationTest {
     @After public void tearDown() throws Exception {
         new File("tmp/ToDoData.csv").delete();
     }
+
+    @AfterClass public static void tearDownAfterClass() throws Exception {
+        IntegerationTestHelper.shutdownTestApplication();
+    }
 }
