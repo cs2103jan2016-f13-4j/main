@@ -1,28 +1,28 @@
 package ui;
 
-import helpers.CommandInputHelper;
-import javafx.scene.control.ListView;
-import javafx.util.Pair;
-import org.junit.After;
-import org.junit.Test;
-import org.testfx.framework.junit.ApplicationTest;
-
-import javafx.scene.input.KeyCode;
-import javafx.stage.Stage;
-import shared.ApplicationContext;
-import helpers.IntegerationTestHelper;
-import shared.Command;
-import shared.Task;
-import storage.Storage;
-
-import java.io.File;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsEqual.equalTo;
 import static org.testfx.api.FxAssert.verifyThat;
 import static org.testfx.matcher.control.ListViewMatchers.hasItems;
 import static org.testfx.matcher.control.ListViewMatchers.hasListCell;
+
+import java.io.File;
+
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Test;
+import org.testfx.framework.junit.ApplicationTest;
+
+import helpers.CommandInputHelper;
+import helpers.IntegerationTestHelper;
+import javafx.scene.control.ListView;
+import javafx.scene.input.KeyCode;
+import javafx.stage.Stage;
+import javafx.util.Pair;
+import shared.ApplicationContext;
+import shared.Task;
+import storage.Storage;
 
 public class CommandInputTest extends ApplicationTest {
 
@@ -52,32 +52,27 @@ public class CommandInputTest extends ApplicationTest {
 
         // then:
         verifyThat("#component--main", hasItems(itemsCount + 1));
+        write("exit").push(KeyCode.ENTER);
     }
 
     @Test public void Existing_item_gets_modified_using_edit_command() {
         // given:
         clickOn("#command-input");
         write(CommandInputHelper.constructAddCommand("To be edited")).push(KeyCode.ENTER);
-        int newItemIndex = ((ListView<?>) IntegerationTestHelper.findComponent("#component--main"))
-                .getItems().size();
+        int newItemIndex = ((ListView<?>) IntegerationTestHelper.findComponent("#component--main")).getItems().size();
         Task recentItem = Storage.getInstance().getAll().stream()
-                .filter(task -> task.getTaskName().equals("To be edited"))
-                .findFirst().get();
+                .filter(task -> task.getTaskName().equals("To be edited")).findFirst().get();
 
         // when:
         write(CommandInputHelper.constructEditCommand(newItemIndex, "Already edited")).push(KeyCode.ENTER);
 
         // then:
         assertThat(recentItem.getTaskName(), is(equalTo("Already edited")));
-        verifyThat("#component--main", hasListCell(new Pair<>(
-                newItemIndex,
-                recentItem
-        )));
+        verifyThat("#component--main", hasListCell(new Pair<>(newItemIndex, recentItem)));
+        write("exit").push(KeyCode.ENTER);
     }
 
     @After public void tearDown() throws Exception {
-        IntegerationTestHelper.shutdownTestApplication();
         new File("tmp/ToDoData.csv").delete();
     }
-
 }

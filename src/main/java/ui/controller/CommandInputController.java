@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -188,7 +189,11 @@ public class CommandInputController {
                 return computeHighlighting(text);
             }
         };
-        this._executor.execute(task);
+        try {
+            this._executor.execute(task);
+        } catch (RejectedExecutionException e) {
+            // Do nothing
+        }
         return task;
     }
 
