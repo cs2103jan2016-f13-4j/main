@@ -32,16 +32,20 @@
 
   "timePrepositions": [{
     "meaning": "CURRENT",
-    "keywords": ["on", "this", "coming", "on this", "this coming", "on this coming"]
+    "keywords": ["on", "this", "coming", "on this", "this coming", "on this coming"],
+    "chainable": true
   }, {
     "meaning": "NEXT",
-    "keywords": ["next", "next week's"]
+    "keywords": ["next", "next week's"],
+    "chainable": true
   }, {
     "meaning": "STARTING",
-    "keywords": ["from", "starting", "after"]
+    "keywords": ["from", "starting", "after"],
+    "chainable": false
   }, {
     "meaning": "ENDING",
-    "keywords": ["to", "ending", "until", "before"]
+    "keywords": ["to", "ending", "until", "before"],
+    "chainable": false
   }],
 
   "timeNouns": [{

@@ -21,8 +21,8 @@ public class FlexiCommandParserTest {
     }
 
     @Test public void FlexiCommandParser_reads_JSON_data_correctly() {
-        System.out.println(this._parser.getInstructions());
-        System.out.println(this._parser.getTimeClauses());
+//        System.out.println(this._parser.getInstructions());
+//        System.out.println(this._parser.getTimeClauses());
     }
 
     @Test public void FlexiCommandParser_parses_add_command_correctly() {

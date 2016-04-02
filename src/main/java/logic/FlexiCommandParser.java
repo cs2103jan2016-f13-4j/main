@@ -3,8 +3,10 @@ package logic;
 import java.lang.reflect.Type;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -27,6 +29,7 @@ import skeleton.CommandParserSpec;
 public class FlexiCommandParser implements CommandParserSpec {
 
     private static final String NAME_FILE_DATA = "CommandParserData.json";
+    private static final String PATTERN_TIME = "\\d{1,2}:?(?:\\d{2})?(?:\\s*(?:am|pm))?";
 
     /**
      * Types
@@ -63,7 +66,7 @@ public class FlexiCommandParser implements CommandParserSpec {
         this.prepareTimeDefinitions();
 
         this.readDefinitions();
-        this.constructRegex();
+        final Pattern timeRegex = this.constructTimeRegex();
     }
 
     /*=================================================================================================
@@ -152,7 +155,60 @@ public class FlexiCommandParser implements CommandParserSpec {
      | this section.                                                                                  |
      |                                                                                                |
      *===============================================================================================*/
-    private void constructRegex() {
+    private Pattern constructTimeRegex() {
+        final HashMap<Set<TimePrepositionMeaning>, Set<TimeNounMeaning>> compressedGraph =
+                new LinkedHashMap<>();
+
+        // Compress the bipartite graph between prepositions and time nouns
+        this._commandDefinitions.getTimeClauseGraph().entrySet().forEach(entry -> {
+            TimeNounMeaning noun = entry.getKey();
+            Set<TimePrepositionMeaning> prepositions = entry.getValue();
+            Set<TimeNounMeaning> nouns = compressedGraph.get(prepositions);
+            if (nouns == null) {
+                nouns = new TreeSet<>();
+                compressedGraph.put(prepositions, nouns);
+            }
+            nouns.add(noun);
+        });
+
+        // Enumerate the possible combinations according to the compressed graph
+        Set<String> compressedTimeClauses = compressedGraph.entrySet().stream().map(entry -> {
+            // All prepositions first
+            String prepositionsRegex = constructChoiceRegex(
+                    entry.getKey().stream().map(this._commandDefinitions::getTimePreposition)
+                            .map(TimePreposition::getKeywords)
+                            .flatMap(Collection::stream).collect(Collectors.toSet())
+            );
+
+
+            // Add some chaining of prepositions behind
+            String chainablePrepositionsRegex = constructChoiceRegex(
+                    entry.getKey().stream().map(this._commandDefinitions::getTimePreposition)
+                            .filter(TimePreposition::isChainable)
+                            .map(TimePreposition::getKeywords)
+                            .flatMap(Collection::stream).collect(Collectors.toSet())
+            );
+            if (!chainablePrepositionsRegex.isEmpty()) { // Account for empty chainable
+                chainablePrepositionsRegex = String.format("(?:%s?\\s+)?", chainablePrepositionsRegex);
+            }
+
+            String nounsRegex = constructChoiceRegex(
+                    entry.getValue().stream().map(this._commandDefinitions::getTimeNounKeywords)
+                            .flatMap(Collection::stream).collect(Collectors.toSet())
+            );
+            // Allow chaining of prepositions
+            return String.format("%s\\s+%s%s",
+                    prepositionsRegex,
+                    chainablePrepositionsRegex,
+                    nounsRegex);
+
+        }).collect(Collectors.toSet());
+
+        // Construct time regex
+        final String timeRegex = String.format("(?<DATE>%s)(?:'s)?\\s+(?<TIME>%s)?",
+                constructChoiceRegex(compressedTimeClauses),
+                PATTERN_TIME);
+        return Pattern.compile(timeRegex, Pattern.CASE_INSENSITIVE);
     }
 
     /*=================================================================================================
@@ -171,9 +227,9 @@ public class FlexiCommandParser implements CommandParserSpec {
          * Properties
          */
         private HashMap<Command.Instruction, Set<String>> _commandKeywordMap;
-        private HashMap<TimePrepositionMeaning, Set<String>> _timePrepositionMap;
+        private HashMap<TimePrepositionMeaning, TimePreposition> _timePrepositionMap;
         private HashMap<TimeNounMeaning, Set<String>> _timeNounMap;
-        private Map<TimeNounMeaning, List<TimePrepositionMeaning>> _adjacencyList;
+        private Map<TimeNounMeaning, Set<TimePrepositionMeaning>> _adjacencyList;
 
         // Caching
         private Set<String> _cachedInstructions;
@@ -192,10 +248,14 @@ public class FlexiCommandParser implements CommandParserSpec {
             this._commandKeywordMap.put(instruction, keywordSet);
         }
 
-        void addTimePreposition(String meaning, String[] keywords) {
+        void addTimePreposition(String meaning, String[] keywords, boolean isChainable) {
             final TimePrepositionMeaning realMeaning = _timePrepositionMeaningMap.get(meaning);
             final Set<String> keywordSet = new CopyOnWriteArraySet<>(Arrays.asList(keywords));
-            this._timePrepositionMap.put(realMeaning, keywordSet);
+            this._timePrepositionMap.put(realMeaning, new TimePreposition(
+                    realMeaning,
+                    keywordSet,
+                    isChainable
+            ));
         }
 
         void addTimeNoun(String meaning, String[] keywords, String[] prepositions) {
@@ -204,9 +264,9 @@ public class FlexiCommandParser implements CommandParserSpec {
             this._timeNounMap.put(realMeaning, keywordSet);
 
             // Add time nouns to adjacency matrix
-            final List<TimePrepositionMeaning> prepositionsList = Arrays.stream(prepositions)
+            final Set<TimePrepositionMeaning> prepositionsList = Arrays.stream(prepositions)
                     .map(_timePrepositionMeaningMap::get)
-                    .collect(Collectors.toList());
+                    .collect(Collectors.toSet());
             this._adjacencyList.put(realMeaning, prepositionsList);
         }
 
@@ -230,7 +290,7 @@ public class FlexiCommandParser implements CommandParserSpec {
                         ))
                         .forEach(pair -> {
                             TimeClause clause = pair.getKey();
-                            Set<String> prepositions = pair.getValue();
+                            Set<String> prepositions = pair.getValue().getKeywords();
 
                             prepositions.stream().flatMap(preposition ->
                                     timeNouns.stream().map(noun -> String.format("%s %s", preposition, noun))
@@ -246,6 +306,10 @@ public class FlexiCommandParser implements CommandParserSpec {
             return timeClauseMap;
         }
 
+        Map<TimeNounMeaning, Set<TimePrepositionMeaning>> getTimeClauseGraph() {
+            return this._adjacencyList;
+        }
+
         Set<String> getInstructions() {
             // Return cache right away
             if (this._cachedInstructions != null) {
@@ -259,6 +323,14 @@ public class FlexiCommandParser implements CommandParserSpec {
                     .collect(Collectors.toSet());
 
             return this._cachedInstructions;
+        }
+
+        TimePreposition getTimePreposition(TimePrepositionMeaning preposition) {
+            return this._timePrepositionMap.get(preposition);
+        }
+
+        Set<String> getTimeNounKeywords(TimeNounMeaning noun) {
+            return this._timeNounMap.get(noun);
         }
     }
 
@@ -301,8 +373,9 @@ public class FlexiCommandParser implements CommandParserSpec {
                 final String[] timePrepositionMeaningKeywords = decodeJSONStringArray(
                         timePrepositionObject.get("keywords").getAsJsonArray()
                 );
+                final boolean isChainable = timePrepositionObject.get("chainable").getAsBoolean();
 
-                definition.addTimePreposition(meaning, timePrepositionMeaningKeywords);
+                definition.addTimePreposition(meaning, timePrepositionMeaningKeywords, isChainable);
             });
 
             // TIME ARRAY
@@ -326,6 +399,30 @@ public class FlexiCommandParser implements CommandParserSpec {
             return definition;
         }
 
+    }
+
+    private class TimePreposition {
+        private TimePrepositionMeaning _meaning;
+        private Set<String> _keywords;
+        private boolean _isChainable;
+
+        TimePreposition(TimePrepositionMeaning meaning, Set<String> keywords, boolean isChainable) {
+            this._meaning = meaning;
+            this._keywords = keywords;
+            this._isChainable = isChainable;
+        }
+
+        TimePrepositionMeaning getMeaning() {
+            return this._meaning;
+        }
+
+        Set<String> getKeywords() {
+            return this._keywords;
+        }
+
+        boolean isChainable() {
+            return this._isChainable;
+        }
     }
 
     private class TimeClause {
@@ -396,14 +493,23 @@ public class FlexiCommandParser implements CommandParserSpec {
         return array;
     }
 
-    private static String constructChoiceRegex(String[] choices) {
-        StringBuilder sb = new StringBuilder("(?:");
-        for (int i = 0; i < choices.length; i++) {
-            if (i != 0) {
+    private static String constructChoiceRegex(Set<String> choices) {
+        // Borderline cases
+        if (choices.size() == 0) {
+            return "";
+        }
+        if (choices.size() == 1) {
+            return choices.iterator().next();
+        }
+
+        StringBuilder sb = new StringBuilder();
+        choices.stream().forEach(choice -> {
+            if (sb.length() != 0) {
                 sb.append("|");
             }
-            sb.append(choices[i]);
-        }
+            sb.append(choice);
+        });
+        sb.insert(0, "(?:");
         sb.append(")");
         return sb.toString();
     }
