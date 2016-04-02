@@ -203,16 +203,17 @@ public class FlexiCommandParser implements CommandParserSpec {
                 new LinkedHashMap<>();
 
         // Compress the bipartite graph between prepositions and time nouns
-        this._commandDefinitions.getTimeClauseGraph().entrySet().forEach(entry -> {
-            TimeNounMeaning noun = entry.getKey();
-            Set<TimePrepositionMeaning> prepositions = entry.getValue();
-            Set<TimeNounMeaning> nouns = compressedGraph.get(prepositions);
-            if (nouns == null) {
-                nouns = new TreeSet<>();
-                compressedGraph.put(prepositions, nouns);
-            }
-            nouns.add(noun);
-        });
+        this._commandDefinitions.getTimeClauseGraph().entrySet().stream()
+                .forEach(entry -> {
+                    TimeNounMeaning noun = entry.getKey();
+                    Set<TimePrepositionMeaning> prepositions = entry.getValue();
+                    Set<TimeNounMeaning> nouns = compressedGraph.get(prepositions);
+                    if (nouns == null) {
+                        nouns = new TreeSet<>();
+                        compressedGraph.put(prepositions, nouns);
+                    }
+                    nouns.add(noun);
+                });
 
         // Enumerate the possible combinations according to the compressed graph
         Set<String> compressedTimeClauses = compressedGraph.entrySet().stream().map(entry -> {
@@ -247,6 +248,11 @@ public class FlexiCommandParser implements CommandParserSpec {
                     nounsRegex);
 
         }).collect(Collectors.toSet());
+
+        // Enumerate special time nouns (those that do not require preceding preposition)
+        compressedTimeClauses.addAll(
+            this._commandDefinitions.getWithoutPrepositionsTimeNounKeywords()
+        );
 
         // Construct time regex
         return String.format("(?<DATE>%s)(?:'s)?\\s*(?<TIME>%s)?",
@@ -285,7 +291,7 @@ public class FlexiCommandParser implements CommandParserSpec {
          */
         private HashMap<Command.Instruction, Set<String>> _commandKeywordMap;
         private HashMap<TimePrepositionMeaning, TimePreposition> _timePrepositionMap;
-        private HashMap<TimeNounMeaning, Set<String>> _timeNounMap;
+        private HashMap<TimeNounMeaning, TimeNoun> _timeNounMap;
         private Set<String> _priorityPrepositions;
         private HashMap<Task.Priority, Set<String>>_prioritiesKeywordMap;
 
@@ -345,10 +351,10 @@ public class FlexiCommandParser implements CommandParserSpec {
          * @param keywords
          * @param prepositions
          */
-        void addTimeNoun(String meaning, String[] keywords, String[] prepositions) {
+        void addTimeNoun(String meaning, String[] keywords, String[] prepositions, boolean canGoWithoutPrepositions) {
             final TimeNounMeaning realMeaning = _timeNounMeaningEnumTranslator.get(meaning);
             final Set<String> keywordSet = new CopyOnWriteArraySet<>(Arrays.asList(keywords));
-            this._timeNounMap.put(realMeaning, keywordSet);
+            this._timeNounMap.put(realMeaning, new TimeNoun(realMeaning, keywordSet, canGoWithoutPrepositions));
 
             // Add time nouns to adjacency matrix
             final Set<TimePrepositionMeaning> prepositionsList = Arrays.stream(prepositions)
@@ -432,12 +438,24 @@ public class FlexiCommandParser implements CommandParserSpec {
 
                             // Try to generate a flat map of prepositions
                             stringClauses.stream()
-                                    .flatMap(stringClause -> this._timeNounMap.get(noun).stream().map(
+                                    .flatMap(stringClause -> this._timeNounMap.get(noun).getKeywords().stream().map(
                                             nounKeyword -> stringClause + " " + nounKeyword
                                     ))
                                     .forEach(stringClause -> timeClauseMap.put(stringClause, timeClause));
                         });
             }
+
+            // Special cases: Enumerate time nouns that can go without prepositions
+            this._timeNounMap.values().stream()
+                    .filter(TimeNoun::canGoWithoutPrepositions)
+                    .forEach(noun -> {
+                        TimeClause clause = new TimeClause(
+                                Collections.singletonList(this._timePrepositionMap.get(TimePrepositionMeaning.ENDING)),
+                                noun.getMeaning()
+                        );
+                        noun.getKeywords().stream()
+                                .forEach(keyword -> timeClauseMap.put(keyword, clause));
+                    });
 
             // Cache
             this._cachedTimeClauseMap = timeClauseMap;
@@ -491,7 +509,15 @@ public class FlexiCommandParser implements CommandParserSpec {
          * @return
          */
         Set<String> getTimeNounKeywords(TimeNounMeaning noun) {
-            return this._timeNounMap.get(noun);
+            return this._timeNounMap.get(noun).getKeywords();
+        }
+
+        Set<String> getWithoutPrepositionsTimeNounKeywords() {
+            return this._timeNounMap.values().stream()
+                    .filter(TimeNoun::canGoWithoutPrepositions)
+                    .map(TimeNoun::getKeywords)
+                    .flatMap(Collection::stream)
+                    .collect(Collectors.toSet());
         }
 
         Set<String> getPriorityPrepositionKeywords() {
@@ -575,8 +601,9 @@ public class FlexiCommandParser implements CommandParserSpec {
                 final String[] prepositions = decodeJSONStringArray(
                         timeObject.get("prepositions").getAsJsonArray()
                 );
+                final boolean canGoWithoutPrepositions = timeObject.get("canGoWithoutPrepositions").getAsBoolean();
 
-                definition.addTimeNoun(meaning, keywords, prepositions);
+                definition.addTimeNoun(meaning, keywords, prepositions, canGoWithoutPrepositions);
             });
 
             // PRIORITY PREPOSITIONS ARRAY
@@ -634,6 +661,30 @@ public class FlexiCommandParser implements CommandParserSpec {
 
             TimePreposition prep = (TimePreposition) o;
             return this._meaning.equals(prep._meaning);
+        }
+    }
+
+    private class TimeNoun {
+        private TimeNounMeaning _meaning;
+        private Set<String> _keywords;
+        private boolean _canGoWithoutPrepositions;
+
+        public TimeNoun(TimeNounMeaning meaning, Set<String> keywords, boolean canGoWithoutPrepositions) {
+            this._meaning = meaning;
+            this._keywords = keywords;
+            this._canGoWithoutPrepositions = canGoWithoutPrepositions;
+        }
+
+        public TimeNounMeaning getMeaning() {
+            return this._meaning;
+        }
+
+        public Set<String> getKeywords() {
+            return this._keywords;
+        }
+
+        public boolean canGoWithoutPrepositions() {
+            return this._canGoWithoutPrepositions;
         }
     }
 
@@ -812,10 +863,10 @@ public class FlexiCommandParser implements CommandParserSpec {
             }
         }
 
-        if (hour >= 24 || // Hour cannot be more than 24
-                hour > 12 && isAm) { // Specified AM but hour is more than 24
+        if (hour >= 24) { // Hour cannot be more than 24
             return null; // Hour cannot be more than 24
         }
+
         if (hour != 12 && !isAm) {
             hour = (hour + 12) % 24;
         }

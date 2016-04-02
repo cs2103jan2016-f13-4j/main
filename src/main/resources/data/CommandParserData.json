@@ -51,43 +51,53 @@
   "timeNouns": [{
     "meaning": "NOW",
     "keywords": ["now"],
-    "prepositions": ["STARTING"]
+    "prepositions": ["STARTING"],
+    "canGoWithoutPrepositions": true
   }, {
     "meaning": "TODAY",
     "keywords": ["today"],
-    "prepositions": ["STARTING", "ENDING"]
+    "prepositions": ["STARTING", "ENDING"],
+    "canGoWithoutPrepositions": true
   }, {
     "meaning": "TOMORROW",
     "keywords": ["tomorrow"],
-    "prepositions": ["STARTING", "ENDING"]
+    "prepositions": ["STARTING", "ENDING"],
+    "canGoWithoutPrepositions": true
   }, {
     "meaning": "MONDAY",
     "keywords": ["monday", "mon"],
-    "prepositions": ["CURRENT", "NEXT", "STARTING", "ENDING"]
+    "prepositions": ["CURRENT", "NEXT", "STARTING", "ENDING"],
+    "canGoWithoutPrepositions": false
   }, {
     "meaning": "TUESDAY",
     "keywords": ["tuesday", "tue"],
-    "prepositions": ["CURRENT", "NEXT", "STARTING", "ENDING"]
+    "prepositions": ["CURRENT", "NEXT", "STARTING", "ENDING"],
+    "canGoWithoutPrepositions": false
   }, {
     "meaning": "WEDNESDAY",
     "keywords": ["wednesday", "wed"],
-    "prepositions": ["CURRENT", "NEXT", "STARTING", "ENDING"]
+    "prepositions": ["CURRENT", "NEXT", "STARTING", "ENDING"],
+    "canGoWithoutPrepositions": false
   }, {
     "meaning": "THURSDAY",
     "keywords": ["thursday", "thu"],
-    "prepositions": ["CURRENT", "NEXT", "STARTING", "ENDING"]
+    "prepositions": ["CURRENT", "NEXT", "STARTING", "ENDING"],
+    "canGoWithoutPrepositions": false
   }, {
     "meaning": "FRIDAY",
     "keywords": ["friday", "fri"],
-    "prepositions": ["CURRENT", "NEXT", "STARTING", "ENDING"]
+    "prepositions": ["CURRENT", "NEXT", "STARTING", "ENDING"],
+    "canGoWithoutPrepositions": false
   }, {
     "meaning": "SATURDAY",
     "keywords": ["saturday", "sat"],
-    "prepositions": ["CURRENT", "NEXT", "STARTING", "ENDING"]
+    "prepositions": ["CURRENT", "NEXT", "STARTING", "ENDING"],
+    "canGoWithoutPrepositions": false
   }, {
     "meaning": "SUNDAY",
     "keywords": ["sunday", "sun"],
-    "prepositions": ["CURRENT", "NEXT", "STARTING", "ENDING"]
+    "prepositions": ["CURRENT", "NEXT", "STARTING", "ENDING"],
+    "canGoWithoutPrepositions": false
   }],
 
   "priorityPrepositions": ["with", "as", "of"],

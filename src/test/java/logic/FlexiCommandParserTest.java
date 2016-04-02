@@ -5,6 +5,7 @@ import org.junit.Test;
 import shared.Command;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
@@ -103,4 +104,36 @@ public class FlexiCommandParserTest {
         );
     }
 
+    @Test public void FlexiCommandParser_parses_time_nouns_without_prepositions_correctly() {
+        String commandString = "add talk cock sing song tomorrow";
+        Command command = this._parser.parse(commandString);
+
+        assertThat(command.getInstruction(), is(Command.Instruction.ADD));
+        assertThat(command.getParameter(Command.ParamName.TASK_NAME),
+                is(equalTo("talk cock sing song")));
+        assertThat(command.getParameter(Command.ParamName.TASK_END),
+                is(equalTo(LocalDateTime.now().plusDays(1).truncatedTo(ChronoUnit.DAYS))));
+    }
+
+    @Test public void FlexiCommandParser_parses_PM_time_correctly() {
+        String commandString = "add talk cock sing song from tomorrow to next week's Thursday 1300";
+        Command command = this._parser.parse(commandString);
+
+        assertThat(command.getInstruction(), is(Command.Instruction.ADD));
+        assertThat(command.getParameter(Command.ParamName.TASK_NAME),
+                is(equalTo("talk cock sing song")));
+        LocalDateTime thursday = LocalDateTime.now();
+        int passes = 1;
+        if (thursday.getDayOfWeek().getValue() >= DayOfWeek.THURSDAY.getValue()) {
+            passes = 0;
+        }
+        while (!thursday.getDayOfWeek().equals(DayOfWeek.THURSDAY) || passes > 0) {
+            if (thursday.getDayOfWeek().equals(DayOfWeek.THURSDAY)) passes--;
+            thursday = thursday.plusDays(1);
+        }
+        thursday = thursday.withHour(13).withMinute(0).truncatedTo(ChronoUnit.MINUTES);
+        assertThat(command.getParameter(Command.ParamName.TASK_END),
+                is(equalTo(thursday)));
+
+    }
 }
