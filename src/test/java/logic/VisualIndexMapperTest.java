@@ -51,4 +51,6 @@ public class VisualIndexMapperTest {
                         LocalDateTime.now(), LocalDateTime.now()))
                 .collect(Collectors.toList());
     }
+
+
 }

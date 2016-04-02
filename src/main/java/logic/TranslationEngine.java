@@ -144,7 +144,7 @@ public class TranslationEngine implements TranslationEngineSpec {
     }
 
     @Override public CommandParserSpec getCommandParser() {
-        return CommandParser.getInstance();
+        return FlexiCommandParser.getInstance();
     }
 
     private static VisualIndexMapper getVisualIndexMapper() {

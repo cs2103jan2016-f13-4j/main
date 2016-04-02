@@ -1,8 +1,14 @@
 package shared;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
+import org.apache.commons.io.IOUtils;
+
+import exception.ExceptionHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.image.Image;
 import javafx.util.Pair;
@@ -94,5 +100,17 @@ public class Resources {
         String imagePath = "images/" + imageName;
         String imageFullPath = this._classLoader.getResource(imagePath).toExternalForm();
         return new Image(imageFullPath);
+    }
+
+    public String getDataFrom(String dataFile) {
+        InputStream stream = this._classLoader.getResourceAsStream("data/" + dataFile);
+        StringWriter writer = new StringWriter();
+        try {
+            IOUtils.copy(stream, writer, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            ExceptionHandler.handle(e);
+            return null;
+        }
+        return writer.toString();
     }
 }
