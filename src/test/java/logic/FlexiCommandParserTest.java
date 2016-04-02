@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -135,5 +136,40 @@ public class FlexiCommandParserTest {
         assertThat(command.getParameter(Command.ParamName.TASK_END),
                 is(equalTo(thursday)));
 
+    }
+
+    @Test public void FlexiCommandParser_parses_edit_task_correctly() {
+        String commandString = "edit task number 32 get down on it from today 2359 to tomorrow 1pm";
+        Command command = this._parser.parse(commandString);
+
+        assertThat(command.getInstruction(), is(Command.Instruction.EDIT));
+        assertThat(command.getIndex(), is(equalTo(32)));
+        assertThat(command.getParameter(Command.ParamName.TASK_NAME), is(equalTo("get down on it")));
+        assertThat(command.getParameter(Command.ParamName.TASK_START), is(equalTo(
+                LocalDateTime.now().withHour(23).withMinute(59).truncatedTo(ChronoUnit.MINUTES)
+        )));
+        assertThat(command.getParameter(Command.ParamName.TASK_END), is(equalTo(
+                LocalDateTime.now().plusDays(1).withHour(13).truncatedTo(ChronoUnit.HOURS)
+        )));
+    }
+
+    @Test public void FlexiCommandParser_parses_edit_with_fillers_correctly() {
+        String commandString = "edit task number 32 change to get down on it from today 2359 to tomorrow 1pm";
+        Command command = this._parser.parse(commandString);
+        assertThat(command.getParameter(Command.ParamName.TASK_NAME), is(equalTo("get down on it")));
+    }
+
+    @Test public void FlexiCommandParser_parses_edit_with_fake_fillers_correctly() {
+        String commandString = "edit task number 32 \"change to get down on it\" from today 2359 to tomorrow 1pm";
+        Command command = this._parser.parse(commandString);
+        assertThat(command.getParameter(Command.ParamName.TASK_NAME), is(equalTo("change to get down on it")));
+    }
+
+    @Test public void FlexiCommandParser_parses_edit_without_task_name_correctly() {
+        String commandString = "edit task number 10 to starting at same day 10pm";
+        Command command = this._parser.parse(commandString);
+        assertThat(command.getParameter(Command.ParamName.TASK_NAME), is(nullValue()));
+        LocalDateTime newTime = LocalDateTime.MIN.withHour(22).truncatedTo(ChronoUnit.HOURS);
+        assertThat(command.getParameter(Command.ParamName.TASK_START), is(equalTo(newTime)));
     }
 }

@@ -40,15 +40,20 @@
     "chainable": true
   }, {
     "meaning": "STARTING",
-    "keywords": ["from", "starting", "after"],
+    "keywords": ["from", "starting", "after", "start from", "starting at"],
     "chainable": false
   }, {
     "meaning": "ENDING",
-    "keywords": ["to", "ending", "until", "before"],
+    "keywords": ["to", "ending", "until", "before", "due", "end", "ending at"],
     "chainable": false
   }],
 
   "timeNouns": [{
+    "meaning": "SAME_DAY",
+    "keywords": ["same day"],
+    "prepositions": ["STARTING", "ENDING"],
+    "canGoWithoutPrepositions": false
+  }, {
     "meaning": "NOW",
     "keywords": ["now"],
     "prepositions": ["STARTING"],

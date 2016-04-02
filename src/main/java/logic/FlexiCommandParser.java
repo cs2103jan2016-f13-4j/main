@@ -35,6 +35,7 @@ public class FlexiCommandParser implements CommandParserSpec {
 
     private static final String NAME_FILE_DATA = "CommandParserData.json";
     private static final String PATTERN_TIME = "\\d{1,2}:?(?:\\d{2})?(?:\\s*(?:am|pm))?";
+    private static final char CHAR_QUOTE = '\"';
 
     /**
      * Types
@@ -43,7 +44,7 @@ public class FlexiCommandParser implements CommandParserSpec {
         CURRENT, NEXT, STARTING, ENDING
     }
     private enum TimeNounMeaning {
-        NOW, TODAY, TOMORROW,
+        NOW, TODAY, TOMORROW, SAME_DAY,
         MONDAY(DayOfWeek.MONDAY),
         TUESDAY(DayOfWeek.TUESDAY),
         WEDNESDAY(DayOfWeek.WEDNESDAY),
@@ -512,6 +513,10 @@ public class FlexiCommandParser implements CommandParserSpec {
             return this._timeNounMap.get(noun).getKeywords();
         }
 
+        Set<TimePreposition> getTimePrepositions() {
+            return new LinkedHashSet<>(this._timePrepositionMap.values());
+        }
+
         Set<String> getWithoutPrepositionsTimeNounKeywords() {
             return this._timeNounMap.values().stream()
                     .filter(TimeNoun::canGoWithoutPrepositions)
@@ -744,29 +749,55 @@ public class FlexiCommandParser implements CommandParserSpec {
         // We will first use the instruction RegExp to determine the type of instruction.
         // This instruction type will then dictate how parameters are created
         Command.Instruction instruction = this.parseInstruction(commandString);
+        if (instruction == Command.Instruction.INVALID) {
+            return Command.invalidCommand();
+        } else if (instruction == Command.Instruction.UNRECOGNISED) {
+            return Command.unrecognisedCommand();
+        }
+
         Command command = new Command(instruction, null, false);
+
+        // Truncate the string to leave out the instruction
+        int instructionEnd = commandString.indexOf(' ');
+        if (instructionEnd > 0) {
+            commandString = commandString.substring(instructionEnd).trim();
+        }
 
         // Based on the INSTRUCTION, we will now proceed to decoding the parameters.
         switch (instruction) {
             case ADD:
                 // Try to find time and priority first
-                Pattern timePattern = Pattern.compile(this.getTimePattern(), Pattern.CASE_INSENSITIVE);
-                Matcher matcher = timePattern.matcher(commandString);
-                int lowestFoundIndex = commandString.length();
+                this.parseParameters(commandString, command);
+                break;
+            case EDIT:
+            case DELETE:
+            case MARK:
+                // Prepare index pattern
+                String indexPattern = "^(?:task\\s+)?(?:number(?:ed)?\\s+)?(?<TASKID>\\d+)";
 
-                while (matcher.find()) {
-                    // For finding task name
-                    if (lowestFoundIndex > matcher.start()) {
-                        lowestFoundIndex = matcher.start();
-                    }
-                    // TODO: Handle overlapping time
-                    // TODO: Handle null results
-                    Pair<Command.ParamName, LocalDateTime> parsedTime = parseDateTime(matcher);
-                    command.setParameter(parsedTime.getKey(), parsedTime.getValue());
+                // Filler words at the end of the index pattern
+                Set<String> fillerWords = new CopyOnWriteArraySet<>(Arrays.asList("set", "to", "change"));
+                String fillerPattern = constructChoiceRegex(fillerWords);
+                fillerPattern = constructNotSurroundedByQuotesRegex(fillerPattern);
+
+                // Query index
+                Pattern taskIdPattern = Pattern.compile(String.format("%s(?:\\s+%s)*",
+                        indexPattern, fillerPattern), Pattern.CASE_INSENSITIVE);
+                Matcher matcher = taskIdPattern.matcher(commandString);
+                if (matcher.find()) {
+                    int taskId = Integer.parseInt(matcher.group("TASKID"));
+                    command.setIndex(taskId);
+                    commandString = commandString.substring(matcher.end()).trim();
+                } else {
+                    // TODO: Handle case where id not found
                 }
 
-                String taskName = commandString.substring(commandString.indexOf(' '), lowestFoundIndex).trim();
-                command.setParameter(Command.ParamName.TASK_NAME, taskName);
+                // Break here if not edit
+                if (instruction != Command.Instruction.EDIT) {
+                    break;
+                }
+
+                this.parseParameters(commandString, command);
                 break;
         }
 
@@ -797,22 +828,48 @@ public class FlexiCommandParser implements CommandParserSpec {
         return instruction;
     }
 
+    private void parseParameters(String commandString, Command command) {
+        Pattern timePattern = Pattern.compile(this.getTimePattern(), Pattern.CASE_INSENSITIVE);
+        Matcher matcher = timePattern.matcher(commandString);
+        int lowestFoundIndex = commandString.length();
+
+        while (matcher.find()) {
+            // For finding task name
+            if (lowestFoundIndex > matcher.start()) {
+                lowestFoundIndex = matcher.start();
+            }
+            // TODO: Handle overlapping time
+            // TODO: Handle null results
+            Pair<Command.ParamName, LocalDateTime> parsedTime = parseDateTime(matcher);
+            command.setParameter(parsedTime.getKey(), parsedTime.getValue());
+        }
+
+        String taskName = commandString.substring(0, lowestFoundIndex).trim();
+        taskName = stripSurroundingQuotes(taskName);
+        command.setParameter(Command.ParamName.TASK_NAME, taskName);
+    }
+
+
     private Pair<Command.ParamName, LocalDateTime> parseDateTime(Matcher matcher) {
         String date = matcher.group("DATE");
         String time = matcher.group("TIME");
 
         // TODO: Handle case when date is null
+        LocalDateTime dateTime;
+        Command.ParamName dateType = null;
+
+        assert date != null;
         date = date.toLowerCase();
         TimeClause clause = this._commandDefinitions.getTimeClause(date);
-        Command.ParamName dateType = null;
         if (clause.getPrepositionMeanings().contains(TimePrepositionMeaning.STARTING)) {
             dateType = Command.ParamName.TASK_START;
         } else if (clause.getPrepositionMeanings().contains(TimePrepositionMeaning.ENDING)) {
             dateType = Command.ParamName.TASK_END;
         }
 
-        LocalDateTime dateTime = null;
         switch (clause.getNoun()) {
+            case SAME_DAY:
+                dateTime = LocalDateTime.MIN;
             case TODAY:
                 dateTime = LocalDateTime.now().truncatedTo(ChronoUnit.DAYS);
                 break;
@@ -921,5 +978,18 @@ public class FlexiCommandParser implements CommandParserSpec {
 
     private static String constructNotSurroundedByQuotesRegex(String currentRegex) {
         return currentRegex + "(?=(?:(?:(?:[^\"\\\\]++|\\\\.)*+\"){2})*+(?:[^\"\\\\]++|\\\\.)*+$)";
+    }
+
+    private static String stripSurroundingQuotes(String string) {
+        string = string.trim();
+        if (string.length() < 2 || string.charAt(0) != CHAR_QUOTE || string.charAt(string.length() - 1) != CHAR_QUOTE) {
+            return string;
+        }
+        return string.substring(1, string.length() - 1);
+    }
+
+    private static String joinStringSet(Set<String> string) {
+        String[] strings = string.toArray(new String[0]);
+        return String.join(" ", strings);
     }
 }
