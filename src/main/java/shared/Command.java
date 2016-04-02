@@ -93,4 +93,28 @@ public class Command {
     public boolean hasParameter(ParamName name) {
         return this._parameters.containsKey(name);
     }
+
+    @Override public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(this._instruction);
+        if (this._index != null) {
+            sb.append("[").append(this._index).append("]");
+        } else if (this._isUniversallyQuantified) {
+            sb.append("[all]");
+        }
+        this._parameters.entrySet().forEach(entry -> {
+            sb.append(" ").append(entry.getKey()).append("=").append(entry.getValue());
+        });
+        return sb.toString();
+    }
+
+    /**
+     * Special types of commands
+     */
+    public static Command invalidCommand() {
+        return new Command(Instruction.INVALID, null, false);
+    }
+    public static Command unrecognisedCommand() {
+        return new Command(Instruction.UNRECOGNISED, null, false);
+    }
 }

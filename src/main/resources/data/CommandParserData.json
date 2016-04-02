@@ -2,7 +2,7 @@
   "instructions": [
     {
       "name": "ADD",
-      "keywords": ["add"]
+      "keywords": ["add", "create"]
     }, {
       "name": "DISPLAY",
       "keywords": ["display", "view", "show"]
@@ -88,5 +88,18 @@
     "meaning": "SUNDAY",
     "keywords": ["sunday", "sun"],
     "prepositions": ["CURRENT", "NEXT", "STARTING", "ENDING"]
+  }],
+
+  "priorityPrepositions": ["with", "as", "of"],
+
+  "priorities": [{
+    "meaning": "HIGH",
+    "keywords": ["high importance", "very important", "important"]
+  }, {
+    "meaning": "MEDIUM",
+    "keywords": ["medium importance", "normal importance"]
+  }, {
+    "meaning": "LOW",
+    "keywords": ["low importance", "unimportant"]
   }]
 }

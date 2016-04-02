@@ -3,10 +3,10 @@ package logic;
 import java.lang.reflect.Type;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -21,10 +21,11 @@ import com.google.gson.internal.LinkedTreeMap;
 import javafx.util.Pair;
 import shared.Command;
 import shared.Resources;
+import shared.Task;
 import skeleton.CommandParserSpec;
 
 /**
- * Created by maianhvu on 31/03/2016.
+ * @@author Mai Anh Vu
  */
 public class FlexiCommandParser implements CommandParserSpec {
 
@@ -40,7 +41,6 @@ public class FlexiCommandParser implements CommandParserSpec {
     private enum TimeNounMeaning {
         NOW, TODAY, TOMORROW, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY
     }
-
     /**
      * Singleton implementation
      */
@@ -53,20 +53,27 @@ public class FlexiCommandParser implements CommandParserSpec {
     /**
      * Properties
      */
-    private HashMap<String, Command.Instruction> _instructionMap;
-    private HashMap<String, TimePrepositionMeaning> _timePrepositionMeaningMap;
-    private HashMap<String, TimeNounMeaning> _timeNounMeaningMap;
+    private HashMap<String, Command.Instruction> _instructionEnumTranslator;
+    private HashMap<String, TimePrepositionMeaning> _timePrepositionMeaningEnumTranslator;
+    private HashMap<String, TimeNounMeaning> _timeNounMeaningEnumTranslator;
+    private HashMap<String, Task.Priority> _priorityNounEnumTranslator;
+
     private Definition _commandDefinitions;
+    private String _instructionPattern;
+    private String _timePattern;
+    private String _priorityPattern;
 
     private FlexiCommandParser() {}
 
     public void initialize() {
-        this.prepareInstructions();
-        this.prepareTimePrepositions();
-        this.prepareTimeDefinitions();
+        // Prepare enum translation map
+        this.prepareEnumTranslators();
 
         this.readDefinitions();
-        final Pattern timeRegex = this.constructTimeRegex();
+
+        this._instructionPattern = constructInstructionRegex();
+        this._timePattern = constructNotSurroundedByQuotesRegex(constructTimeRegex());
+        this._priorityPattern = constructNotSurroundedByQuotesRegex(constructPriorityRegex());
     }
 
     /*=================================================================================================
@@ -80,19 +87,14 @@ public class FlexiCommandParser implements CommandParserSpec {
      | in JSON deserializations.                                                                      |
      |                                                                                                |
      *===============================================================================================*/
-    private void prepareInstructions() {
-        this._instructionMap = constructNameMap(Command.Instruction.class);
+    private void prepareEnumTranslators() {
+        this._instructionEnumTranslator = constructEnumTranslator(Command.Instruction.class);
+        this._timePrepositionMeaningEnumTranslator = constructEnumTranslator(TimePrepositionMeaning.class);
+        this._timeNounMeaningEnumTranslator = constructEnumTranslator(TimeNounMeaning.class);
+        this._priorityNounEnumTranslator = constructEnumTranslator(Task.Priority.class);
     }
 
-    private void prepareTimePrepositions() {
-        this._timePrepositionMeaningMap = constructNameMap(TimePrepositionMeaning.class);
-    }
-
-    private void prepareTimeDefinitions() {
-        this._timeNounMeaningMap = constructNameMap(TimeNounMeaning.class);
-    }
-
-    private static <T extends Enum> HashMap<String, T> constructNameMap(Class<T> enumClass) {
+    private static <T extends Enum> HashMap<String, T> constructEnumTranslator(Class<T> enumClass) {
         HashMap<String, T> map = new HashMap<>();
         Arrays.stream(enumClass.getEnumConstants())
                 .forEach(meaning -> map.put(
@@ -135,14 +137,19 @@ public class FlexiCommandParser implements CommandParserSpec {
      | This allows other classes to access the data deserialized from the JSON file.                  |
      |                                                                                                |
      *===============================================================================================*/
-    public Set<String> getInstructions() {
-        assert this._commandDefinitions != null;
-        return this._commandDefinitions.getInstructions();
+    public String getInstructionPattern() {
+        assert this._instructionPattern != null;
+        return this._instructionPattern;
     }
 
-    public Map<String, TimeClause> getTimeClauses() {
-        assert this._commandDefinitions != null;
-        return this._commandDefinitions.getTimeClauses();
+    public String getTimePattern() {
+        assert this._timePattern != null;
+        return this._timePattern;
+    }
+
+    public String getPriorityPattern() {
+        assert this._priorityPattern != null;
+        return this._priorityPattern;
     }
     /*=================================================================================================
      |                                                                                                |
@@ -155,7 +162,15 @@ public class FlexiCommandParser implements CommandParserSpec {
      | this section.                                                                                  |
      |                                                                                                |
      *===============================================================================================*/
-    private Pattern constructTimeRegex() {
+    private String constructInstructionRegex() {
+        StringBuilder sb = new StringBuilder("(?<INST>^\\s*");
+        Set<String> instructionKeywords = this._commandDefinitions.getInstructionKeywords();
+        sb.append(constructChoiceRegex(instructionKeywords));
+        sb.append(")");
+        return sb.toString();
+    }
+
+    private String constructTimeRegex() {
         final HashMap<Set<TimePrepositionMeaning>, Set<TimeNounMeaning>> compressedGraph =
                 new LinkedHashMap<>();
 
@@ -173,13 +188,12 @@ public class FlexiCommandParser implements CommandParserSpec {
 
         // Enumerate the possible combinations according to the compressed graph
         Set<String> compressedTimeClauses = compressedGraph.entrySet().stream().map(entry -> {
-            // All prepositions first
+            // Group all the prepositions inside a map first
             String prepositionsRegex = constructChoiceRegex(
                     entry.getKey().stream().map(this._commandDefinitions::getTimePreposition)
                             .map(TimePreposition::getKeywords)
                             .flatMap(Collection::stream).collect(Collectors.toSet())
             );
-
 
             // Add some chaining of prepositions behind
             String chainablePrepositionsRegex = constructChoiceRegex(
@@ -194,8 +208,10 @@ public class FlexiCommandParser implements CommandParserSpec {
 
             String nounsRegex = constructChoiceRegex(
                     entry.getValue().stream().map(this._commandDefinitions::getTimeNounKeywords)
-                            .flatMap(Collection::stream).collect(Collectors.toSet())
+                            .flatMap(Collection::stream)
+                            .collect(Collectors.toSet())
             );
+
             // Allow chaining of prepositions
             return String.format("%s\\s+%s%s",
                     prepositionsRegex,
@@ -205,10 +221,23 @@ public class FlexiCommandParser implements CommandParserSpec {
         }).collect(Collectors.toSet());
 
         // Construct time regex
-        final String timeRegex = String.format("(?<DATE>%s)(?:'s)?\\s+(?<TIME>%s)?",
+        return String.format("(?<DATE>%s)(?:'s)?\\s*(?<TIME>%s)?",
                 constructChoiceRegex(compressedTimeClauses),
                 PATTERN_TIME);
-        return Pattern.compile(timeRegex, Pattern.CASE_INSENSITIVE);
+    }
+
+    private String constructPriorityRegex() {
+        assert this._commandDefinitions != null;
+
+        String prepositions = constructChoiceRegex(
+                this._commandDefinitions.getPriorityPrepositionKeywords()
+        );
+        String nouns = constructChoiceRegex(
+                this._commandDefinitions.getPriorityNounKeywords()
+        );
+
+        return String.format("%s\\s+(?<PRIORITY>%s)",
+                prepositions, nouns);
     }
 
     /*=================================================================================================
@@ -229,27 +258,51 @@ public class FlexiCommandParser implements CommandParserSpec {
         private HashMap<Command.Instruction, Set<String>> _commandKeywordMap;
         private HashMap<TimePrepositionMeaning, TimePreposition> _timePrepositionMap;
         private HashMap<TimeNounMeaning, Set<String>> _timeNounMap;
+        private Set<String> _priorityPrepositions;
+        private HashMap<Task.Priority, Set<String>>_prioritiesKeywordMap;
+
         private Map<TimeNounMeaning, Set<TimePrepositionMeaning>> _adjacencyList;
+        private HashMap<String, Command.Instruction> _commandKeywordInversionMap;
+
 
         // Caching
-        private Set<String> _cachedInstructions;
+        private Set<String> _cachedInstructionKeywords;
         private Map<String, TimeClause> _cachedTimeClauseMap;
+        private Set<String> _cachedPriorityNounKeywords;
 
+        /**
+         * TODO: Write JavaDoc
+         */
         Definition() {
             this._commandKeywordMap = new LinkedHashMap<>();
             this._timePrepositionMap = new LinkedHashMap<>();
             this._timeNounMap = new LinkedHashMap<>();
+            this._prioritiesKeywordMap = new LinkedHashMap<>();
             this._adjacencyList = new LinkedTreeMap<>();
+
+            this._commandKeywordInversionMap = new HashMap<>();
         }
 
+        /**
+         * TODO: Write JavaDoc
+         * @param name
+         * @param keywords
+         */
         void addInstruction(String name, String[] keywords) {
-            final Command.Instruction instruction = _instructionMap.get(name);
+            final Command.Instruction instruction = _instructionEnumTranslator.get(name);
             final Set<String> keywordSet = new CopyOnWriteArraySet<>(Arrays.asList(keywords));
             this._commandKeywordMap.put(instruction, keywordSet);
+            keywordSet.stream().forEach(keyword -> this._commandKeywordInversionMap.put(keyword, instruction));
         }
 
+        /**
+         * TODO: Write JavaDoc
+         * @param meaning
+         * @param keywords
+         * @param isChainable
+         */
         void addTimePreposition(String meaning, String[] keywords, boolean isChainable) {
-            final TimePrepositionMeaning realMeaning = _timePrepositionMeaningMap.get(meaning);
+            final TimePrepositionMeaning realMeaning = _timePrepositionMeaningEnumTranslator.get(meaning);
             final Set<String> keywordSet = new CopyOnWriteArraySet<>(Arrays.asList(keywords));
             this._timePrepositionMap.put(realMeaning, new TimePreposition(
                     realMeaning,
@@ -258,18 +311,48 @@ public class FlexiCommandParser implements CommandParserSpec {
             ));
         }
 
+        /**
+         * TODO: Write JavaDoc
+         * @param meaning
+         * @param keywords
+         * @param prepositions
+         */
         void addTimeNoun(String meaning, String[] keywords, String[] prepositions) {
-            final TimeNounMeaning realMeaning = _timeNounMeaningMap.get(meaning);
+            final TimeNounMeaning realMeaning = _timeNounMeaningEnumTranslator.get(meaning);
             final Set<String> keywordSet = new CopyOnWriteArraySet<>(Arrays.asList(keywords));
             this._timeNounMap.put(realMeaning, keywordSet);
 
             // Add time nouns to adjacency matrix
             final Set<TimePrepositionMeaning> prepositionsList = Arrays.stream(prepositions)
-                    .map(_timePrepositionMeaningMap::get)
+                    .map(_timePrepositionMeaningEnumTranslator::get)
                     .collect(Collectors.toSet());
             this._adjacencyList.put(realMeaning, prepositionsList);
         }
 
+        /**
+         * TODO: Write JavaDoc
+         * @param keywords
+         */
+        void setPriorityPrepositions(String[] keywords) {
+            this._priorityPrepositions = new CopyOnWriteArraySet<>(Arrays.asList(keywords));
+        }
+
+        /**
+         * TODO: Write JavaDoc
+         * @param meaning
+         * @param keywords
+         */
+        void addPriorityNoun(String meaning, String[] keywords) {
+            this._prioritiesKeywordMap.put(
+                    _priorityNounEnumTranslator.get(meaning),
+                    new CopyOnWriteArraySet<>(Arrays.asList(keywords))
+            );
+        }
+
+        /**
+         * TODO: Write JavaDoc
+         * @return
+         */
         Map<String, TimeClause> getTimeClauses() {
             if (this._cachedTimeClauseMap != null) {
                 return this._cachedTimeClauseMap;
@@ -306,36 +389,75 @@ public class FlexiCommandParser implements CommandParserSpec {
             return timeClauseMap;
         }
 
+        /**
+         * TODO: Write JavaDoc
+         * @return
+         */
         Map<TimeNounMeaning, Set<TimePrepositionMeaning>> getTimeClauseGraph() {
             return this._adjacencyList;
         }
 
-        Set<String> getInstructions() {
+        /**
+         * TODO: Write JavaDoc
+         * @return
+         */
+        Set<String> getInstructionKeywords() {
             // Return cache right away
-            if (this._cachedInstructions != null) {
-                return this._cachedInstructions;
+            if (this._cachedInstructionKeywords != null) {
+                return this._cachedInstructionKeywords;
             }
 
             // Construct instructions set
-            this._cachedInstructions = this._commandKeywordMap.values().stream()
+            this._cachedInstructionKeywords = this._commandKeywordMap.values().stream()
                     .map(ArrayList::new)
                     .flatMap(Collection::stream)
                     .collect(Collectors.toSet());
 
-            return this._cachedInstructions;
+            return this._cachedInstructionKeywords;
         }
 
+        Command.Instruction getInstruction(String keyword) {
+            return this._commandKeywordInversionMap.get(keyword);
+        }
+
+        /**
+         * TODO: Write JavaDoc
+         * @param preposition
+         * @return
+         */
         TimePreposition getTimePreposition(TimePrepositionMeaning preposition) {
             return this._timePrepositionMap.get(preposition);
         }
 
+        /**
+         * TODO: Write JavaDoc
+         * @param noun
+         * @return
+         */
         Set<String> getTimeNounKeywords(TimeNounMeaning noun) {
             return this._timeNounMap.get(noun);
+        }
+
+        Set<String> getPriorityPrepositionKeywords() {
+            return this._priorityPrepositions;
+        }
+
+        Set<String> getPriorityNounKeywords() {
+            if (this._cachedPriorityNounKeywords != null) {
+                return this._cachedPriorityNounKeywords;
+            }
+
+            this._cachedPriorityNounKeywords = this._prioritiesKeywordMap.values().stream()
+                    .map(ArrayList::new)
+                    .flatMap(Collection::stream)
+                    .collect(Collectors.toSet());
+
+            return this._cachedPriorityNounKeywords;
         }
     }
 
     /**
-     *
+     * This class supports the JSON deserialization of {@link Definition} class.
      */
     private class DefinitionDeserializer implements JsonDeserializer<Definition> {
 
@@ -349,8 +471,8 @@ public class FlexiCommandParser implements CommandParserSpec {
 
             // INSTRUCTIONS ARRAY
             // This array contains the information about command instructions and their alternative forms
-            final JsonArray instructionsArray = definitionObject.get("instructions").getAsJsonArray();
-            instructionsArray.forEach(instructionElement -> {
+            final JsonArray instructions = definitionObject.get("instructions").getAsJsonArray();
+            instructions.forEach(instructionElement -> {
                 final JsonObject instructionObject = instructionElement.getAsJsonObject();
 
                 final String instructionName = instructionObject.get("name").getAsString();
@@ -362,10 +484,11 @@ public class FlexiCommandParser implements CommandParserSpec {
             });
 
             // TIME PREPOSITIONS ARRAY
-            // This array dictates the behaviour of the prepositions which modify the time word which follows
-            // them inside a command string
-            final JsonArray timePrepositionsArray = definitionObject.get("timePrepositions").getAsJsonArray();
-            timePrepositionsArray.forEach(timePrepositionElement -> {
+            // This array dictates the behaviour of the prepositions which modify the time word following
+            // these prepositions, inside a command string
+            // Example: from next
+            final JsonArray timePrepositions = definitionObject.get("timePrepositions").getAsJsonArray();
+            timePrepositions.forEach(timePrepositionElement -> {
                 // Map to an actual JSON object
                 final JsonObject timePrepositionObject = timePrepositionElement.getAsJsonObject();
 
@@ -378,10 +501,10 @@ public class FlexiCommandParser implements CommandParserSpec {
                 definition.addTimePreposition(meaning, timePrepositionMeaningKeywords, isChainable);
             });
 
-            // TIME ARRAY
+            // TIME NOUNS ARRAY
             // This array defines the different types of days that are allowed
-            final JsonArray timeArray = definitionObject.get("timeNouns").getAsJsonArray();
-            timeArray.forEach(timeElement -> {
+            final JsonArray timeNouns = definitionObject.get("timeNouns").getAsJsonArray();
+            timeNouns.forEach(timeElement -> {
                 // Map to an actual JSON object
                 final JsonObject timeObject = timeElement.getAsJsonObject();
 
@@ -396,9 +519,29 @@ public class FlexiCommandParser implements CommandParserSpec {
                 definition.addTimeNoun(meaning, keywords, prepositions);
             });
 
+            // PRIORITY PREPOSITIONS ARRAY
+            // This array contains all the prepositions used to indicate a priority
+            definition.setPriorityPrepositions(decodeJSONStringArray(
+                    definitionObject.get("priorityPrepositions").getAsJsonArray()
+            ));
+
+            // PRIORITY NOUNS ARRAY
+            // This array contains the different meaning and the keywords of priorities.
+            final JsonArray priorityNouns = definitionObject.get("priorities").getAsJsonArray();
+            priorityNouns.forEach(noun -> {
+                // Map to an actual JSON object
+                final JsonObject nounDefinition = noun.getAsJsonObject();
+
+                final String meaning = nounDefinition.get("meaning").getAsString();
+                final String[] keywords = decodeJSONStringArray(
+                        nounDefinition.get("keywords").getAsJsonArray()
+                );
+
+                definition.addPriorityNoun(meaning, keywords);
+            });
+
             return definition;
         }
-
     }
 
     private class TimePreposition {
@@ -456,7 +599,6 @@ public class FlexiCommandParser implements CommandParserSpec {
      | Core method that pieces everything together to construct a Command from a raw query.           |
      |                                                                                                |
      *===============================================================================================*/
-
     /**
      * TODO: Write JavaDoc
      * @param commandString
@@ -467,13 +609,42 @@ public class FlexiCommandParser implements CommandParserSpec {
         assert commandString != null;
         commandString = commandString.trim();
 
-        String instructionWord = commandString.substring(0, commandString.indexOf(' '));
-        Command.Instruction instruction = null; // this._commandDefinitions.getInstruction(instructionWord);
-        if (instruction == null) {
-            return new Command(Command.Instruction.UNRECOGNISED, null, false);
+        // INSTRUCTION parsing
+        // We will first use the instruction RegExp to determine the type of instruction.
+        // This instruction type will then dictate how parameters are created
+        Command.Instruction instruction = this.parseInstruction(commandString);
+
+        // Based on the INSTRUCTION, we will now proceed to decoding the parameters.
+        switch (instruction) {
+            case ADD:
+                break;
         }
 
         return new Command(instruction, null, false);
+    }
+
+    private Command.Instruction parseInstruction(String commandString) {
+        // Empty commands are invalid
+        if (commandString.isEmpty()) {
+            return Command.Instruction.INVALID;
+        }
+
+        // Prepare RegExp
+        Pattern instructionPattern = Pattern.compile(this.getInstructionPattern(), Pattern.CASE_INSENSITIVE);
+        Matcher matcher = instructionPattern.matcher(commandString);
+        // No instructions found, return unrecognised
+        if (!matcher.find()) return Command.Instruction.UNRECOGNISED;
+
+        String instructionString = matcher.group("INST");
+        // Couldn't find the correct string
+        if (instructionString == null) {
+            return Command.Instruction.UNRECOGNISED;
+        }
+
+        Command.Instruction instruction = this._commandDefinitions.getInstruction(instructionString);
+        if (instruction == null) return Command.Instruction.UNRECOGNISED;
+
+        return instruction;
     }
 
     /*=================================================================================================
@@ -503,14 +674,20 @@ public class FlexiCommandParser implements CommandParserSpec {
         }
 
         StringBuilder sb = new StringBuilder();
-        choices.stream().forEach(choice -> {
+        ArrayList<String> choiceList = new ArrayList<>(choices);
+        Collections.sort(choiceList, (noun1, noun2) -> noun2.length() - noun1.length());
+        for (String choice : choiceList) {
             if (sb.length() != 0) {
                 sb.append("|");
             }
             sb.append(choice);
-        });
+        }
         sb.insert(0, "(?:");
         sb.append(")");
         return sb.toString();
+    }
+
+    private static String constructNotSurroundedByQuotesRegex(String currentRegex) {
+        return currentRegex + "(?=(?:(?:(?:[^\"\\\\]++|\\\\.)*+\"){2})*+(?:[^\"\\\\]++|\\\\.)*+$)";
     }
 }
