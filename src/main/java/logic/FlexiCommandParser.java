@@ -1,6 +1,10 @@
 package logic;
 
 import java.lang.reflect.Type;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.regex.Matcher;
@@ -39,7 +43,25 @@ public class FlexiCommandParser implements CommandParserSpec {
         CURRENT, NEXT, STARTING, ENDING
     }
     private enum TimeNounMeaning {
-        NOW, TODAY, TOMORROW, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY
+        NOW, TODAY, TOMORROW,
+        MONDAY(DayOfWeek.MONDAY),
+        TUESDAY(DayOfWeek.TUESDAY),
+        WEDNESDAY(DayOfWeek.WEDNESDAY),
+        THURSDAY(DayOfWeek.THURSDAY),
+        FRIDAY(DayOfWeek.FRIDAY),
+        SATURDAY(DayOfWeek.SATURDAY),
+        SUNDAY(DayOfWeek.SUNDAY);
+
+        final DayOfWeek dayOfWeek;
+
+        TimeNounMeaning(DayOfWeek dow) {
+            dayOfWeek = dow;
+        }
+
+        TimeNounMeaning() {
+            dayOfWeek = null;
+        }
+
     }
     /**
      * Singleton implementation
@@ -66,10 +88,9 @@ public class FlexiCommandParser implements CommandParserSpec {
     private FlexiCommandParser() {}
 
     public void initialize() {
-        // Prepare enum translation map
         this.prepareEnumTranslators();
-
         this.readDefinitions();
+        this.destroyEnumTraslators();
 
         this._instructionPattern = constructInstructionRegex();
         this._timePattern = constructNotSurroundedByQuotesRegex(constructTimeRegex());
@@ -92,6 +113,13 @@ public class FlexiCommandParser implements CommandParserSpec {
         this._timePrepositionMeaningEnumTranslator = constructEnumTranslator(TimePrepositionMeaning.class);
         this._timeNounMeaningEnumTranslator = constructEnumTranslator(TimeNounMeaning.class);
         this._priorityNounEnumTranslator = constructEnumTranslator(Task.Priority.class);
+    }
+
+    private void destroyEnumTraslators() {
+        this._instructionEnumTranslator = null;
+        this._timePrepositionMeaningEnumTranslator = null;
+        this._timeNounMeaningEnumTranslator = null;
+        this._priorityNounEnumTranslator = null;
     }
 
     private static <T extends Enum> HashMap<String, T> constructEnumTranslator(Class<T> enumClass) {
@@ -362,26 +390,54 @@ public class FlexiCommandParser implements CommandParserSpec {
             Map<String, TimeClause> timeClauseMap = new LinkedHashMap<>();
 
             // Run through the adjacency list to construct the map
-            this._adjacencyList.entrySet().forEach(entry -> {
-                // Get all nouns
-                Set<String> timeNouns = this._timeNounMap.get(entry.getKey());
-                // Use all the prepositions to construct the time clause map
-                entry.getValue().stream()
-                        .map(preposition -> new Pair<>(
-                                new TimeClause(preposition, entry.getKey()),
-                                this._timePrepositionMap.get(preposition)
-                        ))
-                        .forEach(pair -> {
-                            TimeClause clause = pair.getKey();
-                            Set<String> prepositions = pair.getValue().getKeywords();
+            for (Map.Entry<TimeNounMeaning, Set<TimePrepositionMeaning>> entry : this._adjacencyList.entrySet()) {
+                // Keep the noun here to refer to it later easily
+                TimeNounMeaning noun = entry.getKey();
 
-                            prepositions.stream().flatMap(preposition ->
-                                    timeNouns.stream().map(noun -> String.format("%s %s", preposition, noun))
-                            ).forEach(
-                                    stringClause -> timeClauseMap.put(stringClause, clause)
-                            );
+                // Enumerate all possible prepositions
+
+                // Add SINGLE prepositions first
+                Set<List<TimePreposition>> prepositionSet = new HashSet<>(entry.getValue().stream()
+                        .map(this._timePrepositionMap::get)
+                        .map(Arrays::asList)
+                        .collect(Collectors.toSet()));
+                // Add CHAINED prepositions
+                entry.getValue().stream().map(this._timePrepositionMap::get)
+                        .filter(TimePreposition::isChainable) // For checking is chainable condition
+                        .flatMap(secondPrep -> entry.getValue().stream()
+                                .map(this._timePrepositionMap::get)
+                                .filter(firstPrep -> !firstPrep.isChainable() && !firstPrep.equals(secondPrep))
+                                .map(firstPrep -> Arrays.asList(firstPrep, secondPrep))
+                        )
+                        .forEach(prepositionSet::add);
+
+                // From each of these prepositions, we will point it to the correct clause
+                prepositionSet.stream().map(prepositionList -> new TimeClause(prepositionList, noun))
+                        .forEach(timeClause -> {
+                            // At this point, we have the clause at the ready
+                            // We will need to enumerate the keywords (a 3-level deep loop at least)
+                            List<TimePreposition> prepositions = timeClause.getPrepositions();
+
+                            List<String> stringClauses = new ArrayList<>();
+                            for (final TimePreposition preposition : prepositions) {
+                                if (stringClauses.isEmpty()) {
+                                    stringClauses.addAll(preposition.getKeywords());
+                                    continue;
+                                }
+                                stringClauses.addAll(stringClauses.stream().flatMap(oldClause ->
+                                        preposition.getKeywords().stream()
+                                                .map(newWord -> oldClause + " " + newWord)
+                                ).collect(Collectors.toList()));
+                            }
+
+                            // Try to generate a flat map of prepositions
+                            stringClauses.stream()
+                                    .flatMap(stringClause -> this._timeNounMap.get(noun).stream().map(
+                                            nounKeyword -> stringClause + " " + nounKeyword
+                                    ))
+                                    .forEach(stringClause -> timeClauseMap.put(stringClause, timeClause));
                         });
-            });
+            }
 
             // Cache
             this._cachedTimeClauseMap = timeClauseMap;
@@ -453,6 +509,10 @@ public class FlexiCommandParser implements CommandParserSpec {
                     .collect(Collectors.toSet());
 
             return this._cachedPriorityNounKeywords;
+        }
+
+        public TimeClause getTimeClause(String date) {
+            return this.getTimeClauses().get(date);
         }
     }
 
@@ -566,19 +626,33 @@ public class FlexiCommandParser implements CommandParserSpec {
         boolean isChainable() {
             return this._isChainable;
         }
+
+        @Override public boolean equals(Object o) {
+            if (o == null) return false;
+            if (this == o) return true;
+            if (!(o instanceof TimePreposition)) return false;
+
+            TimePreposition prep = (TimePreposition) o;
+            return this._meaning.equals(prep._meaning);
+        }
     }
 
     private class TimeClause {
-        private TimePrepositionMeaning _preposition;
+        private List<TimePreposition> _prepositions;
         private TimeNounMeaning _noun;
 
-        TimeClause(TimePrepositionMeaning preposition, TimeNounMeaning noun) {
-            this._preposition = preposition;
+        TimeClause(List<TimePreposition> preposition, TimeNounMeaning noun) {
+            this._prepositions = preposition;
             this._noun = noun;
         }
 
-        TimePrepositionMeaning getPreposition() {
-            return this._preposition;
+        List<TimePreposition> getPrepositions() {
+            return this._prepositions;
+        }
+
+        Set<TimePrepositionMeaning> getPrepositionMeanings() {
+            return new CopyOnWriteArraySet<>(this._prepositions.stream()
+                    .map(TimePreposition::getMeaning).collect(Collectors.toList()));
         }
 
         TimeNounMeaning getNoun() {
@@ -586,7 +660,13 @@ public class FlexiCommandParser implements CommandParserSpec {
         }
 
         @Override public String toString() {
-            return String.format("%s %s", this._preposition.name(), this._noun.name());
+            StringBuilder sb = new StringBuilder();
+            this._prepositions.stream().map(TimePreposition::getMeaning).map(Object::toString).forEach(preposition -> {
+                sb.append(preposition);
+                sb.append(" ");
+            });
+            sb.append(this._noun);
+            return sb.toString();
         }
     }
 
@@ -613,14 +693,33 @@ public class FlexiCommandParser implements CommandParserSpec {
         // We will first use the instruction RegExp to determine the type of instruction.
         // This instruction type will then dictate how parameters are created
         Command.Instruction instruction = this.parseInstruction(commandString);
+        Command command = new Command(instruction, null, false);
 
         // Based on the INSTRUCTION, we will now proceed to decoding the parameters.
         switch (instruction) {
             case ADD:
+                // Try to find time and priority first
+                Pattern timePattern = Pattern.compile(this.getTimePattern(), Pattern.CASE_INSENSITIVE);
+                Matcher matcher = timePattern.matcher(commandString);
+                int lowestFoundIndex = commandString.length();
+
+                while (matcher.find()) {
+                    // For finding task name
+                    if (lowestFoundIndex > matcher.start()) {
+                        lowestFoundIndex = matcher.start();
+                    }
+                    // TODO: Handle overlapping time
+                    // TODO: Handle null results
+                    Pair<Command.ParamName, LocalDateTime> parsedTime = parseDateTime(matcher);
+                    command.setParameter(parsedTime.getKey(), parsedTime.getValue());
+                }
+
+                String taskName = commandString.substring(commandString.indexOf(' '), lowestFoundIndex).trim();
+                command.setParameter(Command.ParamName.TASK_NAME, taskName);
                 break;
         }
 
-        return new Command(instruction, null, false);
+        return command;
     }
 
     private Command.Instruction parseInstruction(String commandString) {
@@ -645,6 +744,88 @@ public class FlexiCommandParser implements CommandParserSpec {
         if (instruction == null) return Command.Instruction.UNRECOGNISED;
 
         return instruction;
+    }
+
+    private Pair<Command.ParamName, LocalDateTime> parseDateTime(Matcher matcher) {
+        String date = matcher.group("DATE");
+        String time = matcher.group("TIME");
+
+        // TODO: Handle case when date is null
+        date = date.toLowerCase();
+        TimeClause clause = this._commandDefinitions.getTimeClause(date);
+        Command.ParamName dateType = null;
+        if (clause.getPrepositionMeanings().contains(TimePrepositionMeaning.STARTING)) {
+            dateType = Command.ParamName.TASK_START;
+        } else if (clause.getPrepositionMeanings().contains(TimePrepositionMeaning.ENDING)) {
+            dateType = Command.ParamName.TASK_END;
+        }
+
+        LocalDateTime dateTime = null;
+        switch (clause.getNoun()) {
+            case TODAY:
+                dateTime = LocalDateTime.now().truncatedTo(ChronoUnit.DAYS);
+                break;
+            case TOMORROW:
+                dateTime = LocalDateTime.now().plusDays(1).truncatedTo(ChronoUnit.DAYS);
+                break;
+            case NOW:
+                dateTime = LocalDateTime.now();
+                break;
+            default:
+                assert clause.getNoun().dayOfWeek != null;
+                int todayDoW = LocalDate.now().getDayOfWeek().getValue();
+                int dayOfWeek = clause.getNoun().dayOfWeek.getValue();
+
+                int dayOffset = dayOfWeek - todayDoW;
+                if (dayOffset < 0 || clause.getPrepositionMeanings().contains(TimePrepositionMeaning.NEXT)) {
+                    dayOffset += 7;
+                }
+
+                dateTime = LocalDateTime.now().plusDays(dayOffset).truncatedTo(ChronoUnit.DAYS);
+                break;
+        }
+
+        // Return result straight away if time is null
+        if (time == null) {
+            return new Pair<>(dateType, dateTime);
+        }
+
+        time = time.toLowerCase().replace(":",""); // Disregard colon
+        boolean isAm = !time.contains("pm"); // Remember if there was pm
+        time = time.replaceAll("[^0-9]",""); // Keep only numbers
+        Integer intTime;
+        try {
+            intTime = Integer.parseInt(time);
+        } catch (NumberFormatException e) {
+            // Invalid date
+            return null;
+        }
+
+        Integer hour, minute = null;
+        if (intTime < 100) {
+            hour = intTime;
+        } else {
+            hour = intTime / 100;
+            minute = intTime % 100;
+            if (minute > 59) {
+                return null;
+            }
+        }
+
+        if (hour >= 24 || // Hour cannot be more than 24
+                hour > 12 || isAm) { // Specified AM but hour is more than 24
+            return null; // Hour cannot be more than 24
+        }
+        if (hour != 12 && !isAm) {
+            hour = (hour + 12) % 24;
+        }
+
+        dateTime = dateTime.withHour(hour);
+        if (minute != null) {
+            dateTime = dateTime.withMinute(minute);
+        }
+
+        return new Pair<>(dateType, dateTime);
     }
 
     /*=================================================================================================

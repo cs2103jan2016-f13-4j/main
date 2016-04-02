@@ -4,7 +4,14 @@ import org.junit.Before;
 import org.junit.Test;
 import shared.Command;
 
+import java.time.DayOfWeek;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.temporal.Temporal;
+import java.time.temporal.TemporalAmount;
+import java.time.temporal.TemporalUnit;
 import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -14,7 +21,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Created by maianhvu on 01/04/2016.
+ * @@author Mai Anh Vu
  */
 public class FlexiCommandParserTest {
 
@@ -73,11 +80,22 @@ public class FlexiCommandParserTest {
     }
 
     @Test public void FlexiCommandParser_parses_add_command_correctly() {
-        String commandString = "add go to the gym on Tuesday with high priority";
+        String commandString = "add go to the gym starting on Tuesday 5pm with high priority";
         Command command = this._parser.parse(commandString);
         assertThat(command.getInstruction(), is(Command.Instruction.ADD));
         assertThat(command.getParameter(Command.ParamName.TASK_NAME),
                 is(equalTo("go to the gym")));
+
+        LocalDateTime tuesday = LocalDateTime.now();
+        while (tuesday.getDayOfWeek() != DayOfWeek.TUESDAY) {
+            tuesday = tuesday.plusDays(1);
+        }
+        tuesday = LocalDateTime.of(tuesday.getYear(), tuesday.getMonth(), tuesday.getDayOfMonth(),
+                17, 0);
+        assertThat(command.getParameter(Command.ParamName.TASK_START), is(equalTo(
+                tuesday
+        )));
+
     }
 
 }
