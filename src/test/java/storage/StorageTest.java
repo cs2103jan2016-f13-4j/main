@@ -331,8 +331,8 @@ public class StorageTest {
     // ----------------------------------------------------------------------------------------
 
     @Test public void Read_from_disk_method_works_correctly() {
-        String taskString1 = "1,marketing pitch,client XYZ,2016-03-09T14:30,2016-03-09T16:30";
-        String taskString2 = "2,sales meeting,client ABC,2016-03-11T12:00,2016-03-11T14:30";
+        String taskString1 = "1,marketing pitch,client XYZ,2016-03-01T00:01,2016-03-09T14:30,2016-03-09T16:30,true,3";
+        String taskString2 = "2,sales meeting,client ABC,2016-03-03T12:05,2016-03-11T12:00,2016-03-11T14:30,false,1";
         ArrayList<String> taskStrings = new ArrayList<String>();
         taskStrings.add(taskString1);
         taskStrings.add(taskString2);
@@ -341,12 +341,18 @@ public class StorageTest {
         this._storage.readFromDisk(taskStrings);
         assertEquals((Integer) 1, this._storage.get(1).getId());
         assertEquals("marketing pitch", this._storage.get(1).getTaskName());
+        assertEquals(LocalDateTime.parse("2016-03-01T00:01"), this._storage.get(1).getCreationTime());
         assertEquals(LocalDateTime.parse("2016-03-09T14:30"), this._storage.get(1).getStartTime());
         assertEquals(LocalDateTime.parse("2016-03-09T16:30"), this._storage.get(1).getEndTime());
+        assertTrue(this._storage.get(1).isCompleted());
+        assertEquals(Task.Priority.LOW, this._storage.get(1).getPriority());
         assertEquals((Integer) 2, this._storage.get(2).getId());
         assertEquals("sales meeting", this._storage.get(2).getTaskName());
+        assertEquals(LocalDateTime.parse("2016-03-03T12:05"), this._storage.get(2).getCreationTime());
         assertEquals(LocalDateTime.parse("2016-03-11T12:00"), this._storage.get(2).getStartTime());
         assertEquals(LocalDateTime.parse("2016-03-11T14:30"), this._storage.get(2).getEndTime());
+        assertFalse(this._storage.get(2).isCompleted());
+        assertEquals(Task.Priority.HIGH, this._storage.get(2).getPriority());
     }
 
 }

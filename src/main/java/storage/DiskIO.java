@@ -46,6 +46,10 @@ public class DiskIO {
         this.createDirectory();
     }
 
+    public String getFileName() {
+        return this._fileName;
+    }
+
     public void setFileName(String fileName) {
         this._fileName = fileName;
         createDirectory();
