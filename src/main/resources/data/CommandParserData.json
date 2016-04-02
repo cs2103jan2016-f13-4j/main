@@ -11,7 +11,7 @@
       "keywords": ["mark", "complete", "done"]
     }, {
       "name": "EDIT",
-      "keywords": ["edit", "change", "modify"]
+      "keywords": ["edit", "change", "modify", "update"]
     }, {
       "name": "SEARCH",
       "keywords": ["search", "find"]

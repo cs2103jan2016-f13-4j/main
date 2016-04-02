@@ -87,14 +87,7 @@ public class UserInterface implements UserInterfaceSpec {
 
     private void setRootView() {
         this._rootView = Resources.getInstance().getComponent("Window");
-        Scene rootScene = new Scene(
-                this._rootView,
-                this._rootView.getPrefWidth(),
-                this._rootView.getPrefHeight(),
-                false,
-                SceneAntialiasing.BALANCED
-        );
-
+        Scene rootScene = new Scene(this._rootView);
         this._primaryStage.setScene(rootScene);
         this._primaryStage.setTitle("Your MOM");
         this._primaryStage.setResizable(false);
