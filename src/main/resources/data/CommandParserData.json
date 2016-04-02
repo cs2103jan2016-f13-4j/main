@@ -1,0 +1,88 @@
+{
+  "instructions": [
+    {
+      "name": "ADD",
+      "keywords": ["add"]
+    }, {
+      "name": "DISPLAY",
+      "keywords": ["display", "view", "show"]
+    }, {
+      "name": "MARK",
+      "keywords": ["mark", "complete", "done"]
+    }, {
+      "name": "EDIT",
+      "keywords": ["edit", "change", "modify"]
+    }, {
+      "name": "SEARCH",
+      "keywords": ["search", "find"]
+    }, {
+      "name": "UNDO",
+      "keywords": ["undo"]
+    }, {
+      "name": "DELETE",
+      "keywords": ["delete", "remove"]
+    }, {
+      "name": "TUTORIAL",
+      "keywords": ["tutorial", "help", "gitgud"]
+    }, {
+      "name": "EXIT",
+      "keywords": ["exit", "quit"]
+    }
+  ],
+
+  "timePrepositions": [{
+    "meaning": "CURRENT",
+    "keywords": ["on", "this", "coming", "on this", "this coming", "on this coming"]
+  }, {
+    "meaning": "NEXT",
+    "keywords": ["next", "next week's"]
+  }, {
+    "meaning": "STARTING",
+    "keywords": ["from", "starting", "after"]
+  }, {
+    "meaning": "ENDING",
+    "keywords": ["to", "ending", "until", "before"]
+  }],
+
+  "timeNouns": [{
+    "meaning": "NOW",
+    "keywords": ["now"],
+    "prepositions": ["STARTING"]
+  }, {
+    "meaning": "TODAY",
+    "keywords": ["today"],
+    "prepositions": ["STARTING", "ENDING"]
+  }, {
+    "meaning": "TOMORROW",
+    "keywords": ["tomorrow"],
+    "prepositions": ["STARTING", "ENDING"]
+  }, {
+    "meaning": "MONDAY",
+    "keywords": ["monday", "mon"],
+    "prepositions": ["CURRENT", "NEXT", "STARTING", "ENDING"]
+  }, {
+    "meaning": "TUESDAY",
+    "keywords": ["tuesday", "tue"],
+    "prepositions": ["CURRENT", "NEXT", "STARTING", "ENDING"]
+  }, {
+    "meaning": "WEDNESDAY",
+    "keywords": ["wednesday", "wed"],
+    "prepositions": ["CURRENT", "NEXT", "STARTING", "ENDING"]
+  }, {
+    "meaning": "THURSDAY",
+    "keywords": ["thursday", "thu"],
+    "prepositions": ["CURRENT", "NEXT", "STARTING", "ENDING"]
+  }, {
+    "meaning": "FRIDAY",
+    "keywords": ["friday", "fri"],
+    "prepositions": ["CURRENT", "NEXT", "STARTING", "ENDING"]
+  }, {
+    "meaning": "SATURDAY",
+    "keywords": ["saturday", "sat"],
+    "prepositions": ["CURRENT", "NEXT", "STARTING", "ENDING"]
+  }, {
+    "meaning": "SUNDAY",
+    "keywords": ["sunday", "sun"],
+    "prepositions": ["CURRENT", "NEXT", "STARTING", "ENDING"]
+  }]
+}
