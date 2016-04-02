@@ -87,7 +87,7 @@ public class FlexiCommandParser implements CommandParserSpec {
 
     private FlexiCommandParser() {}
 
-    public void initialize() {
+    @Override public void initialise() {
         this.prepareEnumTranslators();
         this.readDefinitions();
         this.destroyEnumTraslators();
@@ -813,7 +813,7 @@ public class FlexiCommandParser implements CommandParserSpec {
         }
 
         if (hour >= 24 || // Hour cannot be more than 24
-                hour > 12 || isAm) { // Specified AM but hour is more than 24
+                hour > 12 && isAm) { // Specified AM but hour is more than 24
             return null; // Hour cannot be more than 24
         }
         if (hour != 12 && !isAm) {

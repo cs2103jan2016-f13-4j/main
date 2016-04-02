@@ -54,6 +54,9 @@ public class TranslationEngine implements TranslationEngineSpec {
     }
 
     @Override public void initialise() {
+        // Trigger initialisation of CommandParser
+        this.getCommandParser().initialise();
+
         // Create input handler
         Function<String, Void> commandInputHandler = commandString -> {
             // Translate the raw command string given

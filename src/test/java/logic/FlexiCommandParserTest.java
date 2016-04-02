@@ -5,13 +5,9 @@ import org.junit.Test;
 import shared.Command;
 
 import java.time.DayOfWeek;
-import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAmount;
-import java.time.temporal.TemporalUnit;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,7 +25,7 @@ public class FlexiCommandParserTest {
 
     @Before public void setUp() {
         this._parser = FlexiCommandParser.getInstance();
-        this._parser.initialize();
+        this._parser.initialise();
     }
 
     @Test public void FlexiCommandParser_creates_correct_instruction_pattern() {
@@ -90,12 +86,21 @@ public class FlexiCommandParserTest {
         while (tuesday.getDayOfWeek() != DayOfWeek.TUESDAY) {
             tuesday = tuesday.plusDays(1);
         }
-        tuesday = LocalDateTime.of(tuesday.getYear(), tuesday.getMonth(), tuesday.getDayOfMonth(),
-                17, 0);
+        tuesday = tuesday.withHour(17).truncatedTo(ChronoUnit.HOURS);
         assertThat(command.getParameter(Command.ParamName.TASK_START), is(equalTo(
                 tuesday
         )));
+    }
 
+    @Test public void FlexiCommandParser_parses_complex_add_commands_correctly() {
+        String commandString = "add Eat Da Poo Poo from today 1030 until next Fri's 1am";
+        Command command = this._parser.parse(commandString);
+        assertThat(command.getInstruction(), is(Command.Instruction.ADD));
+        assertThat(command.getParameter(Command.ParamName.TASK_NAME),
+                is(equalTo("Eat Da Poo Poo")));
+        assertThat(command.getParameter(Command.ParamName.TASK_START),
+                is(equalTo(LocalDateTime.now().withHour(10).withMinute(30).truncatedTo(ChronoUnit.MINUTES)))
+        );
     }
 
 }

@@ -9,5 +9,7 @@ import java.util.Set;
  */
 public interface CommandParserSpec {
 
+    void initialise();
+
     Command parse(String commandString);
 }
