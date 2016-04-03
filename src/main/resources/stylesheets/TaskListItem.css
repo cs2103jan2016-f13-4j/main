@@ -26,3 +26,9 @@
     -fx-font-style: italic;
     -fx-text-alignment: right;
 }
+
+.list-cell.completed .item__index,
+.list-cell.completed .item__date,
+.list-cell.completed .item__name {
+    -fx-text-fill: #ccc;
+}

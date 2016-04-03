@@ -61,7 +61,6 @@ public class TaskListView extends View {
 
     public static class Item extends ListCell<Pair<Integer, Task>> {
         private static final String STRING_NAME_TEMPLATE = "TaskListItem";
-        private static final String STRING_DATE_PATTERN = "EE ha";
 
         @FXML private AnchorPane _container;
         @FXML private Label _indexLabel;
@@ -87,6 +86,11 @@ public class TaskListView extends View {
             } else {
                 int index = item.getKey();
                 Task task = item.getValue();
+
+                // Grey out completed tasks
+                if (task.isCompleted()) {
+                    this.getStyleClass().add("completed");
+                }
 
                 this._indexLabel.setText(Integer.toString(index));
                 this._nameLabel.setText(task.getTaskName());

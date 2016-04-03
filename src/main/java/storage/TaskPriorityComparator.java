@@ -18,6 +18,14 @@ public class TaskPriorityComparator implements Comparator<Task> {
     }
 
     @Override public int compare(Task task1, Task task2) {
+        // Completion comparison
+        Integer task1Completed = task1.isCompleted() ? 1 : 0;
+        Integer task2Completed = task2.isCompleted() ? 1 : 0;
+        int completionComparison = task1Completed.compareTo(task2Completed);
+        if (completionComparison != 0) {
+            return completionComparison;
+        }
+
         // Priority comparison
         int priorityComparison = task2.getPriority().compareTo(task1.getPriority());
         if (priorityComparison != 0) return priorityComparison;
