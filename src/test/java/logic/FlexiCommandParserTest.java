@@ -180,5 +180,6 @@ public class FlexiCommandParserTest {
         Command command = this._parser.parse(commandString);
         assertThat(command.getInstruction(), is(Command.Instruction.DELETE));
         assertThat(command.isUniversallyQuantified(), is(true));
+        assertThat(command.getIndex(), is(nullValue()));
     }
 }
