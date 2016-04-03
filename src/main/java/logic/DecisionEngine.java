@@ -8,10 +8,7 @@ import skeleton.SchedulerSpec;
 import storage.Storage;
 import storage.TaskPriorityComparator;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -80,6 +77,8 @@ public class DecisionEngine implements DecisionEngineSpec {
                     .filter(task -> to.compareTo(task.getEndTime()) >= 0)
                     .collect(Collectors.toList());
         }
+
+        Collections.sort(listToDisplay, TaskPriorityComparator.getInstance());
 
         // at this point, we have a properly filtered list
         return new ExecutionResult(ViewType.TASK_LIST, listToDisplay);
