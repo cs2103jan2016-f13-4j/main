@@ -30,9 +30,6 @@ public class DecisionEngine implements DecisionEngineSpec {
     /**
      * instance fields
      */
-    private Stack<Function<Void, Void>> undoOperations = new Stack<>(); // used for undoing
-    private Stack<Function<Void, Void>> redoOperations = new Stack<>();
-
     public static DecisionEngine getInstance() {
         if (instance == null) {
             instance = new DecisionEngine();
@@ -44,28 +41,6 @@ public class DecisionEngine implements DecisionEngineSpec {
     @Override public void initialise() {
         Storage.getInstance().readFromDisk();
     }
-
-    /**
-     * checks whether the supplied command is completely defined (name, start
-     * time, end time, etc) this information may then be used to decide if the
-     * Scheduler should be called
-     *
-     * @param cmd
-     * @return
-     */
-    boolean isCommandComplete(Command cmd) {
-        boolean hasName = cmd.hasParameter(Command.ParamName.TASK_NAME);
-        boolean hasStart = cmd.hasParameter(Command.ParamName.TASK_START);
-        boolean hasEnd = cmd.hasParameter(Command.ParamName.TASK_END);
-
-        boolean isComplete = hasName && hasStart && hasEnd;
-        return isComplete;
-    }
-
-    boolean isCommmandQuery(Command cmd) {
-        return cmd.hasParameter(Command.ParamName.SEARCH_QUERY);
-    }
-
 
 
     protected ExecutionResult displayAllTasks() {
@@ -130,6 +105,7 @@ public class DecisionEngine implements DecisionEngineSpec {
                 op.getInitialOperation().apply(null);
                 StorageWriteOperationHistory.getInstance().addToHistory(op);
                 result = this.displayAllTasks();
+                break;
             case DISPLAY:
                 result = this.handleDisplay(command);
                 break;
