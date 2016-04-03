@@ -29,6 +29,7 @@ public class CommandParser implements CommandParserSpec {
         KEYWORDS_DISPLAY(Command.Instruction.DISPLAY, "display" ),
         KEYWORDS_EDIT   (Command.Instruction.EDIT,    "edit", "update", "modify", "change" ),
         KEYWORDS_UNDO   (Command.Instruction.UNDO,    "undo"),
+        KEYWORDS_REDO   (Command.Instruction.REDO,    "redo"),
         KEYWORDS_SEARCH (Command.Instruction.SEARCH,  "search", "find" ),
         KEYWORDS_DELETE (Command.Instruction.DELETE,  "delete", "remove" ),
         KEYWORDS_MARK   (Command.Instruction.MARK,    "mark", "complete", "done" ),

@@ -5,7 +5,7 @@ import exception.ExceptionHandler;
 import java.util.LinkedHashMap;
 
 /**
- * @author Thenaesh Elango
+ * @@author Mai Anh Vu
  */
 public class Command {
 
@@ -13,7 +13,7 @@ public class Command {
      * Types
      */
     public enum Instruction {
-        ADD, DISPLAY, MARK, EDIT, SEARCH, UNDO, DELETE, EXIT,
+        ADD, DISPLAY, MARK, EDIT, SEARCH, UNDO, REDO, DELETE, EXIT,
         UNRECOGNISED, INVALID;
     }
 
