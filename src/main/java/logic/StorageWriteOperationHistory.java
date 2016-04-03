@@ -42,28 +42,38 @@ public class StorageWriteOperationHistory {
     }
 
 
-    public void undo() {
+    /**
+     * @return false if there were no ops to undo, true otherwise
+     */
+    public boolean undo() {
         this.checkIndexInvariant();
 
         if (!this.existsOperationsToUndo()) {
-            return;
+            return false;
         }
 
         this._opSequence.get(this._opIndex--).getUndoOperation().apply(null);
 
         this.checkIndexInvariant();
+
+        return true;
     }
 
-    public void redo() {
+    /**
+     * @return false if there were no ops to redo, true otherwise
+     */
+    public boolean redo() {
         this.checkIndexInvariant();
 
         if (!this.existsOperationsToRedo()) {
-            return;
+            return false;
         }
 
         this._opSequence.get(++this._opIndex).getRedoOperation().apply(null);
 
         this.checkIndexInvariant();
+
+        return true;
     }
 
 

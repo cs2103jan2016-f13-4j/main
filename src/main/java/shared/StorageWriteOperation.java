@@ -20,7 +20,7 @@ public class StorageWriteOperation {
     private Function<?, ?> _redoOperation;
 
     private Command _command; // command that gave rise to this execution unit
-    private Integer _id = null; // _id of the task created/modified/deleted by this execution unit
+    private Integer _id = null; // _id of the task handled by this execution unit
     private Task _taskPreModification = null; // snapshot of the task before it is modified
     private Task _taskPostModification = null; // snapshot of the task after it is modified
 
@@ -36,6 +36,9 @@ public class StorageWriteOperation {
                 break;
             case EDIT:
                 this.createAsEditUnit();
+                break;
+            case MARK:
+                this.createAsMarkUnit();
                 break;
             default:
                 assert false;
@@ -187,6 +190,29 @@ public class StorageWriteOperation {
             assert this._taskPostModification != null;
 
             Storage.getInstance().save(this._taskPostModification);
+
+            return (Void) null;
+        };
+    }
+
+    private void createAsMarkUnit() {
+
+        this._initialOperation = v -> {
+            this._id = _command.getIndex();
+
+            Storage.getInstance().get(this._id).setCompleted(true);
+
+            return (Void) null;
+        };
+
+        this._undoOperation = v -> {
+            Storage.getInstance().get(this._id).setCompleted(false);
+
+            return (Void) null;
+        };
+
+        this._redoOperation = v -> {
+            Storage.getInstance().get(this._id).setCompleted(true);
 
             return (Void) null;
         };

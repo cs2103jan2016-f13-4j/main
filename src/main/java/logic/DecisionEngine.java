@@ -50,12 +50,39 @@ public class DecisionEngine implements DecisionEngineSpec {
         List<Task> listToDisplay = this.getTaskCollection().getAll().stream()
                 .sorted(TaskPriorityComparator.getInstance()).collect(Collectors.toList());
 
-        return new ExecutionResult(ViewType.TASK_LIST, listToDisplay,null);
+        return new ExecutionResult(ViewType.TASK_LIST, listToDisplay);
     }
 
     protected ExecutionResult handleDisplay(Command command) {
         assert command.hasInstruction(Command.Instruction.DISPLAY);
-        return this.displayAllTasks();
+
+        List<Task> listToDisplay = this.getTaskCollection().getAll();
+
+        // for each command parameter, filter the list of tasks
+        if (command.hasParameter(Command.ParamName.TASK_NAME)) {
+            String name = command.getParameter(Command.ParamName.TASK_NAME);
+            listToDisplay = listToDisplay
+                    .stream()
+                    .filter(task -> task.getTaskName() == name)
+                    .collect(Collectors.toList());
+        }
+        if (command.hasParameter(Command.ParamName.TASK_START)) {
+            CustomTime from = command.getParameter(Command.ParamName.TASK_START);
+            listToDisplay = listToDisplay
+                    .stream()
+                    .filter(task -> from.compareTo(task.getStartTime()) <= 0)
+                    .collect(Collectors.toList());
+        }
+        if (command.hasParameter(Command.ParamName.TASK_END)) {
+            CustomTime to = command.getParameter(Command.ParamName.TASK_END);
+            listToDisplay = listToDisplay
+                    .stream()
+                    .filter(task -> to.compareTo(task.getEndTime()) >= 0)
+                    .collect(Collectors.toList());
+        }
+
+        // at this point, we have a properly filtered list
+        return new ExecutionResult(ViewType.TASK_LIST, listToDisplay);
     }
 
 
@@ -89,7 +116,7 @@ public class DecisionEngine implements DecisionEngineSpec {
                 .map(Pair::getValue)
                 .collect(Collectors.toList());
 
-        return new ExecutionResult(ViewType.TASK_LIST, foundTask , null);
+        return new ExecutionResult(ViewType.TASK_LIST, foundTask);
     }
 
 
@@ -113,6 +140,7 @@ public class DecisionEngine implements DecisionEngineSpec {
             case ADD:
             case DELETE:
             case EDIT:
+            case MARK:
                 StorageWriteOperation op = new StorageWriteOperation(command);
                 op.getInitialOperation().apply(null);
                 StorageWriteOperationHistory.getInstance().addToHistory(op);
@@ -125,12 +153,18 @@ public class DecisionEngine implements DecisionEngineSpec {
                 result = this.handleSearch(command);
                 break;
             case UNDO:
-                StorageWriteOperationHistory.getInstance().undo();
+                boolean undoActuallyHappened = StorageWriteOperationHistory.getInstance().undo();
                 result = this.displayAllTasks();
+                if (!undoActuallyHappened) {
+                    result.setErrorMessage("No tasks to undo!");
+                }
                 break;
             case REDO:
-                StorageWriteOperationHistory.getInstance().redo();
+                boolean redoActuallyHappened = StorageWriteOperationHistory.getInstance().redo();
                 result = this.displayAllTasks();
+                if (!redoActuallyHappened) {
+                    result.setErrorMessage("No tasks to redo");
+                }
                 break;
             default:
                 // if we reach this point, LTA Command Parser has failed in his duty
