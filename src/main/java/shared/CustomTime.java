@@ -9,6 +9,9 @@ import java.time.format.DateTimeFormatter;
  * @@author Mai Anh Vu
  */
 public class CustomTime implements Comparable<CustomTime> {
+    /**
+     * Constants
+     */
     private static final char CHAR_WRAPPER_LEFT = '[';
     private static final char CHAR_WRAPPER_RIGHT = ']';
     private static final char CHAR_SEPARATOR = ',';
@@ -16,13 +19,20 @@ public class CustomTime implements Comparable<CustomTime> {
     private static final DateTimeFormatter FORMATTER_DATE = DateTimeFormatter.ISO_DATE;
     private static final DateTimeFormatter FORMATTER_TIME = DateTimeFormatter.ISO_TIME;
 
-
+    /**
+     * Properties
+     */
     private LocalDate _date;
     private LocalTime _time;
 
     public CustomTime(LocalDate date, LocalTime time) {
         this._date = date;
         this._time = time;
+    }
+
+    public CustomTime(LocalDateTime dateTime) {
+        this._date = dateTime.toLocalDate();
+        this._time = dateTime.toLocalTime();
     }
 
     public static CustomTime now() {
@@ -36,6 +46,11 @@ public class CustomTime implements Comparable<CustomTime> {
     public static CustomTime tomorrowAt(LocalTime time) {
         return new CustomTime(LocalDate.now().plusDays(1), time);
     }
+
+    public CustomTime sameDayAt(LocalTime time) {
+        return new CustomTime(this._date, time);
+    }
+
 
     public LocalDate getDate() {
         return this._date;
@@ -99,6 +114,16 @@ public class CustomTime implements Comparable<CustomTime> {
 
     @Override
     public int compareTo(CustomTime time) {
-        return 0; // TODO: stub
+        LocalDate thisDate = this.hasDate() ? this.getDate() : LocalDate.MAX;
+        LocalDate otherDate = time.hasDate() ? time.getDate() : LocalDate.MAX;
+        int comparison = thisDate.compareTo(otherDate);
+        // If date differs return them straight away
+        if (comparison != 0) {
+            return comparison;
+        }
+
+        LocalTime thisTime = this.hasTime() ? this.getTime() : LocalTime.MAX;
+        LocalTime otherTime = time.hasTime() ? time.getTime() : LocalTime.MAX;
+        return thisTime.compareTo(otherTime);
     }
 }
