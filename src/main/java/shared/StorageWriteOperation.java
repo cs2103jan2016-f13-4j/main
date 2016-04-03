@@ -79,9 +79,16 @@ public class StorageWriteOperation {
             if (this._command.hasParameter(Command.ParamName.TASK_END)) {
                 to = this._command.getParameter(Command.ParamName.TASK_END);
             }
-
             // we now build the Task object for adding into the store
             Task taskToAdd = new Task(null, name, "", from, to);
+
+            // Check for priority
+            if (this._command.hasParameter(Command.ParamName.PRIORITY_VALUE)) {
+                Task.Priority priority = this._command.getParameter(Command.ParamName.PRIORITY_VALUE);
+                if (priority != null) {
+                    taskToAdd.setPriority(priority);
+                }
+            }
 
             this._id = Storage.getInstance().save(taskToAdd);
             return (Void) null;
@@ -171,6 +178,14 @@ public class StorageWriteOperation {
             }
             if (this._command.hasParameter(Command.ParamName.TASK_END)) {
                 task.setEndTime(this._command.getParameter(Command.ParamName.TASK_END));
+            }
+
+            // Check for priority
+            if (this._command.hasParameter(Command.ParamName.PRIORITY_VALUE)) {
+                Task.Priority priority = this._command.getParameter(Command.ParamName.PRIORITY_VALUE);
+                if (priority != null) {
+                    task.setPriority(priority);
+                }
             }
 
             this._taskPostModification = task.clone(); // take snapshot of task after modifying it, for redo operation

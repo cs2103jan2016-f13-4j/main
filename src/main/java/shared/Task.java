@@ -75,10 +75,15 @@ public class Task implements Comparable<Task> {
 
     // copy ctor, used to construct an identical copy in the clone method
     private Task(Task o) {
-        this(o._id, o._taskName, o._description, o._creationTime,
+        this(o._id,
+                o._taskName,
+                o._description,
+                o._creationTime,
                 o._startTime,
                 o._endTime,
-                o._isCompleted, o._priority, o._isDeleted);
+                o._isCompleted,
+                o._priority,
+                o._isDeleted);
     }
 
     private Task(Integer id, String taskName, String description, LocalDateTime creationTime, CustomTime startTime,

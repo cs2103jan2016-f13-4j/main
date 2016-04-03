@@ -9,6 +9,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.shape.Circle;
 import javafx.util.Pair;
 import shared.CustomTime;
 import shared.Resources;
@@ -90,6 +91,11 @@ public class TaskListView extends View {
                 // Grey out completed tasks
                 if (task.isCompleted()) {
                     this.getStyleClass().add("completed");
+                }
+
+                // Take care of priority
+                if (task.getPriority() != null) {
+                    this.getStyleClass().add("priority--" + task.getPriority().name().toLowerCase());
                 }
 
                 this._indexLabel.setText(Integer.toString(index));

@@ -32,3 +32,17 @@
 .list-cell.completed .item__name {
     -fx-text-fill: #ccc;
 }
+
+.list-cell.priority--high .indicator--priority {
+    -fx-fill: #ff6f6f;
+}
+.list-cell.priority--high .item__index {
+    -fx-text-fill: #ff6f6f;
+}
+
+.list-cell.priority--medium .indicator--priority {
+    -fx-fill: #ffbe13;
+}
+.list-cell.priority--medium .item__index {
+    -fx-text-fill: #ffbe13;
+}
