@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 
 /**
  * @@author Mai Anh Vu
@@ -28,9 +29,9 @@ public class CustomTime implements Comparable<CustomTime> {
      */
     private final LocalDate _date;
     private final LocalTime _time;
-    private final ChronoUnit _precision;
+    private final TemporalUnit _precision;
 
-    public CustomTime(LocalDate date, LocalTime time, ChronoUnit precision) {
+    public CustomTime(LocalDate date, LocalTime time, TemporalUnit precision) {
         this._date = date;
         this._time = time;
         if (time == null) {
@@ -51,6 +52,10 @@ public class CustomTime implements Comparable<CustomTime> {
 
     public CustomTime(LocalDateTime dateTime) {
         this(dateTime.toLocalDate(), dateTime.toLocalTime());
+    }
+
+    public CustomTime withPrecision(TemporalUnit unit) {
+        return new CustomTime(this._date, this._time, unit);
     }
 
     public static CustomTime now() {
@@ -91,7 +96,7 @@ public class CustomTime implements Comparable<CustomTime> {
         return this._time;
     }
 
-    public ChronoUnit getPrecision() {
+    public TemporalUnit getPrecision() {
         return this._precision;
     }
 

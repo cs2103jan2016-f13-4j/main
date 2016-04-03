@@ -9,11 +9,11 @@
     -fx-font-family: "Lato";
 }
 
-.item__name {
-    -fx-text-fill: #383838;
+.item__name,
+.item__index {
+    -fx-text-fill: #343434;
 }
 
-.item__index,
 .item__date {
     -fx-text-fill: #636363;
 }

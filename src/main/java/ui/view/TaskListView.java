@@ -1,11 +1,5 @@
 package ui.view;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Function;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -21,6 +15,11 @@ import shared.Resources;
 import shared.Task;
 import ui.controller.TaskListController;
 
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
+
 /**
  * @@author Antonius Satrio Triatmoko
  */
@@ -28,7 +27,7 @@ public class TaskListView extends View {
     /**
      * Constants
      */
-    private final int MAXIMUM_DISPLAY_SIZE = 7;
+    private final int MAXIMUM_DISPLAY_SIZE = 8;
 
     /**
      * Properties
@@ -166,7 +165,6 @@ public class TaskListView extends View {
 
     private boolean canScrollUp() {
         return (this._viewIndex - 1) >= 0;
-
     }
 
     private boolean canScrollDown() {

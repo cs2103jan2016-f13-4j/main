@@ -1,22 +1,32 @@
 /* @@author Mai Anh Vu */
-.wrapper {
-    -fx-background-color: #f7f7f7;
-}
-
-.header__label {
-    -fx-font-family: "Lato";
-    -fx-font-style: italic;
-}
-
-.command-input__container {
-    -fx-background-color: #fff;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.04), 8, 0.0, 4, 8);
-    -fx-border-radius: 4px;
+.window--main {
     -fx-background-radius: 4px;
+    -fx-border-radius: 4px;
+    -fx-background-color: white;
 }
 
-.command-input__field {
+.sub-container {
+    -fx-background-color: transparent;
+}
+
+.command-input__wrapper {
+    -fx-background-color: #ffb656;
+}
+
+.section-label {
+    -fx-text-fill: #ffffff;
     -fx-font-family: "Lato";
+    -fx-font-weight: 900;
+    -fx-font-size: 10px;
+}
+
+.panel__caption {
+    -fx-text-fill: #c7c7c7;
+    -fx-font-weight: 300;
+    -fx-font-family: "Lato";
+    -fx-font-size: 12px;
+    -fx-alignment: center-right;
+    -fx-min-width: 90px;
 }
 
 .command-input__field .scroll-bar {
@@ -27,3 +37,6 @@
     -fx-background-color: #fff;
 }
 
+.info-panel__wrapper {
+    -fx-background-color: #434343;
+}

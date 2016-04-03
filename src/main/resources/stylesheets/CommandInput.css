@@ -4,6 +4,11 @@
     visibility: hidden;
 }
 
+.command-input__field {
+    -fx-background-color: transparent;
+    -fx-text-fill: #5d3807;
+}
+
 /*******************************************
  *
  * INSTRUCTIONS HIGHLIGHTING
@@ -13,33 +18,6 @@
     -fx-font-weight: bold;
 }
 
-.instruction--add {
-    -fx-fill: #46aae2;
-}
-
-.instruction--delete {
-    -fx-fill: #fa4646;
-}
-
-.instruction--display {
-    -fx-fill: #e78012;
-}
-
-.instruction--edit {
-    -fx-fill: #a93bcf;
-}
-
-.instruction--exit {
-    -fx-fill: #66af94;
-}
-
-.instruction--mark {
-    -fx-fill: #49bb00;
-}
-
 .param {
-    -fx-font-family: "Lato";
-    -fx-font-style: italic;
-    -fx-fill: #979797;
+    -fx-font-weight: bold;
 }
-

@@ -1,13 +1,7 @@
 package ui.controller;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
@@ -15,6 +9,7 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import logic.FlexiCommandParser;
 import org.fxmisc.richtext.StyleClassedTextArea;
 import org.fxmisc.richtext.StyleSpans;
 import org.fxmisc.richtext.StyleSpansBuilder;
@@ -35,8 +30,8 @@ import shared.Resources;
  */
 public class CommandInputController {
     private static final String ID_COMMAND_INPUT = "command-input";
-    private static final double PADDING_HORZ_COMMAND_INPUT = 12.0;
-    private static final double PADDING_VERT_COMMAND_INPUT = 17.0;
+    private static final double PADDING_HORZ_COMMAND_INPUT = 0.0;
+    private static final double PADDING_VERT_COMMAND_INPUT = 0.0;
     private static final int DELAY_HIGHLIGHT = 250;
 
     @FXML private AnchorPane _commandInputContainer;
@@ -95,9 +90,14 @@ public class CommandInputController {
                 .forEach(pair -> this._instructionStyleClassMap.put(pair.getKey(), pair.getValue()));
 
         // Create the instruction highlight pattern
-        String instructionPattern = buildInstructionHighlightPattern(highlightList);
+        FlexiCommandParser parser = FlexiCommandParser.getInstance();
+        String highlightPatternString = String.join("|", new String[] {
+                parser.getInstructionPattern(),
+                parser.getTimePattern(),
+                parser.getPriorityPattern()
+        });
 
-        this._highlightPattern = Pattern.compile("(?<INST>" + instructionPattern + ")");
+        this._highlightPattern = Pattern.compile(highlightPatternString, Pattern.CASE_INSENSITIVE);
     }
 
     /**
@@ -208,35 +208,23 @@ public class CommandInputController {
         int lastKeywordEnd = 0;
         StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
 
-        String instructionClass = null;
         while (matcher.find()) {
             // Fill in previous non-highlighted part
             spansBuilder.add(Collections.emptyList(), matcher.start() - lastKeywordEnd);
 
             // Highlight instruction
-            if (instructionClass == null && matcher.group("INST") != null) {
+            if (matcher.group("INST") != null) {
                 // Prepare the list of classes to be added
-                List<String> classes = new ArrayList<>();
-                classes.add("instruction");
-
-                // For individual classes
-                instructionClass = this._instructionStyleClassMap.get(matcher.group("INST"));
-                if (instructionClass != null) {
-                    classes.add("instruction--" + instructionClass);
-                }
-
-                // Fill in the classes
-                spansBuilder.add(classes, matcher.end() - matcher.start());
+                spansBuilder.add(
+                        Collections.singleton("instruction"),
+                        matcher.end() - matcher.start()
+                );
+            } else if (matcher.group("DATE") != null || matcher.group("TIME") != null) {
+                spansBuilder.add(
+                        Collections.singleton("param"),
+                        matcher.end() - matcher.start()
+                );
             }
-            // Highlight parameters
-            // else if (matcher.group("PARAM") != null) {
-            // Collection<String> classes = new ArrayList<>();
-            // classes.add("param");
-            // if (instructionClass != null) {
-            // classes.add("param__" + instructionClass);
-            // }
-            // spansBuilder.add(classes, matcher.end() - matcher.start());
-            // }
 
             // Increase last keyword end to the end of the current word
             lastKeywordEnd = matcher.end();
@@ -261,24 +249,4 @@ public class CommandInputController {
     public void cleanUp() {
         this._executor.shutdown();
     }
-
-    /**
-     * Create a RegExp pattern in String form to recognise all the instructions
-     * laid out by the {@link CommandParser}.
-     * 
-     * @param instructions
-     * @return
-     */
-    private static String buildInstructionHighlightPattern(List<String> instructions) {
-        StringBuilder patternBuilder = new StringBuilder();
-        patternBuilder.append("^\\b(");
-        for (int i = 0; i < instructions.size(); i++) {
-            if (i != 0)
-                patternBuilder.append("|");
-            patternBuilder.append(instructions.get(i));
-        }
-        patternBuilder.append(")\\b");
-        return patternBuilder.toString();
-    }
-
 }

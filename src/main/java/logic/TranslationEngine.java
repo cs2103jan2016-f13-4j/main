@@ -95,8 +95,7 @@ public class TranslationEngine implements TranslationEngineSpec {
             // Set title
             String title = "Here are all the things you should do today!";
             if (visualTaskList.isEmpty()) {
-                title = "You have got nothing left to do! Have something in mind?"
-                        + " Add a new to-do by typing add name:\"<thing to do>\" and press Enter!";
+                title = "Add a new task by entering \"add <task>\"";
             }
 
             // Account for search queries
@@ -110,7 +109,7 @@ public class TranslationEngine implements TranslationEngineSpec {
                 }
             }
 
-            this.getUserInterface().setHeader(title);
+            this.getUserInterface().showNotification(title);
 
             break;
         default:

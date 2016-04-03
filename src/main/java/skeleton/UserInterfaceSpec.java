@@ -14,7 +14,7 @@ public interface UserInterfaceSpec {
 
     void render(View view);
 
-    void setHeader(String title);
+    void showNotification(String title);
 
     void cleanUp();
 }
