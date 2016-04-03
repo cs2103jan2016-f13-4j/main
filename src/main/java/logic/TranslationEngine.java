@@ -165,11 +165,11 @@ public class TranslationEngine implements TranslationEngineSpec {
                     break;
                 case EDIT:
                     // TODO: Take care of failed edit
-                    message = String.format("Edited task number %d with new details!",
+                    message = String.format("Edited task with new details!",
                             this._lastCommand.getIndex());
                     break;
                 case DELETE:
-                    message = String.format("Deleted task number %d! (undoable)",
+                    message = String.format("Deleted task! (undoable)",
                             this._lastCommand.getIndex());
                     break;
                 case SEARCH:
@@ -184,11 +184,25 @@ public class TranslationEngine implements TranslationEngineSpec {
                     }
                     break;
                 case UNDO:
-                    message = "Reverted last command!";
+                    if (result.hasErrorMessage()) {
+                        message = result.getErrorMessage();
+                    } else {
+                        message = "Reverted last command!";
+                    }
                     break;
                 case REDO:
-                    message = "Redone last command!";
+                    if (result.hasErrorMessage()) {
+                        message = result.getErrorMessage();
+                    } else {
+                        message = "Redone last command!";
+                    }
                     break;
+                case MARK:
+                    if (result.hasErrorMessage()) {
+                        message = result.getErrorMessage();
+                    } else {
+                        message = "Marked task as complete! (undoable)";
+                    }
             }
         }
 
