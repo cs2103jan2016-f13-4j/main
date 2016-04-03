@@ -68,7 +68,9 @@ public class UserInterface implements UserInterfaceSpec {
 
         // Set primary stage
         this._primaryStage = ApplicationContext.mainContext().getPrimaryStage();
-        this._primaryStage.initStyle(StageStyle.UNDECORATED);
+        if (this._primaryStage.isShowing()) {
+            this._primaryStage.initStyle(StageStyle.UNDECORATED);
+        }
 
         this._primaryStage.getIcons().add(Resources.getInstance().getImage("mom.png"));
 

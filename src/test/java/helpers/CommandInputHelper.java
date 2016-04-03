@@ -6,10 +6,10 @@ package helpers;
 public class CommandInputHelper {
 
     public static String constructAddCommand(String taskName) {
-        return String.format("add name:\"%s\"", taskName);
+        return String.format("add %s", taskName);
     }
 
     public static String constructEditCommand(int visualId, String taskName) {
-        return String.format("edit:%d name:\"%s\"", visualId, taskName);
+        return String.format("edit task number %d \"%s\"", visualId, taskName);
     }
 }

@@ -4,6 +4,7 @@ import java.lang.reflect.Type;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -24,6 +25,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.internal.LinkedTreeMap;
 import javafx.util.Pair;
 import shared.Command;
+import shared.CustomTime;
 import shared.Resources;
 import shared.Task;
 import skeleton.CommandParserSpec;
@@ -838,24 +840,27 @@ public class FlexiCommandParser implements CommandParserSpec {
             if (lowestFoundIndex > matcher.start()) {
                 lowestFoundIndex = matcher.start();
             }
-            // TODO: Handle overlapping time
+            // TODO: Handle overlapping time and time that starts after end
             // TODO: Handle null results
-            Pair<Command.ParamName, LocalDateTime> parsedTime = parseDateTime(matcher);
+            Pair<Command.ParamName, CustomTime> parsedTime = parseDateTime(matcher);
             command.setParameter(parsedTime.getKey(), parsedTime.getValue());
         }
 
         String taskName = commandString.substring(0, lowestFoundIndex).trim();
         taskName = stripSurroundingQuotes(taskName);
-        command.setParameter(Command.ParamName.TASK_NAME, taskName);
+        // Account for the case where task name is empty
+        if (!taskName.trim().isEmpty()) {
+            command.setParameter(Command.ParamName.TASK_NAME, taskName);
+        }
     }
 
 
-    private Pair<Command.ParamName, LocalDateTime> parseDateTime(Matcher matcher) {
+    private Pair<Command.ParamName, CustomTime> parseDateTime(Matcher matcher) {
         String date = matcher.group("DATE");
         String time = matcher.group("TIME");
 
         // TODO: Handle case when date is null
-        LocalDateTime dateTime;
+        CustomTime dateTime;
         Command.ParamName dateType = null;
 
         assert date != null;
@@ -869,27 +874,19 @@ public class FlexiCommandParser implements CommandParserSpec {
 
         switch (clause.getNoun()) {
             case SAME_DAY:
-                dateTime = LocalDateTime.MIN;
+                dateTime = new CustomTime(null, null);
             case TODAY:
-                dateTime = LocalDateTime.now().truncatedTo(ChronoUnit.DAYS);
+                dateTime = CustomTime.todayAt(null);
                 break;
             case TOMORROW:
-                dateTime = LocalDateTime.now().plusDays(1).truncatedTo(ChronoUnit.DAYS);
+                dateTime = CustomTime.tomorrowAt(null);
                 break;
             case NOW:
-                dateTime = LocalDateTime.now();
+                dateTime = CustomTime.now();
                 break;
             default:
                 assert clause.getNoun().dayOfWeek != null;
-                int todayDoW = LocalDate.now().getDayOfWeek().getValue();
-                int dayOfWeek = clause.getNoun().dayOfWeek.getValue();
-
-                int dayOffset = dayOfWeek - todayDoW;
-                if (dayOffset < 0 || clause.getPrepositionMeanings().contains(TimePrepositionMeaning.NEXT)) {
-                    dayOffset += 7;
-                }
-
-                dateTime = LocalDateTime.now().plusDays(dayOffset).truncatedTo(ChronoUnit.DAYS);
+                dateTime = CustomTime.now().next(clause.getNoun().dayOfWeek);
                 break;
         }
 
@@ -928,10 +925,11 @@ public class FlexiCommandParser implements CommandParserSpec {
             hour = (hour + 12) % 24;
         }
 
-        dateTime = dateTime.withHour(hour);
+        LocalTime theTime = LocalTime.of(hour, 0);
         if (minute != null) {
-            dateTime = dateTime.withMinute(minute);
+            theTime = theTime.withMinute(minute);
         }
+        dateTime = dateTime.sameDayAt(theTime);
 
         return new Pair<>(dateType, dateTime);
     }

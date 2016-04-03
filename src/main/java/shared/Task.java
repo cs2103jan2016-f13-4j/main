@@ -22,8 +22,8 @@ public class Task implements Comparable<Task> {
     private Integer _id;
     private String _taskName;
     private String _description;
-    private LocalDateTime _startTime;
-    private LocalDateTime _endTime;
+    private CustomTime _startTime;
+    private CustomTime _endTime;
     private final LocalDateTime _creationTime;
     private boolean _isCompleted;
     private Priority _priority;
@@ -65,8 +65,12 @@ public class Task implements Comparable<Task> {
      * @param startTime
      * @param endTime
      */
-    public Task(Integer id, String taskName, String description, LocalDateTime startTime, LocalDateTime endTime) {
+    public Task(Integer id, String taskName, String description, CustomTime startTime, CustomTime endTime) {
         this(id, taskName, description, LocalDateTime.now(), startTime, endTime, Priority.LOW, false);
+    }
+
+    public Task(Integer id, String taskName, String description, LocalDateTime startTime, LocalDateTime endTime) {
+        this(id, taskName, description, new CustomTime(startTime), new CustomTime(endTime));
     }
 
     // copy ctor, used to construct an identical copy in the clone method
@@ -74,8 +78,8 @@ public class Task implements Comparable<Task> {
         this(o._id, o._taskName, o._description, o._startTime, o._endTime);
     }
 
-    private Task(Integer id, String taskName, String description, LocalDateTime creationTime, LocalDateTime startTime,
-            LocalDateTime endTime, Priority priority, boolean isDeleted) {
+    private Task(Integer id, String taskName, String description, LocalDateTime creationTime, CustomTime startTime,
+            CustomTime endTime, Priority priority, boolean isDeleted) {
         this._id = id;
         this._taskName = taskName;
         this._description = description;
@@ -175,8 +179,8 @@ public class Task implements Comparable<Task> {
         String taskName = taskValues.get(1);
         String description = taskValues.get(2);
         LocalDateTime creationTime = LocalDateTime.parse(taskValues.get(3));
-        LocalDateTime startTime = taskValues.get(4).trim().isEmpty() ? null : LocalDateTime.parse(taskValues.get(4));
-        LocalDateTime endTime = taskValues.get(5).trim().isEmpty() ? null : LocalDateTime.parse(taskValues.get(5));
+        CustomTime startTime = CustomTime.fromString(taskValues.get(4).trim());
+        CustomTime endTime   = CustomTime.fromString(taskValues.get(5).trim());
 
         int priorityValue = Integer.parseInt(taskValues.get(6));
         final Priority[] priority = new Priority[] { Priority.LOW };
@@ -225,11 +229,11 @@ public class Task implements Comparable<Task> {
         return this._creationTime;
     }
 
-    public LocalDateTime getStartTime() {
+    public CustomTime getStartTime() {
         return this._startTime;
     }
 
-    public LocalDateTime getEndTime() {
+    public CustomTime getEndTime() {
         return this._endTime;
     }
 
@@ -264,11 +268,11 @@ public class Task implements Comparable<Task> {
         this._description = description;
     }
 
-    public void setStartTime(LocalDateTime start) {
+    public void setStartTime(CustomTime start) {
         this._startTime = start;
     }
 
-    public void setEndTime(LocalDateTime end) {
+    public void setEndTime(CustomTime end) {
         this._endTime = end;
     }
 

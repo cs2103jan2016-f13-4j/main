@@ -1,9 +1,11 @@
 package shared;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 
 /**
  * @@author Mai Anh Vu
@@ -18,21 +20,37 @@ public class CustomTime implements Comparable<CustomTime> {
 
     private static final DateTimeFormatter FORMATTER_DATE = DateTimeFormatter.ISO_DATE;
     private static final DateTimeFormatter FORMATTER_TIME = DateTimeFormatter.ISO_TIME;
+    private static final ChronoUnit PRECISION_TIME_DEFAULT = ChronoUnit.MINUTES;
+    private static final ChronoUnit PRECISION_TIME_ALL_NULL = ChronoUnit.FOREVER;
 
     /**
      * Properties
      */
-    private LocalDate _date;
-    private LocalTime _time;
+    private final LocalDate _date;
+    private final LocalTime _time;
+    private final ChronoUnit _precision;
 
-    public CustomTime(LocalDate date, LocalTime time) {
+    public CustomTime(LocalDate date, LocalTime time, ChronoUnit precision) {
         this._date = date;
         this._time = time;
+        if (time == null) {
+            if (date == null) {
+                this._precision = PRECISION_TIME_ALL_NULL;
+            } else {
+                this._precision = ChronoUnit.DAYS;
+            }
+        } else {
+            this._precision = precision;
+        }
+
+    }
+
+    public CustomTime(LocalDate date, LocalTime time) {
+        this(date, time, PRECISION_TIME_DEFAULT);
     }
 
     public CustomTime(LocalDateTime dateTime) {
-        this._date = dateTime.toLocalDate();
-        this._time = dateTime.toLocalTime();
+        this(dateTime.toLocalDate(), dateTime.toLocalTime());
     }
 
     public static CustomTime now() {
@@ -51,6 +69,19 @@ public class CustomTime implements Comparable<CustomTime> {
         return new CustomTime(this._date, time);
     }
 
+    public CustomTime next(DayOfWeek dayOfWeek) {
+        if (!this.hasTime()) {
+            return null;
+        }
+        int thisDoW = this.getDate().getDayOfWeek().getValue();
+        int destDoW = dayOfWeek.getValue();
+        int offset = destDoW - thisDoW;
+        if (offset < 0) {
+            offset += 7;
+        }
+        return new CustomTime(this.getDate().plusDays(offset), this.getTime());
+    }
+
 
     public LocalDate getDate() {
         return this._date;
@@ -58,6 +89,10 @@ public class CustomTime implements Comparable<CustomTime> {
 
     public LocalTime getTime() {
         return this._time;
+    }
+
+    public ChronoUnit getPrecision() {
+        return this._precision;
     }
 
     public boolean hasDate() {
