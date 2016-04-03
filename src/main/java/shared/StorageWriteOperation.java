@@ -1,5 +1,6 @@
 package shared;
 
+import java.util.Set;
 import java.util.function.*;
 import java.time.LocalDateTime;
 import storage.*;
@@ -96,26 +97,57 @@ public class StorageWriteOperation {
 
     private void createAsDeleteUnit() {
 
-        this._initialOperation = v -> {
-            this._id = this._command.getIndex();
-            assert this._id != null;
+        if (_command.isUniversallyQuantified()) {
+            // delete all tasks;
+            Set<Integer> tasksToDelete = Storage.getInstance().getNonDeletedTasks();
 
-            Storage.getInstance().remove(this._id);
+            this._initialOperation = v -> {
+                tasksToDelete
+                        .stream()
+                        .forEach(id -> Storage.getInstance().remove(id));
 
-            return (Void) null;
-        };
+                return (Void) null;
+            };
 
-        this._undoOperation = v -> {
-            Storage.getInstance().undelete(this._id);
+            this._undoOperation = v -> {
+                tasksToDelete
+                        .stream()
+                        .forEach(id -> Storage.getInstance().undelete(id));
 
-            return (Void) null;
-        };
+                return (Void) null;
+            };
 
-        this._redoOperation = v -> {
-            Storage.getInstance().remove(this._id);
+            this._redoOperation = v -> {
+                tasksToDelete
+                        .stream()
+                        .forEach(id -> Storage.getInstance().remove(id));
 
-            return (Void) null;
-        };
+                return (Void) null;
+            };
+
+        } else {
+            // delete a single task
+            this._initialOperation = v -> {
+                this._id = this._command.getIndex();
+                assert this._id != null;
+
+                Storage.getInstance().remove(this._id);
+
+                return (Void) null;
+            };
+
+            this._undoOperation = v -> {
+                Storage.getInstance().undelete(this._id);
+
+                return (Void) null;
+            };
+
+            this._redoOperation = v -> {
+                Storage.getInstance().remove(this._id);
+
+                return (Void) null;
+            };
+        }
     }
 
     private void createAsEditUnit() {
