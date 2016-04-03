@@ -61,8 +61,8 @@ public class StorageWriteOperation {
         this._initialOperation = v -> {
             // initialise temp vars to store the new task properties
             String name = null;
-            LocalDateTime from = null;
-            LocalDateTime to = null;
+            CustomTime from = null;
+            CustomTime to = null;
 
             // for each command parameter, check if it was supplied
             // if so, extract the value and set the appropriate reference above to point to the extracted value

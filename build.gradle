@@ -9,21 +9,13 @@
 
 // Apply the java plugin to add support for Java
 apply plugin: 'java'
+apply plugin: 'idea'
 
 // In this section you declare where to find the dependencies of your project
 repositories {
     // Use 'mavenCentral' for resolving your dependencies.
     // You can declare any Maven/Ivy/file repository here.
     mavenCentral()
-}
-
-sourceSets {
-    main {
-        resources {
-            srcDirs = ['src/main/resources']
-            includes = ['**/*.fxml', '**/*.ttf', '**/*.css', '**/*.png']
-        }
-    }
 }
 
 // In this section you declare the dependencies for your production and test code
@@ -43,6 +35,9 @@ dependencies {
 
     // GSON
     compile "com.google.code.gson:gson:2.6.2"
+
+    // Apache Commons IO
+    compile 'org.apache.directory.studio:org.apache.commons.io:2.4'
 
     // RichTextFX
     compile group: 'org.fxmisc.richtext', name: 'richtextfx', version: '0.6.10'

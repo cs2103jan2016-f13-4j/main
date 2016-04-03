@@ -1,16 +1,18 @@
 package ui;
 
 import javafx.scene.Scene;
+import javafx.scene.SceneAntialiasing;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.util.Pair;
 import shared.ApplicationContext;
 import shared.Resources;
 import skeleton.UserInterfaceSpec;
 import ui.controller.CommandInputController;
-import ui.controller.InfoPanelController;
+import ui.controller.HeaderController;
 import ui.view.View;
 
 import java.util.function.Function;
@@ -42,7 +44,7 @@ public class UserInterface implements UserInterfaceSpec {
     private Function<String, Void> _commandInputHandler;
     private Stage _primaryStage;
     private BorderPane _rootView;
-    private InfoPanelController _infoPanelController;
+    private HeaderController _headerController;
     private CommandInputController _commandInputController;
 
     private AnchorPane _mainContainer;
@@ -62,16 +64,20 @@ public class UserInterface implements UserInterfaceSpec {
      */
     @Override
     public void initialize() {
+        assert (ApplicationContext.mainContext().getPrimaryStage() != null);
+
         // Set primary stage
-        this._primaryStage = ApplicationContext.getPrimaryStage();
+        this._primaryStage = ApplicationContext.mainContext().getPrimaryStage();
+        if (this._primaryStage.isShowing()) {
+            this._primaryStage.initStyle(StageStyle.UNDECORATED);
+        }
+
         this._primaryStage.getIcons().add(Resources.getInstance().getImage("mom.png"));
-        assert (this._primaryStage == null);
 
         this.initializeFonts();
 
         this.setRootView();
-        this.registerInfoPanel();
-        this.registerCommandInput();
+        this.registerHeader();
         this.registerViewContainer();
     }
 
@@ -83,8 +89,8 @@ public class UserInterface implements UserInterfaceSpec {
 
     private void setRootView() {
         this._rootView = Resources.getInstance().getComponent("Window");
-
-        this._primaryStage.setScene(new Scene(this._rootView));
+        Scene rootScene = new Scene(this._rootView);
+        this._primaryStage.setScene(rootScene);
         this._primaryStage.setTitle("Your MOM");
         this._primaryStage.setResizable(false);
     }
@@ -111,16 +117,17 @@ public class UserInterface implements UserInterfaceSpec {
     @Override
     public void setOnCommandInputHandler(Function<String, Void> onCommandInput) {
         this._commandInputHandler = onCommandInput;
+        this.registerCommandInput();
     }
 
-    private void registerInfoPanel() {
-        Pair<AnchorPane, InfoPanelController> headerMetadata =
-                Resources.getInstance().getComponentAndController("InfoPanelWrapper");
+    private void registerHeader() {
+        Pair<AnchorPane, HeaderController> headerMetadata =
+                Resources.getInstance().getComponentAndController("HeaderWrapper");
 
         AnchorPane headerWrapper = headerMetadata.getKey();
-        this._infoPanelController = headerMetadata.getValue();
+        this._headerController = headerMetadata.getValue();
 
-        this._rootView.setRight(headerWrapper);
+        this._rootView.setTop(headerWrapper);
     }
 
     private void registerCommandInput() {
@@ -132,7 +139,7 @@ public class UserInterface implements UserInterfaceSpec {
         assert inputMetadata != null;
 
         AnchorPane commandInputWrapper = inputMetadata.getKey();
-        this._rootView.setTop(commandInputWrapper);
+        this._rootView.setBottom(commandInputWrapper);
 
         this._commandInputController = inputMetadata.getValue();
         this._commandInputController.setInputSubmissionHandler(
@@ -143,7 +150,7 @@ public class UserInterface implements UserInterfaceSpec {
     private void registerViewContainer() {
         this._mainContainer = new AnchorPane();
         this._mainContainer.getStyleClass().add(STYLE_CLASS_CONTAINER_MAIN);
-        this._rootView.setLeft(this._mainContainer);
+        this._rootView.setCenter(this._mainContainer);
     }
 
     @Override
@@ -164,6 +171,6 @@ public class UserInterface implements UserInterfaceSpec {
 
     @Override
     public void setHeader(String title) {
-//        this._infoPanelController.setHeader(title);
+        this._headerController.setHeader(title);
     }
 }

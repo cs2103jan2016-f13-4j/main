@@ -1,11 +1,17 @@
 package shared;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+
+import org.apache.commons.io.IOUtils;
+
+import exception.ExceptionHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.image.Image;
 import javafx.util.Pair;
-
-import java.io.IOException;
-import java.net.URL;
 
 /**
  * @@author Mai Anh Vu
@@ -43,7 +49,8 @@ public class Resources {
     /**
      * Builds a JavaFX view from the specified FXML template.
      *
-     * @param template the template name (without extension)
+     * @param template
+     *            the template name (without extension)
      *
      * @return null if template not found
      */
@@ -62,7 +69,11 @@ public class Resources {
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(getTemplateUrl(template));
-            return new Pair<>(loader.load(), loader.getController());
+
+            T component = loader.load();
+            C controller = loader.getController();
+
+            return new Pair<>(component, controller);
         } catch (IOException e) {
             e.printStackTrace();
             return null;
@@ -76,14 +87,12 @@ public class Resources {
     }
 
     public String getFontUrl(String font) {
-        String fontPath = String.format("%s%s%s",
-                STRING_PATH_FONTS, font, STRING_EXTENSION_FONTS);
+        String fontPath = String.format("%s%s%s", STRING_PATH_FONTS, font, STRING_EXTENSION_FONTS);
         return this._classLoader.getResource(fontPath).toExternalForm();
     }
 
     public String getStylesheet(String stylesheet) {
-        String cssPath = String.format("%s%s%s",
-                STRING_PATH_STYLESHEETS, stylesheet, STRING_EXTENSION_STYLESHEETS);
+        String cssPath = String.format("%s%s%s", STRING_PATH_STYLESHEETS, stylesheet, STRING_EXTENSION_STYLESHEETS);
         return this._classLoader.getResource(cssPath).toExternalForm();
     }
 
@@ -91,5 +100,17 @@ public class Resources {
         String imagePath = "images/" + imageName;
         String imageFullPath = this._classLoader.getResource(imagePath).toExternalForm();
         return new Image(imageFullPath);
+    }
+
+    public String getDataFrom(String dataFile) {
+        InputStream stream = this._classLoader.getResourceAsStream("data/" + dataFile);
+        StringWriter writer = new StringWriter();
+        try {
+            IOUtils.copy(stream, writer, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            ExceptionHandler.handle(e);
+            return null;
+        }
+        return writer.toString();
     }
 }

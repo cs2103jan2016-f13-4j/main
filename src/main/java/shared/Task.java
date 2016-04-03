@@ -22,8 +22,8 @@ public class Task implements Comparable<Task> {
     private Integer _id;
     private String _taskName;
     private String _description;
-    private LocalDateTime _startTime;
-    private LocalDateTime _endTime;
+    private CustomTime _startTime;
+    private CustomTime _endTime;
     private final LocalDateTime _creationTime;
     private boolean _isCompleted;
     private Priority _priority;
@@ -51,7 +51,9 @@ public class Task implements Comparable<Task> {
             return this.PRIORITY_VALUE;
         }
 
-        @Override public String toString() { return Integer.toString(PRIORITY_VALUE); }
+        @Override public String toString() {
+            return Integer.toString(PRIORITY_VALUE);
+        }
     };
 
     /**
@@ -63,8 +65,12 @@ public class Task implements Comparable<Task> {
      * @param startTime
      * @param endTime
      */
-    public Task(Integer id, String taskName, String description, LocalDateTime startTime, LocalDateTime endTime) {
+    public Task(Integer id, String taskName, String description, CustomTime startTime, CustomTime endTime) {
         this(id, taskName, description, LocalDateTime.now(), startTime, endTime, Priority.LOW, false);
+    }
+
+    public Task(Integer id, String taskName, String description, LocalDateTime startTime, LocalDateTime endTime) {
+        this(id, taskName, description, new CustomTime(startTime), new CustomTime(endTime));
     }
 
     // copy ctor, used to construct an identical copy in the clone method
@@ -72,8 +78,8 @@ public class Task implements Comparable<Task> {
         this(o._id, o._taskName, o._description, o._startTime, o._endTime);
     }
 
-    private Task(Integer id, String taskName, String description, LocalDateTime creationTime, LocalDateTime startTime,
-                 LocalDateTime endTime, Priority priority, boolean isDeleted) {
+    private Task(Integer id, String taskName, String description, LocalDateTime creationTime, CustomTime startTime,
+            CustomTime endTime, Priority priority, boolean isDeleted) {
         this._id = id;
         this._taskName = taskName;
         this._description = description;
@@ -83,8 +89,7 @@ public class Task implements Comparable<Task> {
         this._priority = priority;
     }
 
-    @Override
-    public Task clone() {
+    @Override public Task clone() {
         return new Task(this);
     }
 
@@ -95,22 +100,12 @@ public class Task implements Comparable<Task> {
     // ----------------------------------------------------------------------------------------
 
     public String encodeTaskToString() {
-        return String.join(
-                Character.toString(DELIMITER_CSV),
-                this.taskAttributesToStringArray()
-        );
+        return String.join(Character.toString(DELIMITER_CSV), this.taskAttributesToStringArray());
     }
 
     private Object[] attributesToSerialize() {
-        return new Object[] {
-                this._id,
-                this._taskName,
-                this._description,
-                this._creationTime,
-                this._startTime,
-                this._endTime,
-                this._priority
-        };
+        return new Object[] { this._id, this._taskName, this._description, this._creationTime, this._startTime,
+                this._endTime, this._priority };
     }
 
     private String sanitise(Object attribute) {
@@ -137,9 +132,8 @@ public class Task implements Comparable<Task> {
 
     public String[] taskAttributesToStringArray() {
         // Sanitise data
-        return Arrays.stream(this.attributesToSerialize())
-                .map(this::sanitise)
-                .collect(Collectors.toList()).toArray(new String[] {});
+        return Arrays.stream(this.attributesToSerialize()).map(this::sanitise).collect(Collectors.toList())
+                .toArray(new String[] {});
     }
 
     public static Task decodeTaskFromString(String line) {
@@ -155,9 +149,11 @@ public class Task implements Comparable<Task> {
             }
             if (line.charAt(i) == '"' && isDecodingSpecialValue) {
                 // Fake quotes
-                if (i > 0 && line.charAt(i-1) == '\\') { continue; }
+                if (i > 0 && line.charAt(i - 1) == '\\') {
+                    continue;
+                }
 
-                String specialValue = line.substring(begin+1, i);
+                String specialValue = line.substring(begin + 1, i);
                 specialValue = specialValue.replace("\\\"", "\"");
                 specialValue = specialValue.replace("\\\\", "\\");
                 taskValues.add(specialValue);
@@ -170,7 +166,7 @@ public class Task implements Comparable<Task> {
             if (line.charAt(i) == DELIMITER_CSV && !isDecodingSpecialValue) {
                 String value = line.substring(begin, i);
                 taskValues.add(value);
-                begin = i+1;
+                begin = i + 1;
             }
         }
         // Account for last leftover value
@@ -183,15 +179,13 @@ public class Task implements Comparable<Task> {
         String taskName = taskValues.get(1);
         String description = taskValues.get(2);
         LocalDateTime creationTime = LocalDateTime.parse(taskValues.get(3));
-        LocalDateTime startTime = taskValues.get(4).trim().isEmpty() ?
-                null : LocalDateTime.parse(taskValues.get(4));
-        LocalDateTime endTime = taskValues.get(5).trim().isEmpty() ?
-                null : LocalDateTime.parse(taskValues.get(5));
+        CustomTime startTime = CustomTime.fromString(taskValues.get(4).trim());
+        CustomTime endTime   = CustomTime.fromString(taskValues.get(5).trim());
 
         int priorityValue = Integer.parseInt(taskValues.get(6));
         final Priority[] priority = new Priority[] { Priority.LOW };
-        Arrays.stream(Priority.values()).filter(p -> p.getPriorityValue() == priorityValue)
-                .findFirst().ifPresent(p -> priority[0] = p);
+        Arrays.stream(Priority.values()).filter(p -> p.getPriorityValue() == priorityValue).findFirst()
+                .ifPresent(p -> priority[0] = p);
 
         return new Task(id, taskName, description, creationTime, startTime, endTime, priority[0], false);
     }
@@ -235,11 +229,11 @@ public class Task implements Comparable<Task> {
         return this._creationTime;
     }
 
-    public LocalDateTime getStartTime() {
+    public CustomTime getStartTime() {
         return this._startTime;
     }
 
-    public LocalDateTime getEndTime() {
+    public CustomTime getEndTime() {
         return this._endTime;
     }
 
@@ -274,11 +268,11 @@ public class Task implements Comparable<Task> {
         this._description = description;
     }
 
-    public void setStartTime(LocalDateTime start) {
+    public void setStartTime(CustomTime start) {
         this._startTime = start;
     }
 
-    public void setEndTime(LocalDateTime end) {
+    public void setEndTime(CustomTime end) {
         this._endTime = end;
     }
 

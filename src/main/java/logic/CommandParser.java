@@ -1,10 +1,5 @@
 package logic;
 
-import javafx.util.Pair;
-import shared.Command;
-import shared.StringParser;
-import skeleton.CommandParserSpec;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -12,14 +7,17 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javafx.util.Pair;
+import shared.Command;
+import shared.StringParser;
+import skeleton.CommandParserSpec;
+
 /**
  * @@author Mai Anh Vu
  */
 public class CommandParser implements CommandParserSpec {
 
-    private static final Pattern PATTERN_COMMAND_PARSER = Pattern.compile(
-            "(\\w+)(?::(\"[^\"]+\"|[^\"\\s]+))?\\s?"
-    );
+    private static final Pattern PATTERN_COMMAND_PARSER = Pattern.compile("(\\w+)(?::(\"[^\"]+\"|[^\"\\s]+))?\\s?");
     private static final char CHARACTER_QUOTATION_MARK = '"';
     private static final String STRING_EMPTY = "";
     private static final String KEYWORD_UNIVERSAL_QUANTIFIER = "all";
@@ -63,13 +61,11 @@ public class CommandParser implements CommandParserSpec {
 
     public static LinkedHashMap<String, Command.Instruction> constructInstructionMap() {
         LinkedHashMap<String, Command.Instruction> instructionMap = new LinkedHashMap<>();
-        Arrays.asList(InstructionKeywords.values()).stream()
-                .forEach(definition -> {
-                    Arrays.asList(definition.keywords).stream()
-                            .forEach(keyword -> {
-                                instructionMap.put(keyword, definition.instruction);
-                            });
-                });
+        Arrays.asList(InstructionKeywords.values()).stream().forEach(definition -> {
+            Arrays.asList(definition.keywords).stream().forEach(keyword -> {
+                instructionMap.put(keyword, definition.instruction);
+            });
+        });
         return instructionMap;
     }
 
@@ -85,6 +81,11 @@ public class CommandParser implements CommandParserSpec {
         return instance;
     }
 
+    @Override
+    public void initialise() {
+
+    }
+
     /**
      * TODO: Write JavaDoc
      *
@@ -96,7 +97,7 @@ public class CommandParser implements CommandParserSpec {
         // Prepare the instruction and the parameter list
         Command.Instruction instruction = null;
         Integer index = null;
-        boolean isUniversallyQuantified = true;
+        boolean isUniversallyQuantified = false;
         List<Pair<Command.ParamName, Object>> parameters = new ArrayList<>();
 
         // Split the command into discrete chunks
@@ -111,43 +112,54 @@ public class CommandParser implements CommandParserSpec {
             if (instruction == null) {
                 instruction = this.parseInstruction(key);
 
-                // Halt processing once the command has been confirmed to be invalid
+                // Halt processing once the command has been confirmed to be
+                // invalid
                 if (instruction == Command.Instruction.UNRECOGNISED) {
                     break;
                 }
 
                 // Try to parse quantifier
-                if (value == null) continue;
+                if (value == null) {
+                    if (instruction == Command.Instruction.DISPLAY) {
+                        isUniversallyQuantified = true;
+                    }
+                    continue;
+                }
 
                 if (value.trim().toLowerCase().equals(KEYWORD_UNIVERSAL_QUANTIFIER)) {
                     isUniversallyQuantified = true;
-                } else try {
-                    index = Integer.parseInt(value);
-                } catch (NumberFormatException e) {
-                    // Do nothing
-                }
+                } else
+                    try {
+                        index = Integer.parseInt(value);
+                    } catch (NumberFormatException e) {
+                        // Do nothing
+                    }
                 continue;
             }
 
             // Else, we treat the key and value as ordinary parameters
-            // But first, we need to check that the key is a legit parameter type
+            // But first, we need to check that the key is a legit parameter
+            // type
             Command.ParamName paramName = this.parseParamName(key);
-            if (paramName == null) continue; // Ignore invalid param name
+            if (paramName == null)
+                continue; // Ignore invalid param name
             Object paramValue = null;
             switch (paramName.type) {
-                case STRING:
-                    paramValue = value;
-                    break;
-                case DATE:
-                    paramValue = StringParser.asDateTime(value);
-                    break;
-                case INTEGER:
-                    try {
-                        paramValue = Integer.parseInt(value);
-                    } catch (NumberFormatException e) {
-                        instruction = Command.Instruction.INVALID;
-                    }
-                    break;
+            case STRING:
+                paramValue = value;
+                break;
+            case DATE:
+                paramValue = StringParser.asDateTime(value);
+                break;
+            case INTEGER:
+                try {
+                    paramValue = Integer.parseInt(value);
+                } catch (NumberFormatException e) {
+                    instruction = Command.Instruction.INVALID;
+                }
+                break;
+            default:
+                break;
             }
 
             // Account for the case where we had trouble parsing the param value
@@ -187,7 +199,7 @@ public class CommandParser implements CommandParserSpec {
             while (innerMatcher.find()) {
                 String firstPart = innerMatcher.group(1);
                 String secondPart = innerMatcher.group(2);
-                assert(firstPart != null);
+                assert (firstPart != null);
 
                 // Attempt to strip quotes from second part if there are
                 if (secondPart != null && isSurroundedByQuotes(secondPart)) {
@@ -212,18 +224,18 @@ public class CommandParser implements CommandParserSpec {
     private Command.ParamName parseParamName(String string) {
         string = string.trim().toLowerCase();
         switch (string) {
-            case "name":
-                return Command.ParamName.TASK_NAME;
-            case "description":
-                return Command.ParamName.TASK_DESCRIPTION;
-            case "from":
-                return Command.ParamName.TASK_START;
-            case "to":
-                return Command.ParamName.TASK_END;
-            case "query":
-                return Command.ParamName.SEARCH_QUERY;
-            default:
-                return null;
+        case "name":
+            return Command.ParamName.TASK_NAME;
+        case "description":
+            return Command.ParamName.TASK_DESCRIPTION;
+        case "from":
+            return Command.ParamName.TASK_START;
+        case "to":
+            return Command.ParamName.TASK_END;
+        case "query":
+            return Command.ParamName.SEARCH_QUERY;
+        default:
+            return null;
         }
     }
 
@@ -231,16 +243,15 @@ public class CommandParser implements CommandParserSpec {
      * Helper methods
      */
     private static boolean isSurroundedByQuotes(String string) {
-        assert(string != null);
+        assert (string != null);
 
-        return !(string.length() < 2 ||
-                string.charAt(0) != CHARACTER_QUOTATION_MARK ||
-                string.charAt(string.length() - 1) != CHARACTER_QUOTATION_MARK);
+        return !(string.length() < 2 || string.charAt(0) != CHARACTER_QUOTATION_MARK
+                || string.charAt(string.length() - 1) != CHARACTER_QUOTATION_MARK);
 
     }
 
     private static String stripExtremeCharacters(String string) {
-        assert(string != null);
+        assert (string != null);
 
         if (string.length() < 2) {
             return STRING_EMPTY;

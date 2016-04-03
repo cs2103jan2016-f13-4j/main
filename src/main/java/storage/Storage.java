@@ -13,7 +13,7 @@ import java.util.stream.IntStream;
 
 import exception.ExceptionHandler;
 import exception.PrimaryKeyNotFoundException;
-import shared.Command;
+import shared.CustomTime;
 import shared.Task;
 import skeleton.CollectionSpec;
 
@@ -95,7 +95,6 @@ public class Storage implements CollectionSpec<Task> {
             task.setId(index + 1);
             return task;
         }).map(Task::encodeTaskToString).collect(Collectors.toList());
-
         this.getDiskIO().write(tasksToWrite);
     }
 
@@ -209,7 +208,7 @@ public class Storage implements CollectionSpec<Task> {
      * @return a list of Tasks that starts before or at the same time as
      *         dateTime
      */
-    public List<Task> searchByDate(LocalDateTime start, LocalDateTime end) {
+    public List<Task> searchByDate(CustomTime start, CustomTime end) {
         // Search for all
         return this.getAll().stream()
                 .filter(task -> {

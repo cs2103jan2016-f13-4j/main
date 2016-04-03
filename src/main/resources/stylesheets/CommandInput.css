@@ -4,10 +4,6 @@
     visibility: hidden;
 }
 
-.command-input__field {
-    -fx-font-size: 12pt;
-}
-
 /*******************************************
  *
  * INSTRUCTIONS HIGHLIGHTING

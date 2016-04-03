@@ -16,11 +16,13 @@ public class ApplicationContext {
      * Properties
      */
     private Stage _primaryStage;
+    private boolean _isTestingMode;
 
     /**
      * Private singleton constructor
      */
-    public ApplicationContext() {
+    private ApplicationContext() {
+        this._isTestingMode = false;
     }
 
     /**
@@ -28,7 +30,7 @@ public class ApplicationContext {
      *
      * @return
      */
-    private static ApplicationContext getInstance() {
+    public static ApplicationContext mainContext() {
         if (instance == null) {
             instance = new ApplicationContext();
         }
@@ -40,10 +42,10 @@ public class ApplicationContext {
      *
      * @return
      */
-    public static Stage getPrimaryStage() {
+    public Stage getPrimaryStage() {
         assert (instance != null);
         assert (instance._primaryStage != null);
-        return getInstance()._primaryStage;
+        return this._primaryStage;
     }
 
     /**
@@ -51,7 +53,16 @@ public class ApplicationContext {
      *
      * @param primaryStage
      */
-    public static void setPrimaryStage(Stage primaryStage) {
-        getInstance()._primaryStage = primaryStage;
+    public void setPrimaryStage(Stage primaryStage) {
+        assert primaryStage != null;
+        this._primaryStage = primaryStage;
+    }
+
+    public boolean isTestingMode() {
+        return this._isTestingMode;
+    }
+
+    public void setTestingMode(boolean testing) {
+        this._isTestingMode = testing;
     }
 }
