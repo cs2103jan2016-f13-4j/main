@@ -11,6 +11,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -153,6 +154,8 @@ public class UserInterface implements UserInterfaceSpec {
                 Resources.getInstance().getComponentAndController("InfoPanelWrapper");
 
         AnchorPane infoPanelWrapper = infoPanelMetadata.getKey();
+        // TODO: Delete this line to show info panel
+        infoPanelWrapper.setClip(new Rectangle(0,0));
         this._infoPanelController = infoPanelMetadata.getValue();
 
         this._rootView.getChildren().add(infoPanelWrapper);
@@ -206,6 +209,7 @@ public class UserInterface implements UserInterfaceSpec {
                 this._mainContainer.getHeight() - notificationContainer.getHeight() - 20.0
         );
         notificationContainer.toFront();
+        notificationContainer.setTranslateY(-20.0);
 
         // Hide this outside of view for now
         notificationContainer.setTranslateX(-OFFSET_HIDE);

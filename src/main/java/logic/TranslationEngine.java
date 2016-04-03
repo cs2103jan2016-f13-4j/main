@@ -91,30 +91,13 @@ public class TranslationEngine implements TranslationEngineSpec {
             VisualIndexMapper.getInstance().updateList(result.getData());
             View view = new TaskListView(visualTaskList);
             this.getUserInterface().render(view);
-
-            // Set title
-            String title = "Here are all the things you should do today!";
-            if (visualTaskList.isEmpty()) {
-                title = "Add a new task by entering \"add <task>\"";
-            }
-
-            // Account for search queries
-            if (this._lastCommand != null && this._lastCommand.hasInstruction(Command.Instruction.SEARCH)) {
-                if (visualTaskList.isEmpty()) {
-                    title = "No to-do with the query \""
-                            + this._lastCommand.getParameter(Command.ParamName.SEARCH_QUERY) + "\" was found!";
-                } else {
-                    title = String.format("Found %d items matching search query \"%s\"!", visualTaskList.size(),
-                            this._lastCommand.getParameter(Command.ParamName.SEARCH_QUERY));
-                }
-            }
-
-            this.getUserInterface().showNotification(title);
-
             break;
         default:
             break;
         }
+
+        // Display notification
+        this.displayNotification(result);
     }
 
     @Override public void shutdown() {
@@ -153,4 +136,36 @@ public class TranslationEngine implements TranslationEngineSpec {
         return VisualIndexMapper.getInstance();
     }
 
+    private void displayNotification(ExecutionResult result) {
+        String message = "Welcome to Your MOM!";
+
+        if (this._lastCommand != null) {
+            switch (this._lastCommand.getInstruction()) {
+                case DISPLAY:
+                    int taskCount = ((List<?>) result.getData()).size();
+                    if (taskCount == 0) {
+                        message = "Add a new to-do by entering \"add <task>\"!";
+                    } else {
+                        message = String.format("Found %d to-dos!", taskCount);
+                    }
+                    break;
+                case ADD:
+                    // TODO: Take care of failed addition
+                    message = String.format("Added: %s",
+                            this._lastCommand.getParameter(Command.ParamName.TASK_NAME));
+                    break;
+                case EDIT:
+                    // TODO: Take care of failed edit
+                    message = String.format("Edited task number %d with new details!",
+                            this._lastCommand.getIndex());
+                    break;
+                case DELETE:
+                    message = String.format("Deleted task number %d! You can undo this by entering \"undo\"",
+                            this._lastCommand.getIndex());
+                    break;
+            }
+        }
+
+        this.getUserInterface().showNotification(message);
+    }
 }

@@ -79,7 +79,7 @@ public class DateFormatterHelper {
             }
         } else {
             if(cTime.hasTime()){
-                display = display + " ," + getTimeDisplay(cTime);
+                display = display + " " + getTimeDisplay(cTime);
             }
         }
 
