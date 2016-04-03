@@ -162,7 +162,7 @@ public class DecisionEngine implements DecisionEngineSpec {
                 boolean redoActuallyHappened = StorageWriteOperationHistory.getInstance().redo();
                 result = this.displayAllTasks();
                 if (!redoActuallyHappened) {
-                    result.setErrorMessage("No tasks to redo");
+                    result.setErrorMessage("No tasks to redo!");
                 }
                 break;
             default:
