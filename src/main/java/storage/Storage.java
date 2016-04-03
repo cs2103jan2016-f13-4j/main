@@ -1,13 +1,7 @@
 package storage;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.NavigableMap;
-import java.util.NavigableSet;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -192,6 +186,13 @@ public class Storage implements CollectionSpec<Task> {
      */
     public void removeAll() {
         this._taskData.clear();
+    }
+
+    public Set<Integer> getNonDeletedTasks() {
+        return this._taskData.keySet()
+                .stream()
+                .filter(id -> !this._taskData.get(id).isDeleted())
+                .collect(Collectors.toSet());
     }
 
     // ----------------------------------------------------------------------------------------
