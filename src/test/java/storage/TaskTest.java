@@ -1,9 +1,12 @@
 package storage;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import org.junit.Test;
 
+import shared.CustomTime;
 import shared.Task;
 
 import static org.junit.Assert.*;
@@ -23,8 +26,9 @@ public class TaskTest {
     // ----------------------------------------------------------------------------------------
 
     @Test public void Task_is_encoded_correctly() {
-        Task task1 = new Task(1, "proposal", "client ABC", LocalDateTime.of(2016, 3, 6, 14, 30),
-                LocalDateTime.of(2016, 3, 8, 14, 30));
+        CustomTime start = new CustomTime(LocalDateTime.of(2016, 3, 6, 14, 30));
+        CustomTime end = new CustomTime(LocalDateTime.of(2016, 3, 8, 14, 30));
+        Task task1 = new Task(1, "proposal", "client ABC", start, end);
         task1.setCompleted(true);
         task1.setPriority(Task.Priority.MEDIUM);
         String taskString = task1.encodeTaskToString();
@@ -34,22 +38,23 @@ public class TaskTest {
         assertEquals("proposal", taskStringArr[1]);
         assertEquals("client ABC", taskStringArr[2]);
         assertEquals(task1.getCreationTime().toString(), taskStringArr[3]);
-        assertEquals(LocalDateTime.of(2016, 3, 6, 14, 30).toString(), taskStringArr[4]);
-        assertEquals(LocalDateTime.of(2016, 3, 8, 14, 30).toString(), taskStringArr[5]);
+        assertEquals(start.toString(), taskStringArr[4]);
+        assertEquals(end.toString(), taskStringArr[5]);
         assertEquals("true", taskStringArr[6]); // isCompleted has been set as true
         assertEquals("2", taskStringArr[7]); // task priority medium has a value of 2
     }
 
     @Test public void Task_with_special_characters_still_encode_correctly() {
+        CustomTime start = new CustomTime(LocalDateTime.of(2016, 3, 9, 23, 59));
+        CustomTime end = new CustomTime(LocalDateTime.of(2016, 3, 11, 12, 00));
         String specialTaskName = "A task with comma, and \"quotes\", and \"comma, within quotes\"";
         specialTaskName += ", and backslash before quote\\\"";
-        Task specialTask = new Task(123, specialTaskName, "Random description", LocalDateTime.of(2016, 3, 9, 23, 59),
-                LocalDateTime.of(2016, 3, 11, 12, 00));
+        Task specialTask = new Task(123, specialTaskName, "Random description", start, end);
         String creationTime = specialTask.getCreationTime().toString(); // get creationTime to add to expected String for checking
         String specialTaskString = specialTask.encodeTaskToString();
 
         String expected = "123,"
-                + "\"A task with comma, and \\\"quotes\\\", and \\\"comma, within quotes\\\", and backslash before quote\\\\\\\"\",Random description," + creationTime + ",2016-03-09T23:59,2016-03-11T12:00,false,3";
+                + "\"A task with comma, and \\\"quotes\\\", and \\\"comma, within quotes\\\", and backslash before quote\\\\\\\"\",Random description," + creationTime + "," + start.toString() + "," + end.toString() + ",false,3";
 
         assertEquals(expected, specialTaskString);
     }
@@ -68,10 +73,13 @@ public class TaskTest {
         // Convert all commas to backslash comma
         String encodedSpecialString = "A task with comma, and \\\"quotes\\\", and \\\"comma, within quotes\\\", and backslash before quote\\\\\\\"";
 
+        CustomTime start = new CustomTime(LocalDateTime.of(2016, 3, 10, 12, 00));
+        CustomTime end = new CustomTime(LocalDateTime.of(2016, 3, 11, 22, 30));
+
         String taskString = "123,\"" + encodedSpecialString + "\",Random description,"
                 + LocalDateTime.of(2016, 3, 1, 23, 59).toString() + ","
-                + LocalDateTime.of(2016, 3, 10, 12, 00).toString() + ","
-                + LocalDateTime.of(2016, 3, 11, 22, 30).toString() + ",false,1";
+                + start.toString() + ","
+                + end.toString() + ",false,1";
 
         // decode the task string and check if the task attributes are equal to
         // what we expect
@@ -81,22 +89,22 @@ public class TaskTest {
         assertEquals(specialString, task3.getTaskName());
         assertEquals("Random description", task3.getDescription());
         assertEquals(LocalDateTime.of(2016, 3, 1, 23, 59), task3.getCreationTime());
-        assertEquals(LocalDateTime.of(2016, 3, 10, 12, 00), task3.getStartTime());
-        assertEquals(LocalDateTime.of(2016, 3, 11, 22, 30), task3.getEndTime());
+        assertEquals(start, task3.getStartTime());
+        assertEquals(end, task3.getEndTime());
         assertFalse(task3.isCompleted());
         assertEquals(Task.Priority.HIGH, task3.getPriority());
     }
 
     @Test public void Decoded_Task_has_correct_attributes_assigned() {
-        String taskString = "88,marketing pitch,to microsoft,2016-03-02t23:59:01,2016-03-09t14:30:00,2016-03-09t15:30:00,true,2";
+        String taskString = "88,marketing pitch,to microsoft,2016-03-02T23:59:01,2016-03-09T14:30:00,2016-03-09T15:30:00,true,2";
         Task task4 = Task.decodeTaskFromString(taskString);
 
         assertSame(88, task4.getId());
         assertEquals("marketing pitch", task4.getTaskName());
         assertEquals("to microsoft", task4.getDescription());
-        assertEquals(LocalDateTime.parse("2016-03-02t23:59:01"), task4.getCreationTime());
-        assertEquals(LocalDateTime.parse("2016-03-09t14:30:00"), task4.getStartTime());
-        assertEquals(LocalDateTime.parse("2016-03-09t15:30:00"), task4.getEndTime());
+        assertEquals(LocalDateTime.parse("2016-03-02T23:59:01"), task4.getCreationTime());
+        assertEquals(CustomTime.fromString("2016-03-09T14:30:00"), task4.getStartTime());
+        assertEquals(CustomTime.fromString("2016-03-09T15:30:00"), task4.getEndTime());
         assertTrue(task4.isCompleted());
         assertEquals(Task.Priority.MEDIUM, task4.getPriority());
     }
@@ -109,8 +117,8 @@ public class TaskTest {
 
     @Test public void SetId_method_successfully_assign_ID_to_Task() {
         // create Task with null ID
-        Task task5 = new Task(null, "proposal", "client XYZ", LocalDateTime.of(2016, 3, 1, 23, 59),
-                LocalDateTime.of(2016, 3, 2, 1, 00));
+        Task task5 = new Task(null, "proposal", "client XYZ", new CustomTime(LocalDateTime.of(2016, 3, 1, 23, 59)),
+                new CustomTime(LocalDateTime.of(2016, 3, 2, 1, 00)));
 
         // assign an integer ID
         task5.setId(5);

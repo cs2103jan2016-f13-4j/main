@@ -14,9 +14,7 @@ public class CustomTime implements Comparable<CustomTime> {
     /**
      * Constants
      */
-    private static final char CHAR_WRAPPER_LEFT = '[';
-    private static final char CHAR_WRAPPER_RIGHT = ']';
-    private static final char CHAR_SEPARATOR = ',';
+    private static final char CHAR_SEPARATOR = 'T';
 
     private static final DateTimeFormatter FORMATTER_DATE = DateTimeFormatter.ISO_DATE;
     private static final DateTimeFormatter FORMATTER_TIME = DateTimeFormatter.ISO_TIME;
@@ -33,7 +31,7 @@ public class CustomTime implements Comparable<CustomTime> {
     public CustomTime(LocalDate date, LocalTime time, ChronoUnit precision) {
         this._date = date;
         this._time = time;
-        if (time == null) {
+        if (time == null || time.getHour() == 0 && time.getMinute() == 0) {
             if (date == null) {
                 this._precision = PRECISION_TIME_ALL_NULL;
             } else {
@@ -105,7 +103,6 @@ public class CustomTime implements Comparable<CustomTime> {
 
     @Override public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(CHAR_WRAPPER_LEFT);
         if (this._date != null) {
             sb.append(FORMATTER_DATE.format(this._date));
         } else {
@@ -117,7 +114,6 @@ public class CustomTime implements Comparable<CustomTime> {
         } else {
             sb.append("null");
         }
-        sb.append(CHAR_WRAPPER_RIGHT);
         return sb.toString();
     }
 
@@ -125,13 +121,7 @@ public class CustomTime implements Comparable<CustomTime> {
         if (customTimeString == null || customTimeString.trim().isEmpty()) {
             return null;
         }
-        // Wrong format
-        if (customTimeString.charAt(0) != CHAR_WRAPPER_LEFT ||
-                customTimeString.charAt(customTimeString.length() - 1) != CHAR_WRAPPER_RIGHT) {
-            return null;
-        }
-        String[] values = customTimeString.substring(1, customTimeString.length() - 1)
-                .split(Character.toString(CHAR_SEPARATOR));
+        String[] values = customTimeString.split(Character.toString(CHAR_SEPARATOR));
         LocalDate date;
         LocalTime time;
         if (values[0].equals("null")) {
@@ -160,5 +150,26 @@ public class CustomTime implements Comparable<CustomTime> {
         LocalTime thisTime = this.hasTime() ? this.getTime() : LocalTime.MAX;
         LocalTime otherTime = time.hasTime() ? time.getTime() : LocalTime.MAX;
         return thisTime.compareTo(otherTime);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) return false;
+        if (this == o) return true;
+        if (o instanceof CustomTime) {
+            CustomTime time = (CustomTime) o;
+            Object thisDate = this.hasDate() ? this.getDate() : "null";
+            Object otherDate = time.hasDate() ? time.getDate() : "null";
+            if (!thisDate.equals(otherDate)) return false;
+
+            Object thisTime = this.hasTime() ? this.getTime() : "null";
+            Object otherTime = time.hasTime() ? time.getTime() : "null";
+            return thisTime.equals(otherTime);
+        } else if (o instanceof LocalDateTime) {
+            CustomTime time = new CustomTime((LocalDateTime) o);
+            return this.equals(time);
+        } else {
+            return false;
+        }
     }
 }

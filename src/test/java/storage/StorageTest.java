@@ -1,11 +1,5 @@
 package storage;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -13,7 +7,10 @@ import java.util.ArrayList;
 import org.junit.Before;
 import org.junit.Test;
 
+import shared.CustomTime;
 import shared.Task;
+
+import static org.junit.Assert.*;
 
 /**
  * 
@@ -40,21 +37,22 @@ public class StorageTest {
 
     @Test public void Save_returns_correct_Task_ID() {
         int returnedID = this._storage.save(new Task(null, "marketing pitch", "client XYZ",
-                LocalDateTime.of(2016, 3, 9, 14, 30), LocalDateTime.of(2016, 3, 9, 16, 30)));
+                new CustomTime(LocalDateTime.of(2016, 3, 9, 14, 30)), new CustomTime(LocalDateTime.of(2016, 3, 9, 16, 30))));
         assertEquals(1, returnedID);
     }
 
     @Test public void Save_sets_ID_when_ID_is_null() {
         // create Task with null value as ID
-        Task taskNullID = new Task(null, "assignment", "cs3230", LocalDateTime.of(2016, 3, 4, 14, 30),
-                LocalDateTime.of(2016, 3, 5, 14, 30));
+        Task taskNullID = new Task(null, "assignment", "cs3230", new CustomTime(LocalDateTime.of(2016, 3, 4, 14, 30)),
+                new CustomTime(LocalDateTime.of(2016, 3, 5, 14, 30)));
 
         // the next assigned ID will be 1
         this._storage.save(taskNullID);
+        assertSame(1, this._storage.get(1).getId());
         assertEquals("assignment", this._storage.get(1).getTaskName());
         assertEquals("cs3230", this._storage.get(1).getDescription());
-        assertEquals(LocalDateTime.of(2016, 3, 4, 14, 30), this._storage.get(1).getStartTime());
-        assertEquals(LocalDateTime.of(2016, 3, 5, 14, 30), this._storage.get(1).getEndTime());
+        assertEquals(new CustomTime(LocalDateTime.of(2016, 3, 4, 14, 30)), this._storage.get(1).getStartTime());
+        assertEquals(new CustomTime(LocalDateTime.of(2016, 3, 5, 14, 30)), this._storage.get(1).getEndTime());
 
     }
 
@@ -62,10 +60,10 @@ public class StorageTest {
         File actualFile = new File("tmp/ToDoData.csv");
         this._storage.getDiskIO().setFileName("tmp/ToDoData.csv");
 
-        Task task1 = new Task(null, "marketing pitch", "client XYZ", LocalDateTime.of(2016, 3, 9, 14, 30),
-                LocalDateTime.of(2016, 3, 9, 16, 30));
-        Task task2 = new Task(null, "sales meeting", "client ABC", LocalDateTime.of(2016, 3, 11, 12, 00),
-                LocalDateTime.of(2016, 3, 11, 14, 30));
+        Task task1 = new Task(null, "marketing pitch", "client XYZ", new CustomTime(LocalDateTime.of(2016, 3, 9, 14, 30)),
+                new CustomTime(LocalDateTime.of(2016, 3, 9, 16, 30)));
+        Task task2 = new Task(null, "sales meeting", "client ABC", new CustomTime(LocalDateTime.of(2016, 3, 11, 12, 00)),
+                new CustomTime(LocalDateTime.of(2016, 3, 11, 14, 30)));
         this._storage.save(task1);
         this._storage.save(task2);
         this._storage.writeToDisk();
@@ -87,18 +85,17 @@ public class StorageTest {
     // ----------------------------------------------------------------------------------------
 
     @Test public void Get_returns_correct_Task() {
-        Task task3 = new Task(null, "sales training", "HR", LocalDateTime.of(2016, 3, 10, 14, 30),
-                LocalDateTime.of(2016, 3, 10, 16, 30));
-        Task task4 = new Task(null, "meeting to discuss proposal", "sales team", LocalDateTime.of(2016, 3, 11, 12, 00),
-                LocalDateTime.of(2016, 3, 11, 14, 30));
+        Task task3 = new Task(null, "sales training", "HR", new CustomTime(LocalDateTime.of(2016, 3, 10, 14, 30)),
+                new CustomTime(LocalDateTime.of(2016, 3, 10, 16, 30)));
+        Task task4 = new Task(null, "meeting to discuss proposal", "sales team", new CustomTime(LocalDateTime.of(2016, 3, 11, 12, 00)),
+                new CustomTime(LocalDateTime.of(2016, 3, 11, 14, 30)));
         this._storage.save(task3);
         this._storage.save(task4);
         task3.setId(1);
         task4.setId(2);
 
-        Task returnedTask;
-        returnedTask = this._storage.get(1);
-        assertEquals(task3, returnedTask);
+        assertEquals(task3, this._storage.get(1));
+        assertEquals(task4, this._storage.get(2));
 
     }
 
@@ -109,10 +106,10 @@ public class StorageTest {
     // ----------------------------------------------------------------------------------------
 
     @Test public void Get_all_method_with_null_parameter_returns_list_correctly() {
-        Task task5 = new Task(null, "tutorial", "nm2101", LocalDateTime.of(2016, 3, 7, 14, 30),
-                LocalDateTime.of(2016, 3, 8, 14, 30));
-        Task task6 = new Task(null, "essay submission", "nm3238", LocalDateTime.of(2016, 3, 8, 12, 00),
-                LocalDateTime.of(2016, 3, 9, 15, 30));
+        Task task5 = new Task(null, "tutorial", "nm2101", new CustomTime(LocalDateTime.of(2016, 3, 7, 14, 30)),
+                new CustomTime(LocalDateTime.of(2016, 3, 8, 14, 30)));
+        Task task6 = new Task(null, "essay submission", "nm3238", new CustomTime(LocalDateTime.of(2016, 3, 8, 12, 00)),
+                new CustomTime(LocalDateTime.of(2016, 3, 9, 15, 30)));
         this._storage.save(task5);
         this._storage.save(task6);
         task5.setId(1);
@@ -132,10 +129,10 @@ public class StorageTest {
     // ----------------------------------------------------------------------------------------
 
     @Test public void Remove_deletes_correct_Task() {
-        Task task7 = new Task(null, "minor project", "cs1020", LocalDateTime.of(2016, 3, 7, 14, 30),
-                LocalDateTime.of(2016, 3, 8, 14, 30));
-        Task task8 = new Task(null, "major project", "cs2102", LocalDateTime.of(2016, 3, 8, 12, 00),
-                LocalDateTime.of(2016, 3, 9, 15, 30));
+        Task task7 = new Task(null, "minor project", "cs1020", new CustomTime(LocalDateTime.of(2016, 3, 7, 14, 30)),
+                new CustomTime(LocalDateTime.of(2016, 3, 8, 14, 30)));
+        Task task8 = new Task(null, "major project", "cs2102", new CustomTime(LocalDateTime.of(2016, 3, 8, 12, 00)),
+                new CustomTime(LocalDateTime.of(2016, 3, 9, 15, 30)));
         this._storage.save(task7);
         this._storage.save(task8);
 
@@ -157,10 +154,10 @@ public class StorageTest {
     }
 
     @Test public void Removing_invalid_index_returns_null_value() {
-        Task task7 = new Task(null, "minor project", "cs1020", LocalDateTime.of(2016, 3, 7, 14, 30),
-                LocalDateTime.of(2016, 3, 8, 14, 30));
-        Task task8 = new Task(null, "major project", "cs2102", LocalDateTime.of(2016, 3, 8, 12, 00),
-                LocalDateTime.of(2016, 3, 9, 15, 30));
+        Task task7 = new Task(null, "minor project", "cs1020", new CustomTime(LocalDateTime.of(2016, 3, 7, 14, 30)),
+                new CustomTime(LocalDateTime.of(2016, 3, 8, 14, 30)));
+        Task task8 = new Task(null, "major project", "cs2102", new CustomTime(LocalDateTime.of(2016, 3, 8, 12, 00)),
+                new CustomTime(LocalDateTime.of(2016, 3, 9, 15, 30)));
         this._storage.save(task7);
         this._storage.save(task8);
 
@@ -168,10 +165,10 @@ public class StorageTest {
     }
 
     @Test public void Remove_all_clears_all_data() {
-        Task task9 = new Task(null, "assignment 3", "cs3223", LocalDateTime.of(2016, 3, 10, 14, 30),
-                LocalDateTime.of(2016, 3, 12, 12, 00));
-        Task task10 = new Task(null, "homework", "ma1101r", LocalDateTime.of(2016, 3, 8, 12, 00),
-                LocalDateTime.of(2016, 3, 10, 15, 30));
+        Task task9 = new Task(null, "assignment 3", "cs3223", new CustomTime(LocalDateTime.of(2016, 3, 10, 14, 30)),
+                new CustomTime(LocalDateTime.of(2016, 3, 12, 12, 00)));
+        Task task10 = new Task(null, "homework", "ma1101r", new CustomTime(LocalDateTime.of(2016, 3, 8, 12, 00)),
+                new CustomTime(LocalDateTime.of(2016, 3, 10, 15, 30)));
         this._storage.save(task9);
         this._storage.save(task10);
 
@@ -342,15 +339,15 @@ public class StorageTest {
         assertEquals((Integer) 1, this._storage.get(1).getId());
         assertEquals("marketing pitch", this._storage.get(1).getTaskName());
         assertEquals(LocalDateTime.parse("2016-03-01T00:01"), this._storage.get(1).getCreationTime());
-        assertEquals(LocalDateTime.parse("2016-03-09T14:30"), this._storage.get(1).getStartTime());
-        assertEquals(LocalDateTime.parse("2016-03-09T16:30"), this._storage.get(1).getEndTime());
+        assertEquals(CustomTime.fromString("2016-03-09T14:30"), this._storage.get(1).getStartTime());
+        assertEquals(CustomTime.fromString("2016-03-09T16:30"), this._storage.get(1).getEndTime());
         assertTrue(this._storage.get(1).isCompleted());
         assertEquals(Task.Priority.LOW, this._storage.get(1).getPriority());
         assertEquals((Integer) 2, this._storage.get(2).getId());
         assertEquals("sales meeting", this._storage.get(2).getTaskName());
         assertEquals(LocalDateTime.parse("2016-03-03T12:05"), this._storage.get(2).getCreationTime());
-        assertEquals(LocalDateTime.parse("2016-03-11T12:00"), this._storage.get(2).getStartTime());
-        assertEquals(LocalDateTime.parse("2016-03-11T14:30"), this._storage.get(2).getEndTime());
+        assertEquals(CustomTime.fromString("2016-03-11T12:00"), this._storage.get(2).getStartTime());
+        assertEquals(CustomTime.fromString("2016-03-11T14:30"), this._storage.get(2).getEndTime());
         assertFalse(this._storage.get(2).isCompleted());
         assertEquals(Task.Priority.HIGH, this._storage.get(2).getPriority());
     }
