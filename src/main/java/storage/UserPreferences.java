@@ -1,19 +1,31 @@
 package storage;
 
-import com.google.gson.*;
-import exception.ExceptionHandler;
-
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.reflect.Type;
 
-/**
- * Created by Huiyie on 2/4/16.
- */
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 
+import exception.ExceptionHandler;
+
+/**
+ * 
+ * @@author Chng Hui Yie
+ *
+ */
 public class UserPreferences {
-    /**
-     * Properties
-     */
+
     private static UserPreferences instance = new UserPreferences();
 
     public static UserPreferences getInstance() {
@@ -34,12 +46,21 @@ public class UserPreferences {
         createOrReadPreferencesFile();
     }
 
+    /**
+     * Reads user preferences file stored on disk and set the To-Do data path as
+     * specified in the file. If user preferences file does not already exist,
+     * assign the default To-Do data path and create a new user preferences file
+     * on disk.
+     */
+
     public void createOrReadPreferencesFile() {
         boolean preferencesFileExists = checkPreferencesFileExists();
         if (!preferencesFileExists) {
-            this.setTodoDataPath(this.defaultToDoPath); // set path to default one
+            this.setTodoDataPath(this.defaultToDoPath); // set path to default
+                                                        // one
             try {
-                this.writeUserPreferencesToDisk(); // create preferences file on disk
+                this.writeUserPreferencesToDisk(); // create preferences file on
+                                                   // disk
             } catch (IOException e) {
                 ExceptionHandler.handle(e);
             }
@@ -53,8 +74,10 @@ public class UserPreferences {
     }
 
     /**
-     * Checks if json file containing user preferences data already exist, creates a new file if it does not
-     * @return  true if the file already exists, false otherwise
+     * Checks if json file containing user preferences data already exist,
+     * creates a new file if it does not
+     * 
+     * @return true if the file already exists, false otherwise
      */
     public boolean checkPreferencesFileExists() {
         File file = new File(this.preferencesFileName);
@@ -66,7 +89,8 @@ public class UserPreferences {
             }
             return false; // return false if file was newly created
         }
-        return true; // return true if file already existed prior to executing this method
+        return true; // return true if file already existed prior to executing
+                     // this method
     }
 
     /**
@@ -86,14 +110,19 @@ public class UserPreferences {
 
     public class UserPreferencesSerializer implements JsonSerializer<UserPreferences> {
 
-        @Override
-        public JsonElement serialize(UserPreferences userPreferences, Type typeOfSrc, JsonSerializationContext context) {
+        @Override public JsonElement serialize(UserPreferences userPreferences, Type typeOfSrc,
+                JsonSerializationContext context) {
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("todoDataPath", userPreferences.getTodoDataPath());
             return jsonObject;
         }
     }
 
+    /**
+     * Write user preferences data to disk in json format.
+     * 
+     * @throws IOException
+     */
     public void writeUserPreferencesToDisk() throws IOException {
         String json = prepareJson();
 
@@ -104,6 +133,11 @@ public class UserPreferences {
         fileWriter.close();
     }
 
+    /**
+     * Prepare json to be written to disk.
+     * 
+     * @return
+     */
     public String prepareJson() {
         // Configure GSON
         GsonBuilder gsonBuilder = new GsonBuilder();
@@ -130,8 +164,8 @@ public class UserPreferences {
 
     public class UserPreferencesDeserializer implements JsonDeserializer<UserPreferences> {
 
-        @Override
-        public UserPreferences deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        @Override public UserPreferences deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+                throws JsonParseException {
             final JsonObject jsonObject = json.getAsJsonObject();
             final JsonElement jsonDataFileName = jsonObject.get("todoDataPath");
             final String toDoDataPath = jsonDataFileName.getAsString();
@@ -141,10 +175,20 @@ public class UserPreferences {
         }
     }
 
+    /**
+     * Read user preferences data from disk in json format.
+     * 
+     * @throws IOException
+     */
     public void readUserPreferencesFromDisk() throws IOException {
         this.handleJson(this.readLineFromDisk());
     }
 
+    /**
+     * Process json to obtain Java object.
+     * 
+     * @param jsonString
+     */
     public void handleJson(String jsonString) {
         // Configure Gson
         GsonBuilder gsonBuilder = new GsonBuilder();

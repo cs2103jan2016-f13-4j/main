@@ -1,30 +1,36 @@
 package storage;
 
-import exception.ExceptionHandler;
-import org.junit.Test;
-
-import java.io.*;
-
 import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-/**
- * Created by Huiyie on 3/4/16.
- */
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 
+import org.junit.Test;
+
+import exception.ExceptionHandler;
+
+/**
+ * 
+ * @@author Chng Hui Yie
+ *
+ */
 public class UserPreferencesTest {
 
-    @Test
-    public void Default_data_file_name_is_assigned() {
+    @Test public void Default_data_file_name_is_assigned() {
         UserPreferences up = UserPreferences.getInstance();
         up.resetUserPreferences(); // reset to default values
         assertEquals("data/ToDoData.csv", up.getTodoDataPath());
         up.resetUserPreferences();
     }
 
-    @Test
-    public void Changes_to_file_name_are_saved_under_user_preferences() {
+    @Test public void Changes_to_file_name_are_saved_under_user_preferences() {
         UserPreferences up = UserPreferences.getInstance();
         up.resetUserPreferences(); // reset to default values
         up.setTodoDataPath("/Users/Jim/Dropbox/ToDoData.csv");
@@ -32,8 +38,7 @@ public class UserPreferencesTest {
         up.resetUserPreferences();
     }
 
-    @Test
-    public void Serialization_works_correctly() {
+    @Test public void Serialization_works_correctly() {
         UserPreferences up = UserPreferences.getInstance();
         up.resetUserPreferences();
         up.setTodoDataPath("/Family/Mum/Documents/ToDoData.csv");
@@ -41,8 +46,7 @@ public class UserPreferencesTest {
         up.resetUserPreferences();
     }
 
-    @Test
-    public void Writing_to_json_file_works_correctly() {
+    @Test public void Writing_to_json_file_works_correctly() {
         UserPreferences up = UserPreferences.getInstance();
         up.resetUserPreferences();
         up.setTodoDataPath("/Public/Guest/Downloads/ToDoData.csv");
@@ -67,8 +71,7 @@ public class UserPreferencesTest {
         up.resetUserPreferences();
     }
 
-    @Test
-    public void Deserialization_works_correctly() {
+    @Test public void Deserialization_works_correctly() {
         UserPreferences up = UserPreferences.getInstance();
         up.resetUserPreferences();
         String toDeserialize = "{\"todoDataPath\":\"/Users/Jane/GoogleDrive/ToDoData.csv\"}";
@@ -77,8 +80,7 @@ public class UserPreferencesTest {
         up.resetUserPreferences();
     }
 
-    @Test
-    public void Reading_from_existing_user_preferences_data_file_on_disk_works_correctly() {
+    @Test public void Reading_from_existing_user_preferences_data_file_on_disk_works_correctly() {
         // Write a json file to disk
         File file = new File("data/user/UserPreferences.json");
         file.delete();
