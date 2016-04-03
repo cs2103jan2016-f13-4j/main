@@ -6,7 +6,6 @@
 
 .command-input__field {
     -fx-background-color: transparent;
-    -fx-text-fill: #5d3807;
 }
 
 /*******************************************
@@ -14,10 +13,16 @@
  * INSTRUCTIONS HIGHLIGHTING
  *
  *******************************************/
-.instruction {
+.command__instruction,
+.command__normal-text,
+.command__param {
+    -fx-text-fill: #5d3807;
+}
+
+.command__instruction {
     -fx-font-weight: bold;
 }
 
-.param {
+.command__param {
     -fx-font-weight: bold;
 }

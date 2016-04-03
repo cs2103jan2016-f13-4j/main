@@ -30,6 +30,9 @@ public class CommandInputController {
     private static final double PADDING_HORZ_COMMAND_INPUT = 0.0;
     private static final double PADDING_VERT_COMMAND_INPUT = 0.0;
     private static final int DELAY_HIGHLIGHT = 250;
+    private static final String STYLE_CLASS_INSTRUCTION = "command__instruction";
+    private static final String STYLE_CLASS_PARAM = "command__param";
+    private static final String STYLE_CLASS_NORMAL = "command__normal-text";
 
     @FXML private AnchorPane _commandInputContainer;
     private StyleClassedTextArea _inputField;
@@ -181,18 +184,18 @@ public class CommandInputController {
 
         while (matcher.find()) {
             // Fill in previous non-highlighted part
-            spansBuilder.add(Collections.emptyList(), matcher.start() - lastKeywordEnd);
+            spansBuilder.add(Collections.singleton(STYLE_CLASS_NORMAL), matcher.start() - lastKeywordEnd);
 
             // Highlight instruction
             if (matcher.group("INST") != null) {
                 // Prepare the list of classes to be added
                 spansBuilder.add(
-                        Collections.singleton("instruction"),
+                        Collections.singleton(STYLE_CLASS_INSTRUCTION),
                         matcher.end() - matcher.start()
                 );
             } else if (matcher.group("DATE") != null || matcher.group("TIME") != null) {
                 spansBuilder.add(
-                        Collections.singleton("param"),
+                        Collections.singleton(STYLE_CLASS_PARAM),
                         matcher.end() - matcher.start()
                 );
             }
@@ -201,7 +204,7 @@ public class CommandInputController {
             lastKeywordEnd = matcher.end();
         }
 
-        spansBuilder.add(Collections.emptyList(), text.length() - lastKeywordEnd);
+        spansBuilder.add(Collections.singleton(STYLE_CLASS_NORMAL), text.length() - lastKeywordEnd);
         return spansBuilder.create();
     }
 
