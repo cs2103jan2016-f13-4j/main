@@ -827,7 +827,7 @@ public class FlexiCommandParser implements CommandParserSpec {
                         }
 
                         command.setUniversallyQuantified();
-                        return command;
+                        break;
                     }
 
                     match = match.replaceAll("[^0-9]","");

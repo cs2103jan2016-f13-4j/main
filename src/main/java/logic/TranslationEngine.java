@@ -169,7 +169,7 @@ public class TranslationEngine implements TranslationEngineSpec {
                             this._lastCommand.getIndex());
                     break;
                 case DELETE:
-                    message = String.format("Deleted task number %d! You can undo this by entering \"undo\"",
+                    message = String.format("Deleted task number %d! (undoable)",
                             this._lastCommand.getIndex());
                     break;
                 case SEARCH:

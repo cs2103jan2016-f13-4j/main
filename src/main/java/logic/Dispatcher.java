@@ -25,6 +25,7 @@ public class Dispatcher implements DispatcherSpec {
     private Dispatcher() {
         this._commandExecutor = command -> {
             ExecutionResult result = getDecisionEngine().performCommand(command);
+            assert result != null;
 
             // Handle shutdown
             if (result.isShutdownSignal()) {
