@@ -63,6 +63,7 @@ public class TaskListView extends View {
     public static class Item extends ListCell<Pair<Integer, Task>> {
         private static final String STRING_NAME_TEMPLATE = "TaskListItem";
         private static final String STRING_DATE_PATTERN = "EE ha";
+        private static final String STRING_TIMING_PATTERN = "%s\n to %s";
 
         @FXML private AnchorPane _container;
         @FXML private Label _indexLabel;
@@ -89,11 +90,14 @@ public class TaskListView extends View {
                 int index = item.getKey();
                 Task task = item.getValue();
                 LocalDateTime startTime = task.getStartTime();
+                LocalDateTime endTime = task.getEndTime();
                 this._indexLabel.setText(Integer.toString(index));
                 this._nameLabel.setText(task.getTaskName());
 
                 // Optional date time to support floating tasks
-                this._dateLabel.setText(_dateRenderer.getDateDisplay(startTime)); // TODO:
+                String displayStart = _dateRenderer.getDateDisplay(startTime);
+                String displayEnd = _dateRenderer.getDateDisplay(endTime);
+                this._dateLabel.setText(String.format(STRING_TIMING_PATTERN,displayStart,displayEnd)); // TODO:
                                                                                          // stub
 
                 this.setGraphic(this._container);
