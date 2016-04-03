@@ -364,6 +364,6 @@ public class DecisionEngine implements DecisionEngineSpec {
         String query = command.getParameter(Command.ParamName.SEARCH_QUERY);
         return Arrays.asList(query.split("\\s+")).stream()
                 .mapToDouble(String::length)
-                .average().getAsDouble();
+                .average().orElse(0.0);
     }
 }
