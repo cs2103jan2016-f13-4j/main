@@ -120,16 +120,16 @@ public class DateFormatterHelperTest {
         assertFalse(this._dfh.isNextWeek(time));
     }
 
-    /**
+
     @Test public void Helper_Get_Display_Test(){
         CustomTime time = CustomTime.now();
         assertTrue(this._dfh.getDateDisplay(time).equals("Today"));
-        time = time.plusDays(1);
+        time = new CustomTime(time.getDate().plusDays(1),time.getTime());
         assertTrue(this._dfh.getDateDisplay(time).equals("Tomorrow"));
-        time = time.minusDays(2);
+        time = new CustomTime(time.getDate().minusDays(2),time.getTime());
         assertTrue(this._dfh.getDateDisplay(time).equals("Yesterday"));
 
     }
-    */
+
 
 }

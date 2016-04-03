@@ -12,14 +12,17 @@ import java.time.format.DateTimeFormatter;
  */
 public class DateFormatterHelper {
     /**Constant**/
+    private final String EMPTY_STRING = "";
     private final String IN_WEEK_FORMAT = "EE";
     private final String DATE_FORMAT = "dd/MM";
-    private final String HOUR_FORMAT = "ha";
     private final String DATE_YESTERDAY = "Yesterday";
     private final String DATE_TODAY = "Today";
     private final String DATE_TOMMOROW = "Tomorrow";
-    private final String DATE_NEXT_WEEK = "Next %s";
-
+    private final String DATE_NEXT_WEEK = "next %s";
+    private final String DATE_PAIR_PATTERN = "%s\n to %s";
+    private final String TIME_FORMAT = "hh:mm a" ;
+    private final String TIME_FROM = "from %s";
+    private final String TIME_BY = "by %s";
     /**attribute **/
     private CustomTime _now;
     private DateTimeFormatter _inWeekFormat;
@@ -30,32 +33,81 @@ public class DateFormatterHelper {
         this.updateCurrentTime();
         this._inWeekFormat = DateTimeFormatter.ofPattern(IN_WEEK_FORMAT);
         this._otherDateFormat = DateTimeFormatter.ofPattern(DATE_FORMAT);
-        this._timeFormat = DateTimeFormatter.ofPattern(HOUR_FORMAT);
+        this._timeFormat = DateTimeFormatter.ofPattern(TIME_FORMAT);
     }
 
     public String getDateDisplay(CustomTime time) {
         updateCurrentTime();
-        String title = "";
+        String date = EMPTY_STRING;
 
-        if(time.hasDate()) {
+        if(time != null && time.hasDate()) {
 
             if (isToday(time)) {
-                title = DATE_TODAY;
+                date = DATE_TODAY;
             } else if (isTomorrow(time)) {
-                title = DATE_TOMMOROW;
+                date = DATE_TOMMOROW;
             } else if (isYesterday(time)) {
-                title = DATE_YESTERDAY;
+                date = DATE_YESTERDAY;
             } else if (isSameWeek(time)) {
-                title = time.getDate().format(_inWeekFormat);
+                date = time.getDate().format(_inWeekFormat);
             } else if (isNextWeek(time)) {
-                title = String.format(DATE_NEXT_WEEK,time.getDate().format(_inWeekFormat));
+                date = String.format(DATE_NEXT_WEEK,time.getDate().format(_inWeekFormat));
             } else {
-                title = time.getDate().format(_otherDateFormat);
+                date = time.getDate().format(_otherDateFormat);
             }
 
         }
-        return title;
+        return date;
     }
+
+    public String getTimeDisplay(CustomTime time){
+        String display = EMPTY_STRING;
+        if(time.hasTime()){
+            display = this._timeFormat.format(time.getTime());
+        }
+        return display;
+    }
+
+    public String getFullDisplay(CustomTime cTime) {
+        assert cTime != null;
+        String display = EMPTY_STRING;
+        display = getDateDisplay(cTime);
+
+        if(display.isEmpty()){
+            if(cTime.hasTime()){
+                display  = getTimeDisplay(cTime);
+            }
+        } else {
+            if(cTime.hasTime()){
+                display = display + " ," + getTimeDisplay(cTime);
+            }
+        }
+
+        return display;
+    }
+
+    public String getPairDateDisplay(CustomTime start, CustomTime end){
+        String display = EMPTY_STRING;
+        if(start == null && end == null){
+            return display;
+        } else if(start == null && end != null){
+
+                display = String.format(TIME_BY,this.getFullDisplay(end)) ;
+
+        } else if (start != null && end == null){
+
+                display = String.format(TIME_FROM,this.getFullDisplay(start));
+
+        } else {
+            String startDate = this.getFullDisplay(start);
+            String endDate = this.getFullDisplay(end);
+            display =  String.format(DATE_PAIR_PATTERN,startDate,endDate);
+        }
+
+        return display;
+
+    }
+
 
     private void updateCurrentTime() {
         _now = CustomTime.now();
