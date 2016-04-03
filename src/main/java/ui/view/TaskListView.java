@@ -15,6 +15,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
 import javafx.util.Pair;
 import shared.CustomTime;
 import shared.Resources;
@@ -34,6 +35,7 @@ public class TaskListView extends View {
     /**
      * Properties
      */
+
     private ObservableList _observableList;
     private TaskListController _listControl;
     private List<Pair<Integer, Task>> _displayList;
@@ -62,7 +64,7 @@ public class TaskListView extends View {
 
     public static class Item extends ListCell<Pair<Integer, Task>> {
         private static final String STRING_NAME_TEMPLATE = "TaskListItem";
-        private static final String STRING_DATE_PATTERN = "EE ha";
+        private static final String STRING_COMPLETE_COLOR = "#c2c9cc";
 
         @FXML private AnchorPane _container;
         @FXML private Label _indexLabel;
@@ -94,6 +96,12 @@ public class TaskListView extends View {
 
                 // Optional date time to support floating tasks
                 this._dateLabel.setText(_df.getPairDateDisplay(task.getStartTime(),task.getEndTime()));
+
+                if(task.isCompleted()){
+                    this._indexLabel.setTextFill(Color.web(STRING_COMPLETE_COLOR));
+                    this._nameLabel.setTextFill(Color.web(STRING_COMPLETE_COLOR));
+                    this._dateLabel.setTextFill(Color.web(STRING_COMPLETE_COLOR));
+                }
 
                 this.setGraphic(this._container);
             }
