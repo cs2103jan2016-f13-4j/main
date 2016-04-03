@@ -801,6 +801,17 @@ public class FlexiCommandParser implements CommandParserSpec {
 
                 this.parseParameters(commandString, command);
                 break;
+            case SEARCH:
+                // Prepare query pattern
+                String queryPattern = "^" + constructNotSurroundedByQuotesRegex("(?:for)?");
+                Pattern searchFillerPattern = Pattern.compile(queryPattern, Pattern.CASE_INSENSITIVE);
+                Matcher matcher2 = searchFillerPattern.matcher(commandString);
+                if (matcher2.find()) {
+                    commandString = commandString.substring(matcher2.end()).trim();
+                }
+
+                command.setParameter(Command.ParamName.SEARCH_QUERY, commandString);
+                break;
         }
 
         return command;

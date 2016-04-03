@@ -151,8 +151,8 @@ public class TranslationEngine implements TranslationEngineSpec {
                     break;
                 case ADD:
                     // TODO: Take care of failed addition
-                    message = String.format("Added: %s",
-                            this._lastCommand.getParameter(Command.ParamName.TASK_NAME));
+                    String taskName = this._lastCommand.getParameter(Command.ParamName.TASK_NAME);
+                    message = String.format("Added: %s", taskName);
                     break;
                 case EDIT:
                     // TODO: Take care of failed edit
@@ -162,6 +162,17 @@ public class TranslationEngine implements TranslationEngineSpec {
                 case DELETE:
                     message = String.format("Deleted task number %d! You can undo this by entering \"undo\"",
                             this._lastCommand.getIndex());
+                    break;
+                case  SEARCH:
+                    int searchFound = ((List<?>) result.getData()).size();
+                    String searchQuery = this._lastCommand.getParameter(Command.ParamName.SEARCH_QUERY);
+                    if (searchFound == 0) {
+                        message = String.format("Found no to-do with the search query \"%s\"", searchQuery);
+                    } else {
+                        message = String.format("Found %d matches with the query \"%s\"",
+                                searchFound,
+                                searchQuery);
+                    }
                     break;
             }
         }

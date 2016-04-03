@@ -1,13 +1,6 @@
 package logic;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Stack;
-import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
+import javafx.util.Pair;
 import shared.*;
 import skeleton.CollectionSpec;
 import skeleton.DecisionEngineSpec;
@@ -15,10 +8,20 @@ import skeleton.SchedulerSpec;
 import storage.Storage;
 import storage.TaskPriorityComparator;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Stack;
+import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
 /**
  * @@author Thenaesh Elango
  */
 public class DecisionEngine implements DecisionEngineSpec {
+    public static final double THRESHOLD_POWERSEARCH_WEIGHTED = 0.0;
     /**
      * Singleton instance and constructor
      */
@@ -219,21 +222,30 @@ public class DecisionEngine implements DecisionEngineSpec {
 
         // PowerSearching!
         Pattern pattern = buildPowerSearchPattern(command);
+        double averageQueryLength = getAverageQueryLength(command);
 
-        List<Task> foundTask = this.getTaskCollection().getAll().stream().filter(item -> {
+        List<Task> foundTask = this.getTaskCollection().getAll().stream().map(item -> {
             // Match with task name first
             Matcher m = pattern.matcher(item.getTaskName());
-            if (m.find())
-                return true;
+            int matches = 0;
+            List<Double> similarityIndex = new ArrayList<>();
 
-            // If doesn't match with task name, try to match
-            // with description ONLY IF it's not null
-            if (item.getDescription() == null)
-                return false;
-            m = pattern.matcher(item.getDescription());
+            while (m.find()) {
+                matches++;
+                double similarity = averageQueryLength / m.group("MATCH").length();
+                if (similarity > 1.0) {
+                    similarity = 1.0;
+                }
+                similarityIndex.add(similarity);
+            }
 
-            return m.find();
-        }).collect(Collectors.toList());
+            double weightedMatch = matches * similarityIndex.stream()
+                    .mapToDouble(Double::doubleValue).average().orElse(0.0);
+            return new Pair<>(weightedMatch, item);
+        }).filter(pair -> pair.getKey() > THRESHOLD_POWERSEARCH_WEIGHTED)
+                .sorted((pair1, pair2) -> pair2.getKey().compareTo(pair1.getKey()))
+                .map(Pair::getValue)
+                .collect(Collectors.toList());
 
         return new ExecutionResult(ViewType.TASK_LIST, foundTask , null);
     }
@@ -325,7 +337,7 @@ public class DecisionEngine implements DecisionEngineSpec {
         // Begin building pattern by signalling that we are looking for
         // a word that contains the characters
         StringBuilder patternBuilder = new StringBuilder();
-        patternBuilder.append("\\b(?:");
+        patternBuilder.append("\\b(?<MATCH>");
 
         // In that particular order. We achieve this by inserting
         // greedy word (\w*) pattern, slotted between the characters of
@@ -348,4 +360,10 @@ public class DecisionEngine implements DecisionEngineSpec {
         return Pattern.compile(patternBuilder.toString(), Pattern.CASE_INSENSITIVE);
     }
 
+    private static double getAverageQueryLength(Command command) {
+        String query = command.getParameter(Command.ParamName.SEARCH_QUERY);
+        return Arrays.asList(query.split("\\s+")).stream()
+                .mapToDouble(String::length)
+                .average().getAsDouble();
+    }
 }
