@@ -30,9 +30,8 @@ public class DecisionEngine implements DecisionEngineSpec {
     /**
      * instance fields
      */
-    private Stack<Function<Void, Void>> inverseOperations = new Stack<>(); // used
-                                                                           // for
-                                                                           // undoing
+    private Stack<Function<Void, Void>> undoOperations = new Stack<>(); // used for undoing
+    private Stack<Function<Void, Void>> redoOperations = new Stack<>();
 
     public static DecisionEngine getInstance() {
         if (instance == null) {
@@ -111,10 +110,20 @@ public class DecisionEngine implements DecisionEngineSpec {
 
         final int id = this.getTaskCollection().save(taskToAdd);
 
+        // wipe out redo stack
+        this.redoOperations.clear();
+
         // add the corresponding undo operation
-        this.inverseOperations.push(v -> {
+        this.undoOperations.push(v -> {
             this.getTaskCollection().remove(id);
-            return null;
+
+            // add corresponding redo operation
+            this.redoOperations.push(w -> {
+                this.handleAdd(command);
+                return (Void) null;
+            });
+
+            return (Void) null;
         });
 
         return this.displayAllTasks();
@@ -140,10 +149,19 @@ public class DecisionEngine implements DecisionEngineSpec {
             task.setEndTime(command.getParameter(Command.ParamName.TASK_END));
         }
 
+        // wipe out redo stack
+        this.redoOperations.clear();
+
         // add corresponding undo operation
-        this.inverseOperations.push(v -> {
+        this.undoOperations.push(v -> {
+
             this.getTaskCollection().save(originalTaskCopy);
-            return null;
+
+            this.undoOperations.push(w -> {
+                this.handleEdit(command);
+                return (Void) null;
+            });
+            return (Void) null;
         });
 
         return this.displayAllTasks();
@@ -177,9 +195,18 @@ public class DecisionEngine implements DecisionEngineSpec {
         Task deletedTask = this.getTaskCollection().get(id).clone();
         deletedTask.setDeletedStatus(true);
 
+        // wipe out the redo stack
+        this.redoOperations.clear();
+
         // add the corresponding undo operation
-        this.inverseOperations.push(v -> {
+        this.undoOperations.push(v -> {
             this.getTaskCollection().undelete(id);
+
+            this.redoOperations.push(w -> {
+                this.handleDelete(command);
+                return (Void) null;
+            });
+
             return (Void) null;
         });
 
@@ -215,8 +242,18 @@ public class DecisionEngine implements DecisionEngineSpec {
         assert command.hasInstruction(Command.Instruction.UNDO);
 
         // attempt an undo only if the undo stack is not empty
-        if (!this.inverseOperations.isEmpty()) {
-            this.inverseOperations.pop().apply(null);
+        if (!this.undoOperations.isEmpty()) {
+            this.undoOperations.pop().apply(null);
+        }
+
+        return this.displayAllTasks();
+    }
+
+    protected ExecutionResult handleRedo(Command command) {
+        assert command.hasInstruction(Command.Instruction.UNDO);
+
+        if (!this.redoOperations.isEmpty()) {
+            this.redoOperations.pop().apply(null);
         }
 
         return this.displayAllTasks();
@@ -238,28 +275,31 @@ public class DecisionEngine implements DecisionEngineSpec {
 
         // all the standard commands
         switch (command.getInstruction()) {
-        case ADD:
-            result = this.handleAdd(command);
-            break;
-        case EDIT:
-            result = this.handleEdit(command);
-            break;
-        case DISPLAY:
-            result = this.handleDisplay(command);
-            break;
-        case DELETE:
-            result = this.handleDelete(command);
-            break;
-        case SEARCH:
-            result = this.handleSearch(command);
-            break;
-        case UNDO:
-            result = this.handleUndo(command);
-            break;
-        default:
-            // if we reach this point, LTA Command Parser has failed in his duty
-            // and awaits court martial
-            assert false;
+            case ADD:
+            case DELETE:
+            case EDIT:
+                StorageWriteOperation op = new StorageWriteOperation(command);
+                op.getInitialOperation().apply(null);
+                StorageWriteOperationHistory.getInstance().addToHistory(op);
+                result = this.displayAllTasks();
+            case DISPLAY:
+                result = this.handleDisplay(command);
+                break;
+            case SEARCH:
+                result = this.handleSearch(command);
+                break;
+            case UNDO:
+                StorageWriteOperationHistory.getInstance().undo();
+                result = this.displayAllTasks();
+                break;
+            case REDO:
+                StorageWriteOperationHistory.getInstance().redo();
+                result = this.displayAllTasks();
+                break;
+            default:
+                // if we reach this point, LTA Command Parser has failed in his duty
+                // and awaits court martial
+                assert false;
         }
 
         return result;

@@ -19,6 +19,9 @@
       "name": "UNDO",
       "keywords": ["undo"]
     }, {
+      "name": "REDO",
+      "keywords": ["redo"]
+    }, {
       "name": "DELETE",
       "keywords": ["delete", "remove"]
     }, {
