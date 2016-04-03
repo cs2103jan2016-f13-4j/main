@@ -183,6 +183,12 @@ public class TranslationEngine implements TranslationEngineSpec {
                                 searchQuery);
                     }
                     break;
+                case UNDO:
+                    message = "Reverted last command!";
+                    break;
+                case REDO:
+                    message = "Redone last command!";
+                    break;
             }
         }
 
