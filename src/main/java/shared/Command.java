@@ -17,12 +17,12 @@ public class Command {
     }
 
     public enum ParamType {
-        STRING, INTEGER, DATE, DOUBLE
+        STRING, DATE, PRIORITY
     }
 
     public enum ParamName {
         TASK_NAME(ParamType.STRING), TASK_DESCRIPTION(ParamType.STRING), TASK_START(ParamType.DATE), TASK_END(
-                ParamType.DATE), SEARCH_QUERY(ParamType.STRING);
+                ParamType.DATE), SEARCH_QUERY(ParamType.STRING), PRIORITY_VALUE(ParamType.PRIORITY);
 
         public final ParamType type;
 

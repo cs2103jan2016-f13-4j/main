@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import shared.Command;
 import shared.CustomTime;
+import shared.Task;
 
 import java.time.*;
 import java.time.temporal.ChronoUnit;
@@ -216,5 +217,19 @@ public class FlexiCommandParserTest {
                 is(equalTo(startTime)));
         assertThat(command.getParameter(Command.ParamName.TASK_END),
                 is(equalTo(endTime)));
+    }
+
+    @Test public void FlexiCommandParser_parses_simple_priority_correctly() {
+        String commandString = "add go to the gym today with high priority";
+        Command command = this._parser.parse(commandString);
+        assertThat(command.getParameter(Command.ParamName.PRIORITY_VALUE),
+                is(Task.Priority.HIGH));
+    }
+
+    @Test public void FlexiCommandParser_parses_complex_priority_correctly() {
+        String commandString = "add go to the mall from tomorrow's 5pm to next week's Fri 1000 as unimportant";
+        Command command = this._parser.parse(commandString);
+        assertThat(command.getParameter(Command.ParamName.PRIORITY_VALUE),
+                is(Task.Priority.LOW));
     }
 }

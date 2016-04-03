@@ -317,6 +317,7 @@ public class FlexiCommandParser implements CommandParserSpec {
         private Map<TimeNounMeaning, Set<TimePrepositionMeaning>> _adjacencyList;
         private HashMap<String, Command.Instruction> _commandKeywordInversionMap;
         private HashMap<String, TimePrepositionMeaning> _timePrepositionInversionMap;
+        private HashMap<String, Task.Priority> _priorityInversionMap;
 
 
         // Caching
@@ -336,6 +337,7 @@ public class FlexiCommandParser implements CommandParserSpec {
 
             this._commandKeywordInversionMap = new HashMap<>();
             this._timePrepositionInversionMap = new HashMap<>();
+            this._priorityInversionMap = new HashMap<>();
         }
 
         /**
@@ -399,10 +401,10 @@ public class FlexiCommandParser implements CommandParserSpec {
          * @param keywords
          */
         void addPriorityNoun(String meaning, String[] keywords) {
-            this._prioritiesKeywordMap.put(
-                    _priorityNounEnumTranslator.get(meaning),
-                    new CopyOnWriteArraySet<>(Arrays.asList(keywords))
-            );
+            Task.Priority priority = _priorityNounEnumTranslator.get(meaning);
+            Set<String> keywordSet = new CopyOnWriteArraySet<>(Arrays.asList(keywords));
+            this._prioritiesKeywordMap.put(priority, keywordSet);
+            keywordSet.stream().forEach(keyword -> this._priorityInversionMap.put(keyword, priority));
         }
 
         /**
@@ -569,6 +571,10 @@ public class FlexiCommandParser implements CommandParserSpec {
 
         public TimePrepositionMeaning getPrepositionMeaning(String preposition) {
             return this._timePrepositionInversionMap.get(preposition);
+        }
+
+        public Task.Priority getPriority(String priorityClause) {
+            return this._priorityInversionMap.get(priorityClause);
         }
     }
 
@@ -900,6 +906,8 @@ public class FlexiCommandParser implements CommandParserSpec {
     }
 
     private Command parseParameters(String commandString, Command command) {
+        // TIME PARSING
+        // Get the time first
         Pattern timePattern = Pattern.compile(this.getTimePattern(), Pattern.CASE_INSENSITIVE);
         Matcher matcher = timePattern.matcher(commandString);
         int lowestFoundIndex = commandString.length();
@@ -913,6 +921,24 @@ public class FlexiCommandParser implements CommandParserSpec {
             // TODO: Handle null results
             Pair<Command.ParamName, CustomTime> parsedTime = parseDateTime(matcher);
             command.setParameter(parsedTime.getKey(), parsedTime.getValue());
+        }
+
+        // PRIORITY PARSING
+        // Get priority as well
+        Pattern prioPattern = Pattern.compile(this.getPriorityPattern(), Pattern.CASE_INSENSITIVE);
+        matcher = prioPattern.matcher(commandString);
+
+        while (matcher.find()) {
+            if (lowestFoundIndex > matcher.start()) {
+                lowestFoundIndex = matcher.start();
+            }
+
+            String priorityKeyword = matcher.group("PRIORITY");
+            Task.Priority priority = this._commandDefinitions.getPriority(
+                    priorityKeyword.trim().toLowerCase());
+            if (priority != null) {
+                command.setParameter(Command.ParamName.PRIORITY_VALUE, priority);
+            }
         }
 
         String taskName = commandString.substring(0, lowestFoundIndex).trim();
@@ -949,6 +975,7 @@ public class FlexiCommandParser implements CommandParserSpec {
             switch (clause.getNoun()) {
                 case SAME_DAY:
                     dateTime = new CustomTime(null, null);
+                    break;
                 case TODAY:
                     dateTime = CustomTime.todayAt(null);
                     break;
@@ -960,7 +987,13 @@ public class FlexiCommandParser implements CommandParserSpec {
                     break;
                 default:
                     assert clause.getNoun().dayOfWeek != null;
-                    dateTime = CustomTime.todayAt(null).next(clause.getNoun().dayOfWeek);
+                    CustomTime today = CustomTime.todayAt(null);
+                    if (clause.getPrepositionMeanings().contains(TimePrepositionMeaning.NEXT)) {
+                        dateTime = today.next(clause.getNoun().dayOfWeek);
+                    } else {
+                        dateTime = today.current(clause.getNoun().dayOfWeek);
+                    }
+
                     break;
             }
         } else {

@@ -74,7 +74,7 @@ public class CustomTime implements Comparable<CustomTime> {
         return new CustomTime(this._date, time);
     }
 
-    public CustomTime next(DayOfWeek dayOfWeek) {
+    public CustomTime current(DayOfWeek dayOfWeek) {
         if (!this.hasDate()) {
             return null;
         }
@@ -85,6 +85,10 @@ public class CustomTime implements Comparable<CustomTime> {
             offset += 7;
         }
         return new CustomTime(this.getDate().plusDays(offset), this.getTime());
+    }
+
+    public CustomTime next(DayOfWeek dayOfWeek) {
+        return new CustomTime(this.current(dayOfWeek).getDate().plusDays(7), null);
     }
 
 
