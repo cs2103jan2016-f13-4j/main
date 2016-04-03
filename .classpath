@@ -19,7 +19,9 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Gradle: org.slf4j:slf4j-api:1.7.13"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Gradle: com.google.code.gson:gson:2.6.2"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Gradle: org.apache.directory.studio:org.apache.commons.io:2.4"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Gradle: org.fxmisc.richtext:richtextfx:0.6.10"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Gradle: commons-io:commons-io:2.4"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Gradle: org.reactfx:reactfx:2.0-M4u1"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Gradle: org.fxmisc.undo:undofx:1.2"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Gradle: org.fxmisc.flowless:flowless:0.4.5"/>

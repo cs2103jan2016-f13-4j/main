@@ -1,5 +1,6 @@
 package ui.controller;
 
+import shared.CustomTime;
 import shared.Task;
 
 import java.time.DayOfWeek;
@@ -20,7 +21,7 @@ public class DateFormatterHelper {
     private final String DATE_NEXT_WEEK = "Next %s";
 
     /**attribute **/
-    private LocalDateTime _now;
+    private CustomTime _now;
     private DateTimeFormatter _inWeekFormat;
     private DateTimeFormatter _otherDateFormat;
     private DateTimeFormatter _timeFormat;
@@ -32,24 +33,24 @@ public class DateFormatterHelper {
         this._timeFormat = DateTimeFormatter.ofPattern(HOUR_FORMAT);
     }
 
-    public String getDateDisplay(LocalDateTime ldt) {
+    public String getDateDisplay(CustomTime time) {
         updateCurrentTime();
         String title = "";
 
-        if(ldt != null) {
+        if(time.hasDate()) {
 
-            if (isToday(ldt)) {
+            if (isToday(time)) {
                 title = DATE_TODAY;
-            } else if (isTomorrow(ldt)) {
+            } else if (isTomorrow(time)) {
                 title = DATE_TOMMOROW;
-            } else if (isYesterday(ldt)) {
+            } else if (isYesterday(time)) {
                 title = DATE_YESTERDAY;
-            } else if (isSameWeek(ldt)) {
-                title = ldt.format(_inWeekFormat);
-            } else if (isNextWeek(ldt)){
-                title = String.format(DATE_NEXT_WEEK,ldt.format(_inWeekFormat));
+            } else if (isSameWeek(time)) {
+                title = time.getDate().format(_inWeekFormat);
+            } else if (isNextWeek(time)) {
+                title = String.format(DATE_NEXT_WEEK,time.getDate().format(_inWeekFormat));
             } else {
-                title = ldt.format(_otherDateFormat);
+                title = time.getDate().format(_otherDateFormat);
             }
 
         }
@@ -57,27 +58,27 @@ public class DateFormatterHelper {
     }
 
     private void updateCurrentTime() {
-        _now = LocalDateTime.now();
+        _now = CustomTime.now();
     }
 
-    boolean isToday(LocalDateTime ldt) {
+    boolean isToday(CustomTime time) {
 
 
-        int curYear = this._now.getYear();
-        int curDayOfYear = this._now.getDayOfYear();
-        int taskYear = ldt.getYear();
-        int taskDayOfYear = ldt.getDayOfYear();
+        int curYear = this._now.getDate().getYear();
+        int curDayOfYear = this._now.getDate().getDayOfYear();
+        int taskYear = time.getDate().getYear();
+        int taskDayOfYear = time.getDate().getDayOfYear();
 
         return (curYear == taskYear) && (curDayOfYear == taskDayOfYear);
     }
 
-    boolean isTomorrow(LocalDateTime ldt){
+    boolean isTomorrow(CustomTime time){
 
 
-        int curYear = this._now.getYear();
-        int curDayOfYear = this._now.getDayOfYear();
-        int taskYear = ldt.getYear();
-        int taskDayOfYear = ldt.getDayOfYear();
+        int curYear = this._now.getDate().getYear();
+        int curDayOfYear = this._now.getDate().getDayOfYear();
+        int taskYear = time.getDate().getYear();
+        int taskDayOfYear = time.getDate().getDayOfYear();
 
         if (curYear == taskYear){
             return (taskDayOfYear -  curDayOfYear) == 1;
@@ -89,12 +90,12 @@ public class DateFormatterHelper {
     }
 
 
-     boolean isYesterday(LocalDateTime ldt) {
+     boolean isYesterday(CustomTime time) {
 
-        int curYear = this._now.getYear();
-        int curDayOfYear = this._now.getDayOfYear();
-        int taskYear = ldt.getYear();
-        int taskDayOfYear = ldt.getDayOfYear();
+         int curYear = this._now.getDate().getYear();
+         int curDayOfYear = this._now.getDate().getDayOfYear();
+         int taskYear = time.getDate().getYear();
+         int taskDayOfYear = time.getDate().getDayOfYear();
 
         if(curYear == taskYear){
             return (curYear == taskYear) && ((curDayOfYear - taskDayOfYear) == 1);
@@ -106,15 +107,15 @@ public class DateFormatterHelper {
     }
 
 
-     boolean isSameWeek(LocalDateTime ldt){
+     boolean isSameWeek(CustomTime time){
 
-        int curYear = this._now.getYear();
-        int curDayOfYear = this._now.getDayOfYear();
-        int curDayValue = this._now.getDayOfWeek().getValue();
+        int curYear = this._now.getDate().getYear();
+        int curDayOfYear = this._now.getDate().getDayOfYear();
+        int curDayValue = this._now.getDate().getDayOfWeek().getValue();
 
-        int taskYear = ldt.getYear();
-        int taskDayOfYear = ldt.getDayOfYear();
-        int taskDayValue = ldt.getDayOfWeek().getValue();
+        int taskYear = time.getDate().getYear();
+        int taskDayOfYear = time.getDate().getDayOfYear();
+        int taskDayValue = time.getDate().getDayOfWeek().getValue();
 
         int dayValueDifference = taskDayValue - curDayValue;
         //System.out.println(dayValueDifference);
@@ -132,15 +133,15 @@ public class DateFormatterHelper {
         return false;
     }
 
-    boolean isNextWeek(LocalDateTime ldt){
+    boolean isNextWeek(CustomTime time){
         int sunday = DayOfWeek.SUNDAY.getValue();
 
-        int curYear = this._now.getYear();
-        int curDayOfYear = this._now.getDayOfYear();
-        int curDayValue = this._now.getDayOfWeek().getValue();
+        int curYear = this._now.getDate().getYear();
+        int curDayOfYear = this._now.getDate().getDayOfYear();
+        int curDayValue = this._now.getDate().getDayOfWeek().getValue();
 
-        int taskYear = ldt.getYear();
-        int taskDayOfYear = ldt.getDayOfYear();
+        int taskYear = time.getDate().getYear();
+        int taskDayOfYear = time.getDate().getDayOfYear();
         int curNewWeekDistance = sunday - curDayValue;
 
         int maxRange = curNewWeekDistance + 6;
@@ -165,8 +166,8 @@ public class DateFormatterHelper {
     }
 
     // help in testing, to be deceprated.
-    public void setNow(LocalDateTime newLdt){
-        this._now = newLdt;
+    public void setNow(CustomTime newTime){
+        this._now = newTime;
     }
 
     private boolean isLeapYear(int year){

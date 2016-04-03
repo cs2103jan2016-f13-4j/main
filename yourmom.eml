@@ -17,7 +17,9 @@
 	<levels>
 		<level name="Gradle: org.slf4j:slf4j-api:1.7.13" value="project"/>
 		<level name="Gradle: com.google.code.gson:gson:2.6.2" value="project"/>
+		<level name="Gradle: org.apache.directory.studio:org.apache.commons.io:2.4" value="project"/>
 		<level name="Gradle: org.fxmisc.richtext:richtextfx:0.6.10" value="project"/>
+		<level name="Gradle: commons-io:commons-io:2.4" value="project"/>
 		<level name="Gradle: org.reactfx:reactfx:2.0-M4u1" value="project"/>
 		<level name="Gradle: org.fxmisc.undo:undofx:1.2" value="project"/>
 		<level name="Gradle: org.fxmisc.flowless:flowless:0.4.5" value="project"/>

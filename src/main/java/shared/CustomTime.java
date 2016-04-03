@@ -18,8 +18,10 @@ public class CustomTime implements Comparable<CustomTime> {
     private static final char CHAR_WRAPPER_RIGHT = ']';
     private static final char CHAR_SEPARATOR = ',';
 
+    private static final String TIME_FORMAT = "HH:mm";
+
     private static final DateTimeFormatter FORMATTER_DATE = DateTimeFormatter.ISO_DATE;
-    private static final DateTimeFormatter FORMATTER_TIME = DateTimeFormatter.ISO_TIME;
+    private static final DateTimeFormatter FORMATTER_TIME = DateTimeFormatter.ofPattern(TIME_FORMAT);
     private static final ChronoUnit PRECISION_TIME_DEFAULT = ChronoUnit.MINUTES;
     private static final ChronoUnit PRECISION_TIME_ALL_NULL = ChronoUnit.FOREVER;
 
