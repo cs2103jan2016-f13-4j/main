@@ -108,6 +108,12 @@ public class Command {
         return sb.toString();
     }
 
+    public void removeParameter(ParamName taskName) {
+        if (this._parameters.containsKey(taskName)) {
+            this._parameters.remove(taskName);
+        }
+    }
+
     public int getParametersCount() {
         return this._parameters.keySet().size();
     }

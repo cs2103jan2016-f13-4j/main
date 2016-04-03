@@ -863,6 +863,13 @@ public class FlexiCommandParser implements CommandParserSpec {
 
                 command.setParameter(Command.ParamName.SEARCH_QUERY, commandString);
                 break;
+            case DISPLAY:
+                Command newDisplayCommand = parseParameters(commandString, command);
+                if (newDisplayCommand != null) {
+                    newDisplayCommand.removeParameter(Command.ParamName.TASK_NAME);
+                    command = newDisplayCommand;
+                }
+                break;
         }
 
         return command;
