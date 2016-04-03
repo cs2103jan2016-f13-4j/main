@@ -32,6 +32,36 @@ public class DecisionEngineTest {
     private static final String name3 = "watch your front, watch your front";
     private static final String name4 = "firers, check clear";
 
+    /**
+     * creates a Task from a specified command object when it makes sense we
+     * should blow up when creating a Task doesn't really make sense
+     *
+     * @param cmd
+     * @return
+     */
+    private static Task createTask(Command cmd) {
+        // initialisation
+        String name = null;
+        CustomTime from = null;
+        CustomTime to = null;
+
+        // for each command parameter, check if it was supplied
+        // if so, extract the value and set the appropriate reference above to
+        // point to the extracted value
+        if (cmd.hasParameter(Command.ParamName.TASK_NAME)) {
+            name = cmd.getParameter(Command.ParamName.TASK_NAME);
+        }
+        if (cmd.hasParameter(Command.ParamName.TASK_START)) {
+            from = cmd.getParameter(Command.ParamName.TASK_START);
+        }
+        if (cmd.hasParameter(Command.ParamName.TASK_END)) {
+            to = cmd.getParameter(Command.ParamName.TASK_END);
+        }
+
+        // we now build the Task object for adding into the store
+        return new Task(null, name, "", from, to);
+    }
+
 
     @Before
     public void setUp() throws IOException {
@@ -48,10 +78,10 @@ public class DecisionEngineTest {
         Command partialAdd = new Command(Command.Instruction.ADD, null, true);
         partialAdd.setParameter(Command.ParamName.TASK_NAME, name2);
 
-        Task task1 = this.decisionEngine.createTask(fullAdd);
+        Task task1 = createTask(fullAdd);
         task1.setId(specialTestID);
         Task expected1 = new Task(specialTestID, name1, null, testDate1, testDate2);
-        Task task2 = this.decisionEngine.createTask(partialAdd);
+        Task task2 = createTask(partialAdd);
         task2.setId(specialTestID);
         Task expected2 = new Task(specialTestID, name2, null, testDate2, testDate3);
 

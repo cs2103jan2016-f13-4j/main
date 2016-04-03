@@ -66,35 +66,7 @@ public class DecisionEngine implements DecisionEngineSpec {
         return cmd.hasParameter(Command.ParamName.SEARCH_QUERY);
     }
 
-    /**
-     * creates a Task from a specified command object when it makes sense we
-     * should blow up when creating a Task doesn't really make sense
-     * 
-     * @param cmd
-     * @return
-     */
-    protected Task createTask(Command cmd) {
-        // initialisation
-        String name = null;
-        CustomTime from = null;
-        CustomTime to = null;
 
-        // for each command parameter, check if it was supplied
-        // if so, extract the value and set the appropriate reference above to
-        // point to the extracted value
-        if (cmd.hasParameter(Command.ParamName.TASK_NAME)) {
-            name = cmd.getParameter(Command.ParamName.TASK_NAME);
-        }
-        if (cmd.hasParameter(Command.ParamName.TASK_START)) {
-            from = cmd.getParameter(Command.ParamName.TASK_START);
-        }
-        if (cmd.hasParameter(Command.ParamName.TASK_END)) {
-            to = cmd.getParameter(Command.ParamName.TASK_END);
-        }
-
-        // we now build the Task object for adding into the store
-        return new Task(null, name, "", from, to);
-    }
 
     protected ExecutionResult displayAllTasks() {
         List<Task> listToDisplay = this.getTaskCollection().getAll().stream()
@@ -103,116 +75,11 @@ public class DecisionEngine implements DecisionEngineSpec {
         return new ExecutionResult(ViewType.TASK_LIST, listToDisplay);
     }
 
-    protected ExecutionResult handleAdd(Command command) {
-        assert command.hasInstruction(Command.Instruction.ADD);
-
-        Task taskToAdd = this.createTask(command);
-
-        final int id = this.getTaskCollection().save(taskToAdd);
-
-        // wipe out redo stack
-        this.redoOperations.clear();
-
-        // add the corresponding undo operation
-        this.undoOperations.push(v -> {
-            this.getTaskCollection().remove(id);
-
-            // add corresponding redo operation
-            this.redoOperations.push(w -> {
-                this.handleAdd(command);
-                return (Void) null;
-            });
-
-            return (Void) null;
-        });
-
-        return this.displayAllTasks();
-    }
-
-    protected ExecutionResult handleEdit(Command command) {
-        assert command.hasInstruction(Command.Instruction.EDIT);
-
-        Integer index = command.getIndex();
-        assert index != null;
-        Task task = this.getTaskCollection().get(index);
-
-        final Task originalTaskCopy = task.clone();
-
-        // check which parameters have changed
-        if (command.hasParameter(Command.ParamName.TASK_NAME)) {
-            task.setTaskName(command.getParameter(Command.ParamName.TASK_NAME));
-        }
-        if (command.hasParameter(Command.ParamName.TASK_START)) {
-            task.setStartTime(command.getParameter(Command.ParamName.TASK_START));
-        }
-        if (command.hasParameter(Command.ParamName.TASK_END)) {
-            task.setEndTime(command.getParameter(Command.ParamName.TASK_END));
-        }
-
-        // wipe out redo stack
-        this.redoOperations.clear();
-
-        // add corresponding undo operation
-        this.undoOperations.push(v -> {
-
-            this.getTaskCollection().save(originalTaskCopy);
-
-            this.undoOperations.push(w -> {
-                this.handleEdit(command);
-                return (Void) null;
-            });
-            return (Void) null;
-        });
-
-        return this.displayAllTasks();
-    }
-
     protected ExecutionResult handleDisplay(Command command) {
         assert command.hasInstruction(Command.Instruction.DISPLAY);
         return this.displayAllTasks();
     }
 
-    protected ExecutionResult handleDelete(Command command) {
-        assert command.hasInstruction(Command.Instruction.DELETE);
-
-        // // Handle case where delete is aggregate
-        // // TODO: Make this undo-able
-        // if (command.isUniversallyQuantified()) {
-        // // For undoing
-        // this.getTaskCollection().getAll().stream()
-        // .map(Task::clone)
-        // .forEach(task -> task.setDeletedStatus(true));
-        // // Temporary
-        // this.getTaskCollection().getAll().stream()
-        // .mapToInt(Task::getId)
-        // .forEach(this.getTaskCollection()::remove);
-        // return this.displayAllTasks();
-        // }
-
-        Integer id = command.getIndex();
-        assert id != null;
-
-        Task deletedTask = this.getTaskCollection().get(id).clone();
-        deletedTask.setDeletedStatus(true);
-
-        // wipe out the redo stack
-        this.redoOperations.clear();
-
-        // add the corresponding undo operation
-        this.undoOperations.push(v -> {
-            this.getTaskCollection().undelete(id);
-
-            this.redoOperations.push(w -> {
-                this.handleDelete(command);
-                return (Void) null;
-            });
-
-            return (Void) null;
-        });
-
-        this.getTaskCollection().remove(id);
-        return this.displayAllTasks();
-    }
 
     protected ExecutionResult handleSearch(Command command) {
         assert command.hasInstruction(Command.Instruction.SEARCH);
@@ -238,26 +105,7 @@ public class DecisionEngine implements DecisionEngineSpec {
         return new ExecutionResult(ViewType.TASK_LIST, foundTask);
     }
 
-    protected ExecutionResult handleUndo(Command command) {
-        assert command.hasInstruction(Command.Instruction.UNDO);
 
-        // attempt an undo only if the undo stack is not empty
-        if (!this.undoOperations.isEmpty()) {
-            this.undoOperations.pop().apply(null);
-        }
-
-        return this.displayAllTasks();
-    }
-
-    protected ExecutionResult handleRedo(Command command) {
-        assert command.hasInstruction(Command.Instruction.UNDO);
-
-        if (!this.redoOperations.isEmpty()) {
-            this.redoOperations.pop().apply(null);
-        }
-
-        return this.displayAllTasks();
-    }
 
     @Override public ExecutionResult performCommand(Command command) {
 
