@@ -112,12 +112,13 @@
 
   "priorities": [{
     "meaning": "HIGH",
-    "keywords": ["high importance", "very important", "important"]
+    "keywords": ["high importance", "very important", "important", "high priority", "high prio"]
   }, {
     "meaning": "MEDIUM",
-    "keywords": ["medium importance", "normal importance"]
+    "keywords": ["medium importance", "normal importance", "medium priority", "normal priority",
+    "normal prio"]
   }, {
     "meaning": "LOW",
-    "keywords": ["low importance", "unimportant"]
+    "keywords": ["low importance", "unimportant", "low priority", "low prio"]
   }]
 }

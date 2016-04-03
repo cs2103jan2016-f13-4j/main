@@ -31,8 +31,9 @@ public class CommandInputController {
     private static final double PADDING_VERT_COMMAND_INPUT = 0.0;
     private static final int DELAY_HIGHLIGHT = 250;
     private static final String STYLE_CLASS_INSTRUCTION = "command__instruction";
-    private static final String STYLE_CLASS_PARAM = "command__param";
+    private static final String STYLE_CLASS_TIME = "command__time";
     private static final String STYLE_CLASS_NORMAL = "command__normal-text";
+    private static final String STYLE_CLASS_PRIORITY = "command__priority";
 
     @FXML private AnchorPane _commandInputContainer;
     private StyleClassedTextArea _inputField;
@@ -195,7 +196,12 @@ public class CommandInputController {
                 );
             } else if (matcher.group("DATE") != null || matcher.group("TIME") != null) {
                 spansBuilder.add(
-                        Collections.singleton(STYLE_CLASS_PARAM),
+                        Collections.singleton(STYLE_CLASS_TIME),
+                        matcher.end() - matcher.start()
+                );
+            } else if (matcher.group("PRIORITY") != null) {
+                spansBuilder.add(
+                        Collections.singleton(STYLE_CLASS_PRIORITY),
                         matcher.end() - matcher.start()
                 );
             }
