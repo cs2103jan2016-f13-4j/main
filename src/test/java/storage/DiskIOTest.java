@@ -1,7 +1,7 @@
 package storage;
 
+import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedReader;
@@ -10,14 +10,12 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import exception.ExceptionHandler;
-import shared.Task;
 
 /**
  *
@@ -109,9 +107,35 @@ public class DiskIOTest {
         this._diskIO.write(taskStrings);
 
         BufferedReader reader = new BufferedReader(new FileReader("tmp/ToDoData.csv"));
-        assertEquals("1,marketing pitch,client XYZ,2016-03-01T08:00,2016-03-09T14:30,2016-03-09T16:30,false,3", reader.readLine());
-        assertEquals("2,sales meeting,client ABC,2016-03-04T07:00,2016-03-11T12:00,2016-03-11T14:30,true,2", reader.readLine());
+        assertEquals("1,marketing pitch,client XYZ,2016-03-01T08:00,2016-03-09T14:30,2016-03-09T16:30,false,3",
+                reader.readLine());
+        assertEquals("2,sales meeting,client ABC,2016-03-04T07:00,2016-03-11T12:00,2016-03-11T14:30,true,2",
+                reader.readLine());
         reader.close();
     }
 
+    // ----------------------------------------------------------------------------------------
+    //
+    // III. User Preferences Tests
+    //
+    // ----------------------------------------------------------------------------------------
+    @Test public void Loading_user_preferences_from_file_correctly_assigns_custom_file_name() {
+        // Write a json file to disk
+        File file = new File("data/user/UserPreferences.json");
+        file.delete();
+        assertFalse(file.exists());
+        File folder = new File("data/user/UserPreferences.json").getParentFile();
+        folder.mkdirs();
+        BufferedWriter bufferedWriter;
+        try {
+            bufferedWriter = new BufferedWriter(new FileWriter(("data/user/UserPreferences.json")));
+            bufferedWriter.write("{\"todoDataPath\":\"/Users/Mary/Dropbox/ToDoData.csv\"}");
+            bufferedWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertTrue(file.exists());
+        this._diskIO.processUserPreferencesFile();
+        assertEquals("/Users/Mary/Dropbox/ToDoData.csv", this._diskIO.getFileName());
+    }
 }
