@@ -54,7 +54,7 @@ public class TranslationEngine implements TranslationEngineSpec {
     }
 
     @Override public void initialise() {
-        // Trigger initialisation of CommandParser
+        // Trigger initialisation of FlexiCommandParser
         this.getCommandParser().initialise();
 
         // Create input handler

@@ -20,9 +20,6 @@ import javafx.fxml.FXML;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.util.Pair;
-import logic.CommandParser;
-import shared.Command;
 import shared.Resources;
 
 /**
@@ -62,32 +59,6 @@ public class CommandInputController {
         // Prepare the hash map for dealing with finding a command reset
         // instruction
         this._instructionStyleClassMap = new LinkedHashMap<>();
-
-        // Get keyword data from Command Parser
-        LinkedHashMap<String, Command.Instruction> instructionMap = CommandParser.constructInstructionMap();
-
-        // Prepare a list of highlighted instruction words
-        List<String> highlightList = new ArrayList<>();
-
-        instructionMap.entrySet().stream()
-                // Turn into a pair of instruction keyword and the style class
-                // applied to it
-                // based on the instruction's original keyword. Refer to the
-                // CommandParser
-                // for the keywords
-                .map(entry -> {
-                    String instruction = entry.getKey();
-                    String styleClass = entry.getValue().toString().toLowerCase();
-
-                    // Also add this instruction to highlight list
-                    highlightList.add(instruction);
-
-                    return new Pair<>(instruction, styleClass);
-                })
-                // Point each of this keyword to the correct class and store
-                // them
-                // inside a Hash Map for easy referral later
-                .forEach(pair -> this._instructionStyleClassMap.put(pair.getKey(), pair.getValue()));
 
         // Create the instruction highlight pattern
         FlexiCommandParser parser = FlexiCommandParser.getInstance();
