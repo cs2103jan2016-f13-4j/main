@@ -18,7 +18,8 @@ public class TaskPriorityComparator implements Comparator<Task> {
     }
 
     @Override public int compare(Task task1, Task task2) {
-        int priorityComparison = task1.getPriority().compareTo(task2.getPriority());
+        // Priority comparison
+        int priorityComparison = task2.getPriority().compareTo(task1.getPriority());
         if (priorityComparison != 0) return priorityComparison;
 
         // Start time comparison
@@ -28,7 +29,8 @@ public class TaskPriorityComparator implements Comparator<Task> {
         }
 
         if (task1.getStartTime() != null && task2.getStartTime() != null) {
-            return task1.getStartTime().compareTo(task2.getStartTime());
+            int startTimeComparison = task1.getStartTime().compareTo(task2.getStartTime());
+            if (startTimeComparison != 0) return startTimeComparison;
         }
 
         // End time comparison
@@ -38,10 +40,11 @@ public class TaskPriorityComparator implements Comparator<Task> {
         }
 
         if (task1.getEndTime() != null && task2.getEndTime() != null) {
-            return task1.getEndTime().compareTo(task2.getEndTime());
+            int endTimeComparison = task1.getEndTime().compareTo(task2.getEndTime());
+            if (endTimeComparison != 0) return endTimeComparison;
         }
 
-        // Creation time comparision
+        // Creation time comparison
         return task1.getCreationTime().compareTo(task2.getCreationTime());
     }
 }
