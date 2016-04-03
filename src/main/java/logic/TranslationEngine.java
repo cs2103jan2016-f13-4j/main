@@ -66,8 +66,8 @@ public class TranslationEngine implements TranslationEngineSpec {
 
         // Attach input handler to user interface
         UserInterfaceSpec ui = this.getUserInterface();
-        ui.initialize();
         ui.setOnCommandInputHandler(commandInputHandler);
+        ui.initialize();
         ui.show();
     }
 

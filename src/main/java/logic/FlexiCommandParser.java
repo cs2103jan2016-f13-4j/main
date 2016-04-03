@@ -775,8 +775,15 @@ public class FlexiCommandParser implements CommandParserSpec {
             case DELETE:
             case MARK:
                 // Prepare index pattern
-                String indexPattern = "^(?<QUANTIFIER>all|" +
-                        "(?:task\\s+)?(?:number(?:ed)?\\s+)?\\d+)";
+                Set<String> universalQuantifiers = new TreeSet<>(Arrays.asList(
+                        "all", "everything"
+                ));
+                String quantifierPattern = String.join("|", universalQuantifiers.toArray(new String[0]));
+
+                String indexPattern = String.format(
+                        "^(?<QUANTIFIER>%s|(?:task\\s+)?(?:number(?:ed)?\\s+)?\\d+)",
+                        quantifierPattern
+                );
 
                 // Filler words at the end of the index pattern
                 Set<String> fillerWords = new CopyOnWriteArraySet<>(Arrays.asList("set", "to", "change"));
@@ -790,7 +797,7 @@ public class FlexiCommandParser implements CommandParserSpec {
                 String match;
 
                 if (matcher.find() && (match = matcher.group("QUANTIFIER")) != null) {
-                    if (match.equals("all")) {
+                    if (universalQuantifiers.contains(match)) {
                         // Cannot universally quantify edit command
                         if (command.getInstruction() == Command.Instruction.EDIT) {
                             return Command.invalidCommand();
