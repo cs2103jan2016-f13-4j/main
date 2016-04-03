@@ -112,6 +112,10 @@ public class Command {
         return this._parameters.keySet().size();
     }
 
+    public void setUniversallyQuantified() {
+        this._isUniversallyQuantified = true;
+    }
+
     /**
      * Special types of commands
      */

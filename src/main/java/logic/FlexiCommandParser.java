@@ -194,10 +194,10 @@ public class FlexiCommandParser implements CommandParserSpec {
      |                                                                                                |
      *===============================================================================================*/
     private String constructInstructionRegex() {
-        StringBuilder sb = new StringBuilder("(?<INST>^\\s*");
+        StringBuilder sb = new StringBuilder("^\\b(?<INST>");
         Set<String> instructionKeywords = this._commandDefinitions.getInstructionKeywords();
         sb.append(constructChoiceRegex(instructionKeywords));
-        sb.append(")");
+        sb.append(")\\b");
         return sb.toString();
     }
 
@@ -775,7 +775,8 @@ public class FlexiCommandParser implements CommandParserSpec {
             case DELETE:
             case MARK:
                 // Prepare index pattern
-                String indexPattern = "^(?:task\\s+)?(?:number(?:ed)?\\s+)?(?<TASKID>\\d+)";
+                String indexPattern = "^(?<QUANTIFIER>all|" +
+                        "(?:task\\s+)?(?:number(?:ed)?\\s+)?\\d+)";
 
                 // Filler words at the end of the index pattern
                 Set<String> fillerWords = new CopyOnWriteArraySet<>(Arrays.asList("set", "to", "change"));
@@ -786,15 +787,29 @@ public class FlexiCommandParser implements CommandParserSpec {
                 Pattern taskIdPattern = Pattern.compile(String.format("%s(?:\\s+%s)*",
                         indexPattern, fillerPattern), Pattern.CASE_INSENSITIVE);
                 Matcher matcher = taskIdPattern.matcher(commandString);
-                if (matcher.find()) {
-                    int taskId = Integer.parseInt(matcher.group("TASKID"));
+                String match;
+
+                if (matcher.find() && (match = matcher.group("QUANTIFIER")) != null) {
+                    if (match.equals("all")) {
+                        // Cannot universally quantify edit command
+                        if (command.getInstruction() == Command.Instruction.EDIT) {
+                            return Command.invalidCommand();
+                        }
+
+                        command.setUniversallyQuantified();
+                        return command;
+                    }
+
+                    match = match.replaceAll("[^0-9]","");
+                    // Parse ID
+                    int taskId = Integer.parseInt(match);
                     command.setIndex(taskId);
                     commandString = commandString.substring(matcher.end()).trim();
                 } else {
                     // TODO: Handle case where id not found
                 }
 
-                // Break here if not edit
+                // Break if instruction is not EDIT, don't need extra parameters
                 if (instruction != Command.Instruction.EDIT) {
                     break;
                 }

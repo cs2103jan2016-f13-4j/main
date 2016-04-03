@@ -3,10 +3,12 @@ package logic;
 import org.junit.Before;
 import org.junit.Test;
 import shared.Command;
+import shared.CustomTime;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.regex.Matcher;
@@ -33,7 +35,7 @@ public class FlexiCommandParserTest {
     @Test public void FlexiCommandParser_creates_correct_instruction_pattern() {
         final Pattern instructionPattern = Pattern.compile(this._parser.getInstructionPattern(), Pattern.CASE_INSENSITIVE);
         String command = "   ADD a new thing";
-        Matcher m = instructionPattern.matcher(command);
+        Matcher m = instructionPattern.matcher(command.trim());
         assertTrue(m.find());
         assertThat(m.group("INST").trim().toLowerCase(), is(equalTo("add")));
     }
@@ -113,7 +115,7 @@ public class FlexiCommandParserTest {
         assertThat(command.getParameter(Command.ParamName.TASK_NAME),
                 is(equalTo("talk cock sing song")));
         assertThat(command.getParameter(Command.ParamName.TASK_END),
-                is(equalTo(LocalDateTime.now().plusDays(1).truncatedTo(ChronoUnit.DAYS))));
+                is(equalTo(CustomTime.tomorrowAt(null))));
     }
 
     @Test public void FlexiCommandParser_parses_PM_time_correctly() {
@@ -166,10 +168,17 @@ public class FlexiCommandParserTest {
     }
 
     @Test public void FlexiCommandParser_parses_edit_without_task_name_correctly() {
-        String commandString = "edit task number 10 to starting at same day 10pm";
+        String commandString = "edit task number 10 to starting same day 10pm";
         Command command = this._parser.parse(commandString);
         assertThat(command.getParameter(Command.ParamName.TASK_NAME), is(nullValue()));
-        LocalDateTime newTime = LocalDateTime.MIN.withHour(22).truncatedTo(ChronoUnit.HOURS);
+        CustomTime newTime = new CustomTime(null, LocalTime.of(22,0));
         assertThat(command.getParameter(Command.ParamName.TASK_START), is(equalTo(newTime)));
+    }
+
+    @Test public void FlexiCommandParser_parses_universally_delete_command_correctly() {
+        String commandString = "delete all tasks";
+        Command command = this._parser.parse(commandString);
+        assertThat(command.getInstruction(), is(Command.Instruction.DELETE));
+        assertThat(command.isUniversallyQuantified(), is(true));
     }
 }
