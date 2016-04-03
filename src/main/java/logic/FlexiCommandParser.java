@@ -1,10 +1,7 @@
 package logic;
 
 import java.lang.reflect.Type;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -36,7 +33,7 @@ import skeleton.CommandParserSpec;
 public class FlexiCommandParser implements CommandParserSpec {
 
     private static final String NAME_FILE_DATA = "CommandParserData.json";
-    private static final String PATTERN_TIME = "\\d{1,2}:?(?:\\d{2})?(?:\\s*(?:am|pm))?";
+    private static final String PATTERN_TIME = "(?:\\d|:(?=\\d(?<=\\d))){1,5}(?:\\s*(?:am|pm))?";
     private static final char CHAR_QUOTE = '\"';
 
     /**
@@ -257,9 +254,28 @@ public class FlexiCommandParser implements CommandParserSpec {
             this._commandDefinitions.getWithoutPrepositionsTimeNounKeywords()
         );
 
+        // Construct pattern with specific date
+        Set<String> unchainablePrepositions = this._commandDefinitions.getTimePrepositions().stream()
+                .filter(prep -> !prep.isChainable())
+                .map(TimePreposition::getKeywords)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toSet());
+        String unchainablePrepositionChoices = constructNotSurroundedByQuotesRegex(
+                constructChoiceRegex(unchainablePrepositions, "PREP")
+        );
+
+        StringBuilder specificDateRegex = new StringBuilder();
+        specificDateRegex.append(unchainablePrepositionChoices);
+        specificDateRegex.append("\\s+");
+
+        specificDateRegex.append("(?:(?<YEAR>\\d{4})\\s*|(?<DAY>\\b\\d{1,2})(?:st|nd|rd|th)?\\b" +
+                "\\s*|(?<MONTH>january|february|march|april|may|june|july|august|september|" +
+                "october|november|december|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\\s*)+");
+
         // Construct time regex
-        return String.format("(?<DATE>%s)(?:'s)?\\s*(?<TIME>%s)?",
+        return String.format("(?:(?<DATE>%s)|%s)(?:'s)?\\s*(?<TIME>%s)?",
                 constructChoiceRegex(compressedTimeClauses),
+                specificDateRegex,
                 PATTERN_TIME);
     }
 
@@ -300,6 +316,7 @@ public class FlexiCommandParser implements CommandParserSpec {
 
         private Map<TimeNounMeaning, Set<TimePrepositionMeaning>> _adjacencyList;
         private HashMap<String, Command.Instruction> _commandKeywordInversionMap;
+        private HashMap<String, TimePrepositionMeaning> _timePrepositionInversionMap;
 
 
         // Caching
@@ -318,6 +335,7 @@ public class FlexiCommandParser implements CommandParserSpec {
             this._adjacencyList = new LinkedTreeMap<>();
 
             this._commandKeywordInversionMap = new HashMap<>();
+            this._timePrepositionInversionMap = new HashMap<>();
         }
 
         /**
@@ -346,6 +364,7 @@ public class FlexiCommandParser implements CommandParserSpec {
                     keywordSet,
                     isChainable
             ));
+            keywordSet.stream().forEach(keyword -> this._timePrepositionInversionMap.put(keyword, realMeaning));
         }
 
         /**
@@ -546,6 +565,10 @@ public class FlexiCommandParser implements CommandParserSpec {
 
         public TimeClause getTimeClause(String date) {
             return this.getTimeClauses().get(date);
+        }
+
+        public TimePrepositionMeaning getPrepositionMeaning(String preposition) {
+            return this._timePrepositionInversionMap.get(preposition);
         }
     }
 
@@ -901,38 +924,78 @@ public class FlexiCommandParser implements CommandParserSpec {
 
 
     private Pair<Command.ParamName, CustomTime> parseDateTime(Matcher matcher) {
-        String date = matcher.group("DATE");
+        String date;
         String time = matcher.group("TIME");
 
-        // TODO: Handle case when date is null
         CustomTime dateTime;
         Command.ParamName dateType = null;
 
-        assert date != null;
-        date = date.toLowerCase();
-        TimeClause clause = this._commandDefinitions.getTimeClause(date);
-        if (clause.getPrepositionMeanings().contains(TimePrepositionMeaning.STARTING)) {
-            dateType = Command.ParamName.TASK_START;
-        } else if (clause.getPrepositionMeanings().contains(TimePrepositionMeaning.ENDING)) {
-            dateType = Command.ParamName.TASK_END;
-        }
+        if ((date = matcher.group("DATE")) != null) {
+            date = date.toLowerCase();
+            TimeClause clause = this._commandDefinitions.getTimeClause(date);
+            if (clause.getPrepositionMeanings().contains(TimePrepositionMeaning.STARTING)) {
+                dateType = Command.ParamName.TASK_START;
+            } else if (clause.getPrepositionMeanings().contains(TimePrepositionMeaning.ENDING)) {
+                dateType = Command.ParamName.TASK_END;
+            }
 
-        switch (clause.getNoun()) {
-            case SAME_DAY:
-                dateTime = new CustomTime(null, null);
-            case TODAY:
-                dateTime = CustomTime.todayAt(null);
-                break;
-            case TOMORROW:
-                dateTime = CustomTime.tomorrowAt(null);
-                break;
-            case NOW:
-                dateTime = CustomTime.now();
-                break;
-            default:
-                assert clause.getNoun().dayOfWeek != null;
-                dateTime = CustomTime.now().next(clause.getNoun().dayOfWeek);
-                break;
+            switch (clause.getNoun()) {
+                case SAME_DAY:
+                    dateTime = new CustomTime(null, null);
+                case TODAY:
+                    dateTime = CustomTime.todayAt(null);
+                    break;
+                case TOMORROW:
+                    dateTime = CustomTime.tomorrowAt(null);
+                    break;
+                case NOW:
+                    dateTime = CustomTime.now();
+                    break;
+                default:
+                    assert clause.getNoun().dayOfWeek != null;
+                    dateTime = CustomTime.todayAt(null).next(clause.getNoun().dayOfWeek);
+                    break;
+            }
+        } else {
+            String preposition = matcher.group("PREP");
+            String day = matcher.group("DAY");
+            String month = matcher.group("MONTH");
+            String year = matcher.group("YEAR");
+
+            TimePrepositionMeaning prepositionMeaning =
+                    this._commandDefinitions.getPrepositionMeaning(preposition);
+            // This is ensured by regex
+            assert prepositionMeaning == TimePrepositionMeaning.STARTING ||
+                    prepositionMeaning == TimePrepositionMeaning.ENDING;
+            if (prepositionMeaning == TimePrepositionMeaning.STARTING)  {
+                dateType = Command.ParamName.TASK_START;
+            } else {
+                dateType = Command.ParamName.TASK_END;
+            }
+
+            if (day == null) {
+                // Day cannot be null
+                return null;
+            }
+
+            int dayNumber = Integer.parseInt(day);
+            Month monthValue = LocalDate.now().getMonth();
+            if (month != null) {
+                final String shortenedMonth = month.toLowerCase().substring(0, 3);
+                Month parsedMonthValue = Arrays.asList(Month.values()).stream()
+                        .filter(m -> m.name().toLowerCase().substring(0, 3).equals(shortenedMonth))
+                        .findFirst().orElse(null);
+                if (parsedMonthValue != null) {
+                    monthValue = parsedMonthValue;
+                }
+            }
+
+            int yearValue = LocalDate.now().getYear();
+            if (year != null) {
+                yearValue = Integer.parseInt(year);
+            }
+
+            dateTime = new CustomTime(LocalDate.of(yearValue, monthValue, dayNumber), null);
         }
 
         // Return result straight away if time is null
@@ -996,7 +1059,7 @@ public class FlexiCommandParser implements CommandParserSpec {
         return array;
     }
 
-    private static String constructChoiceRegex(Set<String> choices) {
+    private static String constructChoiceRegex(Set<String> choices, String groupName) {
         // Borderline cases
         if (choices.size() == 0) {
             return "";
@@ -1014,9 +1077,15 @@ public class FlexiCommandParser implements CommandParserSpec {
             }
             sb.append(choice);
         }
-        sb.insert(0, "(?:");
+        sb.insert(0, String.format("(?%s", groupName != null ?
+                "<" + groupName + ">" : ":"
+        ));
         sb.append(")");
         return sb.toString();
+    }
+
+    private static String constructChoiceRegex(Set<String> choices) {
+        return constructChoiceRegex(choices, null);
     }
 
     private static String constructNotSurroundedByQuotesRegex(String currentRegex) {

@@ -75,7 +75,7 @@ public class CustomTime implements Comparable<CustomTime> {
     }
 
     public CustomTime next(DayOfWeek dayOfWeek) {
-        if (!this.hasTime()) {
+        if (!this.hasDate()) {
             return null;
         }
         int thisDoW = this.getDate().getDayOfWeek().getValue();

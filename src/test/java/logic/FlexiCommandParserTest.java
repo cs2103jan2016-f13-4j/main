@@ -5,10 +5,7 @@ import org.junit.Test;
 import shared.Command;
 import shared.CustomTime;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.regex.Matcher;
@@ -181,5 +178,43 @@ public class FlexiCommandParserTest {
         assertThat(command.getInstruction(), is(Command.Instruction.DELETE));
         assertThat(command.isUniversallyQuantified(), is(true));
         assertThat(command.getIndex(), is(nullValue()));
+    }
+
+    @Test public void FlexiCommandParser_parses_specific_date_correctly() {
+        String commandString = "add take out the trash from 4 mar to next week's Thursday";
+        Command command = this._parser.parse(commandString);
+        assertThat(command.getInstruction(), is(Command.Instruction.ADD));
+
+        CustomTime fourthMarch = new CustomTime(LocalDate.of(
+                LocalDate.now().getYear(),
+                Month.MARCH,
+                4
+        ), null);
+        assertThat(command.getParameter(Command.ParamName.TASK_START),
+                is(equalTo(fourthMarch)));
+        assertThat(command.getParameter(Command.ParamName.TASK_END),
+                is(equalTo(CustomTime.todayAt(null).next(DayOfWeek.THURSDAY))));
+    }
+
+    @Test public void FlexiCommandParser_parses_specific_date_with_time_correctly() {
+        String commandString = "add go to the gym from Mar 25th 2016's 7pm to 8 apr 330";
+        Command command = this._parser.parse(commandString);
+
+        CustomTime startTime = new CustomTime(
+                LocalDate.of(2016, Month.MARCH, 25),
+                LocalTime.of(19, 0),
+                ChronoUnit.HOURS
+        );
+
+        CustomTime endTime = new CustomTime(
+                LocalDate.of(LocalDate.now().getYear(), Month.APRIL, 8),
+                LocalTime.of(3,30),
+                ChronoUnit.MINUTES
+        );
+
+        assertThat(command.getParameter(Command.ParamName.TASK_START),
+                is(equalTo(startTime)));
+        assertThat(command.getParameter(Command.ParamName.TASK_END),
+                is(equalTo(endTime)));
     }
 }
