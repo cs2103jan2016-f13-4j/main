@@ -108,6 +108,10 @@ public class Command {
         return sb.toString();
     }
 
+    public int getParametersCount() {
+        return this._parameters.keySet().size();
+    }
+
     /**
      * Special types of commands
      */

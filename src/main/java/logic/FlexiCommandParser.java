@@ -769,7 +769,7 @@ public class FlexiCommandParser implements CommandParserSpec {
         switch (instruction) {
             case ADD:
                 // Try to find time and priority first
-                this.parseParameters(commandString, command);
+                command = this.parseParameters(commandString, command);
                 break;
             case EDIT:
             case DELETE:
@@ -799,7 +799,7 @@ public class FlexiCommandParser implements CommandParserSpec {
                     break;
                 }
 
-                this.parseParameters(commandString, command);
+                command = this.parseParameters(commandString, command);
                 break;
             case SEARCH:
                 // Prepare query pattern
@@ -808,6 +808,12 @@ public class FlexiCommandParser implements CommandParserSpec {
                 Matcher matcher2 = searchFillerPattern.matcher(commandString);
                 if (matcher2.find()) {
                     commandString = commandString.substring(matcher2.end()).trim();
+                }
+
+                // No empty search phrase
+                if (commandString.isEmpty()) {
+                    command = Command.invalidCommand();
+                    break;
                 }
 
                 command.setParameter(Command.ParamName.SEARCH_QUERY, commandString);
@@ -841,7 +847,7 @@ public class FlexiCommandParser implements CommandParserSpec {
         return instruction;
     }
 
-    private void parseParameters(String commandString, Command command) {
+    private Command parseParameters(String commandString, Command command) {
         Pattern timePattern = Pattern.compile(this.getTimePattern(), Pattern.CASE_INSENSITIVE);
         Matcher matcher = timePattern.matcher(commandString);
         int lowestFoundIndex = commandString.length();
@@ -863,6 +869,12 @@ public class FlexiCommandParser implements CommandParserSpec {
         if (!taskName.trim().isEmpty()) {
             command.setParameter(Command.ParamName.TASK_NAME, taskName);
         }
+
+        if (command.getParametersCount() == 0) {
+            return Command.invalidCommand();
+        }
+
+        return command;
     }
 
 

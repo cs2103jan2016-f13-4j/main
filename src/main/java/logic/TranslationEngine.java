@@ -114,6 +114,15 @@ public class TranslationEngine implements TranslationEngineSpec {
             VisualIndexMapper.getInstance().translateVisualToRaw(command);
         }
 
+        // Catch unrecognised or invalid command
+        if (command.getInstruction() == Command.Instruction.INVALID) {
+            this.getUserInterface().showNotification("Oops! There is something wrong with your command");
+            return;
+        } else if (command.getInstruction() == Command.Instruction.UNRECOGNISED) {
+            this.getUserInterface().showNotification("Oops! I don't really understand what you are saying");
+            return;
+        }
+
         // Set last command to this command
         this._lastCommand = command;
 
@@ -163,7 +172,7 @@ public class TranslationEngine implements TranslationEngineSpec {
                     message = String.format("Deleted task number %d! You can undo this by entering \"undo\"",
                             this._lastCommand.getIndex());
                     break;
-                case  SEARCH:
+                case SEARCH:
                     int searchFound = ((List<?>) result.getData()).size();
                     String searchQuery = this._lastCommand.getParameter(Command.ParamName.SEARCH_QUERY);
                     if (searchFound == 0) {
