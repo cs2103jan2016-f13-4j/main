@@ -79,6 +79,11 @@ public class CommandParser implements CommandParserSpec {
         return instance;
     }
 
+    @Override
+    public void initialise() {
+
+    }
+
     /**
      * TODO: Write JavaDoc
      *

@@ -16,9 +16,9 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.Pair;
+import shared.CustomTime;
 import shared.Resources;
 import shared.Task;
-import ui.controller.DateFormatterHelper;
 import ui.controller.TaskListController;
 
 /**
@@ -37,7 +37,6 @@ public class TaskListView extends View {
     private TaskListController _listControl;
     private List<Pair<Integer, Task>> _displayList;
     private int _viewIndex;
-
 
     /**
      * Constructs a new view containing the provided data
@@ -63,13 +62,12 @@ public class TaskListView extends View {
     public static class Item extends ListCell<Pair<Integer, Task>> {
         private static final String STRING_NAME_TEMPLATE = "TaskListItem";
         private static final String STRING_DATE_PATTERN = "EE ha";
-        private static final String STRING_TIMING_PATTERN = "%s\n to %s";
 
         @FXML private AnchorPane _container;
         @FXML private Label _indexLabel;
         @FXML private Label _nameLabel;
         @FXML private Label _dateLabel;
-        private DateFormatterHelper _dateRenderer = new DateFormatterHelper();
+        private DateTimeFormatter _df = DateTimeFormatter.ofPattern(STRING_DATE_PATTERN);
 
         public Item() {
             super();
@@ -89,16 +87,12 @@ public class TaskListView extends View {
             } else {
                 int index = item.getKey();
                 Task task = item.getValue();
-                LocalDateTime startTime = task.getStartTime();
-                LocalDateTime endTime = task.getEndTime();
+                CustomTime startTime = task.getStartTime();
                 this._indexLabel.setText(Integer.toString(index));
                 this._nameLabel.setText(task.getTaskName());
 
                 // Optional date time to support floating tasks
-                String displayStart = _dateRenderer.getDateDisplay(startTime);
-                String displayEnd = _dateRenderer.getDateDisplay(endTime);
-                this._dateLabel.setText(String.format(STRING_TIMING_PATTERN,displayStart,displayEnd)); // TODO:
-                                                                                         // stub
+                this._dateLabel.setText(startTime != null ? startTime.toString() : "");
 
                 this.setGraphic(this._container);
             }
