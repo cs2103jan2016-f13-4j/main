@@ -1,10 +1,12 @@
 package ui;
 
 import javafx.scene.Scene;
+import javafx.scene.SceneAntialiasing;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import javafx.util.Pair;
 import shared.ApplicationContext;
 import shared.Resources;
@@ -66,6 +68,10 @@ public class UserInterface implements UserInterfaceSpec {
 
         // Set primary stage
         this._primaryStage = ApplicationContext.mainContext().getPrimaryStage();
+        if (this._primaryStage.isShowing()) {
+            this._primaryStage.initStyle(StageStyle.UNDECORATED);
+        }
+
         this._primaryStage.getIcons().add(Resources.getInstance().getImage("mom.png"));
 
         this.initializeFonts();
@@ -83,8 +89,8 @@ public class UserInterface implements UserInterfaceSpec {
 
     private void setRootView() {
         this._rootView = Resources.getInstance().getComponent("Window");
-
-        this._primaryStage.setScene(new Scene(this._rootView));
+        Scene rootScene = new Scene(this._rootView);
+        this._primaryStage.setScene(rootScene);
         this._primaryStage.setTitle("Your MOM");
         this._primaryStage.setResizable(false);
     }

@@ -1,0 +1,120 @@
+{
+  "instructions": [
+    {
+      "name": "ADD",
+      "keywords": ["add", "create"]
+    }, {
+      "name": "DISPLAY",
+      "keywords": ["display", "view", "show"]
+    }, {
+      "name": "MARK",
+      "keywords": ["mark", "complete", "done"]
+    }, {
+      "name": "EDIT",
+      "keywords": ["edit", "change", "modify", "update"]
+    }, {
+      "name": "SEARCH",
+      "keywords": ["search", "find"]
+    }, {
+      "name": "UNDO",
+      "keywords": ["undo"]
+    }, {
+      "name": "DELETE",
+      "keywords": ["delete", "remove"]
+    }, {
+      "name": "TUTORIAL",
+      "keywords": ["tutorial", "help", "gitgud"]
+    }, {
+      "name": "EXIT",
+      "keywords": ["exit", "quit"]
+    }
+  ],
+
+  "timePrepositions": [{
+    "meaning": "CURRENT",
+    "keywords": ["on", "this", "coming", "on this", "this coming", "on this coming"],
+    "chainable": true
+  }, {
+    "meaning": "NEXT",
+    "keywords": ["next", "next week's"],
+    "chainable": true
+  }, {
+    "meaning": "STARTING",
+    "keywords": ["from", "starting", "after", "start from", "starting at"],
+    "chainable": false
+  }, {
+    "meaning": "ENDING",
+    "keywords": ["to", "ending", "until", "before", "due", "end", "ending at"],
+    "chainable": false
+  }],
+
+  "timeNouns": [{
+    "meaning": "SAME_DAY",
+    "keywords": ["same day"],
+    "prepositions": ["STARTING", "ENDING"],
+    "canGoWithoutPrepositions": false
+  }, {
+    "meaning": "NOW",
+    "keywords": ["now"],
+    "prepositions": ["STARTING"],
+    "canGoWithoutPrepositions": true
+  }, {
+    "meaning": "TODAY",
+    "keywords": ["today"],
+    "prepositions": ["STARTING", "ENDING"],
+    "canGoWithoutPrepositions": true
+  }, {
+    "meaning": "TOMORROW",
+    "keywords": ["tomorrow"],
+    "prepositions": ["STARTING", "ENDING"],
+    "canGoWithoutPrepositions": true
+  }, {
+    "meaning": "MONDAY",
+    "keywords": ["monday", "mon"],
+    "prepositions": ["CURRENT", "NEXT", "STARTING", "ENDING"],
+    "canGoWithoutPrepositions": false
+  }, {
+    "meaning": "TUESDAY",
+    "keywords": ["tuesday", "tue"],
+    "prepositions": ["CURRENT", "NEXT", "STARTING", "ENDING"],
+    "canGoWithoutPrepositions": false
+  }, {
+    "meaning": "WEDNESDAY",
+    "keywords": ["wednesday", "wed"],
+    "prepositions": ["CURRENT", "NEXT", "STARTING", "ENDING"],
+    "canGoWithoutPrepositions": false
+  }, {
+    "meaning": "THURSDAY",
+    "keywords": ["thursday", "thu"],
+    "prepositions": ["CURRENT", "NEXT", "STARTING", "ENDING"],
+    "canGoWithoutPrepositions": false
+  }, {
+    "meaning": "FRIDAY",
+    "keywords": ["friday", "fri"],
+    "prepositions": ["CURRENT", "NEXT", "STARTING", "ENDING"],
+    "canGoWithoutPrepositions": false
+  }, {
+    "meaning": "SATURDAY",
+    "keywords": ["saturday", "sat"],
+    "prepositions": ["CURRENT", "NEXT", "STARTING", "ENDING"],
+    "canGoWithoutPrepositions": false
+  }, {
+    "meaning": "SUNDAY",
+    "keywords": ["sunday", "sun"],
+    "prepositions": ["CURRENT", "NEXT", "STARTING", "ENDING"],
+    "canGoWithoutPrepositions": false
+  }],
+
+  "priorityPrepositions": ["with", "as", "of"],
+
+  "priorities": [{
+    "meaning": "HIGH",
+    "keywords": ["high importance", "very important", "important"]
+  }, {
+    "meaning": "MEDIUM",
+    "keywords": ["medium importance", "normal importance"]
+  }, {
+    "meaning": "LOW",
+    "keywords": ["low importance", "unimportant"]
+  }]
+}

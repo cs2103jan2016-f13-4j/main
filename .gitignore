@@ -102,3 +102,6 @@ data/
 
 ###Collate###
 **/collated/
+
+###Project Specific###
+!src/main/resources/data

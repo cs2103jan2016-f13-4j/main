@@ -16,6 +16,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.Pair;
+import shared.CustomTime;
 import shared.Resources;
 import shared.Task;
 import ui.controller.TaskListController;
@@ -86,13 +87,12 @@ public class TaskListView extends View {
             } else {
                 int index = item.getKey();
                 Task task = item.getValue();
-                LocalDateTime startTime = task.getStartTime();
+                CustomTime startTime = task.getStartTime();
                 this._indexLabel.setText(Integer.toString(index));
                 this._nameLabel.setText(task.getTaskName());
 
                 // Optional date time to support floating tasks
-                this._dateLabel.setText(startTime != null ? _df.format(startTime) : ""); // TODO:
-                                                                                         // stub
+                this._dateLabel.setText(startTime != null ? startTime.toString() : "");
 
                 this.setGraphic(this._container);
             }

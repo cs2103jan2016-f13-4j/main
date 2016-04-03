@@ -8,10 +8,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import shared.Command;
-import shared.ExecutionResult;
-import shared.Task;
-import shared.ViewType;
+import shared.*;
 import skeleton.CollectionSpec;
 import skeleton.DecisionEngineSpec;
 import skeleton.SchedulerSpec;
@@ -80,8 +77,8 @@ public class DecisionEngine implements DecisionEngineSpec {
     protected Task createTask(Command cmd) {
         // initialisation
         String name = null;
-        LocalDateTime from = null;
-        LocalDateTime to = null;
+        CustomTime from = null;
+        CustomTime to = null;
 
         // for each command parameter, check if it was supplied
         // if so, extract the value and set the appropriate reference above to
