@@ -50,7 +50,7 @@ public class DecisionEngine implements DecisionEngineSpec {
         List<Task> listToDisplay = this.getTaskCollection().getAll().stream()
                 .sorted(TaskPriorityComparator.getInstance()).collect(Collectors.toList());
 
-        return new ExecutionResult(ViewType.TASK_LIST, listToDisplay, null);
+        return new ExecutionResult(ViewType.TASK_LIST, listToDisplay);
     }
 
     protected ExecutionResult handleDisplay(Command command) {
@@ -82,7 +82,7 @@ public class DecisionEngine implements DecisionEngineSpec {
         }
 
         // at this point, we have a properly filtered list
-        return new ExecutionResult(ViewType.TASK_LIST, listToDisplay, null);
+        return new ExecutionResult(ViewType.TASK_LIST, listToDisplay);
     }
 
 
@@ -116,7 +116,7 @@ public class DecisionEngine implements DecisionEngineSpec {
                 .map(Pair::getValue)
                 .collect(Collectors.toList());
 
-        return new ExecutionResult(ViewType.TASK_LIST, foundTask , null);
+        return new ExecutionResult(ViewType.TASK_LIST, foundTask);
     }
 
 
@@ -153,12 +153,18 @@ public class DecisionEngine implements DecisionEngineSpec {
                 result = this.handleSearch(command);
                 break;
             case UNDO:
-                StorageWriteOperationHistory.getInstance().undo();
+                boolean undoActuallyHappened = StorageWriteOperationHistory.getInstance().undo();
                 result = this.displayAllTasks();
+                if (!undoActuallyHappened) {
+                    result.setErrorMessage("No tasks to undo!");
+                }
                 break;
             case REDO:
-                StorageWriteOperationHistory.getInstance().redo();
+                boolean redoActuallyHappened = StorageWriteOperationHistory.getInstance().redo();
                 result = this.displayAllTasks();
+                if (!redoActuallyHappened) {
+                    result.setErrorMessage("No tasks to redo");
+                }
                 break;
             default:
                 // if we reach this point, LTA Command Parser has failed in his duty
