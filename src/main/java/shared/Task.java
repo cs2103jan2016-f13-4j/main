@@ -25,7 +25,7 @@ public class Task implements Comparable<Task> {
     private CustomTime _startTime;
     private CustomTime _endTime;
     private final LocalDateTime _creationTime;
-    private boolean _isCompleted;
+    private Boolean _isCompleted;
     private Priority _priority;
     private boolean _isDeleted;
 
@@ -66,7 +66,7 @@ public class Task implements Comparable<Task> {
      * @param endTime
      */
     public Task(Integer id, String taskName, String description, CustomTime startTime, CustomTime endTime) {
-        this(id, taskName, description, LocalDateTime.now(), startTime, endTime, Priority.LOW, false);
+        this(id, taskName, description, LocalDateTime.now(), startTime, endTime, false, Priority.LOW, false);
     }
 
     public Task(Integer id, String taskName, String description, LocalDateTime startTime, LocalDateTime endTime) {
@@ -75,12 +75,14 @@ public class Task implements Comparable<Task> {
 
     // copy ctor, used to construct an identical copy in the clone method
     private Task(Task o) {
-        this(o._id, o._taskName, o._description, o._creationTime, o._startTime, o._endTime, o._isCompleted, o._priority,
-                o._isDeleted);
+        this(o._id, o._taskName, o._description, o._creationTime,
+                o._startTime,
+                o._endTime,
+                o._isCompleted, o._priority, o._isDeleted);
     }
 
     private Task(Integer id, String taskName, String description, LocalDateTime creationTime, CustomTime startTime,
-            CustomTime endTime, Priority priority, boolean isDeleted) {
+            CustomTime endTime, boolean isCompleted, Priority priority, boolean isDeleted) {
         this._id = id;
         this._taskName = taskName;
         this._description = description;
@@ -89,6 +91,7 @@ public class Task implements Comparable<Task> {
         this._endTime = endTime;
         this._isCompleted = isCompleted;
         this._priority = priority;
+        this._isDeleted = isDeleted;
     }
 
     @Override public Task clone() {
@@ -184,7 +187,9 @@ public class Task implements Comparable<Task> {
         CustomTime startTime = CustomTime.fromString(taskValues.get(4).trim());
         CustomTime endTime   = CustomTime.fromString(taskValues.get(5).trim());
 
-        int priorityValue = Integer.parseInt(taskValues.get(6));
+        boolean isCompleted = taskValues.get(6).trim().toLowerCase().equals("true");
+
+        int priorityValue = Integer.parseInt(taskValues.get(7));
         final Priority[] priority = new Priority[] { Priority.LOW };
         Arrays.stream(Priority.values()).filter(p -> p.getPriorityValue() == priorityValue).findFirst()
                 .ifPresent(p -> priority[0] = p);
