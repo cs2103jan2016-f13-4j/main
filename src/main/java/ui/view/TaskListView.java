@@ -13,6 +13,7 @@ import javafx.util.Pair;
 import shared.CustomTime;
 import shared.Resources;
 import shared.Task;
+import ui.controller.DateFormatterHelper;
 import ui.controller.TaskListController;
 
 import java.time.format.DateTimeFormatter;
@@ -66,7 +67,7 @@ public class TaskListView extends View {
         @FXML private Label _indexLabel;
         @FXML private Label _nameLabel;
         @FXML private Label _dateLabel;
-        private DateTimeFormatter _df = DateTimeFormatter.ofPattern(STRING_DATE_PATTERN);
+        private DateFormatterHelper _df = new DateFormatterHelper();
 
         public Item() {
             super();
@@ -86,12 +87,12 @@ public class TaskListView extends View {
             } else {
                 int index = item.getKey();
                 Task task = item.getValue();
-                CustomTime startTime = task.getStartTime();
+
                 this._indexLabel.setText(Integer.toString(index));
                 this._nameLabel.setText(task.getTaskName());
 
                 // Optional date time to support floating tasks
-                this._dateLabel.setText(startTime != null ? startTime.toString() : "");
+                this._dateLabel.setText(_df.getPairDateDisplay(task.getStartTime(),task.getEndTime()));
 
                 this.setGraphic(this._container);
             }

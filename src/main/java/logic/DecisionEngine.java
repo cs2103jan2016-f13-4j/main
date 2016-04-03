@@ -100,7 +100,7 @@ public class DecisionEngine implements DecisionEngineSpec {
         List<Task> listToDisplay = this.getTaskCollection().getAll().stream()
                 .sorted(TaskPriorityComparator.getInstance()).collect(Collectors.toList());
 
-        return new ExecutionResult(ViewType.TASK_LIST, listToDisplay);
+        return new ExecutionResult(ViewType.TASK_LIST, listToDisplay,null);
     }
 
     protected ExecutionResult handleAdd(Command command) {
@@ -235,7 +235,7 @@ public class DecisionEngine implements DecisionEngineSpec {
             return m.find();
         }).collect(Collectors.toList());
 
-        return new ExecutionResult(ViewType.TASK_LIST, foundTask);
+        return new ExecutionResult(ViewType.TASK_LIST, foundTask , null);
     }
 
     protected ExecutionResult handleUndo(Command command) {
