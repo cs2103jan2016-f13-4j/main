@@ -143,7 +143,7 @@ public class FlexiCommandParserTest {
         Command command = this._parser.parse(commandString);
 
         assertThat(command.getInstruction(), is(Command.Instruction.EDIT));
-        assertThat(command.getIndex(), is(equalTo(32)));
+        assertThat(command.getParameter(Command.ParamName.TASK_INDEX), is(equalTo(32)));
         assertThat(command.getParameter(Command.ParamName.TASK_NAME), is(equalTo("get down on it")));
         assertThat(command.getParameter(Command.ParamName.TASK_START), is(equalTo(
                 LocalDateTime.now().withHour(23).withMinute(59).truncatedTo(ChronoUnit.MINUTES)
@@ -177,8 +177,8 @@ public class FlexiCommandParserTest {
         String commandString = "delete all tasks";
         Command command = this._parser.parse(commandString);
         assertThat(command.getInstruction(), is(Command.Instruction.DELETE));
-        assertThat(command.isUniversallyQuantified(), is(true));
-        assertThat(command.getIndex(), is(nullValue()));
+        assertThat(command.hasTrueValue(Command.ParamName.TASK_UNIVERSALLY_QUANTIFIED), is(true));
+        assertThat(command.getParameter(Command.ParamName.TASK_INDEX), is(nullValue()));
     }
 
     @Test public void FlexiCommandParser_parses_specific_date_correctly() {
@@ -245,7 +245,7 @@ public class FlexiCommandParserTest {
                 is(equalTo(start)));
         assertThat(command.getParameter(Command.ParamName.TASK_END),
                 is(equalTo(end)));
-        assertThat(command.isUniversallyQuantified(), is(true));
+        assertThat(command.hasTrueValue(Command.ParamName.TASK_UNIVERSALLY_QUANTIFIED), is(true));
     }
 
 }

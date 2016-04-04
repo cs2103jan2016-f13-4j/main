@@ -48,11 +48,11 @@ public class VisualIndexMapper {
 
     public void translateVisualToRaw(Command command) {
         assert this._itemsMap.isEmpty() == false;
-        int visualIndex = command.getIndex();
+        int visualIndex = command.getParameter(Command.ParamName.TASK_INDEX);
         Task item = this._itemsMap.get(visualIndex);
         int rawIndex = item.getId();
         // FIXME: Might be null
-        command.setIndex(rawIndex);
+        command.setParameter(Command.ParamName.TASK_INDEX, rawIndex);
     }
 
     public List<Pair<Integer, Task>> translateRawToVisual(List<Task> rawList) {

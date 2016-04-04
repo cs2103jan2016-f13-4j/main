@@ -96,15 +96,15 @@ public class TaskTest {
     }
 
     @Test public void Decoded_Task_has_correct_attributes_assigned() {
-        String taskString = "88,marketing pitch,to microsoft,2016-03-02T23:59:01,2016-03-09T14:30:00,2016-03-09T15:30:00,true,2";
+        String taskString = "88,marketing pitch,to microsoft,2016-03-02T23:59:01,2016-03-09T14:30,2016-03-09T15:30,true,2";
         Task task4 = Task.decodeTaskFromString(taskString);
 
         assertSame(88, task4.getId());
         assertEquals("marketing pitch", task4.getTaskName());
         assertEquals("to microsoft", task4.getDescription());
         assertEquals(LocalDateTime.parse("2016-03-02T23:59:01"), task4.getCreationTime());
-        assertEquals(CustomTime.fromString("2016-03-09T14:30:00"), task4.getStartTime());
-        assertEquals(CustomTime.fromString("2016-03-09T15:30:00"), task4.getEndTime());
+        assertEquals(CustomTime.fromString("2016-03-09T14:30"), task4.getStartTime());
+        assertEquals(CustomTime.fromString("2016-03-09T15:30"), task4.getEndTime());
         assertTrue(task4.isCompleted());
         assertEquals(Task.Priority.MEDIUM, task4.getPriority());
     }

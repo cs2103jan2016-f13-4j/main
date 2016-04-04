@@ -107,7 +107,8 @@ public class StorageWriteOperation {
 
     private void createAsDeleteUnit() {
 
-        if (_command.isUniversallyQuantified()) {
+        if (_command.hasTrueValue(Command.ParamName.TASK_UNIVERSALLY_QUANTIFIED)) {
+
             // delete all tasks;
             Set<Integer> tasksToDelete = Storage.getInstance().getNonDeletedTasks();
 
@@ -138,7 +139,7 @@ public class StorageWriteOperation {
         } else {
             // delete a single task
             this._initialOperation = v -> {
-                this._id = this._command.getIndex();
+                this._id = this._command.getParameter(Command.ParamName.TASK_INDEX);
                 assert this._id != null;
 
                 Storage.getInstance().remove(this._id);
@@ -163,7 +164,7 @@ public class StorageWriteOperation {
     private void createAsEditUnit() {
 
         this._initialOperation = v -> {
-            this._id = this._command.getIndex();
+            this._id = this._command.getParameter(Command.ParamName.TASK_INDEX);
             assert this._id != null;
             Task task = Storage.getInstance().get(this._id);
 
@@ -213,7 +214,7 @@ public class StorageWriteOperation {
     private void createAsMarkUnit() {
 
         this._initialOperation = v -> {
-            this._id = _command.getIndex();
+            this._id = _command.getParameter(Command.ParamName.TASK_INDEX);
 
             Storage.getInstance().get(this._id).setCompleted(true);
 

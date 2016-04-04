@@ -1,5 +1,6 @@
 package shared;
 
+import java.security.InvalidParameterException;
 import java.util.LinkedHashMap;
 
 import exception.ExceptionHandler;
@@ -17,12 +18,30 @@ public class Command {
     }
 
     public enum ParamType {
-        STRING, DATE, PRIORITY
+        STRING(String.class),
+        DATE(CustomTime.class),
+        PRIORITY(Task.Priority.class),
+        BOOLEAN(Boolean.class),
+        INTEGER(Integer.class);
+
+        final Class<?> typeClass;
+
+        ParamType(Class<?> tClass) {
+            typeClass = tClass;
+        }
     }
 
     public enum ParamName {
-        TASK_NAME(ParamType.STRING), TASK_DESCRIPTION(ParamType.STRING), TASK_START(ParamType.DATE), TASK_END(
-                ParamType.DATE), SEARCH_QUERY(ParamType.STRING), PRIORITY_VALUE(ParamType.PRIORITY);
+        TASK_NAME(ParamType.STRING),
+        TASK_DESCRIPTION(ParamType.STRING),
+        TASK_START(ParamType.DATE),
+        TASK_END(ParamType.DATE),
+        PRIORITY_VALUE(ParamType.PRIORITY),
+
+        SEARCH_QUERY(ParamType.STRING),
+
+        TASK_INDEX(ParamType.INTEGER),
+        TASK_UNIVERSALLY_QUANTIFIED(ParamType.BOOLEAN);
 
         public final ParamType type;
 
@@ -35,44 +54,29 @@ public class Command {
      * Properties
      */
     private Instruction _instruction;
-    private Integer _index;
-    private boolean _isUniversallyQuantified;
     private LinkedHashMap<ParamName, Object> _parameters;
 
     /**
      * Constructs a command with the given instruction, index OR quantifier.
      * 
      * @param instruction
-     * @param index
-     * @param isUniversallyQuantified
      */
-    public Command(Instruction instruction, Integer index, boolean isUniversallyQuantified) {
-        assert index == null || !isUniversallyQuantified; // isUniversallyQuantified
-                                                          // => (index == null)
-
+    public Command(Instruction instruction) {
         this._instruction = instruction;
-        this._index = index;
-        this._isUniversallyQuantified = isUniversallyQuantified;
         this._parameters = new LinkedHashMap<>();
-    }
-
-    public void setIndex(int index) {
-        this._index = index;
-    }
-
-    public Integer getIndex() {
-        return this._index;
-    }
-
-    public boolean isUniversallyQuantified() {
-        return this._isUniversallyQuantified;
     }
 
     public Instruction getInstruction() {
         return this._instruction;
     }
 
-    public void setParameter(ParamName name, Object value) {
+    public void setParameter(ParamName name, Object value) throws InvalidParameterException {
+        if (!name.type.typeClass.isAssignableFrom(value.getClass())) {
+            throw new InvalidParameterException(
+                    String.format("A value of type %s cannot be assigned to parameter %s (%s)",
+                            value.getClass().getCanonicalName(), name.name(),
+                            name.type.typeClass.getCanonicalName()));
+        }
         this._parameters.put(name, value);
     }
 
@@ -97,13 +101,9 @@ public class Command {
     @Override public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(this._instruction);
-        if (this._index != null) {
-            sb.append("[").append(this._index).append("]");
-        } else if (this._isUniversallyQuantified) {
-            sb.append("[all]");
-        }
         this._parameters.entrySet().forEach(entry -> {
-            sb.append(" ").append(entry.getKey()).append("=").append(entry.getValue());
+            sb.append(" ").append(entry.getKey())
+                    .append("=").append(entry.getValue());
         });
         return sb.toString();
     }
@@ -118,21 +118,27 @@ public class Command {
         return this._parameters.keySet().size();
     }
 
-    public void setUniversallyQuantified() {
-        this._isUniversallyQuantified = true;
-    }
-
     /**
      * Special types of commands
      */
     public static Command invalidCommand() {
-        return new Command(Instruction.INVALID, null, false);
+        return new Command(Instruction.INVALID);
     }
     public static Command unrecognisedCommand() {
-        return new Command(Instruction.UNRECOGNISED, null, false);
+        return new Command(Instruction.UNRECOGNISED);
     }
 
     public static Command initialCommand() {
-        return new Command(Instruction.DISPLAY, null, true);
+        Command command = new Command(Instruction.DISPLAY);
+        command.setParameter(ParamName.TASK_UNIVERSALLY_QUANTIFIED, true);
+        return command;
+    }
+
+    public boolean hasTrueValue(ParamName name) {
+        try {
+            return this.hasParameter(name) && (boolean) this.getParameter(name);
+        } catch (ClassCastException e) {
+            return false;
+        }
     }
 }

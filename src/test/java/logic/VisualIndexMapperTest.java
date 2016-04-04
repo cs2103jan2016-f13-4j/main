@@ -36,13 +36,10 @@ public class VisualIndexMapperTest {
     @Test
     public void Mapper_transforms_visual_command_into_raw_command() {
         getMapper().updateList(buildTaskList());
-        Command deleteCommand = new Command(
-                Command.Instruction.DELETE,
-                1,
-                false
-        );
+        Command deleteCommand = new Command(Command.Instruction.DELETE);
+        deleteCommand.setParameter(Command.ParamName.TASK_INDEX, 1);
         getMapper().translateVisualToRaw(deleteCommand);
-        assertThat(deleteCommand.getIndex(), is(equalTo(51)));
+        assertThat(deleteCommand.getParameter(Command.ParamName.TASK_INDEX), is(equalTo(51)));
     }
 
     private static List<Task> buildTaskList() {

@@ -792,7 +792,7 @@ public class FlexiCommandParser implements CommandParserSpec {
             return Command.unrecognisedCommand();
         }
 
-        Command command = new Command(instruction, null, false);
+        Command command = new Command(instruction);
 
         // Truncate the string to leave out the instruction
         int instructionEnd = commandString.indexOf(' ');
@@ -830,14 +830,14 @@ public class FlexiCommandParser implements CommandParserSpec {
                             return Command.invalidCommand();
                         }
 
-                        command.setUniversallyQuantified();
+                        command.setParameter(Command.ParamName.TASK_UNIVERSALLY_QUANTIFIED, true);
                         break;
                     }
 
                     match = match.replaceAll("[^0-9]","");
                     // Parse ID
                     int taskId = Integer.parseInt(match);
-                    command.setIndex(taskId);
+                    command.setParameter(Command.ParamName.TASK_INDEX, taskId);
                     commandString = commandString.substring(matcher.end()).trim();
                 } else {
                     // TODO: Handle case where id not found
@@ -874,7 +874,7 @@ public class FlexiCommandParser implements CommandParserSpec {
 
                 if (matcher.find() && matcher.group("QUANTIFIER") != null &&
                         KEYWORDS_QUANTIFIER_UNIVERSAL.contains(matcher.group("QUANTIFIER"))) {
-                    command.setUniversallyQuantified();
+                    command.setParameter(Command.ParamName.TASK_UNIVERSALLY_QUANTIFIED, true);
                     commandString = commandString.substring(matcher.end()).trim();
                 }
 
