@@ -54,7 +54,7 @@ public class TranslationEngine implements TranslationEngineSpec {
     }
 
     @Override public void initialise() {
-        // Trigger initialisation of CommandParser
+        // Trigger initialisation of FlexiCommandParser
         this.getCommandParser().initialise();
 
         // Create input handler
@@ -66,8 +66,8 @@ public class TranslationEngine implements TranslationEngineSpec {
 
         // Attach input handler to user interface
         UserInterfaceSpec ui = this.getUserInterface();
-        ui.initialize();
         ui.setOnCommandInputHandler(commandInputHandler);
+        ui.initialize();
         ui.show();
     }
 
@@ -91,31 +91,13 @@ public class TranslationEngine implements TranslationEngineSpec {
             VisualIndexMapper.getInstance().updateList(result.getData());
             View view = new TaskListView(visualTaskList);
             this.getUserInterface().render(view);
-
-            // Set title
-            String title = "Here are all the things you should do today!";
-            if (visualTaskList.isEmpty()) {
-                title = "You have got nothing left to do! Have something in mind?"
-                        + " Add a new to-do by typing add name:\"<thing to do>\" and press Enter!";
-            }
-
-            // Account for search queries
-            if (this._lastCommand != null && this._lastCommand.hasInstruction(Command.Instruction.SEARCH)) {
-                if (visualTaskList.isEmpty()) {
-                    title = "No to-do with the query \""
-                            + this._lastCommand.getParameter(Command.ParamName.SEARCH_QUERY) + "\" was found!";
-                } else {
-                    title = String.format("Found %d items matching search query \"%s\"!", visualTaskList.size(),
-                            this._lastCommand.getParameter(Command.ParamName.SEARCH_QUERY));
-                }
-            }
-
-            this.getUserInterface().setHeader(title);
-
             break;
         default:
             break;
         }
+
+        // Display notification
+        this.displayNotification(result);
     }
 
     @Override public void shutdown() {
@@ -130,6 +112,15 @@ public class TranslationEngine implements TranslationEngineSpec {
 
         if (command.getIndex() != null) {
             VisualIndexMapper.getInstance().translateVisualToRaw(command);
+        }
+
+        // Catch unrecognised or invalid command
+        if (command.getInstruction() == Command.Instruction.INVALID) {
+            this.getUserInterface().showNotification("Oops! There is something wrong with your command");
+            return;
+        } else if (command.getInstruction() == Command.Instruction.UNRECOGNISED) {
+            this.getUserInterface().showNotification("Oops! I don't really understand what you are saying");
+            return;
         }
 
         // Set last command to this command
@@ -154,4 +145,67 @@ public class TranslationEngine implements TranslationEngineSpec {
         return VisualIndexMapper.getInstance();
     }
 
+    private void displayNotification(ExecutionResult result) {
+        String message = "Welcome to Your MOM!";
+
+        if (this._lastCommand != null) {
+            switch (this._lastCommand.getInstruction()) {
+                case DISPLAY:
+                    int taskCount = ((List<?>) result.getData()).size();
+                    if (taskCount == 0) {
+                        message = "Add a new to-do by entering \"add <task>\"!";
+                    } else {
+                        message = String.format("Found %d to-dos!", taskCount);
+                    }
+                    break;
+                case ADD:
+                    // TODO: Take care of failed addition
+                    String taskName = this._lastCommand.getParameter(Command.ParamName.TASK_NAME);
+                    message = String.format("Added: %s", taskName);
+                    break;
+                case EDIT:
+                    // TODO: Take care of failed edit
+                    message = String.format("Edited task with new details!",
+                            this._lastCommand.getIndex());
+                    break;
+                case DELETE:
+                    message = String.format("Deleted task! (undoable)",
+                            this._lastCommand.getIndex());
+                    break;
+                case SEARCH:
+                    int searchFound = ((List<?>) result.getData()).size();
+                    String searchQuery = this._lastCommand.getParameter(Command.ParamName.SEARCH_QUERY);
+                    if (searchFound == 0) {
+                        message = String.format("Found no to-do with the search query \"%s\"", searchQuery);
+                    } else {
+                        message = String.format("Found %d matches with the query \"%s\"",
+                                searchFound,
+                                searchQuery);
+                    }
+                    break;
+                case UNDO:
+                    if (result.hasErrorMessage()) {
+                        message = result.getErrorMessage();
+                    } else {
+                        message = "Reverted last command!";
+                    }
+                    break;
+                case REDO:
+                    if (result.hasErrorMessage()) {
+                        message = result.getErrorMessage();
+                    } else {
+                        message = "Redone last command!";
+                    }
+                    break;
+                case MARK:
+                    if (result.hasErrorMessage()) {
+                        message = result.getErrorMessage();
+                    } else {
+                        message = "Marked task as complete! (undoable)";
+                    }
+            }
+        }
+
+        this.getUserInterface().showNotification(message);
+    }
 }

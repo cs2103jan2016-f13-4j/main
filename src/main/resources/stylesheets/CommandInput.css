@@ -4,42 +4,30 @@
     visibility: hidden;
 }
 
+.command-input__field {
+    -fx-background-color: transparent;
+    -fx-highlight-fill: #F9D29E;
+}
 /*******************************************
  *
  * INSTRUCTIONS HIGHLIGHTING
  *
  *******************************************/
-.instruction {
+.command__instruction,
+.command__normal-text,
+.command__time,
+.command__priority {
+    -fx-text-fill: #5d3807;
+}
+
+.command__instruction {
     -fx-font-weight: bold;
 }
 
-.instruction--add {
-    -fx-fill: #46aae2;
+.command__time {
+    -fx-underline: true;
 }
 
-.instruction--delete {
-    -fx-fill: #fa4646;
+.command__priority {
+    -fx-font-weight: bold;
 }
-
-.instruction--display {
-    -fx-fill: #e78012;
-}
-
-.instruction--edit {
-    -fx-fill: #a93bcf;
-}
-
-.instruction--exit {
-    -fx-fill: #66af94;
-}
-
-.instruction--mark {
-    -fx-fill: #49bb00;
-}
-
-.param {
-    -fx-font-family: "Lato";
-    -fx-font-style: italic;
-    -fx-fill: #979797;
-}
-

@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- @@author Mai Anh Vu -->
+
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.shape.Line?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="83.0" prefWidth="420.0" styleClass="wrapper" stylesheets="@../stylesheets/Window.css" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.controller.CommandInputController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="70.0" prefWidth="420.0" styleClass="command-input__wrapper" stylesheets="@../stylesheets/Window.css" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.controller.CommandInputController">
     <children>
-        <Line endX="420.0" stroke="#e6e6e6" />
-        <AnchorPane fx:id="_commandInputContainer" layoutX="14.0" layoutY="-63.0" prefHeight="200.0" prefWidth="200.0" styleClass="command-input__container" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="18.0" AnchorPane.rightAnchor="18.0" AnchorPane.topAnchor="15.0" />
+        <Line endX="380.0" layoutX="20.0" layoutY="50.0" stroke="WHITE" />
+        <AnchorPane fx:id="_commandInputContainer" prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="18.0" AnchorPane.rightAnchor="18.0" AnchorPane.topAnchor="30.0" />
+        <Label styleClass="section-label" text="COMMAND" AnchorPane.leftAnchor="19.0" AnchorPane.topAnchor="12.0" />
     </children>
 </AnchorPane>

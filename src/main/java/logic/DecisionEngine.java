@@ -1,13 +1,6 @@
 package logic;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Stack;
-import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
+import javafx.util.Pair;
 import shared.*;
 import skeleton.CollectionSpec;
 import skeleton.DecisionEngineSpec;
@@ -15,10 +8,17 @@ import skeleton.SchedulerSpec;
 import storage.Storage;
 import storage.TaskPriorityComparator;
 
+import java.util.*;
+import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
 /**
  * @@author Thenaesh Elango
  */
 public class DecisionEngine implements DecisionEngineSpec {
+    public static final double THRESHOLD_POWERSEARCH_WEIGHTED = 0.0;
     /**
      * Singleton instance and constructor
      */
@@ -30,10 +30,6 @@ public class DecisionEngine implements DecisionEngineSpec {
     /**
      * instance fields
      */
-    private Stack<Function<Void, Void>> inverseOperations = new Stack<>(); // used
-                                                                           // for
-                                                                           // undoing
-
     public static DecisionEngine getInstance() {
         if (instance == null) {
             instance = new DecisionEngine();
@@ -46,181 +42,83 @@ public class DecisionEngine implements DecisionEngineSpec {
         Storage.getInstance().readFromDisk();
     }
 
-    /**
-     * checks whether the supplied command is completely defined (name, start
-     * time, end time, etc) this information may then be used to decide if the
-     * Scheduler should be called
-     *
-     * @param cmd
-     * @return
-     */
-    boolean isCommandComplete(Command cmd) {
-        boolean hasName = cmd.hasParameter(Command.ParamName.TASK_NAME);
-        boolean hasStart = cmd.hasParameter(Command.ParamName.TASK_START);
-        boolean hasEnd = cmd.hasParameter(Command.ParamName.TASK_END);
-
-        boolean isComplete = hasName && hasStart && hasEnd;
-        return isComplete;
-    }
-
-    boolean isCommmandQuery(Command cmd) {
-        return cmd.hasParameter(Command.ParamName.SEARCH_QUERY);
-    }
-
-    /**
-     * creates a Task from a specified command object when it makes sense we
-     * should blow up when creating a Task doesn't really make sense
-     * 
-     * @param cmd
-     * @return
-     */
-    protected Task createTask(Command cmd) {
-        // initialisation
-        String name = null;
-        CustomTime from = null;
-        CustomTime to = null;
-
-        // for each command parameter, check if it was supplied
-        // if so, extract the value and set the appropriate reference above to
-        // point to the extracted value
-        if (cmd.hasParameter(Command.ParamName.TASK_NAME)) {
-            name = cmd.getParameter(Command.ParamName.TASK_NAME);
-        }
-        if (cmd.hasParameter(Command.ParamName.TASK_START)) {
-            from = cmd.getParameter(Command.ParamName.TASK_START);
-        }
-        if (cmd.hasParameter(Command.ParamName.TASK_END)) {
-            to = cmd.getParameter(Command.ParamName.TASK_END);
-        }
-
-        // we now build the Task object for adding into the store
-        return new Task(null, name, "", from, to);
-    }
 
     protected ExecutionResult displayAllTasks() {
         List<Task> listToDisplay = this.getTaskCollection().getAll().stream()
                 .sorted(TaskPriorityComparator.getInstance()).collect(Collectors.toList());
 
-        return new ExecutionResult(ViewType.TASK_LIST, listToDisplay,null);
-    }
-
-    protected ExecutionResult handleAdd(Command command) {
-        assert command.hasInstruction(Command.Instruction.ADD);
-
-        Task taskToAdd = this.createTask(command);
-
-        final int id = this.getTaskCollection().save(taskToAdd);
-
-        // add the corresponding undo operation
-        this.inverseOperations.push(v -> {
-            this.getTaskCollection().remove(id);
-            return null;
-        });
-
-        return this.displayAllTasks();
-    }
-
-    protected ExecutionResult handleEdit(Command command) {
-        assert command.hasInstruction(Command.Instruction.EDIT);
-
-        Integer index = command.getIndex();
-        assert index != null;
-        Task task = this.getTaskCollection().get(index);
-
-        final Task originalTaskCopy = task.clone();
-
-        // check which parameters have changed
-        if (command.hasParameter(Command.ParamName.TASK_NAME)) {
-            task.setTaskName(command.getParameter(Command.ParamName.TASK_NAME));
-        }
-        if (command.hasParameter(Command.ParamName.TASK_START)) {
-            task.setStartTime(command.getParameter(Command.ParamName.TASK_START));
-        }
-        if (command.hasParameter(Command.ParamName.TASK_END)) {
-            task.setEndTime(command.getParameter(Command.ParamName.TASK_END));
-        }
-
-        // add corresponding undo operation
-        this.inverseOperations.push(v -> {
-            this.getTaskCollection().save(originalTaskCopy);
-            return null;
-        });
-
-        return this.displayAllTasks();
+        return new ExecutionResult(ViewType.TASK_LIST, listToDisplay);
     }
 
     protected ExecutionResult handleDisplay(Command command) {
         assert command.hasInstruction(Command.Instruction.DISPLAY);
-        return this.displayAllTasks();
+
+        List<Task> listToDisplay = this.getTaskCollection().getAll();
+
+        // for each command parameter, filter the list of tasks
+        if (command.hasParameter(Command.ParamName.TASK_NAME)) {
+            String name = command.getParameter(Command.ParamName.TASK_NAME);
+            listToDisplay = listToDisplay
+                    .stream()
+                    .filter(task -> task.getTaskName() == name)
+                    .collect(Collectors.toList());
+        }
+        if (command.hasParameter(Command.ParamName.TASK_START)) {
+            CustomTime from = command.getParameter(Command.ParamName.TASK_START);
+            listToDisplay = listToDisplay
+                    .stream()
+                    .filter(task -> from.compareTo(task.getStartTime()) <= 0)
+                    .collect(Collectors.toList());
+        }
+        if (command.hasParameter(Command.ParamName.TASK_END)) {
+            CustomTime to = command.getParameter(Command.ParamName.TASK_END);
+            listToDisplay = listToDisplay
+                    .stream()
+                    .filter(task -> to.compareTo(task.getEndTime()) >= 0)
+                    .collect(Collectors.toList());
+        }
+
+        Collections.sort(listToDisplay, TaskPriorityComparator.getInstance());
+
+        // at this point, we have a properly filtered list
+        return new ExecutionResult(ViewType.TASK_LIST, listToDisplay);
     }
 
-    protected ExecutionResult handleDelete(Command command) {
-        assert command.hasInstruction(Command.Instruction.DELETE);
-
-        // // Handle case where delete is aggregate
-        // // TODO: Make this undo-able
-        // if (command.isUniversallyQuantified()) {
-        // // For undoing
-        // this.getTaskCollection().getAll().stream()
-        // .map(Task::clone)
-        // .forEach(task -> task.setDeletedStatus(true));
-        // // Temporary
-        // this.getTaskCollection().getAll().stream()
-        // .mapToInt(Task::getId)
-        // .forEach(this.getTaskCollection()::remove);
-        // return this.displayAllTasks();
-        // }
-
-        Integer id = command.getIndex();
-        assert id != null;
-
-        Task deletedTask = this.getTaskCollection().get(id).clone();
-        deletedTask.setDeletedStatus(true);
-
-        // add the corresponding undo operation
-        this.inverseOperations.push(v -> {
-            this.getTaskCollection().undelete(id);
-            return (Void) null;
-        });
-
-        this.getTaskCollection().remove(id);
-        return this.displayAllTasks();
-    }
 
     protected ExecutionResult handleSearch(Command command) {
         assert command.hasInstruction(Command.Instruction.SEARCH);
 
         // PowerSearching!
         Pattern pattern = buildPowerSearchPattern(command);
+        double averageQueryLength = getAverageQueryLength(command);
 
-        List<Task> foundTask = this.getTaskCollection().getAll().stream().filter(item -> {
+        List<Task> foundTask = this.getTaskCollection().getAll().stream().map(item -> {
             // Match with task name first
             Matcher m = pattern.matcher(item.getTaskName());
-            if (m.find())
-                return true;
+            int matches = 0;
+            List<Double> similarityIndex = new ArrayList<>();
 
-            // If doesn't match with task name, try to match
-            // with description ONLY IF it's not null
-            if (item.getDescription() == null)
-                return false;
-            m = pattern.matcher(item.getDescription());
+            while (m.find()) {
+                matches++;
+                double similarity = averageQueryLength / m.group("MATCH").length();
+                if (similarity > 1.0) {
+                    similarity = 1.0;
+                }
+                similarityIndex.add(similarity);
+            }
 
-            return m.find();
-        }).collect(Collectors.toList());
+            double weightedMatch = matches * similarityIndex.stream()
+                    .mapToDouble(Double::doubleValue).average().orElse(0.0);
+            return new Pair<>(weightedMatch, item);
+        }).filter(pair -> pair.getKey() > THRESHOLD_POWERSEARCH_WEIGHTED)
+                .sorted((pair1, pair2) -> pair2.getKey().compareTo(pair1.getKey()))
+                .map(Pair::getValue)
+                .collect(Collectors.toList());
 
-        return new ExecutionResult(ViewType.TASK_LIST, foundTask , null);
+        return new ExecutionResult(ViewType.TASK_LIST, foundTask);
     }
 
-    protected ExecutionResult handleUndo(Command command) {
-        assert command.hasInstruction(Command.Instruction.UNDO);
 
-        // attempt an undo only if the undo stack is not empty
-        if (!this.inverseOperations.isEmpty()) {
-            this.inverseOperations.pop().apply(null);
-        }
-
-        return this.displayAllTasks();
-    }
 
     @Override public ExecutionResult performCommand(Command command) {
 
@@ -238,28 +136,39 @@ public class DecisionEngine implements DecisionEngineSpec {
 
         // all the standard commands
         switch (command.getInstruction()) {
-        case ADD:
-            result = this.handleAdd(command);
-            break;
-        case EDIT:
-            result = this.handleEdit(command);
-            break;
-        case DISPLAY:
-            result = this.handleDisplay(command);
-            break;
-        case DELETE:
-            result = this.handleDelete(command);
-            break;
-        case SEARCH:
-            result = this.handleSearch(command);
-            break;
-        case UNDO:
-            result = this.handleUndo(command);
-            break;
-        default:
-            // if we reach this point, LTA Command Parser has failed in his duty
-            // and awaits court martial
-            assert false;
+            case ADD:
+            case DELETE:
+            case EDIT:
+            case MARK:
+                StorageWriteOperation op = new StorageWriteOperation(command);
+                op.getInitialOperation().apply(null);
+                StorageWriteOperationHistory.getInstance().addToHistory(op);
+                result = this.displayAllTasks();
+                break;
+            case DISPLAY:
+                result = this.handleDisplay(command);
+                break;
+            case SEARCH:
+                result = this.handleSearch(command);
+                break;
+            case UNDO:
+                boolean undoActuallyHappened = StorageWriteOperationHistory.getInstance().undo();
+                result = this.displayAllTasks();
+                if (!undoActuallyHappened) {
+                    result.setErrorMessage("No tasks to undo!");
+                }
+                break;
+            case REDO:
+                boolean redoActuallyHappened = StorageWriteOperationHistory.getInstance().redo();
+                result = this.displayAllTasks();
+                if (!redoActuallyHappened) {
+                    result.setErrorMessage("No tasks to redo");
+                }
+                break;
+            default:
+                // if we reach this point, LTA Command Parser has failed in his duty
+                // and awaits court martial
+                assert false;
         }
 
         return result;
@@ -285,7 +194,7 @@ public class DecisionEngine implements DecisionEngineSpec {
         // Begin building pattern by signalling that we are looking for
         // a word that contains the characters
         StringBuilder patternBuilder = new StringBuilder();
-        patternBuilder.append("\\b(?:");
+        patternBuilder.append("\\b(?<MATCH>");
 
         // In that particular order. We achieve this by inserting
         // greedy word (\w*) pattern, slotted between the characters of
@@ -308,4 +217,10 @@ public class DecisionEngine implements DecisionEngineSpec {
         return Pattern.compile(patternBuilder.toString(), Pattern.CASE_INSENSITIVE);
     }
 
+    private static double getAverageQueryLength(Command command) {
+        String query = command.getParameter(Command.ParamName.SEARCH_QUERY);
+        return Arrays.asList(query.split("\\s+")).stream()
+                .mapToDouble(String::length)
+                .average().orElse(0.0);
+    }
 }

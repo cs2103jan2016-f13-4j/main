@@ -3,10 +3,10 @@ package logic;
 import org.junit.Before;
 import org.junit.Test;
 import shared.Command;
+import shared.CustomTime;
+import shared.Task;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.regex.Matcher;
@@ -33,7 +33,7 @@ public class FlexiCommandParserTest {
     @Test public void FlexiCommandParser_creates_correct_instruction_pattern() {
         final Pattern instructionPattern = Pattern.compile(this._parser.getInstructionPattern(), Pattern.CASE_INSENSITIVE);
         String command = "   ADD a new thing";
-        Matcher m = instructionPattern.matcher(command);
+        Matcher m = instructionPattern.matcher(command.trim());
         assertTrue(m.find());
         assertThat(m.group("INST").trim().toLowerCase(), is(equalTo("add")));
     }
@@ -113,7 +113,7 @@ public class FlexiCommandParserTest {
         assertThat(command.getParameter(Command.ParamName.TASK_NAME),
                 is(equalTo("talk cock sing song")));
         assertThat(command.getParameter(Command.ParamName.TASK_END),
-                is(equalTo(LocalDateTime.now().plusDays(1).truncatedTo(ChronoUnit.DAYS))));
+                is(equalTo(CustomTime.tomorrowAt(null))));
     }
 
     @Test public void FlexiCommandParser_parses_PM_time_correctly() {
@@ -166,10 +166,70 @@ public class FlexiCommandParserTest {
     }
 
     @Test public void FlexiCommandParser_parses_edit_without_task_name_correctly() {
-        String commandString = "edit task number 10 to starting at same day 10pm";
+        String commandString = "edit task number 10 to starting same day 10pm";
         Command command = this._parser.parse(commandString);
         assertThat(command.getParameter(Command.ParamName.TASK_NAME), is(nullValue()));
-        LocalDateTime newTime = LocalDateTime.MIN.withHour(22).truncatedTo(ChronoUnit.HOURS);
+        CustomTime newTime = new CustomTime(null, LocalTime.of(22,0));
         assertThat(command.getParameter(Command.ParamName.TASK_START), is(equalTo(newTime)));
+    }
+
+    @Test public void FlexiCommandParser_parses_universally_delete_command_correctly() {
+        String commandString = "delete all tasks";
+        Command command = this._parser.parse(commandString);
+        assertThat(command.getInstruction(), is(Command.Instruction.DELETE));
+        assertThat(command.isUniversallyQuantified(), is(true));
+        assertThat(command.getIndex(), is(nullValue()));
+    }
+
+    @Test public void FlexiCommandParser_parses_specific_date_correctly() {
+        String commandString = "add take out the trash from 4 mar to next week's Thursday";
+        Command command = this._parser.parse(commandString);
+        assertThat(command.getInstruction(), is(Command.Instruction.ADD));
+
+        CustomTime fourthMarch = new CustomTime(LocalDate.of(
+                LocalDate.now().getYear(),
+                Month.MARCH,
+                4
+        ), null);
+        assertThat(command.getParameter(Command.ParamName.TASK_START),
+                is(equalTo(fourthMarch)));
+        assertThat(command.getParameter(Command.ParamName.TASK_END),
+                is(equalTo(CustomTime.todayAt(null).next(DayOfWeek.THURSDAY))));
+    }
+
+    @Test public void FlexiCommandParser_parses_specific_date_with_time_correctly() {
+        String commandString = "add go to the gym from Mar 25th 2016's 7pm to 8 apr 330";
+        Command command = this._parser.parse(commandString);
+
+        CustomTime startTime = new CustomTime(
+                LocalDate.of(2016, Month.MARCH, 25),
+                LocalTime.of(19, 0),
+                ChronoUnit.HOURS
+        );
+
+        CustomTime endTime = new CustomTime(
+                LocalDate.of(LocalDate.now().getYear(), Month.APRIL, 8),
+                LocalTime.of(3,30),
+                ChronoUnit.MINUTES
+        );
+
+        assertThat(command.getParameter(Command.ParamName.TASK_START),
+                is(equalTo(startTime)));
+        assertThat(command.getParameter(Command.ParamName.TASK_END),
+                is(equalTo(endTime)));
+    }
+
+    @Test public void FlexiCommandParser_parses_simple_priority_correctly() {
+        String commandString = "add go to the gym today with high priority";
+        Command command = this._parser.parse(commandString);
+        assertThat(command.getParameter(Command.ParamName.PRIORITY_VALUE),
+                is(Task.Priority.HIGH));
+    }
+
+    @Test public void FlexiCommandParser_parses_complex_priority_correctly() {
+        String commandString = "add go to the mall from tomorrow's 5pm to next week's Fri 1000 as unimportant";
+        Command command = this._parser.parse(commandString);
+        assertThat(command.getParameter(Command.ParamName.PRIORITY_VALUE),
+                is(Task.Priority.LOW));
     }
 }

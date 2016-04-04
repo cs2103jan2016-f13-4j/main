@@ -5,7 +5,7 @@ import java.util.LinkedHashMap;
 import exception.ExceptionHandler;
 
 /**
- * @author Thenaesh Elango
+ * @@author Mai Anh Vu
  */
 public class Command {
 
@@ -13,16 +13,16 @@ public class Command {
      * Types
      */
     public enum Instruction {
-        ADD, DISPLAY, MARK, EDIT, SEARCH, UNDO, DELETE, TUTORIAL, EXIT, UNRECOGNISED, INVALID;
+        ADD, DISPLAY, MARK, EDIT, SEARCH, UNDO, REDO, DELETE, TUTORIAL, EXIT, UNRECOGNISED, INVALID;
     }
 
     public enum ParamType {
-        STRING, INTEGER, DATE, DOUBLE
+        STRING, DATE, PRIORITY
     }
 
     public enum ParamName {
         TASK_NAME(ParamType.STRING), TASK_DESCRIPTION(ParamType.STRING), TASK_START(ParamType.DATE), TASK_END(
-                ParamType.DATE), SEARCH_QUERY(ParamType.STRING);
+                ParamType.DATE), SEARCH_QUERY(ParamType.STRING), PRIORITY_VALUE(ParamType.PRIORITY);
 
         public final ParamType type;
 
@@ -106,6 +106,20 @@ public class Command {
             sb.append(" ").append(entry.getKey()).append("=").append(entry.getValue());
         });
         return sb.toString();
+    }
+
+    public void removeParameter(ParamName taskName) {
+        if (this._parameters.containsKey(taskName)) {
+            this._parameters.remove(taskName);
+        }
+    }
+
+    public int getParametersCount() {
+        return this._parameters.keySet().size();
+    }
+
+    public void setUniversallyQuantified() {
+        this._isUniversallyQuantified = true;
     }
 
     /**

@@ -1,13 +1,7 @@
 package ui.controller;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
@@ -15,6 +9,7 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import logic.FlexiCommandParser;
 import org.fxmisc.richtext.StyleClassedTextArea;
 import org.fxmisc.richtext.StyleSpans;
 import org.fxmisc.richtext.StyleSpansBuilder;
@@ -25,9 +20,6 @@ import javafx.fxml.FXML;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.util.Pair;
-import logic.CommandParser;
-import shared.Command;
 import shared.Resources;
 
 /**
@@ -35,9 +27,13 @@ import shared.Resources;
  */
 public class CommandInputController {
     private static final String ID_COMMAND_INPUT = "command-input";
-    private static final double PADDING_HORZ_COMMAND_INPUT = 12.0;
-    private static final double PADDING_VERT_COMMAND_INPUT = 17.0;
+    private static final double PADDING_HORZ_COMMAND_INPUT = 0.0;
+    private static final double PADDING_VERT_COMMAND_INPUT = 0.0;
     private static final int DELAY_HIGHLIGHT = 250;
+    private static final String STYLE_CLASS_INSTRUCTION = "command__instruction";
+    private static final String STYLE_CLASS_TIME = "command__time";
+    private static final String STYLE_CLASS_NORMAL = "command__normal-text";
+    private static final String STYLE_CLASS_PRIORITY = "command__priority";
 
     @FXML private AnchorPane _commandInputContainer;
     private StyleClassedTextArea _inputField;
@@ -68,36 +64,15 @@ public class CommandInputController {
         // instruction
         this._instructionStyleClassMap = new LinkedHashMap<>();
 
-        // Get keyword data from Command Parser
-        LinkedHashMap<String, Command.Instruction> instructionMap = CommandParser.constructInstructionMap();
-
-        // Prepare a list of highlighted instruction words
-        List<String> highlightList = new ArrayList<>();
-
-        instructionMap.entrySet().stream()
-                // Turn into a pair of instruction keyword and the style class
-                // applied to it
-                // based on the instruction's original keyword. Refer to the
-                // CommandParser
-                // for the keywords
-                .map(entry -> {
-                    String instruction = entry.getKey();
-                    String styleClass = entry.getValue().toString().toLowerCase();
-
-                    // Also add this instruction to highlight list
-                    highlightList.add(instruction);
-
-                    return new Pair<>(instruction, styleClass);
-                })
-                // Point each of this keyword to the correct class and store
-                // them
-                // inside a Hash Map for easy referral later
-                .forEach(pair -> this._instructionStyleClassMap.put(pair.getKey(), pair.getValue()));
-
         // Create the instruction highlight pattern
-        String instructionPattern = buildInstructionHighlightPattern(highlightList);
+        FlexiCommandParser parser = FlexiCommandParser.getInstance();
+        String highlightPatternString = String.join("|", new String[] {
+                parser.getInstructionPattern(),
+                parser.getTimePattern(),
+                parser.getPriorityPattern()
+        });
 
-        this._highlightPattern = Pattern.compile("(?<INST>" + instructionPattern + ")");
+        this._highlightPattern = Pattern.compile(highlightPatternString, Pattern.CASE_INSENSITIVE);
     }
 
     /**
@@ -208,41 +183,34 @@ public class CommandInputController {
         int lastKeywordEnd = 0;
         StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
 
-        String instructionClass = null;
         while (matcher.find()) {
             // Fill in previous non-highlighted part
-            spansBuilder.add(Collections.emptyList(), matcher.start() - lastKeywordEnd);
+            spansBuilder.add(Collections.singleton(STYLE_CLASS_NORMAL), matcher.start() - lastKeywordEnd);
 
             // Highlight instruction
-            if (instructionClass == null && matcher.group("INST") != null) {
+            if (matcher.group("INST") != null) {
                 // Prepare the list of classes to be added
-                List<String> classes = new ArrayList<>();
-                classes.add("instruction");
-
-                // For individual classes
-                instructionClass = this._instructionStyleClassMap.get(matcher.group("INST"));
-                if (instructionClass != null) {
-                    classes.add("instruction--" + instructionClass);
-                }
-
-                // Fill in the classes
-                spansBuilder.add(classes, matcher.end() - matcher.start());
+                spansBuilder.add(
+                        Collections.singleton(STYLE_CLASS_INSTRUCTION),
+                        matcher.end() - matcher.start()
+                );
+            } else if (matcher.group("DATE") != null || matcher.group("TIME") != null) {
+                spansBuilder.add(
+                        Collections.singleton(STYLE_CLASS_TIME),
+                        matcher.end() - matcher.start()
+                );
+            } else if (matcher.group("PRIORITY") != null) {
+                spansBuilder.add(
+                        Collections.singleton(STYLE_CLASS_PRIORITY),
+                        matcher.end() - matcher.start()
+                );
             }
-            // Highlight parameters
-            // else if (matcher.group("PARAM") != null) {
-            // Collection<String> classes = new ArrayList<>();
-            // classes.add("param");
-            // if (instructionClass != null) {
-            // classes.add("param__" + instructionClass);
-            // }
-            // spansBuilder.add(classes, matcher.end() - matcher.start());
-            // }
 
             // Increase last keyword end to the end of the current word
             lastKeywordEnd = matcher.end();
         }
 
-        spansBuilder.add(Collections.emptyList(), text.length() - lastKeywordEnd);
+        spansBuilder.add(Collections.singleton(STYLE_CLASS_NORMAL), text.length() - lastKeywordEnd);
         return spansBuilder.create();
     }
 
@@ -261,24 +229,4 @@ public class CommandInputController {
     public void cleanUp() {
         this._executor.shutdown();
     }
-
-    /**
-     * Create a RegExp pattern in String form to recognise all the instructions
-     * laid out by the {@link CommandParser}.
-     * 
-     * @param instructions
-     * @return
-     */
-    private static String buildInstructionHighlightPattern(List<String> instructions) {
-        StringBuilder patternBuilder = new StringBuilder();
-        patternBuilder.append("^\\b(");
-        for (int i = 0; i < instructions.size(); i++) {
-            if (i != 0)
-                patternBuilder.append("|");
-            patternBuilder.append(instructions.get(i));
-        }
-        patternBuilder.append(")\\b");
-        return patternBuilder.toString();
-    }
-
 }

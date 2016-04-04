@@ -19,6 +19,9 @@
       "name": "UNDO",
       "keywords": ["undo"]
     }, {
+      "name": "REDO",
+      "keywords": ["redo"]
+    }, {
       "name": "DELETE",
       "keywords": ["delete", "remove"]
     }, {
@@ -44,7 +47,7 @@
     "chainable": false
   }, {
     "meaning": "ENDING",
-    "keywords": ["to", "ending", "until", "before", "due", "end", "ending at"],
+    "keywords": ["to", "ending", "until", "before", "due", "end", "ending at", "by"],
     "chainable": false
   }],
 
@@ -109,12 +112,13 @@
 
   "priorities": [{
     "meaning": "HIGH",
-    "keywords": ["high importance", "very important", "important"]
+    "keywords": ["high importance", "very important", "important", "high priority", "high prio", "critical","as top priority", "highest priority"]
   }, {
     "meaning": "MEDIUM",
-    "keywords": ["medium importance", "normal importance"]
+    "keywords": ["medium importance", "normal importance", "medium priority", "normal priority",
+    "normal prio", "medium", "normal"]
   }, {
     "meaning": "LOW",
-    "keywords": ["low importance", "unimportant"]
+    "keywords": ["low importance", "unimportant", "low priority", "low prio"]
   }]
 }

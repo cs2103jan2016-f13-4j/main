@@ -1,7 +1,7 @@
 package storage;
 
+import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedReader;
@@ -36,6 +36,7 @@ public class DiskIOTest {
         this._storage.writeToDisk();
         File file = new File("tmp/ToDoData.csv");
         file.delete();
+        this._diskIO.setFileName("tmp/ToDoData.csv");
     }
 
     @Test public void File_does_not_exist_upon_setting_up() throws IOException {
@@ -53,16 +54,16 @@ public class DiskIOTest {
         File file = new File("tmp/ToDoData.csv");
         file.delete();
         assertFalse(file.exists());
-
+        assertEquals("tmp/ToDoData.csv", this._diskIO.getFileName());
         this._diskIO.read();
         // Check that file gets created after the read method is called
         assertTrue(file.exists());
     }
 
     @Test public void Read_function_extracts_tasks_data_from_file() {
-        String taskString1 = "1,marketing pitch,client FGH,2016-03-04T10:00,2016-03-04T12:00";
-        String taskString2 = "2,sales meeting,client IJK,2016-03-05T11:30,2016-03-05T13:30";
-        String taskString3 = "3,sales meeting,internal,2016-03-06T09:30,2016-03-06T11:30";
+        String taskString1 = "1,marketing pitch,client FGH,2016-03-01T08:00,2016-03-04T10:00,2016-03-04T12:00,true,2";
+        String taskString2 = "2,sales meeting,client IJK,2016-03-02T09:00,2016-03-05T11:30,2016-03-05T13:30,false,2";
+        String taskString3 = "3,sales meeting,internal,2016-03-04T07:00,2016-03-06T09:30,2016-03-06T11:30,false,1";
 
         ArrayList<String> taskStrings = new ArrayList<String>();
         taskStrings.add(taskString1);
@@ -83,7 +84,7 @@ public class DiskIOTest {
             // TODO Auto-generated catch block
             ExceptionHandler.handle(e);
         }
-
+        assertEquals("tmp/ToDoData.csv", this._diskIO.getFileName());
         ArrayList<String> actualTaskList = this._diskIO.read();
         // Check that actual list matches expected list
         assertEquals(taskStrings, actualTaskList);
@@ -97,19 +98,44 @@ public class DiskIOTest {
 
     @Test public void Write_function_writes_data_into_file_correctly() throws IOException {
 
-        String taskString1 = "1,marketing pitch,client XYZ,2016-03-09T14:30,2016-03-09T16:30";
-        String taskString2 = "2,sales meeting,client ABC,2016-03-11T12:00,2016-03-11T14:30";
+        String taskString1 = "1,marketing pitch,client XYZ,2016-03-01T08:00,2016-03-09T14:30,2016-03-09T16:30,false,3";
+        String taskString2 = "2,sales meeting,client ABC,2016-03-04T07:00,2016-03-11T12:00,2016-03-11T14:30,true,2";
         ArrayList<String> taskStrings = new ArrayList<String>();
         taskStrings.add(taskString1);
         taskStrings.add(taskString2);
 
-        this._diskIO.setFileName("tmp/ToDoData.csv");
         this._diskIO.write(taskStrings);
 
         BufferedReader reader = new BufferedReader(new FileReader("tmp/ToDoData.csv"));
-        assertEquals("1,marketing pitch,client XYZ,2016-03-09T14:30,2016-03-09T16:30", reader.readLine());
-        assertEquals("2,sales meeting,client ABC,2016-03-11T12:00,2016-03-11T14:30", reader.readLine());
+        assertEquals("1,marketing pitch,client XYZ,2016-03-01T08:00,2016-03-09T14:30,2016-03-09T16:30,false,3",
+                reader.readLine());
+        assertEquals("2,sales meeting,client ABC,2016-03-04T07:00,2016-03-11T12:00,2016-03-11T14:30,true,2",
+                reader.readLine());
         reader.close();
     }
 
+    // ----------------------------------------------------------------------------------------
+    //
+    // III. User Preferences Tests
+    //
+    // ----------------------------------------------------------------------------------------
+    @Test public void Loading_user_preferences_from_file_correctly_assigns_custom_file_name() {
+        // Write a json file to disk
+        File file = new File("data/user/UserPreferences.json");
+        file.delete();
+        assertFalse(file.exists());
+        File folder = new File("data/user/UserPreferences.json").getParentFile();
+        folder.mkdirs();
+        BufferedWriter bufferedWriter;
+        try {
+            bufferedWriter = new BufferedWriter(new FileWriter(("data/user/UserPreferences.json")));
+            bufferedWriter.write("{\"todoDataPath\":\"/Users/Mary/Dropbox/ToDoData.csv\"}");
+            bufferedWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        assertTrue(file.exists());
+        this._diskIO.processUserPreferencesFile();
+        assertEquals("/Users/Mary/Dropbox/ToDoData.csv", this._diskIO.getFileName());
+    }
 }

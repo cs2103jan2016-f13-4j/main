@@ -21,6 +21,10 @@ public class ExecutionResult {
         this._errorMessage = error;
     }
 
+    public ExecutionResult(ViewType viewType, Object data) {
+        this(viewType, data, null);
+    }
+
     public ViewType getViewType() {
         return this._viewType;
     }
@@ -53,5 +57,13 @@ public class ExecutionResult {
 
     public String getErrorMessage(){
         return this._errorMessage;
+    }
+
+    public void setErrorMessage(String errorMsg) {
+        this._errorMessage = errorMsg;
+    }
+
+    public boolean hasErrorMessage() {
+        return this._errorMessage != null;
     }
 }

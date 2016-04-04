@@ -1,11 +1,5 @@
 package ui.view;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Function;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -15,13 +9,18 @@ import javafx.scene.control.ListView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.util.Pair;
 import shared.CustomTime;
 import shared.Resources;
 import shared.Task;
 import ui.controller.DateFormatterHelper;
 import ui.controller.TaskListController;
+
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
 
 /**
  * @@author Antonius Satrio Triatmoko
@@ -30,12 +29,11 @@ public class TaskListView extends View {
     /**
      * Constants
      */
-    private final int MAXIMUM_DISPLAY_SIZE = 7;
+    private final int MAXIMUM_DISPLAY_SIZE = 8;
 
     /**
      * Properties
      */
-
     private ObservableList _observableList;
     private TaskListController _listControl;
     private List<Pair<Integer, Task>> _displayList;
@@ -64,7 +62,6 @@ public class TaskListView extends View {
 
     public static class Item extends ListCell<Pair<Integer, Task>> {
         private static final String STRING_NAME_TEMPLATE = "TaskListItem";
-        private static final String STRING_COMPLETE_COLOR = "#c2c9cc";
 
         @FXML private AnchorPane _container;
         @FXML private Label _indexLabel;
@@ -91,17 +88,21 @@ public class TaskListView extends View {
                 int index = item.getKey();
                 Task task = item.getValue();
 
+                // Grey out completed tasks
+                if (task.isCompleted()) {
+                    this.getStyleClass().add("completed");
+                }
+
+                // Take care of priority
+                if (task.getPriority() != null) {
+                    this.getStyleClass().add("priority--" + task.getPriority().name().toLowerCase());
+                }
+
                 this._indexLabel.setText(Integer.toString(index));
                 this._nameLabel.setText(task.getTaskName());
 
                 // Optional date time to support floating tasks
                 this._dateLabel.setText(_df.getPairDateDisplay(task.getStartTime(),task.getEndTime()));
-
-                if(task.isCompleted()){
-                    this._indexLabel.setTextFill(Color.web(STRING_COMPLETE_COLOR));
-                    this._nameLabel.setTextFill(Color.web(STRING_COMPLETE_COLOR));
-                    this._dateLabel.setTextFill(Color.web(STRING_COMPLETE_COLOR));
-                }
 
                 this.setGraphic(this._container);
             }
@@ -175,7 +176,6 @@ public class TaskListView extends View {
 
     private boolean canScrollUp() {
         return (this._viewIndex - 1) >= 0;
-
     }
 
     private boolean canScrollDown() {

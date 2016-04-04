@@ -1,0 +1,13 @@
+.notification__container {
+    -fx-background-color: #434343;
+    -fx-border-radius: 19px;
+    -fx-background-radius: 19px;
+    
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 4, 0.0, 0, 2);
+}
+
+.notification__label {
+    -fx-text-fill: #ffffff;
+    -fx-font-family: "Lato";
+    -fx-font-size: 14px;
+}
