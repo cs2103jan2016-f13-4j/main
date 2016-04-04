@@ -2,13 +2,13 @@ package logic;
 
 import java.lang.reflect.Type;
 import java.time.*;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -35,6 +35,12 @@ public class FlexiCommandParser implements CommandParserSpec {
     private static final String NAME_FILE_DATA = "CommandParserData.json";
     private static final String PATTERN_TIME = "(?:\\d|:(?=\\d(?<=\\d))){1,5}(?:\\s*(?:am|pm))?";
     private static final char CHAR_QUOTE = '\"';
+    private static final Set<String> KEYWORDS_QUANTIFIER_UNIVERSAL = new CopyOnWriteArraySet<>(Arrays.asList(
+            "all", "everything"
+    ));
+    private static final Set<String> KEYWORDS_TASK = new TreeSet<>(Arrays.asList(
+            "task", "tasks", "todo", "todos", "to-do", "to-dos", "item", "items"
+    ));
 
     /**
      * Types
@@ -803,16 +809,7 @@ public class FlexiCommandParser implements CommandParserSpec {
             case EDIT:
             case DELETE:
             case MARK:
-                // Prepare index pattern
-                Set<String> universalQuantifiers = new TreeSet<>(Arrays.asList(
-                        "all", "everything"
-                ));
-                String quantifierPattern = String.join("|", universalQuantifiers.toArray(new String[0]));
-
-                String indexPattern = String.format(
-                        "^(?<QUANTIFIER>%s|(?:task\\s+)?(?:number(?:ed)?\\s+)?\\d+)",
-                        quantifierPattern
-                );
+                String quantifierRegex = constructQuantifierRegex();
 
                 // Filler words at the end of the index pattern
                 Set<String> fillerWords = new CopyOnWriteArraySet<>(Arrays.asList("set", "to", "change"));
@@ -821,12 +818,13 @@ public class FlexiCommandParser implements CommandParserSpec {
 
                 // Query index
                 Pattern taskIdPattern = Pattern.compile(String.format("%s(?:\\s+%s)*",
-                        indexPattern, fillerPattern), Pattern.CASE_INSENSITIVE);
+                        quantifierRegex, fillerPattern), Pattern.CASE_INSENSITIVE);
                 Matcher matcher = taskIdPattern.matcher(commandString);
                 String match;
 
                 if (matcher.find() && (match = matcher.group("QUANTIFIER")) != null) {
-                    if (universalQuantifiers.contains(match)) {
+                    // If the quantifier is a keyword that signifies a universal quantifier
+                    if (KEYWORDS_QUANTIFIER_UNIVERSAL.contains(match)) {
                         // Cannot universally quantify edit command
                         if (command.getInstruction() == Command.Instruction.EDIT) {
                             return Command.invalidCommand();
@@ -856,9 +854,9 @@ public class FlexiCommandParser implements CommandParserSpec {
                 // Prepare query pattern
                 String queryPattern = "^" + constructNotSurroundedByQuotesRegex("(?:for)?");
                 Pattern searchFillerPattern = Pattern.compile(queryPattern, Pattern.CASE_INSENSITIVE);
-                Matcher matcher2 = searchFillerPattern.matcher(commandString);
-                if (matcher2.find()) {
-                    commandString = commandString.substring(matcher2.end()).trim();
+                matcher = searchFillerPattern.matcher(commandString);
+                if (matcher.find()) {
+                    commandString = commandString.substring(matcher.end()).trim();
                 }
 
                 // No empty search phrase
@@ -870,6 +868,16 @@ public class FlexiCommandParser implements CommandParserSpec {
                 command.setParameter(Command.ParamName.SEARCH_QUERY, commandString);
                 break;
             case DISPLAY:
+                quantifierRegex = constructQuantifierRegex();
+                Pattern displayPattern = Pattern.compile(quantifierRegex, Pattern.CASE_INSENSITIVE);
+                matcher = displayPattern.matcher(commandString);
+
+                if (matcher.find() && matcher.group("QUANTIFIER") != null &&
+                        KEYWORDS_QUANTIFIER_UNIVERSAL.contains(matcher.group("QUANTIFIER"))) {
+                    command.setUniversallyQuantified();
+                    commandString = commandString.substring(matcher.end()).trim();
+                }
+
                 Command newDisplayCommand = parseParameters(commandString, command);
                 if (newDisplayCommand != null) {
                     newDisplayCommand.removeParameter(Command.ParamName.TASK_NAME);
@@ -1133,6 +1141,20 @@ public class FlexiCommandParser implements CommandParserSpec {
         return currentRegex + "(?=(?:(?:(?:[^\"\\\\]++|\\\\.)*+\"){2})*+(?:[^\"\\\\]++|\\\\.)*+$)";
     }
 
+    private static String constructQuantifierRegex() {
+        // Prepare quantifier pattern
+        String quantifierPattern = constructChoiceRegex(KEYWORDS_QUANTIFIER_UNIVERSAL);
+        String taskKeywordPattern = constructChoiceRegex(
+                getSimplePluralStream(KEYWORDS_TASK.stream()).collect(Collectors.toSet())
+        );
+
+        return String.format(
+                "^(?<QUANTIFIER>%s|(?:%s\\s+)?(?:number(?:ed)?\\s+)?\\d+)",
+                quantifierPattern,
+                taskKeywordPattern
+        );
+    }
+
     private static String stripSurroundingQuotes(String string) {
         string = string.trim();
         if (string.length() < 2 || string.charAt(0) != CHAR_QUOTE || string.charAt(string.length() - 1) != CHAR_QUOTE) {
@@ -1141,8 +1163,8 @@ public class FlexiCommandParser implements CommandParserSpec {
         return string.substring(1, string.length() - 1);
     }
 
-    private static String joinStringSet(Set<String> string) {
-        String[] strings = string.toArray(new String[0]);
-        return String.join(" ", strings);
+    private static Stream<String> getSimplePluralStream(Stream<String> stringStream) {
+        return stringStream.map(string -> Arrays.asList(string, string + " "))
+                .flatMap(Collection::stream);
     }
 }

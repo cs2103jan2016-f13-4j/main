@@ -9,7 +9,7 @@ import skeleton.DispatcherSpec;
 /**
  * Created by maianhvu on 01/04/2016.
  */
-public class IntegerationTestHelper {
+public class IntegrationTestHelper {
 
     public static void startTestApplication(Stage primaryStage) {
         // Register the main stage and flag the application as testing
