@@ -131,4 +131,8 @@ public class Command {
     public static Command unrecognisedCommand() {
         return new Command(Instruction.UNRECOGNISED, null, false);
     }
+
+    public static Command initialCommand() {
+        return new Command(Instruction.DISPLAY, null, true);
+    }
 }
