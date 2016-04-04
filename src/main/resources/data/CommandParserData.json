@@ -116,7 +116,7 @@
   }, {
     "meaning": "MEDIUM",
     "keywords": ["medium importance", "normal importance", "medium priority", "normal priority",
-    "normal prio"]
+    "normal prio", "medium", "normal"]
   }, {
     "meaning": "LOW",
     "keywords": ["low importance", "unimportant", "low priority", "low prio"]

@@ -8,7 +8,6 @@ import javafx.animation.Timeline;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
@@ -56,6 +55,9 @@ public class UserInterface implements UserInterfaceSpec {
     private static final Duration TIMELINE_OUTGOING = Duration.millis(
             DURATION_ANIM_TRANSITION + DURATION_ANIM_STOP + DURATION_ANIM_TRANSITION
     );
+
+    private static final int INDEX_X = 0;
+    private static final int INDEX_Y = 1;
 
 
     /**
@@ -171,6 +173,27 @@ public class UserInterface implements UserInterfaceSpec {
 
         AnchorPane commandInputWrapper = inputMetadata.getKey();
         this._rootView.getChildren().add(commandInputWrapper);
+
+        final double[] originalPosition = new double[2];
+        final double[] offset = new double[2];
+
+        // Command input anchor pane will be used for moving
+        commandInputWrapper.setOnMousePressed(event -> {
+            Stage primaryStage = ApplicationContext.mainContext().getPrimaryStage();
+
+            originalPosition[INDEX_X] = primaryStage.getX();
+            originalPosition[INDEX_Y] = primaryStage.getY();
+
+            offset[INDEX_X] = event.getScreenX();
+            offset[INDEX_Y] = event.getScreenY();
+        });
+        commandInputWrapper.setOnMouseDragged(event -> {
+            Stage primaryStage = ApplicationContext.mainContext().getPrimaryStage();
+            double offsetX = event.getScreenX() - offset[INDEX_X];
+            double offsetY = event.getScreenY() - offset[INDEX_Y];
+            primaryStage.setX(originalPosition[INDEX_X] + offsetX);
+            primaryStage.setY(originalPosition[INDEX_Y] + offsetY);
+        });
 
         this._commandInputController = inputMetadata.getValue();
         this._commandInputController.setInputSubmissionHandler(
