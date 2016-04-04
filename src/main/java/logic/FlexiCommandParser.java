@@ -899,6 +899,7 @@ public class FlexiCommandParser implements CommandParserSpec {
             return Command.Instruction.UNRECOGNISED;
         }
 
+        instructionString = instructionString.toLowerCase();
         Command.Instruction instruction = this._commandDefinitions.getInstruction(instructionString);
         if (instruction == null) return Command.Instruction.UNRECOGNISED;
 

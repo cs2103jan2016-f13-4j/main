@@ -112,7 +112,7 @@
 
   "priorities": [{
     "meaning": "HIGH",
-    "keywords": ["high importance", "very important", "important", "high priority", "high prio"]
+    "keywords": ["high importance", "very important", "important", "high priority", "high prio", "critical","as top priority", "highest priority"]
   }, {
     "meaning": "MEDIUM",
     "keywords": ["medium importance", "normal importance", "medium priority", "normal priority",
