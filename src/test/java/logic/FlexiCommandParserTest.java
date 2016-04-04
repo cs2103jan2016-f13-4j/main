@@ -232,4 +232,20 @@ public class FlexiCommandParserTest {
         assertThat(command.getParameter(Command.ParamName.PRIORITY_VALUE),
                 is(Task.Priority.LOW));
     }
+
+    @Test public void FlexiCommandParser_parses_display_with_parameters_correctly() {
+        String commandString = "display all tasks from today 5pm until 25th May 2016";
+        Command command = this._parser.parse(commandString);
+
+        assertThat(command.getInstruction(), is(Command.Instruction.DISPLAY));
+
+        CustomTime start = CustomTime.todayAt(LocalTime.of(17, 0));
+        CustomTime end = new CustomTime(LocalDate.of(2016, Month.MAY, 25), null);
+        assertThat(command.getParameter(Command.ParamName.TASK_START),
+                is(equalTo(start)));
+        assertThat(command.getParameter(Command.ParamName.TASK_END),
+                is(equalTo(end)));
+        assertThat(command.isUniversallyQuantified(), is(true));
+    }
+
 }

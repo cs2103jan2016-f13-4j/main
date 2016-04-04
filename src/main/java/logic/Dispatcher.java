@@ -91,11 +91,7 @@ public class Dispatcher implements DispatcherSpec {
     }
 
     private static Command constructInitialCommand() {
-        Command.Instruction instruction = Command.Instruction.DISPLAY;
-        Integer index = null;
-        boolean isUniversallyQuantified = true;
-
-        return new Command(instruction, index, isUniversallyQuantified);
+        return Command.initialCommand();
     }
 
 }

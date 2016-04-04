@@ -11,6 +11,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.shape.Circle;
 import javafx.util.Pair;
+import shared.Command;
 import shared.CustomTime;
 import shared.Resources;
 import shared.Task;
@@ -35,7 +36,6 @@ public class TaskListView extends View {
      * Properties
      */
     private ObservableList _observableList;
-    private TaskListController _listControl;
     private List<Pair<Integer, Task>> _displayList;
     private int _viewIndex;
 
@@ -44,8 +44,8 @@ public class TaskListView extends View {
      *
      * @param data
      */
-    public TaskListView(List<Pair<Integer, Task>> data) {
-        super(data);
+    public TaskListView(List<Pair<Integer, Task>> data, Command lastCommand) {
+        super(data, lastCommand);
         _viewIndex = 0;
     }
 

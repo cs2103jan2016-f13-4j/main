@@ -18,6 +18,7 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
 import exception.ExceptionHandler;
+import shared.ApplicationContext;
 
 /**
  * 
@@ -216,6 +217,9 @@ public class UserPreferences {
     // ----------------------------------------------------------------------------------------
 
     public String getTodoDataPath() {
+        if (ApplicationContext.mainContext().isTestingMode()) {
+            return "tmp/ToDoData.csv";
+        }
         return this.todoDataPath;
     }
 

@@ -2,6 +2,7 @@ package ui.view;
 
 import javafx.scene.Node;
 import javafx.scene.input.KeyEvent;
+import shared.Command;
 
 import java.util.function.Function;
 
@@ -14,10 +15,16 @@ public abstract class View {
      * Properties
      */
     private Object _data;
+    private Command _lastCommand;
     private Node _component;
 
-    public View(Object data) {
+    public View(Object data, Command lastCommand) {
         this._data = data;
+        if (lastCommand != null) {
+            this._lastCommand = lastCommand;
+        } else {
+            this._lastCommand = Command.initialCommand();
+        }
         this.buildContent();
     }
 
@@ -28,6 +35,10 @@ public abstract class View {
             assert false; // Explode
             return null;
         }
+    }
+
+    protected Command getLastCommand() {
+        return this._lastCommand;
     }
 
     protected abstract void buildContent();

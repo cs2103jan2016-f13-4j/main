@@ -89,7 +89,7 @@ public class TranslationEngine implements TranslationEngineSpec {
 
             // Update mapper with list
             VisualIndexMapper.getInstance().updateList(result.getData());
-            View view = new TaskListView(visualTaskList);
+            View view = new TaskListView(visualTaskList, this._lastCommand);
             this.getUserInterface().render(view);
             break;
         default:
