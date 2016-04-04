@@ -68,24 +68,11 @@ public class TaskListView extends View {
     }
 
     private int obtainNewTaskIndex(){
-        List<Pair<Integer,Task>> taskList = this.getData();
-        int index = 0;
-        Task temp ;
-        Task current= null;
-        for(int i = 0; i < taskList.size();  i++){
-            if(current == null){
-                current = taskList.get(i).getValue();
-            } else {
-                temp = taskList.get(i).getValue();
-                LocalDateTime curCreationTime = current.getCreationTime();
-                LocalDateTime tempCreationTime = temp.getCreationTime();
-                if(curCreationTime.compareTo(tempCreationTime) < 0){
-                    current = temp;
-                    index = i;
-                }
-            }
-        }
-        return index/MAXIMUM_DISPLAY_SIZE;
+        List<Pair<Integer, Task>> taskList = this.getData();
+        return taskList.stream()
+                .max((task1, task2) -> task1.getValue().getCreationTime()
+                        .compareTo(task2.getValue().getCreationTime()))
+                .map(Pair::getKey).orElse(0) / MAXIMUM_DISPLAY_SIZE;
     }
 
     public static class Item extends ListCell<Pair<Integer, Task>> {
