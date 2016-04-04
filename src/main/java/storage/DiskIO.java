@@ -28,17 +28,10 @@ public class DiskIO {
 
     private String _fileName;
     private UserPreferences _userPreferences;
-    private static final String FILE_NAME_DEFAULT = "data/ToDoData.csv";
-    private static final String FILE_NAME_TESTING = "tmp/ToDoData.csv";
 
     private DiskIO() {
-        // Select DiskIO reading/writing file based on testing mode
-        this._fileName = ApplicationContext.mainContext().isTestingMode() ? FILE_NAME_TESTING : FILE_NAME_DEFAULT;
-
         this._userPreferences = UserPreferences.getInstance();
-
         processUserPreferencesFile();
-
         this.createDirectory();
     }
 

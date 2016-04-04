@@ -14,7 +14,7 @@ import org.junit.Test;
 import org.testfx.framework.junit.ApplicationTest;
 
 import helpers.CommandInputHelper;
-import helpers.IntegerationTestHelper;
+import helpers.IntegrationTestHelper;
 import javafx.scene.control.ListView;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
@@ -26,7 +26,7 @@ import storage.Storage;
 public class CommandInputTest extends ApplicationTest {
 
     @Override public void start(Stage stage) {
-        IntegerationTestHelper.startTestApplication(stage);
+        IntegrationTestHelper.startTestApplication(stage);
     }
 
     @Test public void Application_closes_on_exit_command() {
@@ -43,7 +43,7 @@ public class CommandInputTest extends ApplicationTest {
     @Test public void New_item_appears_on_valid_add_command() {
         // given:
         clickOn("#command-input");
-        ListView<?> listView = IntegerationTestHelper.findComponent("#component--main");
+        ListView<?> listView = IntegrationTestHelper.findComponent("#component--main");
         int itemsCount = listView.getItems().size();
 
         // when:
@@ -58,7 +58,7 @@ public class CommandInputTest extends ApplicationTest {
         // given:
         clickOn("#command-input");
         write(CommandInputHelper.constructAddCommand("To be edited")).push(KeyCode.ENTER);
-        int newItemIndex = ((ListView<?>) IntegerationTestHelper.findComponent("#component--main")).getItems().size();
+        int newItemIndex = ((ListView<?>) IntegrationTestHelper.findComponent("#component--main")).getItems().size();
         Task recentItem = Storage.getInstance().getAll().stream()
                 .filter(task -> task.getTaskName().equals("To be edited")).findFirst().get();
 
@@ -72,7 +72,7 @@ public class CommandInputTest extends ApplicationTest {
     }
 
     @AfterClass public static void tearDownAfterClass() throws Exception {
-        IntegerationTestHelper.shutdownTestApplication();
+        IntegrationTestHelper.shutdownTestApplication();
         new File("tmp/ToDoData.csv").delete();
     }
 }
