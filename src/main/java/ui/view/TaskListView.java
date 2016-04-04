@@ -18,6 +18,7 @@ import shared.Task;
 import ui.controller.DateFormatterHelper;
 import ui.controller.TaskListController;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +51,12 @@ public class TaskListView extends View {
     }
 
     @Override protected void buildContent() {
+        // find viewIndex for new task if the last command is add
+        if(this.getLastCommand().getInstruction() == Command.Instruction.ADD){
+            System.out.println("last Command is:" + this.getLastCommand().toString());
+            _viewIndex = obtainNewTaskIndex();
+        }
+
         _displayList = constructDisplayList();
         _observableList = FXCollections.observableArrayList(_displayList);
 
@@ -58,6 +65,27 @@ public class TaskListView extends View {
         listView.setCellFactory(list -> new Item());
 
         this.setComponent(listView);
+    }
+
+    private int obtainNewTaskIndex(){
+        List<Pair<Integer,Task>> taskList = this.getData();
+        int index = 0;
+        Task temp ;
+        Task current= null;
+        for(int i = 0; i < taskList.size();  i++){
+            if(current == null){
+                current = taskList.get(i).getValue();
+            } else {
+                temp = taskList.get(i).getValue();
+                LocalDateTime curCreationTime = current.getCreationTime();
+                LocalDateTime tempCreationTime = temp.getCreationTime();
+                if(curCreationTime.compareTo(tempCreationTime) < 0){
+                    current = temp;
+                    index = i;
+                }
+            }
+        }
+        return index/MAXIMUM_DISPLAY_SIZE;
     }
 
     public static class Item extends ListCell<Pair<Integer, Task>> {
