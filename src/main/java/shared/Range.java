@@ -1,9 +1,8 @@
 package shared;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Created by maianhvu on 05/04/2016.
@@ -145,7 +144,7 @@ public class Range implements Comparable<Range> {
                 it.remove();
                 didMerge = true;
             }
-            // Check for continuation
+            // Check for continuation of end [5, 6] + [6, 8]
             if (previousRange.hasEnd() && thisRange.getStart().equals(previousRange.getEnd() + 1)) {
                 if (thisRange.hasEnd()) {
                     previousRange.setEnd(thisRange.getEnd());
@@ -155,10 +154,27 @@ public class Range implements Comparable<Range> {
                 it.remove();
                 didMerge = true;
             }
+            // Check for continuation of start [5] [6] [7]
+            if (!(previousRange.hasEnd() && thisRange.hasEnd()) &&
+                    thisRange.getStart().equals(previousRange.getStart() + 1)) {
+                previousRange.setEnd(thisRange.getStart());
+                it.remove();
+                didMerge = true;
+            }
 
             if (!didMerge) {
                 previousRange = thisRange;
             }
         }
+    }
+
+    public static int[] enumerateRanges(List<Range> ranges) {
+        return ranges.stream().flatMapToInt(range -> {
+            if (!range.hasEnd()) {
+                return IntStream.of(range.getStart());
+            } else {
+                return IntStream.range(range.getStart(), range.getEnd() + 1);
+            }
+        }).sorted().toArray();
     }
 }

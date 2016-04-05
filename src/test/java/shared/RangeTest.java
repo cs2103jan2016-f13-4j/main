@@ -2,10 +2,13 @@ package shared;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import static junit.framework.TestCase.assertFalse;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -112,5 +115,18 @@ public class RangeTest {
     @Test(expected = AssertionError.class)
     public void A_range_cannot_end_earlier_than_it_starts() {
         Range range = new Range(10, 1);
+    }
+
+    @Test
+    public void Range_with_single_values_merge_when_continuous() {
+        List<Range> ranges = new ArrayList<>(Arrays.asList(
+                new Range(5),
+                new Range(6),
+                new Range(7),
+                new Range(8)
+        ));
+        Range.straightenRanges(ranges);
+        assertThat(ranges, hasSize(1));
+        assertThat(ranges, hasItem(new Range(5, 8)));
     }
 }

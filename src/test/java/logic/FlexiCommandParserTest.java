@@ -259,12 +259,9 @@ public class FlexiCommandParserTest {
         assertFalse(command.hasTrueValue(Command.ParamName.TASK_UNIVERSALLY_QUANTIFIED));
         List<Range> ranges = command.getParameter(Command.ParamName.TASK_INDEX_RANGES);
         assertThat(ranges, hasItems(
-                new Range(1, 5),
-                new Range(6, 9),
-                new Range(10, 12),
+                new Range(1, 12),
                 new Range(15),
-                new Range(18, 20),
-                new Range(21, 22)
+                new Range(18, 22)
         ));
     }
 
