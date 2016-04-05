@@ -53,6 +53,31 @@ public class TaskPriorityComparatorTest {
         assertEquals(lowPriorityTask, taskList.get(2));
     }
 
+    @Test public void Mix_of_tasks_with_priority_values_and_null_priorities_are_ordered_correctly() {
+        CustomTime standardStartTime = new CustomTime(LocalDateTime.of(2016, 3, 30, 10, 00));
+        CustomTime standardEndTime = new CustomTime(LocalDateTime.of(2016, 4, 1, 14, 30));
+
+        // default priority is null
+        Task nullPriorityTask = new Task(null, "draft progress report", null, standardStartTime, standardEndTime);
+        Task lowPriorityTask = new Task(null, "make software demo slides", null, standardStartTime, standardEndTime);
+        lowPriorityTask.setPriority(Priority.LOW);
+        Task highPriorityTask = new Task(null, "v0.4 milestone delivery", null, standardStartTime, standardEndTime);
+        highPriorityTask.setPriority(Priority.HIGH);
+
+        this.storage_.save(nullPriorityTask); // nullPriorityTask ID: 1
+        this.storage_.save(lowPriorityTask); // lowPriorityTask ID: 2
+        this.storage_.save(highPriorityTask); // highPriorityTask ID: 3
+        List<Task> taskList = this.storage_.getAll();
+
+        // sort
+        Collections.sort(taskList, new TaskPriorityComparator());
+
+        // check that low priority task comes last, right below null priority task
+        assertEquals(highPriorityTask, taskList.get(0));
+        assertEquals(nullPriorityTask, taskList.get(1));
+        assertEquals(lowPriorityTask, taskList.get(2));
+    }
+
     @Test public void Tasks_with_same_priorities_but_different_start_times_are_ordered_correctly() {
         CustomTime standardEndTime = new CustomTime(LocalDateTime.of(2016, 4, 20, 18, 00));
 

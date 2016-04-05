@@ -105,7 +105,7 @@ public class StorageTest {
     //
     // ----------------------------------------------------------------------------------------
 
-    @Test public void Get_all_method_with_null_parameter_returns_list_correctly() {
+    @Test public void Get_all_method_returns_list_correctly() {
         Task task5 = new Task(null, "tutorial", "nm2101", new CustomTime(LocalDateTime.of(2016, 3, 7, 14, 30)),
                 new CustomTime(LocalDateTime.of(2016, 3, 8, 14, 30)));
         Task task6 = new Task(null, "essay submission", "nm3238", new CustomTime(LocalDateTime.of(2016, 3, 8, 12, 00)),
@@ -342,14 +342,14 @@ public class StorageTest {
         assertEquals(CustomTime.fromString("2016-03-09T14:30"), this._storage.get(1).getStartTime());
         assertEquals(CustomTime.fromString("2016-03-09T16:30"), this._storage.get(1).getEndTime());
         assertTrue(this._storage.get(1).isCompleted());
-        assertEquals(Task.Priority.LOW, this._storage.get(1).getPriority());
+        assertEquals(Task.Priority.HIGH, this._storage.get(1).getPriority());
         assertEquals((Integer) 2, this._storage.get(2).getId());
         assertEquals("sales meeting", this._storage.get(2).getTaskName());
         assertEquals(LocalDateTime.parse("2016-03-03T12:05"), this._storage.get(2).getCreationTime());
         assertEquals(CustomTime.fromString("2016-03-11T12:00"), this._storage.get(2).getStartTime());
         assertEquals(CustomTime.fromString("2016-03-11T14:30"), this._storage.get(2).getEndTime());
         assertFalse(this._storage.get(2).isCompleted());
-        assertEquals(Task.Priority.HIGH, this._storage.get(2).getPriority());
+        assertEquals(Task.Priority.NULL, this._storage.get(2).getPriority());
     }
 
 }
