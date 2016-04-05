@@ -35,6 +35,7 @@ public class Storage extends TimerTask implements StorageSpec<Task> {
      */
     private TreeMap<Integer, Task> _taskData;
     private boolean _isDirty;
+    private Timer _autosaveTimer;
 
     /**
      * Constructs a new Storage instance.
@@ -56,9 +57,10 @@ public class Storage extends TimerTask implements StorageSpec<Task> {
     @Override
     public void initialise() {
         this.readFromDisk();
-        // tODO: initialize periodic save
-        final Timer timer = new Timer();
-        Platform.runLater(() -> timer.scheduleAtFixedRate(this, this.SAVE_DELAY, this.SAVE_DELAY));
+
+        this._autosaveTimer = new Timer();
+        Platform.runLater(() -> this._autosaveTimer
+                .scheduleAtFixedRate(this, SAVE_DELAY, SAVE_DELAY));
     }
 
 
@@ -265,4 +267,11 @@ public class Storage extends TimerTask implements StorageSpec<Task> {
 
         this._isDirty = false;
     }
+
+    @Override
+    public void shutdown() {
+        this.writeToDisk();
+        this._autosaveTimer.cancel();
+    }
+
 }

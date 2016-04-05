@@ -18,4 +18,6 @@ public interface StorageSpec<T> {
     void undelete(int index);
 
     List<T> getAll();
+
+    void shutdown();
 }

@@ -191,7 +191,8 @@ public class DecisionEngine implements DecisionEngineSpec {
     }
 
     @Override public void shutdown() {
-        Storage.getInstance().writeToDisk();
+        StorageSpec<?> storage = this.getStorage();
+        storage.shutdown();
     }
 
     @Override public StorageSpec<Task> getStorage() {
