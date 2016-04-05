@@ -1,9 +1,14 @@
 package shared;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+
 /**
  * Created by maianhvu on 05/04/2016.
  */
-public class Range {
+public class Range implements Comparable<Range> {
 
     /**
      * Properties
@@ -40,6 +45,30 @@ public class Range {
         }
         assert hasEnd();
         return value >= this._start && value <= this._end;
+    }
+
+    public boolean contains(Range another) {
+        // If the other value is a single value, fall back
+        // to the single value contains method
+        if (!another.hasEnd()) {
+            return this.contains(another.getStart());
+        }
+
+        // If the second value starts smaller than this then
+        // it is definitely not contained inside
+        if (another.getStart() < this.getStart()) {
+            return false;
+        }
+
+        // When this doesn't have an end, the only case where
+        // the second one is contained inside this, is where
+        // the end value is exactly equal to the start value
+        if (!this.hasEnd()) {
+            return another.getEnd().equals(another.getStart());
+        }
+
+        // Compare the end points
+        return another.getEnd() <= this.getEnd();
     }
 
     public Integer getStart() {
@@ -90,5 +119,46 @@ public class Range {
         }
 
         return this.getEnd().equals(otherRange.getEnd());
+    }
+
+    @Override public int compareTo(Range another) {
+        return this.getStart().compareTo(another.getStart());
+    }
+
+    public static void straightenRanges(List<Range> rangeList) {
+        Collections.sort(rangeList);
+        Range previousRange = null;
+        for (Iterator<Range> it = rangeList.iterator(); it.hasNext(); ) {
+            Range thisRange = it.next();
+            if (previousRange == null) {
+                previousRange = thisRange;
+                continue;
+            }
+            boolean didMerge = false;
+            // Check for containment or overlap
+            if (previousRange.contains(thisRange) || previousRange.contains(thisRange.getStart())) {
+                // Does contain, merge the two!
+                if (thisRange.hasEnd() && (!previousRange.hasEnd() || previousRange.hasEnd() &&
+                        previousRange.getEnd() < thisRange.getEnd())) {
+                    previousRange.setEnd(thisRange.getEnd());
+                }
+                it.remove();
+                didMerge = true;
+            }
+            // Check for continuation
+            if (previousRange.hasEnd() && thisRange.getStart().equals(previousRange.getEnd() + 1)) {
+                if (thisRange.hasEnd()) {
+                    previousRange.setEnd(thisRange.getEnd());
+                } else {
+                    previousRange.setEnd(thisRange.getStart());
+                }
+                it.remove();
+                didMerge = true;
+            }
+
+            if (!didMerge) {
+                previousRange = thisRange;
+            }
+        }
     }
 }

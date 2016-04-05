@@ -73,4 +73,44 @@ public class RangeTest {
         Range range2 = new Range(2, 5);
         assertThat(range1, is(not(equalTo(range2))));
     }
+
+    @Test
+    public void A_larger_range_contains_a_smaller_range() {
+        Range larger = new Range(1, 7);
+        Range smaller = new Range(3, 5);
+        assertTrue(larger.contains(smaller));
+    }
+
+    @Test
+    public void A_single_index_range_contains_a_range_with_same_start_end_values() {
+        Range index = new Range(5);
+        Range range = new Range(5, 5);
+        assertTrue(index.contains(range));
+    }
+
+    @Test
+    public void A_smaller_range_does_not_contain_a_larger_range() {
+        Range smaller = new Range(1, 4);
+        Range larger = new Range(2, 5);
+        assertFalse(smaller.contains(larger));
+    }
+
+    @Test
+    public void Two_non_overlapping_ranges_do_not_contain_each_other() {
+        Range range1 = new Range(1, 4);
+        Range range2 = new Range(5, 6);
+        assertFalse(range1.contains(range2));
+        assertFalse(range2.contains(range1));
+    }
+
+    @Test
+    public void A_range_should_contain_itself() {
+        Range range = new Range(2, 6);
+        assertTrue(range.contains(range));
+    }
+
+    @Test(expected = AssertionError.class)
+    public void A_range_cannot_end_earlier_than_it_starts() {
+        Range range = new Range(10, 1);
+    }
 }

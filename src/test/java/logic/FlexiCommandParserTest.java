@@ -268,6 +268,19 @@ public class FlexiCommandParserTest {
         ));
     }
 
+    @Test public void FlexiCommandParser_straighten_overlapping_ranges() {
+        String commandString = "delete 1-5, 3-7, 2-4, 10-19, 12, 21 to 23";
+        Command command = this._parser.parse(commandString);
+        List<Range> ranges = command.getParameter(Command.ParamName.TASK_INDEX_RANGES);
+
+        assertThat(ranges, hasSize(3));
+        assertThat(ranges, hasItems(
+                new Range(1, 7),
+                new Range(10, 19),
+                new Range(21, 23)
+        ));
+    }
+
     @Test public void FlexiCommandParser_parses_simple_mark_correctly() {
         Command command = this._parser.parse("mark 5");
         assertThat(command.getInstruction(), is(equalTo(Command.Instruction.MARK)));

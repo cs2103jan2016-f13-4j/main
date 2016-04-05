@@ -895,6 +895,9 @@ public class FlexiCommandParser implements CommandParserSpec {
                 // If there is a range, then we disregard the universal quantifier anyway
                 if (!ranges.isEmpty()) {
                     command.setParameter(Command.ParamName.TASK_UNIVERSALLY_QUANTIFIED, false);
+
+                    // Straighten out range
+                    Range.straightenRanges(ranges);
                     // And then set the command parameter of the range to this value
                     command.setParameter(Command.ParamName.TASK_INDEX_RANGES, ranges);
                 }
