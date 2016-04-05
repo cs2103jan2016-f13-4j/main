@@ -53,7 +53,7 @@ public class TaskListView extends View {
     @Override protected void buildContent() {
         // find viewIndex for new task if the last command is add
         if(this.getLastCommand().getInstruction() == Command.Instruction.ADD){
-            System.out.println("last Command is:" + this.getLastCommand().toString());
+            //System.out.println("last Command is:" + this.getLastCommand().toString());
             _viewIndex = obtainNewTaskIndex();
         }
 
@@ -62,7 +62,7 @@ public class TaskListView extends View {
 
         ListView listView = Resources.getInstance().getComponent("TaskList");
         listView.setItems(this._observableList);
-        listView.setCellFactory(list -> new Item());
+        listView.setCellFactory(list -> new Item(this.getLastCommand(),this._viewIndex));
 
         this.setComponent(listView);
     }
@@ -90,22 +90,29 @@ public class TaskListView extends View {
 
     public static class Item extends ListCell<Pair<Integer, Task>> {
         private static final String STRING_NAME_TEMPLATE = "TaskListItem";
-
+        private static final String STRING_HIGHLIGHT_COLOR = "-fx-background-color: #FFFFFF;";
         @FXML private AnchorPane _container;
         @FXML private Label _indexLabel;
         @FXML private Label _nameLabel;
         @FXML private Label _dateLabel;
         private DateFormatterHelper _df = new DateFormatterHelper();
+        private Command _lastCommand;
+        private int _newTaskIndex;
 
-        public Item() {
+        public Item(Command lastCommand, int newTaskIndex) {
             super();
             this._container = Resources.getInstance().getComponent(STRING_NAME_TEMPLATE);
             this._indexLabel = (Label) this._container.lookup("#_indexLabel");
             this._nameLabel = (Label) this._container.lookup("#_taskNameLabel");
             this._dateLabel = (Label) this._container.lookup("#_timeLabel");
+
             assert this._indexLabel != null;
             assert this._nameLabel != null;
             assert this._dateLabel != null;
+
+            this._lastCommand = lastCommand ;
+            this._newTaskIndex = newTaskIndex;
+
         }
 
         @Override protected void updateItem(Pair<Integer, Task> item, boolean empty) {
@@ -129,6 +136,10 @@ public class TaskListView extends View {
                 this._indexLabel.setText(Integer.toString(index));
                 this._nameLabel.setText(task.getTaskName());
 
+                //set animation for newly added task
+                if(this._lastCommand.getInstruction() == Command.Instruction.ADD && item.getKey() == this._newTaskIndex) {
+                    setFlashingAnimation();
+                }
                 // Optional date time to support floating tasks
                 this._dateLabel.setText(_df.getPairDateDisplay(task.getStartTime(),task.getEndTime()));
 
@@ -161,6 +172,10 @@ public class TaskListView extends View {
             } else {
                 return false;
             }
+        }
+
+        private void setFlashingAnimation(){
+           // final KeyValue initial = new KeyValue(this._container.styleProperty(),)
         }
     }
 
