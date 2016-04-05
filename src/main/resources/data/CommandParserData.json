@@ -108,15 +108,18 @@
     "canGoWithoutPrepositions": false
   }],
 
-  "priorityPrepositions": ["with", "as", "of"],
+  "priorityPrepositions": ["with", "as", "of", "be"],
 
   "priorities": [{
     "meaning": "HIGH",
     "keywords": ["high importance", "very important", "important", "high priority", "high prio", "critical","as top priority", "highest priority"]
   }, {
     "meaning": "MEDIUM",
-    "keywords": ["medium importance", "normal importance", "medium priority", "normal priority",
-    "normal prio", "medium", "normal"]
+    "keywords": ["medium importance", "medium priority", "medium"]
+  }, {
+    "meaning": "NULL",
+    "keywords": ["default", "normal", "normal importance", "normal priority", "default priority",
+      "default importance", "no particular priority", "no particular importance"]
   }, {
     "meaning": "LOW",
     "keywords": ["low importance", "unimportant", "low priority", "low prio"]

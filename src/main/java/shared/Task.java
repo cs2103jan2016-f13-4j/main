@@ -36,10 +36,7 @@ public class Task implements Comparable<Task> {
      *
      */
     public enum Priority {
-        // We want Tasks with high priority to appear nearer the start of the
-        // list
-        LOW(3), MEDIUM(2), HIGH(1); // assign the smallest numeric value to
-                                    // "high"
+        LOW(0), NULL(1), MEDIUM(2), HIGH(3);
 
         private final int PRIORITY_VALUE;
 
@@ -66,7 +63,7 @@ public class Task implements Comparable<Task> {
      * @param endTime
      */
     public Task(Integer id, String taskName, String description, CustomTime startTime, CustomTime endTime) {
-        this(id, taskName, description, LocalDateTime.now(), startTime, endTime, false, Priority.LOW, false);
+        this(id, taskName, description, LocalDateTime.now(), startTime, endTime, false, Priority.NULL, false);
     }
 
     public Task(Integer id, String taskName, String description, LocalDateTime startTime, LocalDateTime endTime) {
@@ -194,8 +191,8 @@ public class Task implements Comparable<Task> {
 
         boolean isCompleted = taskValues.get(6).trim().toLowerCase().equals("true");
 
-        int priorityValue = Integer.parseInt(taskValues.get(7));
         final Priority[] priority = new Priority[] { Priority.LOW };
+        int priorityValue = Integer.parseInt(taskValues.get(7));
         Arrays.stream(Priority.values()).filter(p -> p.getPriorityValue() == priorityValue).findFirst()
                 .ifPresent(p -> priority[0] = p);
 

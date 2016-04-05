@@ -2,14 +2,13 @@ package logic;
 
 import javafx.util.Pair;
 import shared.*;
-import skeleton.CollectionSpec;
+import skeleton.StorageSpec;
 import skeleton.DecisionEngineSpec;
 import skeleton.SchedulerSpec;
 import storage.Storage;
 import storage.TaskPriorityComparator;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -39,12 +38,13 @@ public class DecisionEngine implements DecisionEngineSpec {
     }
 
     @Override public void initialise() {
-        Storage.getInstance().readFromDisk();
+        StorageSpec<?> storage = this.getStorage();
+        storage.initialise();
     }
 
 
     protected ExecutionResult displayAllTasks() {
-        List<Task> listToDisplay = this.getTaskCollection().getAll().stream()
+        List<Task> listToDisplay = this.getStorage().getAll().stream()
                 .sorted(TaskPriorityComparator.getInstance()).collect(Collectors.toList());
 
         return new ExecutionResult(ViewType.TASK_LIST, listToDisplay);
@@ -53,7 +53,7 @@ public class DecisionEngine implements DecisionEngineSpec {
     protected ExecutionResult handleDisplay(Command command) {
         assert command.hasInstruction(Command.Instruction.DISPLAY);
 
-        List<Task> listToDisplay = this.getTaskCollection().getAll();
+        List<Task> listToDisplay = this.getStorage().getAll();
 
         // for each command parameter, filter the list of tasks
         if (command.hasParameter(Command.ParamName.TASK_NAME)) {
@@ -92,7 +92,7 @@ public class DecisionEngine implements DecisionEngineSpec {
         Pattern pattern = buildPowerSearchPattern(command);
         double averageQueryLength = getAverageQueryLength(command);
 
-        List<Task> foundTask = this.getTaskCollection().getAll().stream().map(item -> {
+        List<Task> foundTask = this.getStorage().getAll().stream().map(item -> {
             // Match with task name first
             Matcher m = pattern.matcher(item.getTaskName());
             int matches = 0;
@@ -191,10 +191,11 @@ public class DecisionEngine implements DecisionEngineSpec {
     }
 
     @Override public void shutdown() {
-        Storage.getInstance().writeToDisk();
+        StorageSpec<?> storage = this.getStorage();
+        storage.shutdown();
     }
 
-    @Override public CollectionSpec<Task> getTaskCollection() {
+    @Override public StorageSpec<Task> getStorage() {
         return Storage.getInstance();
     }
 
