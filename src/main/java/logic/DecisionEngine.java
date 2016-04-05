@@ -118,6 +118,21 @@ public class DecisionEngine implements DecisionEngineSpec {
         return new ExecutionResult(ViewType.TASK_LIST, foundTask);
     }
 
+    protected ExecutionResult handleWriteOperation(Command command) {
+        assert command.hasInstruction(Command.Instruction.ADD)
+                || command.hasInstruction(Command.Instruction.DELETE)
+                || command.hasInstruction(Command.Instruction.EDIT)
+                || command.hasInstruction(Command.Instruction.MARK);
+
+        StorageWriteOperation op = new StorageWriteOperation(command);
+        String errorMsg = StorageWriteOperationHistory.getInstance().addToHistoryAfterExecuting(op);
+
+        ExecutionResult result = this.displayAllTasks();
+        result.setErrorMessage(errorMsg);
+
+        return result;
+    }
+
 
 
     @Override public ExecutionResult performCommand(Command command) {
@@ -140,10 +155,7 @@ public class DecisionEngine implements DecisionEngineSpec {
             case DELETE:
             case EDIT:
             case MARK:
-                StorageWriteOperation op = new StorageWriteOperation(command);
-                op.getInitialOperation().apply(null);
-                StorageWriteOperationHistory.getInstance().addToHistory(op);
-                result = this.displayAllTasks();
+                result = this.handleWriteOperation(command);
                 break;
             case DISPLAY:
                 result = this.handleDisplay(command);
