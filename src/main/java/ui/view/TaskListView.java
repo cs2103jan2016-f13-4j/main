@@ -1,5 +1,6 @@
 package ui.view;
 
+import javafx.animation.FillTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.collections.FXCollections;
@@ -22,7 +23,7 @@ import shared.Task;
 import ui.controller.DateFormatterHelper;
 import ui.controller.TaskListController;
 
-import java.time.Duration;
+import javafx.util.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -95,7 +96,7 @@ public class TaskListView extends View {
 
     public static class Item extends ListCell<Pair<Integer, Task>> {
         private static final String STRING_NAME_TEMPLATE = "TaskListItem";
-        private static final String STRING_HIGHLIGHT_COLOR = "FBFF74";
+        private static final String STRING_HIGHLIGHT_COLOR = "#FBFF74";
         @FXML private AnchorPane _container;
         @FXML private Label _indexLabel;
         @FXML private Label _nameLabel;
@@ -205,6 +206,12 @@ public class TaskListView extends View {
             final KeyValue dateFinal = new KeyValue(this._dateLabel.textFillProperty(),
                     this._dateLabel.getTextFill());
             */
+
+            FillTransition highlight = new FillTransition(Duration.millis(200),this._highlight,Color.WHITE,Color.web(STRING_HIGHLIGHT_COLOR));
+            highlight.setCycleCount(2);
+            highlight.setAutoReverse(true);
+
+            highlight.play();
             //final KeyFrame first = new KeyFrame(javafx.util.Duration.ZERO, indexInitial, nameInitial, dateInitial);
             //final KeyFrame mid = new KeyFrame(javafx.util.Duration.ZERO, indexMiddle, nameMiddle, dateMiddle);
             //final KeyFrame last = new KeyFrame(javafx.util.Duration.ZERO, indexFinal, nameFinal, dateFinal);
