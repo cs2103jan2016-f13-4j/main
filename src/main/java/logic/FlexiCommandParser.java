@@ -21,10 +21,7 @@ import com.google.gson.JsonParseException;
 
 import com.google.gson.internal.LinkedTreeMap;
 import javafx.util.Pair;
-import shared.Command;
-import shared.CustomTime;
-import shared.Resources;
-import shared.Task;
+import shared.*;
 import skeleton.CommandParserSpec;
 
 /**
@@ -34,13 +31,16 @@ public class FlexiCommandParser implements CommandParserSpec {
 
     private static final String NAME_FILE_DATA = "CommandParserData.json";
     private static final String PATTERN_TIME = "(?:\\d|:(?=\\d(?<=\\d))){1,5}(?:\\s*(?:am|pm))?";
+
     private static final char CHAR_QUOTE = '\"';
-    private static final Set<String> KEYWORDS_QUANTIFIER_UNIVERSAL = new CopyOnWriteArraySet<>(Arrays.asList(
-            "all", "everything"
-    ));
-    private static final Set<String> KEYWORDS_TASK = new TreeSet<>(Arrays.asList(
-            "task", "tasks", "todo", "todos", "to-do", "to-dos", "item", "items"
-    ));
+
+    private static final Set<String> KEYWORDS_QUANTIFIER_UNIVERSAL = asStringSet("all", "everything");
+    private static final Set<String> KEYWORDS_EDIT_FILLER = asStringSet("to");
+
+    private static final String MATCHER_GROUP_QUANTIFIER = "QUANTIFIER";
+    private static final String MATCHER_GROUP_RANGE_START = "RSTART";
+    private static final String MATCHER_GROUP_RANGE_END = "REND";
+    private static final String MATCHER_GROUP_TASK_ID = "TASKID";
 
     /**
      * Types
@@ -754,10 +754,12 @@ public class FlexiCommandParser implements CommandParserSpec {
 
         @Override public String toString() {
             StringBuilder sb = new StringBuilder();
-            this._prepositions.stream().map(TimePreposition::getMeaning).map(Object::toString).forEach(preposition -> {
-                sb.append(preposition);
-                sb.append(" ");
-            });
+            this._prepositions.stream().map(TimePreposition::getMeaning)
+                    .map(Object::toString)
+                    .forEach(preposition -> {
+                        sb.append(preposition);
+                        sb.append(" ");
+                    });
             sb.append(this._noun);
             return sb.toString();
         }
@@ -800,61 +802,109 @@ public class FlexiCommandParser implements CommandParserSpec {
             commandString = commandString.substring(instructionEnd).trim();
         }
 
+        Pattern pattern;
+        Matcher matcher;
+        int lowestParamIndex;
+
         // Based on the INSTRUCTION, we will now proceed to decoding the parameters.
         switch (instruction) {
             case ADD:
                 // Try to find time and priority first
-                command = this.parseParameters(commandString, command);
+                lowestParamIndex = this.parseParameters(commandString, command);
+                // Trim command string to get task name
+                commandString = commandString.substring(0, lowestParamIndex).trim();
+                this.parseTaskName(commandString, command);
+
                 break;
             case EDIT:
-            case DELETE:
-            case MARK:
-                String quantifierRegex = constructQuantifierRegex();
+                // Get the index first
+                pattern = Pattern.compile(constructSingleIndexRegex(), Pattern.CASE_INSENSITIVE);
+                matcher = pattern.matcher(commandString);
 
-                // Filler words at the end of the index pattern
-                Set<String> fillerWords = new CopyOnWriteArraySet<>(Arrays.asList("set", "to", "change"));
-                String fillerPattern = constructChoiceRegex(fillerWords);
-                fillerPattern = constructNotSurroundedByQuotesRegex(fillerPattern);
+                if (matcher.find()) {
+                    // Get the index and truncate it from the commandString
+                    int index = Integer.parseInt(matcher.group(MATCHER_GROUP_TASK_ID));
+                    command.setParameter(Command.ParamName.TASK_INDEX, index);
 
-                // Query index
-                Pattern taskIdPattern = Pattern.compile(String.format("%s(?:\\s+%s)*",
-                        quantifierRegex, fillerPattern), Pattern.CASE_INSENSITIVE);
-                Matcher matcher = taskIdPattern.matcher(commandString);
-                String match;
-
-                if (matcher.find() && (match = matcher.group("QUANTIFIER")) != null) {
-                    // If the quantifier is a keyword that signifies a universal quantifier
-                    if (KEYWORDS_QUANTIFIER_UNIVERSAL.contains(match)) {
-                        // Cannot universally quantify edit command
-                        if (command.getInstruction() == Command.Instruction.EDIT) {
-                            return Command.invalidCommand();
-                        }
-
-                        command.setParameter(Command.ParamName.TASK_UNIVERSALLY_QUANTIFIED, true);
-                        break;
+                    commandString = commandString.substring(matcher.end())
+                            .trim();
+                    // Trim fillers too
+                    pattern = Pattern.compile("^" + constructNotSurroundedByQuotesRegex(
+                            constructChoiceRegex(KEYWORDS_EDIT_FILLER)
+                    ));
+                    matcher = pattern.matcher(commandString);
+                    if (matcher.find()) {
+                        commandString = commandString.substring(matcher.end()).trim();
                     }
 
-                    match = match.replaceAll("[^0-9]","");
-                    // Parse ID
-                    int taskId = Integer.parseInt(match);
-                    command.setParameter(Command.ParamName.TASK_INDEX, taskId);
-                    commandString = commandString.substring(matcher.end()).trim();
+                    // Begin getting parameters
+                    lowestParamIndex = this.parseParameters(commandString, command);
+
+                    // Now get task name if any
+                    if (lowestParamIndex > 0 && lowestParamIndex <= commandString.length()) {
+                        commandString = commandString.substring(0, lowestParamIndex).trim();
+                        this.parseTaskName(commandString, command);
+                    }
+
                 } else {
-                    // TODO: Handle case where id not found
+                    // No index to edit, return as invalid command
+                    command = Command.invalidCommand();
+                }
+                break;
+            case DELETE:
+            case MARK:
+                pattern = Pattern.compile(constructChoiceRegex(asStringSet(
+                        constructRangeRegex(),
+                        constructQuantifierRegex()
+                )), Pattern.CASE_INSENSITIVE);
+                matcher = pattern.matcher(commandString);
+                List<Range> ranges = new ArrayList<>();
+
+                while (matcher.find()) {
+                    // For ranges
+                    if (matcher.group(MATCHER_GROUP_RANGE_START) != null) {
+                        ranges.add(new Range(Integer.parseInt(
+                                matcher.group(MATCHER_GROUP_RANGE_START)
+                        )));
+                    }
+                    if (matcher.group(MATCHER_GROUP_RANGE_END) != null) {
+                        // We should be certain that there is already an
+                        // existing range inside the ranges
+                        assert ranges.size() > 0;
+                        // And that it doesn't have an end value yet
+                        Range latestRange = ranges.get(ranges.size() - 1);
+                        assert !latestRange.hasEnd();
+
+                        // Set the end range
+                        latestRange.setEnd(Integer.parseInt(
+                                matcher.group(MATCHER_GROUP_RANGE_END)
+                        ));
+                    }
+                    // For quantifiers
+                    if (matcher.group(MATCHER_GROUP_QUANTIFIER) != null) {
+                        // We want to make sure that this string is contained
+                        // inside the set
+                        assert KEYWORDS_QUANTIFIER_UNIVERSAL.contains(
+                                matcher.group(MATCHER_GROUP_QUANTIFIER).toLowerCase()
+                        );
+
+                        command.setParameter(Command.ParamName.TASK_UNIVERSALLY_QUANTIFIED, true);
+                    }
                 }
 
-                // Break if instruction is not EDIT, don't need extra parameters
-                if (instruction != Command.Instruction.EDIT) {
-                    break;
+                // If there is a range, then we disregard the universal quantifier anyway
+                if (!ranges.isEmpty()) {
+                    command.setParameter(Command.ParamName.TASK_UNIVERSALLY_QUANTIFIED, false);
+                    // And then set the command parameter of the range to this value
+                    command.setParameter(Command.ParamName.TASK_INDEX_RANGES, ranges);
                 }
-
-                command = this.parseParameters(commandString, command);
                 break;
             case SEARCH:
                 // Prepare query pattern
                 String queryPattern = "^" + constructNotSurroundedByQuotesRegex("(?:for)?");
-                Pattern searchFillerPattern = Pattern.compile(queryPattern, Pattern.CASE_INSENSITIVE);
-                matcher = searchFillerPattern.matcher(commandString);
+                pattern = Pattern.compile(queryPattern, Pattern.CASE_INSENSITIVE);
+                matcher = pattern.matcher(commandString);
+
                 if (matcher.find()) {
                     commandString = commandString.substring(matcher.end()).trim();
                 }
@@ -868,21 +918,8 @@ public class FlexiCommandParser implements CommandParserSpec {
                 command.setParameter(Command.ParamName.SEARCH_QUERY, commandString);
                 break;
             case DISPLAY:
-                quantifierRegex = constructQuantifierRegex();
-                Pattern displayPattern = Pattern.compile(quantifierRegex, Pattern.CASE_INSENSITIVE);
-                matcher = displayPattern.matcher(commandString);
-
-                if (matcher.find() && matcher.group("QUANTIFIER") != null &&
-                        KEYWORDS_QUANTIFIER_UNIVERSAL.contains(matcher.group("QUANTIFIER"))) {
-                    command.setParameter(Command.ParamName.TASK_UNIVERSALLY_QUANTIFIED, true);
-                    commandString = commandString.substring(matcher.end()).trim();
-                }
-
-                Command newDisplayCommand = parseParameters(commandString, command);
-                if (newDisplayCommand != null) {
-                    newDisplayCommand.removeParameter(Command.ParamName.TASK_NAME);
-                    command = newDisplayCommand;
-                }
+                // Parses command string for parameters too
+                this.parseParameters(commandString, command);
                 break;
         }
 
@@ -914,7 +951,16 @@ public class FlexiCommandParser implements CommandParserSpec {
         return instruction;
     }
 
-    private Command parseParameters(String commandString, Command command) {
+    /**
+     * Extracts out the parameters from the command string given and add them to
+     * the command object passed in. The starting index of the parameters is
+     * returned as a result so that the original command string can be trimmed.
+     *
+     * @param commandString
+     * @param command
+     * @return the smallest index where the parameters start
+     */
+    private int parseParameters(String commandString, Command command) {
         // TIME PARSING
         // Get the time first
         Pattern timePattern = Pattern.compile(this.getTimePattern(), Pattern.CASE_INSENSITIVE);
@@ -950,20 +996,16 @@ public class FlexiCommandParser implements CommandParserSpec {
             }
         }
 
-        String taskName = commandString.substring(0, lowestFoundIndex).trim();
-        taskName = stripSurroundingQuotes(taskName);
+        return lowestFoundIndex;
+    }
+
+    private void parseTaskName(String commandString, Command command) {
+        String taskName = stripSurroundingQuotes(commandString.trim());
         // Account for the case where task name is empty
         if (!taskName.trim().isEmpty()) {
             command.setParameter(Command.ParamName.TASK_NAME, taskName);
         }
-
-        if (command.getParametersCount() == 0) {
-            return Command.invalidCommand();
-        }
-
-        return command;
     }
-
 
     private Pair<Command.ParamName, CustomTime> parseDateTime(Matcher matcher) {
         String date;
@@ -1108,6 +1150,10 @@ public class FlexiCommandParser implements CommandParserSpec {
         return array;
     }
 
+    private static Set<String> asStringSet(String... array) {
+        return new CopyOnWriteArraySet<>(Arrays.asList(array));
+    }
+
     private static String constructChoiceRegex(Set<String> choices, String groupName) {
         // Borderline cases
         if (choices.size() == 0) {
@@ -1142,17 +1188,19 @@ public class FlexiCommandParser implements CommandParserSpec {
     }
 
     private static String constructQuantifierRegex() {
-        // Prepare quantifier pattern
-        String quantifierPattern = constructChoiceRegex(KEYWORDS_QUANTIFIER_UNIVERSAL);
-        String taskKeywordPattern = constructChoiceRegex(
-                getSimplePluralStream(KEYWORDS_TASK.stream()).collect(Collectors.toSet())
-        );
+        return constructChoiceRegex(KEYWORDS_QUANTIFIER_UNIVERSAL, MATCHER_GROUP_QUANTIFIER);
+    }
 
-        return String.format(
-                "^(?<QUANTIFIER>%s|(?:%s\\s+)?(?:number(?:ed)?\\s+)?\\d+)",
-                quantifierPattern,
-                taskKeywordPattern
-        );
+    private static String constructRangeRegex() {
+        return String.format("(?:all\\s+)?(?:task(?:s)?\\s+)?(?:number(?:ed)?\\s+)?" +
+                "(?:(?<%s>\\d+)(?:\\s*(?:to|-)\\s*(?<%s>\\d+))?)",
+                MATCHER_GROUP_RANGE_START,
+                MATCHER_GROUP_RANGE_END);
+    }
+
+    private static String constructSingleIndexRegex() {
+        return String.format("(?:task\\s+)?(?:number(?:ed)?\\s+)?(?<%s>\\d+)\\s*",
+                MATCHER_GROUP_TASK_ID);
     }
 
     private static String stripSurroundingQuotes(String string) {

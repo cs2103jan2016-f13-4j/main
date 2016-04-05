@@ -2,6 +2,7 @@ package shared;
 
 import java.security.InvalidParameterException;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import exception.ExceptionHandler;
 
@@ -22,7 +23,8 @@ public class Command {
         DATE(CustomTime.class),
         PRIORITY(Task.Priority.class),
         BOOLEAN(Boolean.class),
-        INTEGER(Integer.class);
+        INTEGER(Integer.class),
+        LIST(List.class);
 
         final Class<?> typeClass;
 
@@ -33,7 +35,6 @@ public class Command {
 
     public enum ParamName {
         TASK_NAME(ParamType.STRING),
-        TASK_DESCRIPTION(ParamType.STRING),
         TASK_START(ParamType.DATE),
         TASK_END(ParamType.DATE),
         PRIORITY_VALUE(ParamType.PRIORITY),
@@ -41,6 +42,7 @@ public class Command {
         SEARCH_QUERY(ParamType.STRING),
 
         TASK_INDEX(ParamType.INTEGER),
+        TASK_INDEX_RANGES(ParamType.LIST),
         TASK_UNIVERSALLY_QUANTIFIED(ParamType.BOOLEAN);
 
         public final ParamType type;

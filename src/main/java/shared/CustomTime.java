@@ -13,7 +13,6 @@ public class CustomTime implements Comparable<CustomTime> {
      * Constants
      */
     private static final char CHAR_SEPARATOR = 'T';
-
     private static final String TIME_FORMAT = "HH:mm";
 
     private static final DateTimeFormatter FORMATTER_DATE = DateTimeFormatter.ISO_DATE;

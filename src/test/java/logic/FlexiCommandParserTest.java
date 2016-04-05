@@ -4,18 +4,22 @@ import org.junit.Before;
 import org.junit.Test;
 import shared.Command;
 import shared.CustomTime;
+import shared.Range;
 import shared.Task;
 
 import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
+import static junit.framework.TestCase.assertFalse;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -154,7 +158,7 @@ public class FlexiCommandParserTest {
     }
 
     @Test public void FlexiCommandParser_parses_edit_with_fillers_correctly() {
-        String commandString = "edit task number 32 change to get down on it from today 2359 to tomorrow 1pm";
+        String commandString = "edit task number 32 to get down on it from today 2359 to tomorrow 1pm";
         Command command = this._parser.parse(commandString);
         assertThat(command.getParameter(Command.ParamName.TASK_NAME), is(equalTo("get down on it")));
     }
@@ -245,7 +249,31 @@ public class FlexiCommandParserTest {
                 is(equalTo(start)));
         assertThat(command.getParameter(Command.ParamName.TASK_END),
                 is(equalTo(end)));
-        assertThat(command.hasTrueValue(Command.ParamName.TASK_UNIVERSALLY_QUANTIFIED), is(true));
+    }
+
+    @Test public void FlexiCommandParser_parses_delete_range_correctly() {
+        String commandString = "delete all tasks numbered 1-5, 6 to 9, task 10-12, 15, number 18-20, 21-22";
+        Command command = this._parser.parse(commandString);
+        assertThat(command.getInstruction(), is(Command.Instruction.DELETE));
+
+        assertFalse(command.hasTrueValue(Command.ParamName.TASK_UNIVERSALLY_QUANTIFIED));
+        List<Range> ranges = command.getParameter(Command.ParamName.TASK_INDEX_RANGES);
+        assertThat(ranges, hasItems(
+                new Range(1, 5),
+                new Range(6, 9),
+                new Range(10, 12),
+                new Range(15),
+                new Range(18, 20),
+                new Range(21, 22)
+        ));
+    }
+
+    @Test public void FlexiCommandParser_parses_simple_mark_correctly() {
+        Command command = this._parser.parse("mark 5");
+        assertThat(command.getInstruction(), is(equalTo(Command.Instruction.MARK)));
+        List<Range> ranges = command.getParameter(Command.ParamName.TASK_INDEX_RANGES);
+        assertThat(ranges, hasSize(1));
+        assertThat(ranges, hasItem(new Range(5)));
     }
 
 }
