@@ -1,5 +1,7 @@
 package ui.view;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -9,7 +11,9 @@ import javafx.scene.control.ListView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import javafx.util.Pair;
 import shared.Command;
 import shared.CustomTime;
@@ -18,6 +22,7 @@ import shared.Task;
 import ui.controller.DateFormatterHelper;
 import ui.controller.TaskListController;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -90,11 +95,12 @@ public class TaskListView extends View {
 
     public static class Item extends ListCell<Pair<Integer, Task>> {
         private static final String STRING_NAME_TEMPLATE = "TaskListItem";
-        private static final String STRING_HIGHLIGHT_COLOR = "-fx-background-color: #FFFFFF;";
+        private static final String STRING_HIGHLIGHT_COLOR = "FBFF74";
         @FXML private AnchorPane _container;
         @FXML private Label _indexLabel;
         @FXML private Label _nameLabel;
         @FXML private Label _dateLabel;
+        @FXML private Rectangle _highlight;
         private DateFormatterHelper _df = new DateFormatterHelper();
         private Command _lastCommand;
         private int _newTaskIndex;
@@ -105,10 +111,11 @@ public class TaskListView extends View {
             this._indexLabel = (Label) this._container.lookup("#_indexLabel");
             this._nameLabel = (Label) this._container.lookup("#_taskNameLabel");
             this._dateLabel = (Label) this._container.lookup("#_timeLabel");
-
+            this._highlight = (Rectangle) this._container.lookup("_highlightEffect");
             assert this._indexLabel != null;
             assert this._nameLabel != null;
             assert this._dateLabel != null;
+            assert this._highlight != null;
 
             this._lastCommand = lastCommand ;
             this._newTaskIndex = newTaskIndex;
@@ -138,7 +145,7 @@ public class TaskListView extends View {
 
                 //set animation for newly added task
                 if(this._lastCommand.getInstruction() == Command.Instruction.ADD && item.getKey() == this._newTaskIndex) {
-                    setFlashingAnimation();
+                    setHighlightAnimation();
                 }
                 // Optional date time to support floating tasks
                 this._dateLabel.setText(_df.getPairDateDisplay(task.getStartTime(),task.getEndTime()));
@@ -174,8 +181,33 @@ public class TaskListView extends View {
             }
         }
 
-        private void setFlashingAnimation(){
-           // final KeyValue initial = new KeyValue(this._container.styleProperty(),)
+        private void setHighlightAnimation(){
+
+            /**
+            final KeyValue indexInitial = new KeyValue(this._indexLabel.textFillProperty(),
+                    this._indexLabel.getTextFill());
+            final KeyValue nameInitial = new KeyValue(this._nameLabel.textFillProperty(),
+                    this._nameLabel.getTextFill());
+            final KeyValue dateInitial = new KeyValue(this._dateLabel.textFillProperty(),
+                    this._dateLabel.getTextFill());
+
+            final KeyValue indexMiddle = new KeyValue(this._indexLabel.textFillProperty(),
+                    Color.ORANGE);
+            final KeyValue nameMiddle = new KeyValue(this._nameLabel.textFillProperty(),
+                    Color.ORANGE);
+            final KeyValue dateMiddle = new KeyValue(this._dateLabel.textFillProperty(),
+                    Color.ORANGE);
+
+            final KeyValue indexFinal = new KeyValue(this._indexLabel.textFillProperty(),
+                    this._indexLabel.getTextFill());
+            final KeyValue nameFinal = new KeyValue(this._nameLabel.textFillProperty(),
+                    this._nameLabel.getTextFill());
+            final KeyValue dateFinal = new KeyValue(this._dateLabel.textFillProperty(),
+                    this._dateLabel.getTextFill());
+            */
+            //final KeyFrame first = new KeyFrame(javafx.util.Duration.ZERO, indexInitial, nameInitial, dateInitial);
+            //final KeyFrame mid = new KeyFrame(javafx.util.Duration.ZERO, indexMiddle, nameMiddle, dateMiddle);
+            //final KeyFrame last = new KeyFrame(javafx.util.Duration.ZERO, indexFinal, nameFinal, dateFinal);
         }
     }
 
