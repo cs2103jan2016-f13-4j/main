@@ -5,7 +5,9 @@ import java.util.List;
 /**
  * @@author Mai Anh Vu
  */
-public interface CollectionSpec<T> {
+public interface StorageSpec<T> {
+
+    void initialise();
 
     int save(T item);
 
