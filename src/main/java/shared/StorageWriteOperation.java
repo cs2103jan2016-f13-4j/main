@@ -1,5 +1,6 @@
 package shared;
 
+import java.util.List;
 import java.util.Set;
 import java.util.function.*;
 import java.time.LocalDateTime;
@@ -10,19 +11,33 @@ import storage.*;
  * Encapsulates both the operation and its inverse
  * Contains sufficient information to enable undo/redo of the operation
  *
+ * There is a boolean field to denote whether an operation has been executed.
+ * Undo/redo of an operation should not be carried out if the operation has not been executed.
+ * This is enforced in undo/redo lambdas whenever the original operation may fail, and is reflected in their return values.
+ *
  * WARNING: These objects should NOT persist between sessions. Undefined behaviour may result.
  *
  * @@author Thenaesh Elango
  */
 public class StorageWriteOperation {
-    private Function<?, ?> _initialOperation;
-    private Function<?, ?> _undoOperation;
-    private Function<?, ?> _redoOperation;
+    public static Function<?, String> createErrorFunction(String str) {
+        return v -> str;
+    }
+
+    public static final String ERROR_ALREADY_DELETED_ALL_TASKS = "All tasks have already been deleted!";
+    public static final String ERROR_ALREADY_MARKED_TASK = "Already marked task!";
+
+
+    private Function<?, String> _initialOperation; // returns the error string for the operation, to be placed in an ExecutionResult
+    private Function<?, Boolean> _undoOperation; // returns false if nothing was done due to original operation not being run
+    private Function<?, Boolean> _redoOperation; // returns false if nothing was done due to original operation not being run
 
     private Command _command; // command that gave rise to this execution unit
     private Integer _id = null; // _id of the task handled by this execution unit
+    private List<Range> _ranges = null; // ranges of ids of the task to be modified
     private Task _taskPreModification = null; // snapshot of the task before it is modified
     private Task _taskPostModification = null; // snapshot of the task after it is modified
+    private boolean _wasExecuted = false; // success code for the operation
 
     public StorageWriteOperation(Command command) {
         this._command = command;
@@ -47,16 +62,20 @@ public class StorageWriteOperation {
 
 
     // getters
-    public Function<?, ?> getInitialOperation() {
+    public Function<?, String> getInitialOperation() {
         return this._initialOperation;
     }
 
-    public Function<?, ?> getUndoOperation() {
+    public Function<?, Boolean> getUndoOperation() {
         return this._undoOperation;
     }
 
-    public Function<?, ?> getRedoOperation() {
+    public Function<?, Boolean> getRedoOperation() {
         return this._redoOperation;
+    }
+
+    public boolean isOperationExecuted() {
+        return this._wasExecuted;
     }
 
 
@@ -91,18 +110,22 @@ public class StorageWriteOperation {
             }
 
             this._id = Storage.getInstance().save(taskToAdd);
-            return (Void) null;
+
+            this._wasExecuted = true; // adding a task never fails
+            return null;
         };
+
 
         this._undoOperation = v -> {
             Storage.getInstance().remove(this._id);
-            return (Void) null;
+            return true;
         };
 
         this._redoOperation = v -> {
             Storage.getInstance().undelete(this._id);
-            return (Void) null;
+            return true;
         };
+
     }
 
     private void createAsDeleteUnit() {
@@ -113,50 +136,69 @@ public class StorageWriteOperation {
             Set<Integer> tasksToDelete = Storage.getInstance().getNonDeletedTasks();
 
             this._initialOperation = v -> {
+
+                // failure case where all tasks are already deleted
+                if (tasksToDelete.isEmpty()) {
+                    this._wasExecuted = false;
+                    return ERROR_ALREADY_DELETED_ALL_TASKS;
+                }
+
                 tasksToDelete
                         .stream()
                         .forEach(id -> Storage.getInstance().remove(id));
 
-                return (Void) null;
+                this._wasExecuted = true; // something actually got deleted
+                return null;
             };
 
+
             this._undoOperation = v -> {
+                if (!this._wasExecuted) {
+                    return false;
+                }
+
                 tasksToDelete
                         .stream()
                         .forEach(id -> Storage.getInstance().undelete(id));
 
-                return (Void) null;
+                return true;
             };
 
             this._redoOperation = v -> {
+                if (!this._wasExecuted) {
+                    return false;
+                }
+
                 tasksToDelete
                         .stream()
                         .forEach(id -> Storage.getInstance().remove(id));
 
-                return (Void) null;
+                return true;
             };
 
         } else {
-            // delete a single task
+            /*
+             * DELETE A SINGLE TASK
+             */
+
             this._initialOperation = v -> {
                 this._id = this._command.getParameter(Command.ParamName.TASK_INDEX);
                 assert this._id != null;
 
                 Storage.getInstance().remove(this._id);
 
-                return (Void) null;
+                this._wasExecuted = true; // deleting a single task never fails
+                return null;
             };
 
             this._undoOperation = v -> {
                 Storage.getInstance().undelete(this._id);
-
-                return (Void) null;
+                return true;
             };
 
             this._redoOperation = v -> {
                 Storage.getInstance().remove(this._id);
-
-                return (Void) null;
+                return true;
             };
         }
     }
@@ -191,23 +233,22 @@ public class StorageWriteOperation {
 
             this._taskPostModification = task.clone(); // take snapshot of task after modifying it, for redo operation
 
-            return (Void) null;
+            this._wasExecuted = true; // editing a task never fails
+            return null;
         };
 
         this._undoOperation = v -> {
             assert this._taskPreModification != null;
 
             Storage.getInstance().save(this._taskPreModification);
-
-            return (Void) null;
+            return true;
         };
 
         this._redoOperation = v -> {
             assert this._taskPostModification != null;
 
             Storage.getInstance().save(this._taskPostModification);
-
-            return (Void) null;
+            return true;
         };
     }
 
@@ -215,22 +256,33 @@ public class StorageWriteOperation {
 
         this._initialOperation = v -> {
             this._id = _command.getParameter(Command.ParamName.TASK_INDEX);
+            Task taskToMark = Storage.getInstance().get(this._id);
 
-            Storage.getInstance().get(this._id).setCompleted(true);
+            if (taskToMark.isCompleted()) {
+                this._wasExecuted = false; // task already marked
+                return ERROR_ALREADY_MARKED_TASK;
+            }
 
-            return (Void) null;
+            taskToMark.setCompleted(true);
+
+            this._wasExecuted = true;
+            return null;
         };
 
         this._undoOperation = v -> {
+            if (!this._wasExecuted) {
+                return false;
+            }
             Storage.getInstance().get(this._id).setCompleted(false);
-
-            return (Void) null;
+            return true;
         };
 
         this._redoOperation = v -> {
+            if (!this._wasExecuted) {
+                return false;
+            }
             Storage.getInstance().get(this._id).setCompleted(true);
-
-            return (Void) null;
+            return true;
         };
     }
 }
