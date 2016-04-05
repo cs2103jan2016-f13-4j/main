@@ -10,10 +10,10 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="48.0" prefWidth="410.0" styleClass="item__container" stylesheets="@../stylesheets/TaskListItem.css" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <Rectangle fx:id="_highlightEffect" arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="48.0" stroke="BLACK" strokeType="INSIDE" width="410.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+      <Rectangle fx:id="_highlightEffect" arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="48.0" stroke="WHITE" strokeType="INSIDE" width="410.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
       <Label fx:id="_indexLabel" layoutX="14.0" layoutY="16.0" styleClass="item__index" text="88" AnchorPane.bottomAnchor="16.0" AnchorPane.leftAnchor="22.0" AnchorPane.topAnchor="15.0" />
       <Label fx:id="_taskNameLabel" layoutX="36.0" layoutY="15.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="17.0" prefWidth="280.0" styleClass="item__name" text="Label" AnchorPane.bottomAnchor="16.0" AnchorPane.leftAnchor="42.0" AnchorPane.topAnchor="15.0" />
-      <Label fx:id="_timeLabel" alignment="CENTER_RIGHT" layoutX="297.0" layoutY="15.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="48.0" prefWidth="113.0" styleClass="item__date" text="Label" textAlignment="RIGHT" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="297.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+      <Label fx:id="_timeLabel" alignment="CENTER_RIGHT" layoutX="296.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="48.0" prefWidth="113.0" styleClass="item__date" text="Label" textAlignment="RIGHT" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="296.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="0.0" />
       <Line endX="408.0" layoutY="48.0" startX="12.0" stroke="#f0f0f0" />
       <Circle fill="WHITE" layoutX="33.0" layoutY="24.0" radius="3.0" stroke="TRANSPARENT" strokeType="INSIDE" strokeWidth="0.0" styleClass="indicator--priority" AnchorPane.leftAnchor="11.0" AnchorPane.topAnchor="21.0" />
    </children>

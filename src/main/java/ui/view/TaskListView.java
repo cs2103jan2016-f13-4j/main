@@ -1,6 +1,7 @@
 package ui.view;
 
 import javafx.animation.FillTransition;
+import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.collections.FXCollections;
@@ -45,6 +46,7 @@ public class TaskListView extends View {
     private ObservableList _observableList;
     private List<Pair<Integer, Task>> _displayList;
     private int _viewIndex;
+    private int _newTaskIndex;
 
     /**
      * Constructs a new view containing the provided data
@@ -54,13 +56,15 @@ public class TaskListView extends View {
     public TaskListView(List<Pair<Integer, Task>> data, Command lastCommand) {
         super(data, lastCommand);
         _viewIndex = 0;
+        _newTaskIndex = -1;
     }
 
     @Override protected void buildContent() {
         // find viewIndex for new task if the last command is add
         if(this.getLastCommand().getInstruction() == Command.Instruction.ADD){
-            //System.out.println("last Command is:" + this.getLastCommand().toString());
-            _viewIndex = obtainNewTaskIndex();
+            Pair<Integer, Integer> indexPair =  obtainNewTaskIndex();
+            this._viewIndex = indexPair.getValue();
+            this._newTaskIndex = indexPair.getKey();
         }
 
         _displayList = constructDisplayList();
@@ -68,12 +72,15 @@ public class TaskListView extends View {
 
         ListView listView = Resources.getInstance().getComponent("TaskList");
         listView.setItems(this._observableList);
-        listView.setCellFactory(list -> new Item(this.getLastCommand(),this._viewIndex));
+
+        final int highlightIndex = this._newTaskIndex;
+
+        listView.setCellFactory(list -> new Item(this.getLastCommand(),highlightIndex));
 
         this.setComponent(listView);
     }
 
-    private int obtainNewTaskIndex(){
+    private Pair<Integer,Integer> obtainNewTaskIndex(){
         List<Pair<Integer,Task>> taskList = this.getData();
         int index = 0;
         Task temp ;
@@ -91,7 +98,7 @@ public class TaskListView extends View {
                 }
             }
         }
-        return index/MAXIMUM_DISPLAY_SIZE;
+        return new Pair<Integer,Integer>(index,index/MAXIMUM_DISPLAY_SIZE);
     }
 
     public static class Item extends ListCell<Pair<Integer, Task>> {
@@ -106,13 +113,17 @@ public class TaskListView extends View {
         private Command _lastCommand;
         private int _newTaskIndex;
 
+        public Item(Command lastCommand){
+            this(lastCommand,-1);
+        }
+
         public Item(Command lastCommand, int newTaskIndex) {
             super();
             this._container = Resources.getInstance().getComponent(STRING_NAME_TEMPLATE);
             this._indexLabel = (Label) this._container.lookup("#_indexLabel");
             this._nameLabel = (Label) this._container.lookup("#_taskNameLabel");
             this._dateLabel = (Label) this._container.lookup("#_timeLabel");
-            this._highlight = (Rectangle) this._container.lookup("_highlightEffect");
+            this._highlight = (Rectangle) this._container.lookup("#_highlightEffect");
             assert this._indexLabel != null;
             assert this._nameLabel != null;
             assert this._dateLabel != null;
@@ -145,7 +156,7 @@ public class TaskListView extends View {
                 this._nameLabel.setText(task.getTaskName());
 
                 //set animation for newly added task
-                if(this._lastCommand.getInstruction() == Command.Instruction.ADD && item.getKey() == this._newTaskIndex) {
+                if(this._lastCommand.getInstruction() == Command.Instruction.ADD && item.getKey() == (this._newTaskIndex +1)) {
                     setHighlightAnimation();
                 }
                 // Optional date time to support floating tasks
@@ -183,38 +194,14 @@ public class TaskListView extends View {
         }
 
         private void setHighlightAnimation(){
+            //System.out.println("setting up highlight animation");
 
-            /**
-            final KeyValue indexInitial = new KeyValue(this._indexLabel.textFillProperty(),
-                    this._indexLabel.getTextFill());
-            final KeyValue nameInitial = new KeyValue(this._nameLabel.textFillProperty(),
-                    this._nameLabel.getTextFill());
-            final KeyValue dateInitial = new KeyValue(this._dateLabel.textFillProperty(),
-                    this._dateLabel.getTextFill());
-
-            final KeyValue indexMiddle = new KeyValue(this._indexLabel.textFillProperty(),
-                    Color.ORANGE);
-            final KeyValue nameMiddle = new KeyValue(this._nameLabel.textFillProperty(),
-                    Color.ORANGE);
-            final KeyValue dateMiddle = new KeyValue(this._dateLabel.textFillProperty(),
-                    Color.ORANGE);
-
-            final KeyValue indexFinal = new KeyValue(this._indexLabel.textFillProperty(),
-                    this._indexLabel.getTextFill());
-            final KeyValue nameFinal = new KeyValue(this._nameLabel.textFillProperty(),
-                    this._nameLabel.getTextFill());
-            final KeyValue dateFinal = new KeyValue(this._dateLabel.textFillProperty(),
-                    this._dateLabel.getTextFill());
-            */
-
-            FillTransition highlight = new FillTransition(Duration.millis(200),this._highlight,Color.WHITE,Color.web(STRING_HIGHLIGHT_COLOR));
+            FillTransition highlight = new FillTransition(Duration.millis(750),this._highlight,Color.WHITE,Color.web(STRING_HIGHLIGHT_COLOR));
             highlight.setCycleCount(2);
             highlight.setAutoReverse(true);
-
+            highlight.setInterpolator(Interpolator.EASE_BOTH);
             highlight.play();
-            //final KeyFrame first = new KeyFrame(javafx.util.Duration.ZERO, indexInitial, nameInitial, dateInitial);
-            //final KeyFrame mid = new KeyFrame(javafx.util.Duration.ZERO, indexMiddle, nameMiddle, dateMiddle);
-            //final KeyFrame last = new KeyFrame(javafx.util.Duration.ZERO, indexFinal, nameFinal, dateFinal);
+
         }
     }
 
