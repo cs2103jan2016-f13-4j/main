@@ -1,6 +1,8 @@
 package storage;
 
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Semaphore;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -19,8 +21,8 @@ public class Storage extends TimerTask implements StorageSpec<Task> {
     /**
      * Constants
      */
-    public static final int INDEX_TASK_INITIAL = 1;
-    public static final int SAVE_DELAY = 5000;
+    private static final int INDEX_TASK_INITIAL = 1;
+    private static final int SAVE_DELAY = 5000;
 
     /**
      * Singleton Implementation
@@ -44,8 +46,6 @@ public class Storage extends TimerTask implements StorageSpec<Task> {
         // Instantiates storage
         this._taskData = new TreeMap<>();
         this._isDirty = false;
-
-        // this.readFromDisk();
     }
 
     @Override
@@ -59,8 +59,7 @@ public class Storage extends TimerTask implements StorageSpec<Task> {
         this.readFromDisk();
 
         this._autosaveTimer = new Timer();
-        Platform.runLater(() -> this._autosaveTimer
-                .scheduleAtFixedRate(this, SAVE_DELAY, SAVE_DELAY));
+        this._autosaveTimer.scheduleAtFixedRate(this, SAVE_DELAY, SAVE_DELAY);
     }
 
 
@@ -80,7 +79,6 @@ public class Storage extends TimerTask implements StorageSpec<Task> {
     @Override public int save(Task task) {
         // TODO: Check for potential time clashes
         boolean isNewTask = (task.getId() == null);
-        boolean isDeleted = task.isDeleted();
 
         // Find a new ID for tasks that does not exist inside the storage
         if (isNewTask) {
@@ -101,7 +99,7 @@ public class Storage extends TimerTask implements StorageSpec<Task> {
         return task.getId();
     }
 
-    public void writeToDisk() {
+    private void writeToDisk() {
         List<Task> allTask = this.getAll();
 
         // Keep internal index serial
