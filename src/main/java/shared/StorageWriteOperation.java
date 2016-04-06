@@ -22,7 +22,6 @@ import storage.*;
 public class StorageWriteOperation {
     public static final String ERROR_RANGE_EMPTY = "No valid tasks in range!";
 
-
     private Function<?, String> _initialOperation; // returns the error string for the operation, to be placed in an ExecutionResult
     private Function<?, Boolean> _undoOperation; // returns false if nothing was done due to original operation not being run
     private Function<?, Boolean> _redoOperation; // returns false if nothing was done due to original operation not being run

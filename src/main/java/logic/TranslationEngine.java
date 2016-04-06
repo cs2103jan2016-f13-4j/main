@@ -61,7 +61,7 @@ public class TranslationEngine implements TranslationEngineSpec {
         // Create input handler
         Function<String, Void> commandInputHandler = commandString -> {
             // Translate the raw command string given
-            instance.translateCommand(commandString);
+            this.translateCommand(commandString);
             return null;
         };
 
@@ -112,7 +112,8 @@ public class TranslationEngine implements TranslationEngineSpec {
 
         Command command = this.getCommandParser().parse(commandString);
 
-        if (command.getParameter(Command.ParamName.TASK_INDEX) != null) {
+        if (command.hasParameter(Command.ParamName.TASK_INDEX) ||
+                command.hasParameter(Command.ParamName.TASK_INDEX_RANGES)) {
             VisualIndexMapper.getInstance().translateVisualToRaw(command);
         }
 
