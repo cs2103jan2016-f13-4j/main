@@ -2,8 +2,6 @@ package ui.view;
 
 import javafx.animation.FillTransition;
 import javafx.animation.Interpolator;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -14,19 +12,15 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Pair;
 import shared.Command;
-import shared.CustomTime;
 import shared.Resources;
 import shared.Task;
 import ui.controller.DateFormatterHelper;
-import ui.controller.TaskListController;
 
 import javafx.util.Duration;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -44,7 +38,7 @@ public class TaskListView extends View {
      * Properties
      */
     private ObservableList _observableList;
-    private List<Pair<Integer, Task>> _displayList;
+    private List<VisualTask> _displayList;
     private int _viewIndex;
     private int _newTaskIndex;
 
@@ -53,10 +47,10 @@ public class TaskListView extends View {
      *
      * @param data
      */
-    public TaskListView(List<Pair<Integer, Task>> data, Command lastCommand) {
+    public TaskListView(List<VisualTask> data, Command lastCommand) {
         super(data, lastCommand);
-        _viewIndex = 0;
         _newTaskIndex = -1;
+        this._viewIndex = 0;
     }
 
     @Override protected void buildContent() {
@@ -67,7 +61,7 @@ public class TaskListView extends View {
             this._newTaskIndex = indexPair.getKey();
         }
 
-        _displayList = constructDisplayList();
+        this._displayList = constructDisplayList();
         _observableList = FXCollections.observableArrayList(_displayList);
 
         ListView listView = Resources.getInstance().getComponent("TaskList");
@@ -81,15 +75,15 @@ public class TaskListView extends View {
     }
 
     private Pair<Integer,Integer> obtainNewTaskIndex(){
-        List<Pair<Integer,Task>> taskList = this.getData();
+        List<VisualTask> taskList = this.getData();
         int index = 0;
         Task temp ;
         Task current= null;
         for(int i = 0; i < taskList.size();  i++){
             if(current == null){
-                current = taskList.get(i).getValue();
+                current = taskList.get(i).getTask();
             } else {
-                temp = taskList.get(i).getValue();
+                temp = taskList.get(i).getTask();
                 LocalDateTime curCreationTime = current.getCreationTime();
                 LocalDateTime tempCreationTime = temp.getCreationTime();
                 if(curCreationTime.compareTo(tempCreationTime) < 0){
@@ -101,7 +95,7 @@ public class TaskListView extends View {
         return new Pair<>(index,index/MAXIMUM_DISPLAY_SIZE);
     }
 
-    public static class Item extends ListCell<Pair<Integer, Task>> {
+    private class Item extends ListCell<VisualTask> {
         private static final String STRING_NAME_TEMPLATE = "TaskListItem";
         private static final String STRING_HIGHLIGHT_COLOR = "#FBFF74";
         @FXML private AnchorPane _container;
@@ -134,13 +128,21 @@ public class TaskListView extends View {
 
         }
 
-        @Override protected void updateItem(Pair<Integer, Task> item, boolean empty) {
+        @Override protected void updateItem(VisualTask item, boolean empty) {
             super.updateItem(item, empty);
             if (empty) {
                 this.setGraphic(null);
             } else {
-                int index = item.getKey();
-                Task task = item.getValue();
+                int index = item.getVisualIndex();
+                Task task = item.getTask();
+
+                // Highlight added task
+                if (item.isHighlighted()) {
+                    Rectangle highlighter = new Rectangle(0.0, 0.0,
+                            this._container.getWidth(), this._container.getHeight());
+                    highlighter.setFill(Color.RED);
+                    this._container.getChildren().add(highlighter);
+                }
 
                 // Grey out completed tasks
                 if (task.isCompleted()) {
@@ -156,40 +158,14 @@ public class TaskListView extends View {
                 this._nameLabel.setText(task.getTaskName());
 
                 //set animation for newly added task
-                if(this._lastCommand.getInstruction() == Command.Instruction.ADD && item.getKey() == (this._newTaskIndex +1)) {
+                if (this._lastCommand.getInstruction() == Command.Instruction.ADD &&
+                        item.getVisualIndex() == (this._newTaskIndex +1)) {
                     setHighlightAnimation();
                 }
                 // Optional date time to support floating tasks
                 this._dateLabel.setText(_df.getPairDateDisplay(task.getStartTime(),task.getEndTime()));
 
                 this.setGraphic(this._container);
-            }
-        }
-
-        @Override public boolean equals(Object o) {
-            if (o == null)
-                return false;
-            if (this == o)
-                return true;
-
-            if (o instanceof Pair) {
-                Pair<Integer, Task> data = (Pair<Integer, Task>) o;
-                if (!data.getKey().toString().equals(this._indexLabel.getText()))
-                    return false;
-                if (!data.getValue().getTaskName().equals(this._nameLabel.getText()))
-                    return false;
-                return true;
-            } else if (o instanceof Item) {
-                Item otherCell = (Item) o;
-                if (!this._indexLabel.getText().equals(otherCell._indexLabel.getText()))
-                    return false;
-                if (!this._nameLabel.getText().equals(otherCell._nameLabel.getText()))
-                    return false;
-                if (!this._dateLabel.getText().equals(otherCell._dateLabel.getText()))
-                    return false;
-                return true;
-            } else {
-                return false;
             }
         }
 
@@ -205,9 +181,9 @@ public class TaskListView extends View {
         }
     }
 
-    private List<Pair<Integer, Task>> constructDisplayList() {
-        List<Pair<Integer, Task>> temp = new ArrayList<>();
-        List<Pair<Integer, Task>> viewData = this.getData();
+    private List<VisualTask> constructDisplayList() {
+        List<VisualTask> temp = new ArrayList<>();
+        List<VisualTask> viewData = this.getData();
 
         int startIndex = this._viewIndex * MAXIMUM_DISPLAY_SIZE;
         int difference = viewData.size() - startIndex;
@@ -248,7 +224,7 @@ public class TaskListView extends View {
     }
 
     private boolean canScrollDown() {
-        List<Pair<Integer, Task>> viewData = this.getData();
+        List<VisualTask> viewData = this.getData();
         int size = viewData.size() - (this._viewIndex + 1) * MAXIMUM_DISPLAY_SIZE;
         return size > 0;
     }

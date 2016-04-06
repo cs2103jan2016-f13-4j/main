@@ -13,6 +13,7 @@ import skeleton.UserInterfaceSpec;
 import ui.UserInterface;
 import ui.view.TaskListView;
 import ui.view.View;
+import ui.view.VisualTask;
 
 /**
  * @@author Mai Anh Vu
@@ -85,7 +86,7 @@ public class TranslationEngine implements TranslationEngineSpec {
         switch (result.getViewType()) {
         case TASK_LIST:
             // Convert list to one with visual IDs only
-            List<Pair<Integer, Task>> visualTaskList = getVisualIndexMapper()
+            List<VisualTask> visualTaskList = getVisualIndexMapper()
                     .translateRawToVisual(result.getData());
 
             // Update mapper with list

@@ -4,6 +4,7 @@ import javafx.util.Pair;
 import shared.Command;
 import shared.Range;
 import shared.Task;
+import ui.view.VisualTask;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -38,7 +39,7 @@ public class VisualIndexMapper {
     }
 
     public void translateVisualToRaw(Command command) {
-        assert this._itemsList.isEmpty() == false;
+        assert !this._itemsList.isEmpty();
 
         // Parse a single task index
         if (command.hasParameter(Command.ParamName.TASK_INDEX)) {
@@ -70,9 +71,9 @@ public class VisualIndexMapper {
         }
     }
 
-    public List<Pair<Integer, Task>> translateRawToVisual(List<Task> rawList) {
+    public List<VisualTask> translateRawToVisual(List<Task> rawList) {
         return IntStream.range(0, rawList.size())
-                .mapToObj(index -> new Pair<>(
+                .mapToObj(index -> new VisualTask(
                         getVisualIndexFromArrayIndex(index),
                         rawList.get(index)))
                 .collect(Collectors.toList());
