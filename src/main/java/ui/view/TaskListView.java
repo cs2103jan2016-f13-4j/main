@@ -1,5 +1,9 @@
 package ui.view;
 
+import javafx.animation.FillTransition;
+import javafx.animation.Interpolator;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -9,7 +13,9 @@ import javafx.scene.control.ListView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import javafx.util.Pair;
 import shared.Command;
 import shared.CustomTime;
@@ -18,6 +24,7 @@ import shared.Task;
 import ui.controller.DateFormatterHelper;
 import ui.controller.TaskListController;
 
+import javafx.util.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -39,6 +46,7 @@ public class TaskListView extends View {
     private ObservableList _observableList;
     private List<Pair<Integer, Task>> _displayList;
     private int _viewIndex;
+    private int _newTaskIndex;
 
     /**
      * Constructs a new view containing the provided data
@@ -48,13 +56,15 @@ public class TaskListView extends View {
     public TaskListView(List<Pair<Integer, Task>> data, Command lastCommand) {
         super(data, lastCommand);
         _viewIndex = 0;
+        _newTaskIndex = -1;
     }
 
     @Override protected void buildContent() {
         // find viewIndex for new task if the last command is add
         if(this.getLastCommand().getInstruction() == Command.Instruction.ADD){
-            System.out.println("last Command is:" + this.getLastCommand().toString());
-            _viewIndex = obtainNewTaskIndex();
+            Pair<Integer, Integer> indexPair =  obtainNewTaskIndex();
+            this._viewIndex = indexPair.getValue();
+            this._newTaskIndex = indexPair.getKey();
         }
 
         _displayList = constructDisplayList();
@@ -62,37 +72,66 @@ public class TaskListView extends View {
 
         ListView listView = Resources.getInstance().getComponent("TaskList");
         listView.setItems(this._observableList);
-        listView.setCellFactory(list -> new Item());
+
+        final int highlightIndex = this._newTaskIndex;
+
+        listView.setCellFactory(list -> new Item(this.getLastCommand(),highlightIndex));
 
         this.setComponent(listView);
     }
 
-    private int obtainNewTaskIndex(){
-        List<Pair<Integer, Task>> taskList = this.getData();
-        return taskList.stream()
-                .max((task1, task2) -> task1.getValue().getCreationTime()
-                        .compareTo(task2.getValue().getCreationTime()))
-                .map(Pair::getKey).orElse(0) / MAXIMUM_DISPLAY_SIZE;
+    private Pair<Integer,Integer> obtainNewTaskIndex(){
+        List<Pair<Integer,Task>> taskList = this.getData();
+        int index = 0;
+        Task temp ;
+        Task current= null;
+        for(int i = 0; i < taskList.size();  i++){
+            if(current == null){
+                current = taskList.get(i).getValue();
+            } else {
+                temp = taskList.get(i).getValue();
+                LocalDateTime curCreationTime = current.getCreationTime();
+                LocalDateTime tempCreationTime = temp.getCreationTime();
+                if(curCreationTime.compareTo(tempCreationTime) < 0){
+                    current = temp;
+                    index = i;
+                }
+            }
+        }
+        return new Pair<>(index,index/MAXIMUM_DISPLAY_SIZE);
     }
 
     public static class Item extends ListCell<Pair<Integer, Task>> {
         private static final String STRING_NAME_TEMPLATE = "TaskListItem";
-
+        private static final String STRING_HIGHLIGHT_COLOR = "#FBFF74";
         @FXML private AnchorPane _container;
         @FXML private Label _indexLabel;
         @FXML private Label _nameLabel;
         @FXML private Label _dateLabel;
+        @FXML private Rectangle _highlight;
         private DateFormatterHelper _df = new DateFormatterHelper();
+        private Command _lastCommand;
+        private int _newTaskIndex;
 
-        public Item() {
+        public Item(Command lastCommand){
+            this(lastCommand,-1);
+        }
+
+        public Item(Command lastCommand, int newTaskIndex) {
             super();
             this._container = Resources.getInstance().getComponent(STRING_NAME_TEMPLATE);
             this._indexLabel = (Label) this._container.lookup("#_indexLabel");
             this._nameLabel = (Label) this._container.lookup("#_taskNameLabel");
             this._dateLabel = (Label) this._container.lookup("#_timeLabel");
+            this._highlight = (Rectangle) this._container.lookup("#_highlightEffect");
             assert this._indexLabel != null;
             assert this._nameLabel != null;
             assert this._dateLabel != null;
+            assert this._highlight != null;
+
+            this._lastCommand = lastCommand ;
+            this._newTaskIndex = newTaskIndex;
+
         }
 
         @Override protected void updateItem(Pair<Integer, Task> item, boolean empty) {
@@ -116,6 +155,10 @@ public class TaskListView extends View {
                 this._indexLabel.setText(Integer.toString(index));
                 this._nameLabel.setText(task.getTaskName());
 
+                //set animation for newly added task
+                if(this._lastCommand.getInstruction() == Command.Instruction.ADD && item.getKey() == (this._newTaskIndex +1)) {
+                    setHighlightAnimation();
+                }
                 // Optional date time to support floating tasks
                 this._dateLabel.setText(_df.getPairDateDisplay(task.getStartTime(),task.getEndTime()));
 
@@ -148,6 +191,17 @@ public class TaskListView extends View {
             } else {
                 return false;
             }
+        }
+
+        private void setHighlightAnimation(){
+            //System.out.println("setting up highlight animation");
+
+            FillTransition highlight = new FillTransition(Duration.millis(750),this._highlight,Color.WHITE,Color.web(STRING_HIGHLIGHT_COLOR));
+            highlight.setCycleCount(2);
+            highlight.setAutoReverse(true);
+            highlight.setInterpolator(Interpolator.EASE_BOTH);
+            highlight.play();
+
         }
     }
 
