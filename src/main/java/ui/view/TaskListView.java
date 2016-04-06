@@ -137,14 +137,6 @@ public class TaskListView extends View {
                 int index = item.getVisualIndex();
                 Task task = item.getTask();
 
-                // Highlight added task
-                if (item.isHighlighted()) {
-                    Rectangle highlighter = new Rectangle(0.0, 0.0,
-                            this._container.getWidth(), this._container.getHeight());
-                    highlighter.setFill(Color.RED);
-                    this._container.getChildren().add(highlighter);
-                }
-
                 // Grey out completed tasks
                 if (task.isCompleted()) {
                     this.getStyleClass().add("completed");
