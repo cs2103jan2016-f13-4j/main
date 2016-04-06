@@ -41,6 +41,12 @@ public class StorageWriteOperationHistory {
         this.checkIndexInvariant();
     }
 
+    public String addToHistoryAfterExecuting(StorageWriteOperation op) {
+        String errorMsg = op.getInitialOperation().apply(null);
+        this.addToHistory(op);
+        return errorMsg;
+    }
+
 
     /**
      * @return false if there were no ops to undo, true otherwise
@@ -52,7 +58,16 @@ public class StorageWriteOperationHistory {
             return false;
         }
 
-        this._opSequence.get(this._opIndex--).getUndoOperation().apply(null);
+        // get the operation we wish to undo
+        StorageWriteOperation op = this._opSequence.get(this._opIndex--);
+
+        // apply undo operation if the operation was actually performed, otherwise skip over it
+        if (!op.isOperationExecuted()) {
+            return this.undo();
+        }
+
+        boolean isUndoSuccessful = op.getUndoOperation().apply(null);
+        assert isUndoSuccessful;
 
         this.checkIndexInvariant();
 
@@ -69,7 +84,16 @@ public class StorageWriteOperationHistory {
             return false;
         }
 
-        this._opSequence.get(++this._opIndex).getRedoOperation().apply(null);
+        // get the operation we wish to redo
+        StorageWriteOperation op = this._opSequence.get(++this._opIndex);
+
+        // apply redo operation if the operation was actually performed, otherwise skip over it
+        if (!op.isOperationExecuted()) {
+            this.redo();
+        }
+
+        boolean isRedoSuccessful = op.getRedoOperation().apply(null);
+        assert isRedoSuccessful;
 
         this.checkIndexInvariant();
 

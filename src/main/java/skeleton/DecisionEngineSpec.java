@@ -11,7 +11,7 @@ public interface DecisionEngineSpec {
 
     void initialise();
 
-    CollectionSpec<Task> getTaskCollection();
+    StorageSpec<Task> getStorage();
 
     ExecutionResult performCommand(Command cmd);
 

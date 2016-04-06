@@ -49,12 +49,12 @@ public class TaskTest {
         CustomTime end = new CustomTime(LocalDateTime.of(2016, 3, 11, 12, 00));
         String specialTaskName = "A task with comma, and \"quotes\", and \"comma, within quotes\"";
         specialTaskName += ", and backslash before quote\\\"";
-        Task specialTask = new Task(123, specialTaskName, "Random description", start, end);
+        Task specialTask = new Task(123, specialTaskName, "Random description", start, end); // priority is set to default
         String creationTime = specialTask.getCreationTime().toString(); // get creationTime to add to expected String for checking
         String specialTaskString = specialTask.encodeTaskToString();
 
         String expected = "123,"
-                + "\"A task with comma, and \\\"quotes\\\", and \\\"comma, within quotes\\\", and backslash before quote\\\\\\\"\",Random description," + creationTime + "," + start.toString() + "," + end.toString() + ",false,3";
+                + "\"A task with comma, and \\\"quotes\\\", and \\\"comma, within quotes\\\", and backslash before quote\\\\\\\"\",Random description," + creationTime + "," + start.toString() + "," + end.toString() + ",false,1";
 
         assertEquals(expected, specialTaskString);
     }
@@ -79,7 +79,7 @@ public class TaskTest {
         String taskString = "123,\"" + encodedSpecialString + "\",Random description,"
                 + LocalDateTime.of(2016, 3, 1, 23, 59).toString() + ","
                 + start.toString() + ","
-                + end.toString() + ",false,1";
+                + end.toString() + ",false,2";
 
         // decode the task string and check if the task attributes are equal to
         // what we expect
@@ -92,19 +92,19 @@ public class TaskTest {
         assertEquals(start, task3.getStartTime());
         assertEquals(end, task3.getEndTime());
         assertFalse(task3.isCompleted());
-        assertEquals(Task.Priority.HIGH, task3.getPriority());
+        assertEquals(Task.Priority.MEDIUM, task3.getPriority());
     }
 
     @Test public void Decoded_Task_has_correct_attributes_assigned() {
-        String taskString = "88,marketing pitch,to microsoft,2016-03-02T23:59:01,2016-03-09T14:30:00,2016-03-09T15:30:00,true,2";
+        String taskString = "88,marketing pitch,to microsoft,2016-03-02T23:59:01,2016-03-09T14:30,2016-03-09T15:30,true,2";
         Task task4 = Task.decodeTaskFromString(taskString);
 
         assertSame(88, task4.getId());
         assertEquals("marketing pitch", task4.getTaskName());
         assertEquals("to microsoft", task4.getDescription());
         assertEquals(LocalDateTime.parse("2016-03-02T23:59:01"), task4.getCreationTime());
-        assertEquals(CustomTime.fromString("2016-03-09T14:30:00"), task4.getStartTime());
-        assertEquals(CustomTime.fromString("2016-03-09T15:30:00"), task4.getEndTime());
+        assertEquals(CustomTime.fromString("2016-03-09T14:30"), task4.getStartTime());
+        assertEquals(CustomTime.fromString("2016-03-09T15:30"), task4.getEndTime());
         assertTrue(task4.isCompleted());
         assertEquals(Task.Priority.MEDIUM, task4.getPriority());
     }

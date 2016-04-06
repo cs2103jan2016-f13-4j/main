@@ -1,9 +1,6 @@
 package shared;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
@@ -16,7 +13,6 @@ public class CustomTime implements Comparable<CustomTime> {
      * Constants
      */
     private static final char CHAR_SEPARATOR = 'T';
-
     private static final String TIME_FORMAT = "HH:mm";
 
     private static final DateTimeFormatter FORMATTER_DATE = DateTimeFormatter.ISO_DATE;
@@ -52,6 +48,10 @@ public class CustomTime implements Comparable<CustomTime> {
 
     public CustomTime(LocalDateTime dateTime) {
         this(dateTime.toLocalDate(), dateTime.toLocalTime());
+    }
+
+    public CustomTime(int year, Month month, int day, int hour, int minute) {
+        this(LocalDate.of(year, month, day), LocalTime.of(hour, minute));
     }
 
     public CustomTime withPrecision(TemporalUnit unit) {
@@ -169,13 +169,17 @@ public class CustomTime implements Comparable<CustomTime> {
         if (this == o) return true;
         if (o instanceof CustomTime) {
             CustomTime time = (CustomTime) o;
-            Object thisDate = this.hasDate() ? this.getDate() : "null";
-            Object otherDate = time.hasDate() ? time.getDate() : "null";
-            if (!thisDate.equals(otherDate)) return false;
+            if (this.hasDate() ^ time.hasDate()) return false;
+            if (this.hasDate() && !this.getDate().equals(time.getDate())) {
+                return false;
+            }
 
-            Object thisTime = this.hasTime() ? this.getTime() : "null";
-            Object otherTime = time.hasTime() ? time.getTime() : "null";
-            return thisTime.equals(otherTime);
+            if (this.hasTime() ^ time.hasTime()) return false;
+            if (this.hasTime() && !this.getTime().equals(time.getTime())) {
+                return false;
+            }
+
+            return true;
         } else if (o instanceof LocalDateTime) {
             CustomTime time = new CustomTime((LocalDateTime) o);
             return this.equals(time);

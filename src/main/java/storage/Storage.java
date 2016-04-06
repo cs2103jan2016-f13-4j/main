@@ -1,25 +1,28 @@
 package storage;
 
-import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Semaphore;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import exception.ExceptionHandler;
 import exception.PrimaryKeyNotFoundException;
+import javafx.application.Platform;
 import shared.CustomTime;
 import shared.Task;
-import skeleton.CollectionSpec;
+import skeleton.StorageSpec;
 
 /**
  * @@author Chng Hui Yie
  */
-public class Storage implements CollectionSpec<Task> {
+public class Storage extends TimerTask implements StorageSpec<Task> {
 
     /**
      * Constants
      */
-    public static final int INDEX_TASK_INITIAL = 1;
+    private static final int INDEX_TASK_INITIAL = 1;
+    private static final int SAVE_DELAY = 5000;
 
     /**
      * Singleton Implementation
@@ -33,6 +36,8 @@ public class Storage implements CollectionSpec<Task> {
      * Properties
      */
     private TreeMap<Integer, Task> _taskData;
+    private boolean _isDirty;
+    private Timer _autosaveTimer;
 
     /**
      * Constructs a new Storage instance.
@@ -40,9 +45,23 @@ public class Storage implements CollectionSpec<Task> {
     private Storage() {
         // Instantiates storage
         this._taskData = new TreeMap<>();
-
-        // this.readFromDisk();
+        this._isDirty = false;
     }
+
+    @Override
+    public void run() {
+        if (!this._isDirty) return;
+        this.writeToDisk();
+    }
+
+    @Override
+    public void initialise() {
+        this.readFromDisk();
+
+        this._autosaveTimer = new Timer();
+        this._autosaveTimer.scheduleAtFixedRate(this, SAVE_DELAY, SAVE_DELAY);
+    }
+
 
     // ----------------------------------------------------------------------------------------
     //
@@ -60,7 +79,6 @@ public class Storage implements CollectionSpec<Task> {
     @Override public int save(Task task) {
         // TODO: Check for potential time clashes
         boolean isNewTask = (task.getId() == null);
-        boolean isDeleted = task.isDeleted();
 
         // Find a new ID for tasks that does not exist inside the storage
         if (isNewTask) {
@@ -76,11 +94,12 @@ public class Storage implements CollectionSpec<Task> {
 
         // Put the task
         this._taskData.put(task.getId(), task);
+        this._isDirty = true;
 
         return task.getId();
     }
 
-    public void writeToDisk() {
+    private void writeToDisk() {
         List<Task> allTask = this.getAll();
 
         // Keep internal index serial
@@ -90,6 +109,8 @@ public class Storage implements CollectionSpec<Task> {
             return task;
         }).map(Task::encodeTaskToString).collect(Collectors.toList());
         this.getDiskIO().write(tasksToWrite);
+
+        this._isDirty = false;
     }
 
     // ----------------------------------------------------------------------------------------
@@ -166,6 +187,7 @@ public class Storage implements CollectionSpec<Task> {
             return null;
         }
         this._taskData.get(id).setDeletedStatus(true);
+        this._isDirty = true;
         return this._taskData.get(id);
     }
 
@@ -177,8 +199,8 @@ public class Storage implements CollectionSpec<Task> {
                 ExceptionHandler.handle(e);
             }
         }
-
         this._taskData.get(id).setDeletedStatus(false);
+        this._isDirty = true;
     }
 
     /**
@@ -186,6 +208,7 @@ public class Storage implements CollectionSpec<Task> {
      */
     public void removeAll() {
         this._taskData.clear();
+        this._isDirty = true;
     }
 
     public Set<Integer> getNonDeletedTasks() {
@@ -239,5 +262,14 @@ public class Storage implements CollectionSpec<Task> {
         taskStrings.stream()
                 .map(Task::decodeTaskFromString)
                 .forEach(this::save);
+
+        this._isDirty = false;
     }
+
+    @Override
+    public void shutdown() {
+        this.writeToDisk();
+        this._autosaveTimer.cancel();
+    }
+
 }

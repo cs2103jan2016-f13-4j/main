@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -26,7 +27,7 @@ public class CustomTimeTest {
         assertThat(dateWithoutTime.hasTime(), is(false));
     }
 
-    @Test public void CustomTime_toString_is_in_ISO_format() {
+    @Test public void CustomTime_toString_is_in_ISO_format_up_to_minute() {
         LocalDate nowDate = LocalDate.now();
         LocalTime nowTime = LocalTime.now();
 
@@ -36,11 +37,11 @@ public class CustomTimeTest {
         )));
     }
 
-    @Test public void CustomTime_decodes_correctly_from_ISO_string() {
+    @Test public void CustomTime_decodes_correctly_from_ISO_up_to_minute_string() {
         LocalDate nowDate = LocalDate.now();
-        LocalTime nowTime = LocalTime.now();
+        LocalTime nowTime = LocalTime.now().truncatedTo(ChronoUnit.MINUTES);
         DateTimeFormatter isoFormatterDate = DateTimeFormatter.ISO_DATE;
-        DateTimeFormatter isoFormatterTime = DateTimeFormatter.ISO_TIME;
+        DateTimeFormatter isoFormatterTime = DateTimeFormatter.ofPattern("HH:mm");
         String encodedTime = encodeTime(nowDate, nowTime);
         CustomTime time = CustomTime.fromString(encodedTime);
 
@@ -50,8 +51,8 @@ public class CustomTimeTest {
 
     private static String encodeTime(LocalDate date, LocalTime time) {
         DateTimeFormatter isoFormatterDate = DateTimeFormatter.ISO_DATE;
-        DateTimeFormatter isoFormatterTime = DateTimeFormatter.ISO_TIME;
-        return String.format("[%s,%s]",
+        DateTimeFormatter isoFormatterTime = DateTimeFormatter.ofPattern("HH:mm");
+        return String.format("%sT%s",
                 isoFormatterDate.format(date),
                 isoFormatterTime.format(time));
     }

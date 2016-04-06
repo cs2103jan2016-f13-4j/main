@@ -4,7 +4,7 @@ package exception;
  * @@author Mai Anh Vu
  */
 public class ExceptionHandler {
-    private final static ExceptionHandler instance = new ExceptionHandler();
+    private static ExceptionHandler instance = new ExceptionHandler();
 
     public static ExceptionHandler getInstance() {
         return instance;

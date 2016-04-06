@@ -13,6 +13,7 @@ import skeleton.UserInterfaceSpec;
 import ui.UserInterface;
 import ui.view.TaskListView;
 import ui.view.View;
+import ui.view.VisualTask;
 
 /**
  * @@author Mai Anh Vu
@@ -60,7 +61,7 @@ public class TranslationEngine implements TranslationEngineSpec {
         // Create input handler
         Function<String, Void> commandInputHandler = commandString -> {
             // Translate the raw command string given
-            instance.translateCommand(commandString);
+            this.translateCommand(commandString);
             return null;
         };
 
@@ -85,7 +86,8 @@ public class TranslationEngine implements TranslationEngineSpec {
         switch (result.getViewType()) {
         case TASK_LIST:
             // Convert list to one with visual IDs only
-            List<Pair<Integer, Task>> visualTaskList = getVisualIndexMapper().translateRawToVisual(result.getData());
+            List<VisualTask> visualTaskList = getVisualIndexMapper()
+                    .translateRawToVisual(result.getData());
 
             // Update mapper with list
             VisualIndexMapper.getInstance().updateList(result.getData());
@@ -110,16 +112,19 @@ public class TranslationEngine implements TranslationEngineSpec {
 
         Command command = this.getCommandParser().parse(commandString);
 
-        if (command.getIndex() != null) {
+        if (command.hasParameter(Command.ParamName.TASK_INDEX) ||
+                command.hasParameter(Command.ParamName.TASK_INDEX_RANGES)) {
             VisualIndexMapper.getInstance().translateVisualToRaw(command);
         }
 
         // Catch unrecognised or invalid command
         if (command.getInstruction() == Command.Instruction.INVALID) {
-            this.getUserInterface().showNotification("Oops! There is something wrong with your command");
+            this.getUserInterface().showNotification(
+                    "Oops! There is something wrong with your command");
             return;
         } else if (command.getInstruction() == Command.Instruction.UNRECOGNISED) {
-            this.getUserInterface().showNotification("Oops! I don't really understand what you are saying");
+            this.getUserInterface().showNotification(
+                    "Oops! I don't really understand what you are saying");
             return;
         }
 
@@ -165,12 +170,10 @@ public class TranslationEngine implements TranslationEngineSpec {
                     break;
                 case EDIT:
                     // TODO: Take care of failed edit
-                    message = String.format("Edited task with new details!",
-                            this._lastCommand.getIndex());
+                    message = "Edited task with new details!";
                     break;
                 case DELETE:
-                    message = String.format("Deleted task! (undoable)",
-                            this._lastCommand.getIndex());
+                    message = "Deleted task! (undo-able)";
                     break;
                 case SEARCH:
                     int searchFound = ((List<?>) result.getData()).size();

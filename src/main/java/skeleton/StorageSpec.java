@@ -5,7 +5,9 @@ import java.util.List;
 /**
  * @@author Mai Anh Vu
  */
-public interface CollectionSpec<T> {
+public interface StorageSpec<T> {
+
+    void initialise();
 
     int save(T item);
 
@@ -16,4 +18,6 @@ public interface CollectionSpec<T> {
     void undelete(int index);
 
     List<T> getAll();
+
+    void shutdown();
 }

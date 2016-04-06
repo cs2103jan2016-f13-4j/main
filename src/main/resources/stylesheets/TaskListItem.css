@@ -46,3 +46,14 @@
 .list-cell.priority--medium .item__index {
     -fx-text-fill: #ffbe13;
 }
+
+.list-cell.priority--low .indicator--priority {
+    -fx-fill: #8E8C8C;
+}
+.list-cell.priority--low .item__index {
+    -fx-text-fill: #8E8C8C;
+}
+
+.list-cell.priority--null .indicator--priority {
+    -fx-fill: transparent;
+}
