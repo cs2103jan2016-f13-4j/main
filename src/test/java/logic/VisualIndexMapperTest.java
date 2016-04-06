@@ -6,6 +6,7 @@ import shared.Command;
 import shared.CustomTime;
 import shared.Range;
 import shared.Task;
+import ui.view.VisualTask;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -31,11 +32,11 @@ public class VisualIndexMapperTest {
 
     @Test
     public void Mapper_transforms_task_list_into_visual_list() {
-        List<Pair<Integer, Task>> visualList = getMapper().translateRawToVisual(buildTaskList());
+        List<VisualTask> visualList = getMapper().translateRawToVisual(buildTaskList());
         // Index should start from 1
         int currentIndex = 1;
-        for (Pair<Integer, Task> visualItem : visualList) {
-            assertThat(visualItem.getKey(), is(equalTo(currentIndex++)));
+        for (VisualTask visualItem : visualList) {
+            assertThat(visualItem.getVisualIndex(), is(equalTo(currentIndex++)));
         }
     }
 
