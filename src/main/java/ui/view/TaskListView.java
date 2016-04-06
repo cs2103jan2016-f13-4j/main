@@ -96,6 +96,7 @@ public class TaskListView extends View {
     }
 
     private class Item extends ListCell<VisualTask> {
+        public static final double STRING_HIGHLIGHT_OPACITY = .31;
         private static final String STRING_NAME_TEMPLATE = "TaskListItem";
         private static final String STRING_HIGHLIGHT_COLOR = "#FBFF74";
         @FXML private AnchorPane _container;
@@ -170,9 +171,12 @@ public class TaskListView extends View {
         }
 
         private void setHighlightAnimation(){
-            //System.out.println("setting up highlight animation");
-
-            FillTransition highlight = new FillTransition(Duration.millis(750),this._highlight,Color.WHITE,Color.web(STRING_HIGHLIGHT_COLOR));
+            FillTransition highlight = new FillTransition(
+                    Duration.millis(750),
+                    this._highlight,
+                    Color.WHITE,
+                    Color.web(STRING_HIGHLIGHT_COLOR, STRING_HIGHLIGHT_OPACITY)
+            );
             highlight.setCycleCount(2);
             highlight.setAutoReverse(true);
             highlight.setInterpolator(Interpolator.EASE_BOTH);

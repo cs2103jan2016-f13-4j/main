@@ -20,16 +20,6 @@ import storage.*;
  * @@author Thenaesh Elango
  */
 public class StorageWriteOperation {
-    private static Set<Integer> createIntegerSetFromIntArray(int[] array) {
-        Set<Integer> set = new TreeSet<>();
-
-        for (int elem : array) {
-            set.add(elem);
-        }
-
-        return set;
-    }
-
     public static final String ERROR_RANGE_EMPTY = "No valid tasks in range!";
 
 
@@ -39,7 +29,7 @@ public class StorageWriteOperation {
 
     private Command _command; // command that gave rise to this execution unit
     private Integer _id = null; // id of the task handled by this op, if used
-    private Set<Integer> _idRange = null; // set of ids handled by this op, if used
+    private int[] _idRange = null; // set of ids handled by this op, if used
     private Task _taskPreModification = null; // snapshot of the task before it is modified
     private Task _taskPostModification = null; // snapshot of the task after it is modified
     private boolean _wasExecuted = false; // success code for the operation
@@ -115,7 +105,6 @@ public class StorageWriteOperation {
             }
 
             this._id = Storage.getInstance().save(taskToAdd);
-            assert this._id != null;
 
             this._wasExecuted = true; // adding a task never fails
             return null;
@@ -141,24 +130,25 @@ public class StorageWriteOperation {
         this._initialOperation = v -> {
             // get the set of IDs whose corresponding tasks are to be deleted
             if (this._command.hasTrueValue(Command.ParamName.TASK_UNIVERSALLY_QUANTIFIED)) {
-                this._idRange = Storage.getInstance().getNonDeletedTasks(); // get all tasks (that have not been deleted)
+                this._idRange = Storage.getInstance().getNonDeletedTasks()
+                        .stream() // get all tasks (that have not been deleted)
+                        .mapToInt(Integer::intValue).toArray();
             } else {
-                this._idRange = createIntegerSetFromIntArray(Range.enumerateRanges(this._command.getParameter(Command.ParamName.TASK_INDEX_RANGES)))
-                        .stream()
+                List<Range> ranges = this._command.getParameter(Command.ParamName.TASK_INDEX_RANGES);
+                this._idRange = Arrays.stream(Range.enumerateRanges(ranges))
                         .filter(id -> !Storage.getInstance().get(id).isDeleted())
-                        .collect(Collectors.toSet());
+                        .toArray();
             }
 
             assert this._idRange != null;
 
-            if (this._idRange.isEmpty()) {
+            if (this._idRange.length == 0) {
                 this._wasExecuted = false; // we didn't delete anything
                 return ERROR_RANGE_EMPTY;
             }
 
-            this._idRange
-                    .stream()
-                    .forEach(id -> Storage.getInstance().remove(id));
+            Arrays.stream(this._idRange)
+                    .forEach(Storage.getInstance()::remove);
 
             this._wasExecuted = true; // we actually deleted some tasks
             return null;
@@ -171,9 +161,8 @@ public class StorageWriteOperation {
             }
 
             assert this._idRange != null;
-            this._idRange
-                    .stream()
-                    .forEach(id -> Storage.getInstance().undelete(id));
+            Arrays.stream(this._idRange)
+                    .forEach(Storage.getInstance()::undelete);
             return true;
         };
 
@@ -183,9 +172,8 @@ public class StorageWriteOperation {
             }
 
             assert this._idRange != null;
-            this._idRange
-                    .stream()
-                    .forEach(id -> Storage.getInstance().remove(id));
+            Arrays.stream(this._idRange)
+                    .forEach(Storage.getInstance()::remove);
             return true;
         };
 
@@ -243,24 +231,24 @@ public class StorageWriteOperation {
     private void createAsMarkUnit() {
 
         this._initialOperation = v -> {
-            this._idRange = createIntegerSetFromIntArray(Range.enumerateRanges(this._command.getParameter(Command.ParamName.TASK_INDEX_RANGES)))
-                    .stream()
+            List<Range> ranges = this._command.getParameter(Command.ParamName.TASK_INDEX_RANGES);
+            this._idRange = Arrays.stream(Range.enumerateRanges(ranges))
                     .filter(id -> {
                         Task task = Storage.getInstance().get(id);
                         return !(task.isDeleted() || task.isCompleted());
                     })
-                    .collect(Collectors.toSet());
+                    .toArray();
 
             assert this._idRange != null;
 
-            if (this._idRange.isEmpty()) {
+            if (this._idRange.length == 0) {
                 this._wasExecuted = false;
                 return ERROR_RANGE_EMPTY;
             }
 
-            this._idRange
-                    .stream()
-                    .forEach(id -> Storage.getInstance().get(id).setCompleted(true));
+            Arrays.stream(this._idRange)
+                    .mapToObj(Storage.getInstance()::get)
+                    .forEach(task -> task.setCompleted(true));
 
             this._wasExecuted = true;
             return null;
@@ -273,9 +261,9 @@ public class StorageWriteOperation {
             }
 
             assert this._idRange != null;
-            this._idRange
-                    .stream()
-                    .forEach(id -> Storage.getInstance().get(id).setCompleted(false));
+            Arrays.stream(this._idRange)
+                    .mapToObj(Storage.getInstance()::get)
+                    .forEach(task -> task.setCompleted(false));
             return true;
         };
 
@@ -285,9 +273,9 @@ public class StorageWriteOperation {
             }
 
             assert this._idRange != null;
-            this._idRange
-                    .stream()
-                    .forEach(id -> Storage.getInstance().get(id).setCompleted(true));
+            Arrays.stream(this._idRange)
+                    .mapToObj(Storage.getInstance()::get)
+                    .forEach(task -> task.setCompleted(true));
             return true;
         };
 
