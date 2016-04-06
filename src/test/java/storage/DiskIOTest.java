@@ -33,7 +33,7 @@ public class DiskIOTest {
 
         // Clear remnants of previous test(s)
         this._storage.removeAll();
-        this._storage.writeToDisk();
+        //this._storage.writeToDisk();
         File file = new File("tmp/ToDoData.csv");
         file.delete();
         this._diskIO.setFileName("tmp/ToDoData.csv");

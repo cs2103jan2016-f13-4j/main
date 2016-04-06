@@ -66,7 +66,7 @@ public class StorageTest {
                 new CustomTime(LocalDateTime.of(2016, 3, 11, 14, 30)));
         this._storage.save(task1);
         this._storage.save(task2);
-        this._storage.writeToDisk();
+        //this._storage.writeToDisk();
 
         // check that file gets created when writeToFile() is called
         assertTrue(actualFile.isFile());
