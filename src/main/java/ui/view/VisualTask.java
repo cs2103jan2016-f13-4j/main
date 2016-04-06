@@ -25,12 +25,4 @@ public class VisualTask {
     public Task getTask() {
         return this._task;
     }
-
-    public boolean isHighlighted() {
-        return this._isHighlighted;
-    }
-
-    public void highlight() {
-        this._isHighlighted = true;
-    }
 }
