@@ -64,7 +64,7 @@ public class TaskListView extends View {
         this._displayList = constructDisplayList();
         _observableList = FXCollections.observableArrayList(_displayList);
 
-        ListView listView = Resources.getInstance().getComponent("TaskList");
+        ListView listView = Resources.sharedResources().getComponent("TaskList");
         listView.setItems(this._observableList);
 
         final int highlightIndex = this._newTaskIndex;
@@ -114,7 +114,7 @@ public class TaskListView extends View {
 
         public Item(Command lastCommand, int newTaskIndex) {
             super();
-            this._container = Resources.getInstance().getComponent(STRING_NAME_TEMPLATE);
+            this._container = Resources.sharedResources().getComponent(STRING_NAME_TEMPLATE);
             this._indexLabel = (Label) this._container.lookup("#_indexLabel");
             this._nameLabel = (Label) this._container.lookup("#_taskNameLabel");
             this._dateLabel = (Label) this._container.lookup("#_timeLabel");

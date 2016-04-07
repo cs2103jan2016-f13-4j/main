@@ -118,7 +118,7 @@ public class CommandInputController {
      * Put the appropriate elements in place, visually.
      */
     private void initializeLayout() {
-        String stylesheet = Resources.getInstance().getStylesheet("CommandInput");
+        String stylesheet = Resources.sharedResources().getStylesheet("CommandInput");
         this._inputField.getStylesheets().add(stylesheet);
 
         this._inputField.getStyleClass().add("command-input__field");

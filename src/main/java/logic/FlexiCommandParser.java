@@ -156,7 +156,7 @@ public class FlexiCommandParser implements CommandParserSpec {
         Gson gson = builder.create();
 
         // Deserialize
-        String definitionData = Resources.getInstance().getDataFrom(NAME_FILE_DATA);
+        String definitionData = Resources.sharedResources().getDataFrom(NAME_FILE_DATA);
         Definition definition = gson.fromJson(definitionData, Definition.class);
 
         this._commandDefinitions = definition;
