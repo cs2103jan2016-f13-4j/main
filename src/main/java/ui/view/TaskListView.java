@@ -175,6 +175,27 @@ public class TaskListView extends View {
             highlight.play();
 
         }
+
+        @Override public boolean equals( Object obj){
+            if(obj == null){
+                return false;
+            } else if ( this == obj){
+                return true;
+            }
+
+            if(obj instanceof Item){
+                Item another = (Item) obj;
+                VisualTask itemStored = another.getItem();
+                return this.equals(itemStored);
+            }
+
+            if(obj instanceof VisualTask){
+                VisualTask comparator = (VisualTask) obj;
+                return obj.equals(this.getItem());
+            }
+
+            return false;
+        }
     }
 
     private List<VisualTask> constructDisplayList() {
