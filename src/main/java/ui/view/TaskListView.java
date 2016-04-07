@@ -12,6 +12,9 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Stop;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Pair;
 import shared.Command;
@@ -96,14 +99,18 @@ public class TaskListView extends View {
     }
 
     private class Item extends ListCell<VisualTask> {
+        private static final int STRING_FIRST_ITEM = 1;
         public static final double STRING_HIGHLIGHT_OPACITY = .31;
         private static final String STRING_NAME_TEMPLATE = "TaskListItem";
         private static final String STRING_HIGHLIGHT_COLOR = "#FBFF74";
+        private final Color COLOR_TRANSPARENT_FULL = new Color(1,1,1,0);
+        private final Color COLOR_TRANSPARENT_NONE = new Color(1,1,1,0.8);
         @FXML private AnchorPane _container;
         @FXML private Label _indexLabel;
         @FXML private Label _nameLabel;
         @FXML private Label _dateLabel;
         @FXML private Rectangle _highlight;
+        @FXML private Rectangle _canScrollUp;
         private DateFormatterHelper _df = new DateFormatterHelper();
         private Command _lastCommand;
         private int _newTaskIndex;
@@ -119,6 +126,7 @@ public class TaskListView extends View {
             this._nameLabel = (Label) this._container.lookup("#_taskNameLabel");
             this._dateLabel = (Label) this._container.lookup("#_timeLabel");
             this._highlight = (Rectangle) this._container.lookup("#_highlightEffect");
+            this._canScrollUp = (Rectangle) this._container.lookup("#_scrollUp");
             assert this._indexLabel != null;
             assert this._nameLabel != null;
             assert this._dateLabel != null;
@@ -131,6 +139,7 @@ public class TaskListView extends View {
 
         @Override protected void updateItem(VisualTask item, boolean empty) {
             super.updateItem(item, empty);
+
             if (empty) {
                 this.setGraphic(null);
             } else {
@@ -141,6 +150,7 @@ public class TaskListView extends View {
                 if (task.isCompleted()) {
                     this.getStyleClass().add("completed");
                 }
+                // reset priority before applying new one
 
                 // Take care of priority
                 if (task.getPriority() != null) {
@@ -155,6 +165,19 @@ public class TaskListView extends View {
                         item.getVisualIndex() == (this._newTaskIndex +1)) {
                     setHighlightAnimation();
                 }
+
+                // check for any reused cell, the behaviour of the ListCell is that sometimes it might reproduce an existing cell,
+                // so there is a need to reset the effect applied, else it might interfere with the interface
+                if(this._canScrollUp.getOpacity() == 1){
+                    this._canScrollUp.setOpacity(0);
+                }
+
+                // set indicator for scrolling up
+                if (this.getItem().getVisualIndex()%MAXIMUM_DISPLAY_SIZE == STRING_FIRST_ITEM && canScrollUp()) {
+                    setScrollUpIndicator();
+                }
+
+
                 // Optional date time to support floating tasks
                 this._dateLabel.setText(_df.getPairDateDisplay(task.getStartTime(),task.getEndTime()));
 
@@ -174,6 +197,13 @@ public class TaskListView extends View {
             highlight.setInterpolator(Interpolator.EASE_BOTH);
             highlight.play();
 
+        }
+
+        private void setScrollUpIndicator() {
+            this._canScrollUp.setOpacity(1);
+            Stop[] pattern = new Stop[] {new Stop(0.9,COLOR_TRANSPARENT_NONE), new Stop(1,COLOR_TRANSPARENT_FULL)};
+            LinearGradient gradientFlow = new LinearGradient(0,0,0,1,true, CycleMethod.NO_CYCLE,pattern);
+            this._canScrollUp.setFill(gradientFlow);
         }
 
         @Override public boolean equals( Object obj){
