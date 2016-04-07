@@ -30,7 +30,8 @@ public class StorageWriteOperation {
         return set;
     }
 
-    public static final String ERROR_RANGE_EMPTY = "No valid tasks in range!";
+    public static final String ERROR_RANGE_EMPTY_FOR_DELETE = "No valid tasks in range to delete!";
+    public static final String ERROR_RANGE_EMPTY_FOR_MARK = "No valid tasks in range to mark as complete!";
 
 
     private Function<?, String> _initialOperation; // returns the error string for the operation, to be placed in an ExecutionResult
@@ -153,7 +154,7 @@ public class StorageWriteOperation {
 
             if (this._idRange.isEmpty()) {
                 this._wasExecuted = false; // we didn't delete anything
-                return ERROR_RANGE_EMPTY;
+                return ERROR_RANGE_EMPTY_FOR_DELETE;
             }
 
             this._idRange
@@ -255,7 +256,7 @@ public class StorageWriteOperation {
 
             if (this._idRange.isEmpty()) {
                 this._wasExecuted = false;
-                return ERROR_RANGE_EMPTY;
+                return ERROR_RANGE_EMPTY_FOR_MARK;
             }
 
             this._idRange
