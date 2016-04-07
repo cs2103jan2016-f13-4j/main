@@ -13,6 +13,7 @@ import skeleton.UserInterfaceSpec;
 import ui.UserInterface;
 import ui.view.TaskListView;
 import ui.view.View;
+import ui.view.VisualTask;
 
 /**
  * @@author Mai Anh Vu
@@ -60,7 +61,7 @@ public class TranslationEngine implements TranslationEngineSpec {
         // Create input handler
         Function<String, Void> commandInputHandler = commandString -> {
             // Translate the raw command string given
-            instance.translateCommand(commandString);
+            this.translateCommand(commandString);
             return null;
         };
 
@@ -85,7 +86,7 @@ public class TranslationEngine implements TranslationEngineSpec {
         switch (result.getViewType()) {
         case TASK_LIST:
             // Convert list to one with visual IDs only
-            List<Pair<Integer, Task>> visualTaskList = getVisualIndexMapper()
+            List<VisualTask> visualTaskList = getVisualIndexMapper()
                     .translateRawToVisual(result.getData());
 
             // Update mapper with list
@@ -111,7 +112,8 @@ public class TranslationEngine implements TranslationEngineSpec {
 
         Command command = this.getCommandParser().parse(commandString);
 
-        if (command.getParameter(Command.ParamName.TASK_INDEX) != null) {
+        if (command.hasParameter(Command.ParamName.TASK_INDEX) ||
+                command.hasParameter(Command.ParamName.TASK_INDEX_RANGES)) {
             VisualIndexMapper.getInstance().translateVisualToRaw(command);
         }
 

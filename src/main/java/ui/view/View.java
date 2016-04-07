@@ -53,6 +53,10 @@ public abstract class View {
         return this._component;
     }
 
+    public void setData(Object data) {
+        this._data = data;
+    }
+
     public Function<KeyEvent, Boolean> getKeyInputInterceptor() {
         return (event -> false);
     }

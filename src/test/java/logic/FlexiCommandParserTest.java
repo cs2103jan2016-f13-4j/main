@@ -286,4 +286,9 @@ public class FlexiCommandParserTest {
         assertThat(ranges, hasItem(new Range(5)));
     }
 
+    @Test public void FlexiCommandParser_can_parse_command_with_starting_but_without_ending_date() {
+        Command command = this._parser.parse("add new task today 5pm to 6pm");
+        assertThat(command.getInstruction(), is(Command.Instruction.ADD));
+    }
+
 }
