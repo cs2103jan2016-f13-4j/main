@@ -1,5 +1,6 @@
 package shared;
 
+import logic.parser.RegexUtils;
 import org.junit.Test;
 
 import java.util.regex.Matcher;

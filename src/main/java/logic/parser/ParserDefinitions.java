@@ -35,6 +35,11 @@ public class ParserDefinitions {
     private List<Priority> _priorities;
     private LinkedHashMap<String, Task.Priority> _priorityTranslator;
 
+    // Caching behaviours
+    private String[] _cachedInstructionKeywords;
+    private String[] _cachedUnchainableTimePrepositionKeywords;
+    private String[] _cachedChainableTimePrepositionKeywords;
+
     public ParserDefinitions() {
         this._instructionTranslator = new LinkedHashMap<>();
         this._timePrepositionTranslator = new LinkedHashMap<>();
@@ -141,4 +146,23 @@ public class ParserDefinitions {
     // GETTER METHODS
     //
     //-------------------------------------------------------------------------------------------------
+    public String[] getInstructionKeywords() {
+        if (this._cachedInstructionKeywords == null) {
+            this._cachedInstructionKeywords = this._instructions.stream()
+                    .map(Instruction::getKeywords)
+                    .flatMap(Set::stream)
+                    .toArray(String[]::new);
+        }
+        return this._cachedInstructionKeywords;
+    }
+
+    public List<TimePreposition> getTimePrepositions() {
+        return this._timePrepositions;
+    }
+
+    public List<TimeNoun> getTimeNouns() {
+        return this._timeNouns;
+    }
+
+
 }

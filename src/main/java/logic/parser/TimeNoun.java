@@ -16,7 +16,6 @@ public class TimeNoun {
     private static final String KEY_JSON_MEANING = "meaning";
     private static final String KEY_JSON_KEYWORDS = "keywords";
     private static final String KEY_JSON_PREPOSITIONS = "prepositions";
-    private static final String KEY_JSON_CGWP = "canGoWithoutPrepositions";
 
     /**
      * Types
@@ -43,7 +42,6 @@ public class TimeNoun {
         assert nounObject.has(KEY_JSON_MEANING);
         assert nounObject.has(KEY_JSON_KEYWORDS);
         assert nounObject.has(KEY_JSON_PREPOSITIONS);
-        assert nounObject.has(KEY_JSON_CGWP);
 
         // Parse meaning
         String meaning = nounObject.get(KEY_JSON_MEANING).getAsString();
@@ -63,8 +61,6 @@ public class TimeNoun {
                 .stream()
                 .map(prep -> JsonUtils.findEnumValue(prep, TimePreposition.Meaning.class))
                 .collect(Collectors.toSet());
-
-        this._canGoWithoutPrepositions = nounObject.get(KEY_JSON_CGWP).getAsBoolean();
     }
 
     public boolean isRelative() {
@@ -89,7 +85,4 @@ public class TimeNoun {
         return this._prepositions;
     }
 
-    public boolean canGoWithoutPrepositions() {
-        return this._canGoWithoutPrepositions;
-    }
 }
