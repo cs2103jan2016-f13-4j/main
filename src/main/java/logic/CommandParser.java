@@ -2,12 +2,8 @@ package logic;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import logic.parser.ParserDefinitions;
-import logic.parser.ParserDefinitionsDeserializer;
-import logic.parser.TimeNoun;
-import logic.parser.TimePreposition;
+import logic.parser.*;
 import shared.Command;
-import logic.parser.RegexUtils;
 import shared.Resources;
 import skeleton.CommandParserSpec;
 
@@ -20,14 +16,15 @@ import java.util.stream.Collectors;
 public class CommandParser implements CommandParserSpec {
 
     private static final String FILE_PARSER_DATA = "CommandParserData.json";
-    private static final String MATCHER_GROUP_INSTRUCTION = "INST";
 
+    private static final String MATCHER_GROUP_INSTRUCTION = "INST";
     private static final String MATCHER_GROUP_PREPOSITION_RELATIVE = "RELPREP";
     private static final String MATCHER_GROUP_PREPOSITION_ABSOLUTE = "ABSPREP";
     private static final String MATCHER_GROUP_PREPOSITION_DATE = "DATEPREP";
     private static final String MATCHER_GROUP_RELATIVE_DATE = "RELDATE";
     private static final String MATCHER_GROUP_ABSOLUTE_DATE = "ABSDATE";
     private static final String MATCHER_GROUP_TIME = "TIME";
+    private static final String MATCHER_GROUP_PRIORITY = "PRIO";
 
     /**
      * Singleton implementation
@@ -42,7 +39,8 @@ public class CommandParser implements CommandParserSpec {
      */
     private ParserDefinitions _definitions;
     private String _instructionPattern;
-    private String _startTimePattern;
+    private String _timePattern;
+    private String _priorityPattern;
 
     private CommandParser() {
 
@@ -75,7 +73,8 @@ public class CommandParser implements CommandParserSpec {
     //-------------------------------------------------------------------------------------------------
     private void constructRegularExpression() {
         this.constructInstructionRegExp();
-        this.constructStartTimeRegExp();
+        this.constructTimeRegExp();
+        this.constructPriorityRegExp();
     }
 
     private void constructInstructionRegExp() {
@@ -86,7 +85,7 @@ public class CommandParser implements CommandParserSpec {
         ));
     }
 
-    private void constructStartTimeRegExp() {
+    private void constructTimeRegExp() {
         //=====================================================================
         // RELATIVE TIME
         //=====================================================================
@@ -187,7 +186,7 @@ public class CommandParser implements CommandParserSpec {
         );
 
         // Combine them all!
-        this._startTimePattern = String.format("%s%s%s",
+        this._timePattern = String.format("%s%s%s",
                 RegexUtils.choice(
                         relativeStartTimeRegex,
                         absoluteStartTimeRegex1,
@@ -198,12 +197,18 @@ public class CommandParser implements CommandParserSpec {
         );
     }
 
-    private void constructEndTimeRegExp() {
-        // TODO: stub
-    }
-
     private void constructPriorityRegExp() {
-        // TODO: stub
+        String[] priorityKeywords = this._definitions.getPriorities().stream()
+                .map(Priority::getKeywords)
+                .flatMap(Set::stream)
+                .toArray(String[]::new);
+
+        this._priorityPattern = RegexUtils.word(
+                RegexUtils.choice(this._definitions.getPriorityPrepositionKeywords())
+        ).concat(RegexUtils.namedChoice(
+                MATCHER_GROUP_PRIORITY,
+                priorityKeywords
+        ));
     }
 
     @Override

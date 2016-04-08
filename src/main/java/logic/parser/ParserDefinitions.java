@@ -37,8 +37,7 @@ public class ParserDefinitions {
 
     // Caching behaviours
     private String[] _cachedInstructionKeywords;
-    private String[] _cachedUnchainableTimePrepositionKeywords;
-    private String[] _cachedChainableTimePrepositionKeywords;
+    private String[] _cachedPriorityPrepositionKeywords;
 
     public ParserDefinitions() {
         this._instructionTranslator = new LinkedHashMap<>();
@@ -164,5 +163,15 @@ public class ParserDefinitions {
         return this._timeNouns;
     }
 
+    public String[] getPriorityPrepositionKeywords() {
+        if (this._cachedPriorityPrepositionKeywords == null) {
+            this._cachedPriorityPrepositionKeywords = this._priorityPrepositions
+                    .stream().toArray(String[]::new);
+        }
+        return this._cachedPriorityPrepositionKeywords;
+    }
 
+    public List<Priority> getPriorities() {
+        return this._priorities;
+    }
 }
