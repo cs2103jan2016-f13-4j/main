@@ -40,6 +40,11 @@ public class TemporalRange {
             }
 
             @Override
+            public boolean isAdjacentTo(TemporalRange rangeToCheck) {
+                return false;
+            }
+
+            @Override
             public TemporalRange merge(TemporalRange rangeToMerge) {
                 return rangeToMerge;
             }
@@ -75,6 +80,10 @@ public class TemporalRange {
 
 
     public boolean overlaps(TemporalRange rangeToCheck) {
+        if (rangeToCheck.equals(getUniversalRange())) {
+            return true;
+        }
+
         boolean endsBefore = this.getEnd().compareTo(rangeToCheck.getStart()) <= 0;
         boolean startsAfter = this.getStart().compareTo(rangeToCheck.getEnd()) >= 0;
 
@@ -82,6 +91,10 @@ public class TemporalRange {
     }
 
     public boolean isAdjacentTo(TemporalRange rangeToCheck) {
+        if (rangeToCheck.equals(getUniversalRange())) {
+            return false;
+        }
+
         boolean endsAtStart = this.getEnd().compareTo(rangeToCheck.getStart()) == 0;
         boolean startsAtEnd = this.getStart().compareTo(rangeToCheck.getEnd()) == 0;
 
@@ -89,6 +102,10 @@ public class TemporalRange {
     }
 
     public TemporalRange merge(TemporalRange rangeToMerge) {
+        if (rangeToMerge.equals(getUniversalRange())) {
+            return this;
+        }
+
         CustomTime start;
         CustomTime end;
 

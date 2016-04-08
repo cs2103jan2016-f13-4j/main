@@ -83,4 +83,12 @@ public class TemporalRangeTest {
         assertNull(range1.merge(range3));
         assertNull(range3.merge(range1));
     }
+
+    @Test
+    public void Universal_range_works_as_intended() {
+        assertEquals(TemporalRange.getUniversalRange().merge(range1), range1);
+        assertEquals(range2.merge(TemporalRange.getUniversalRange()), range2);
+
+        assertEquals(TemporalRange.getUniversalRange().merge(TemporalRange.getUniversalRange()), TemporalRange.getUniversalRange());
+    }
 }
