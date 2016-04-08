@@ -17,13 +17,13 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 // Create jar with all dependencies
-task fatJar(type: Jar) {
+task deploy(type: Jar) {
     manifest {
-        attributes 'Implementation-Title': 'Gradle Jar File',  
+        attributes 'Implementation-Title': 'Gradle Deploy',  
             'Implementation-Version': version,
             'Main-Class': 'launcher.Launcher'
     }
-    baseName = project.name + '-all'
+    baseName = project.name + '-release'
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
     with jar
 }
