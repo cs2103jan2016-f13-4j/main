@@ -52,8 +52,7 @@ public class TaskListView extends View {
      */
     public TaskListView(List<VisualTask> data, Command lastCommand) {
         super(data, lastCommand);
-        _newTaskIndex = -1;
-        this._viewIndex = 0;
+
     }
 
     @Override protected void buildContent() {
@@ -62,6 +61,9 @@ public class TaskListView extends View {
             Pair<Integer, Integer> indexPair =  obtainNewTaskIndex();
             this._viewIndex = indexPair.getValue();
             this._newTaskIndex = indexPair.getKey();
+        } else {
+            this._viewIndex = 0;
+            this._newTaskIndex = -1;
         }
 
         this._displayList = constructDisplayList();
@@ -95,7 +97,7 @@ public class TaskListView extends View {
                 }
             }
         }
-        return new Pair<>(index,index/MAXIMUM_DISPLAY_SIZE);
+        return new Pair<Integer, Integer>(index,index/MAXIMUM_DISPLAY_SIZE);
     }
 
     private class Item extends ListCell<VisualTask> {
