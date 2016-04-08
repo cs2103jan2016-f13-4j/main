@@ -1,5 +1,7 @@
 package ui;
 
+import java.util.function.Function;
+
 import exception.ExceptionHandler;
 import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
@@ -24,8 +26,6 @@ import ui.controller.InfoPanelController;
 import ui.controller.NotificationToastController;
 import ui.view.View;
 
-import java.util.function.Function;
-
 /**
  * @@author Mai Anh Vu
  */
@@ -34,13 +34,7 @@ public class UserInterface implements UserInterfaceSpec {
     /**
      * Constants
      */
-    private static final String[] SOURCES_FONT = {
-            "Lato-Black",
-            "Lato-Bold",
-            "Lato-Italic",
-            "Lato-Regular",
-            "Lato-Light"
-    };
+    private static final String[] SOURCES_FONT = { "Lato-Bold", "Lato-Italic", "Lato-Regular" };
     private static final double SIZE_FONT_DEFAULT = 16.0;
     private static final String STYLE_CLASS_CONTAINER_MAIN = "sub-container";
     private static final double HEIGHT_MAIN_CONTAINER_MIN = 300.0;
@@ -51,14 +45,12 @@ public class UserInterface implements UserInterfaceSpec {
     private static final int DURATION_ANIM_STOP = 3000;
 
     private static final Duration TIMELINE_INCOMING = Duration.millis(DURATION_ANIM_TRANSITION);
-    private static final Duration TIMELINE_HANGING  = Duration.millis(DURATION_ANIM_TRANSITION + DURATION_ANIM_STOP);
-    private static final Duration TIMELINE_OUTGOING = Duration.millis(
-            DURATION_ANIM_TRANSITION + DURATION_ANIM_STOP + DURATION_ANIM_TRANSITION
-    );
+    private static final Duration TIMELINE_HANGING = Duration.millis(DURATION_ANIM_TRANSITION + DURATION_ANIM_STOP);
+    private static final Duration TIMELINE_OUTGOING = Duration
+            .millis(DURATION_ANIM_TRANSITION + DURATION_ANIM_STOP + DURATION_ANIM_TRANSITION);
 
     private static final int INDEX_X = 0;
     private static final int INDEX_Y = 1;
-
 
     /**
      * Singleton instance
@@ -92,8 +84,7 @@ public class UserInterface implements UserInterfaceSpec {
     /**
      * TODO: Write JavaDoc
      */
-    @Override
-    public void initialize() {
+    @Override public void initialize() {
         assert (ApplicationContext.mainContext().getPrimaryStage() != null);
         assert this._commandInputHandler != null;
 
@@ -130,8 +121,7 @@ public class UserInterface implements UserInterfaceSpec {
     /**
      * TODO: Write JavaDoc
      */
-    @Override
-    public void show() {
+    @Override public void show() {
         // Make sure stage and command input handler are both set
         assert (this._primaryStage != null);
         assert (this._commandInputHandler != null);
@@ -146,18 +136,17 @@ public class UserInterface implements UserInterfaceSpec {
      *
      * @param onCommandInput
      */
-    @Override
-    public void setOnCommandInputHandler(Function<String, Void> onCommandInput) {
+    @Override public void setOnCommandInputHandler(Function<String, Void> onCommandInput) {
         this._commandInputHandler = onCommandInput;
     }
 
     private void registerInfoPanel() {
-        Pair<AnchorPane, InfoPanelController> infoPanelMetadata =
-                Resources.getInstance().getComponentAndController("InfoPanelWrapper");
+        Pair<AnchorPane, InfoPanelController> infoPanelMetadata = Resources.getInstance()
+                .getComponentAndController("InfoPanelWrapper");
 
         AnchorPane infoPanelWrapper = infoPanelMetadata.getKey();
         // TODO: Delete this line to show info panel
-        infoPanelWrapper.setClip(new Rectangle(0,0));
+        infoPanelWrapper.setClip(new Rectangle(0, 0));
         this._infoPanelController = infoPanelMetadata.getValue();
 
         this._rootView.getChildren().add(infoPanelWrapper);
@@ -166,8 +155,8 @@ public class UserInterface implements UserInterfaceSpec {
     private void registerCommandInput() {
         assert (this._commandInputHandler != null);
 
-        Pair<AnchorPane, CommandInputController> inputMetadata =
-                Resources.getInstance().getComponentAndController("CommandInputWrapper");
+        Pair<AnchorPane, CommandInputController> inputMetadata = Resources.getInstance()
+                .getComponentAndController("CommandInputWrapper");
 
         assert inputMetadata != null;
 
@@ -196,9 +185,8 @@ public class UserInterface implements UserInterfaceSpec {
         });
 
         this._commandInputController = inputMetadata.getValue();
-        this._commandInputController.setInputSubmissionHandler(
-                rawCommand -> this._commandInputHandler.apply(rawCommand)
-        );
+        this._commandInputController
+                .setInputSubmissionHandler(rawCommand -> this._commandInputHandler.apply(rawCommand));
     }
 
     private void registerViewContainer() {
@@ -224,13 +212,11 @@ public class UserInterface implements UserInterfaceSpec {
     private void registerNotificationToast() {
         assert this._mainContainer != null;
 
-        Pair<AnchorPane, NotificationToastController> toastMetadata =
-                Resources.getInstance().getComponentAndController("NotificationToast");
+        Pair<AnchorPane, NotificationToastController> toastMetadata = Resources.getInstance()
+                .getComponentAndController("NotificationToast");
 
         AnchorPane notificationContainer = toastMetadata.getKey();
-        notificationContainer.setLayoutY(
-                this._mainContainer.getHeight() - notificationContainer.getHeight() - 20.0
-        );
+        notificationContainer.setLayoutY(this._mainContainer.getHeight() - notificationContainer.getHeight() - 20.0);
         notificationContainer.toFront();
         notificationContainer.setTranslateY(-20.0);
 
@@ -242,8 +228,7 @@ public class UserInterface implements UserInterfaceSpec {
         this._mainContainer.getChildren().add(notificationContainer);
     }
 
-    @Override
-    public void render(View view) {
+    @Override public void render(View view) {
         assert this._viewWrapper != null;
         assert view != null;
 
@@ -253,34 +238,22 @@ public class UserInterface implements UserInterfaceSpec {
         this._commandInputController.setKeyInputInterceptor(view.getKeyInputInterceptor());
     }
 
-    @Override
-    public void cleanUp() {
+    @Override public void cleanUp() {
         // Trickle down to controller
         this._commandInputController.cleanUp();
     }
 
-    @Override
-    public void showNotification(String notif) {
+    @Override public void showNotification(String notif) {
         assert this._notification != null;
         assert this._notificationController != null;
 
         // Set title first
         this._notificationController.setNotification(notif);
 
-        final KeyValue initial = new KeyValue(
-                this._notification.translateXProperty(),
-                -OFFSET_HIDE
-        );
-        final KeyValue incoming = new KeyValue(
-                this._notification.translateXProperty(),
-                0,
-                Interpolator.EASE_BOTH
-        );
-        final KeyValue outgoing = new KeyValue(
-                this._notification.translateXProperty(),
-                OFFSET_HIDE,
-                Interpolator.EASE_BOTH
-        );
+        final KeyValue initial = new KeyValue(this._notification.translateXProperty(), -OFFSET_HIDE);
+        final KeyValue incoming = new KeyValue(this._notification.translateXProperty(), 0, Interpolator.EASE_BOTH);
+        final KeyValue outgoing = new KeyValue(this._notification.translateXProperty(), OFFSET_HIDE,
+                Interpolator.EASE_BOTH);
 
         // Construct animation keyframes
         final KeyFrame initialFrame = new KeyFrame(Duration.ZERO, initial);

@@ -10,6 +10,23 @@
 // Apply the java plugin to add support for Java
 apply plugin: 'java'
 apply plugin: 'idea'
+apply plugin: 'eclipse'
+
+version '0.4'
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+// Create jar with all dependencies
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'Gradle Jar File',  
+            'Implementation-Version': version,
+            'Main-Class': 'launcher.Launcher'
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
 
 // In this section you declare where to find the dependencies of your project
 repositories {
