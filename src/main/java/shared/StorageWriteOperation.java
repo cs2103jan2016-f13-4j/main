@@ -106,6 +106,8 @@ public class StorageWriteOperation {
             }
 
             this._id = Storage.getInstance().save(taskToAdd);
+            // TODO: REMEMBER TO GET RID OF THIS SHIT
+            System.err.printf("added %s at id %d%n", name, this._id);
 
             this._wasExecuted = true; // adding a task never fails
             return null;
@@ -137,6 +139,11 @@ public class StorageWriteOperation {
             } else {
                 List<Range> ranges = this._command.getParameter(Command.ParamName.TASK_INDEX_RANGES);
                 this._idRange = Arrays.stream(Range.enumerateRanges(ranges))
+                        // TODO: REMEMBER TO GET RID OF THIS SHIT
+                        .map(id -> {
+                            System.err.printf("deleting task at id %d%n", id);
+                            return id;
+                        })
                         .filter(id -> !Storage.getInstance().get(id).isDeleted())
                         .toArray();
             }
