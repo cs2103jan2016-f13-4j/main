@@ -30,9 +30,9 @@
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <Label fx:id="_startPrefix" alignment="BOTTOM_RIGHT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" opacity="0.0" prefHeight="28.0" prefWidth="32.0" styleClass="item__date" text="From" textAlignment="RIGHT" GridPane.hgrow="NEVER" />
+            <Label fx:id="_startPrefix" alignment="BOTTOM_RIGHT" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="24.0" prefWidth="32.0" styleClass="item__date" text="From" textAlignment="RIGHT" GridPane.hgrow="NEVER" />
             <Label fx:id="_endPrefix" alignment="TOP_RIGHT" contentDisplay="RIGHT" prefHeight="24.0" prefWidth="32.0" styleClass="item__date" text="To" textAlignment="RIGHT" GridPane.rowIndex="1" />
-            <Label fx:id="_startTime" alignment="BOTTOM_CENTER" maxHeight="24.0" prefHeight="24.0" styleClass="item__date" text="Tommorow" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
+            <Label fx:id="_startTime" alignment="BOTTOM_LEFT" maxHeight="31.0" prefHeight="31.0" prefWidth="60.0" styleClass="item__date" text="Tommorow" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
             <Label fx:id="_endTime" alignment="TOP_CENTER" maxHeight="24.0" prefHeight="24.0" styleClass="item__date" text="Next Wed 23:59 PM" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" />
          </children>
          <opaqueInsets>
