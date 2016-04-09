@@ -26,6 +26,7 @@ public class Scheduler implements SchedulerSpec {
 
     private Storage _storage;
 
+
     @Override
     public boolean isColliding(Task task) {
         TemporalRange taskRange = new TemporalRange(task.getStartTime(), task.getEndTime());
@@ -33,7 +34,7 @@ public class Scheduler implements SchedulerSpec {
         return !this._storage.getAll()
                 .stream()
                 .map(task_ -> new TemporalRange(task_.getStartTime(), task_.getEndTime()))
-                .map(range_ -> taskRange.overlaps(range_))
+                .filter(range_ -> taskRange.overlaps(range_))
                 .collect(Collectors.toList())
                 .isEmpty();
     }
