@@ -14,35 +14,33 @@ import java.util.stream.Collectors;
  * @@author Thenaesh Elango
  */
 public class Scheduler implements SchedulerSpec {
-    private static final Scheduler instance = new Scheduler();
-
+    private static final Scheduler instance = new Scheduler(Storage.getInstance());
     public static Scheduler getInstance() {
         return instance;
     }
 
-    private Scheduler() {
+    protected Scheduler(Storage storage) {
+        this._storage = storage;
     }
+
+
+    private Storage _storage;
 
     @Override
     public boolean isColliding(Task task) {
-        return !Storage.getInstance().getAll()
+        TemporalRange taskRange = new TemporalRange(task.getStartTime(), task.getEndTime());
+
+        return !this._storage.getAll()
                 .stream()
-                .filter(otherTask -> {
-                    CustomTime startOfTask = task.getStartTime();
-                    CustomTime endOfTask = task.getEndTime();
-                    CustomTime startOfOtherTask = otherTask.getStartTime();
-                    CustomTime endOfOtherTask = otherTask.getEndTime();
-
-                    boolean endsStrictlyBefore = endOfTask.compareTo(startOfOtherTask) <= 0;
-                    boolean startsStrictlyAfter = startOfTask.compareTo(endOfOtherTask) >= 0;
-
-                    return !(endsStrictlyBefore || startsStrictlyAfter);
-                }).collect(Collectors.toList()).isEmpty();
+                .map(task_ -> new TemporalRange(task_.getStartTime(), task_.getEndTime()))
+                .map(range_ -> taskRange.overlaps(range_))
+                .collect(Collectors.toList())
+                .isEmpty();
     }
 
     @Override
     public CustomTime getFreeSlot(CustomTime lowerBound, CustomTime upperBound) {
-        List<TemporalRange> occupiedRanges = this.collapseOverlappingRanges(Storage.getInstance().getAll()
+        List<TemporalRange> occupiedRanges = this.collapseOverlappingRanges(this._storage.getAll()
         .stream()
         .map(task -> new TemporalRange(task.getStartTime(), task.getEndTime()))
         .collect(Collectors.toList()))
@@ -58,6 +56,13 @@ public class Scheduler implements SchedulerSpec {
      * helper methods
      */
 
+    /**
+     * takes a list of temporal ranges and returns a new list of disjoint ranges that represent
+     * the time spanned by all the ranges
+     *
+     * @param ranges the original ranges
+     * @return new list of disjoint ranges sorted by start time
+     */
     protected List<TemporalRange> collapseOverlappingRanges(List<TemporalRange> ranges) {
         List<TemporalRange> collapsedRanges = new LinkedList<>();
         List<TemporalRange> originalRanges = ranges
