@@ -57,6 +57,7 @@ public class DateFormatterHelper {
             }
 
         }
+
         return date;
     }
 
@@ -68,17 +69,16 @@ public class DateFormatterHelper {
         return display;
     }
 
-    public String getFullDisplay(CustomTime cTime) {
+    public String getDateTimeDisplay(CustomTime cTime) {
         assert cTime != null;
-        String display = EMPTY_STRING;
-        display = getDateDisplay(cTime);
 
-        if(display.isEmpty()){
-            if(cTime.hasTime()){
+        String display =  getDateDisplay(cTime);
+        if (display.isEmpty()) {
+            if (cTime.hasTime()) {
                 display  = getTimeDisplay(cTime);
             }
         } else {
-            if(cTime.hasTime()){
+            if (cTime.hasTime()) {
                 display = display + " " + getTimeDisplay(cTime);
             }
         }
@@ -86,25 +86,33 @@ public class DateFormatterHelper {
         return display;
     }
 
-    public String getPairDateDisplay(CustomTime start, CustomTime end){
-        String display = EMPTY_STRING;
-        if(start == null && end == null){
-            return display;
-        } else if(start == null && end != null){
-
-                display = String.format(TIME_BY,this.getFullDisplay(end)) ;
-
-        } else if (start != null && end == null){
-
-                display = String.format(TIME_FROM,this.getFullDisplay(start));
-
+    public String getSingleTimeTaskDisplay(Task task ) {
+        assert(!(task.getStartTime() != null && task.getEndTime() != null));
+        CustomTime taskTime;
+        if (task.getStartTime() != null) {
+            taskTime = task.getStartTime();
+            return String.format(TIME_FROM, this.getDateTimeDisplay(taskTime));
+        } else if (task.getEndTime() != null) {
+            taskTime = task.getEndTime();
+            return String.format(TIME_BY, this.getDateTimeDisplay(taskTime));
         } else {
-            String startDate = this.getFullDisplay(start);
-            String endDate = this.getFullDisplay(end);
-            display =  String.format(DATE_PAIR_PATTERN,startDate,endDate);
+            return EMPTY_STRING;
         }
+    }
 
-        return display;
+
+    public String getPrefixDisplay(Task task){
+
+        CustomTime start = task.getStartTime();
+        CustomTime end = task.getEndTime();
+
+        if (start != null) {
+            return TIME_FROM;
+        } else if (end != null) {
+           return TIME_BY;
+        } else {
+            return EMPTY_STRING;
+        }
 
     }
 

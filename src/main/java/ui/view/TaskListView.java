@@ -103,14 +103,18 @@ public class TaskListView extends View {
     private class Item extends ListCell<VisualTask> {
         private static final int STRING_FIRST_ITEM = 1;
         public static final double STRING_HIGHLIGHT_OPACITY = .31;
-        private static final String STRING_NAME_TEMPLATE = "TaskListItem";
+        private static final String STRING_NAME_TEMPLATE_EVENT = "TaskListItemDouble";
+        private static final String STRING_NAME_TEMPLATE_SINGLE = "TaskListItemSingle";
         private static final String STRING_HIGHLIGHT_COLOR = "#FBFF74";
         private final Color COLOR_TRANSPARENT_FULL = new Color(1,1,1,0);
         private final Color COLOR_TRANSPARENT_NONE = new Color(1,1,1,0.8);
         @FXML private AnchorPane _container;
         @FXML private Label _indexLabel;
         @FXML private Label _nameLabel;
-        @FXML private Label _dateLabel;
+        @FXML private Label _startLabelPrefix;
+        @FXML private Label _startLabelTime;
+        @FXML private Label _endLabelPrefix;
+        @FXML private Label _endLabelTime;
         @FXML private Rectangle _highlight;
         @FXML private Rectangle _canScrollUp;
         private DateFormatterHelper _df = new DateFormatterHelper();
@@ -123,16 +127,19 @@ public class TaskListView extends View {
 
         public Item(Command lastCommand, int newTaskIndex) {
             super();
-            this._container = Resources.getInstance().getComponent(STRING_NAME_TEMPLATE);
+
+
+                this._container = Resources.getInstance().getComponent(STRING_NAME_TEMPLATE_EVENT);
+
+
             this._indexLabel = (Label) this._container.lookup("#_indexLabel");
             this._nameLabel = (Label) this._container.lookup("#_taskNameLabel");
-            this._dateLabel = (Label) this._container.lookup("#_timeLabel");
             this._highlight = (Rectangle) this._container.lookup("#_highlightEffect");
             this._canScrollUp = (Rectangle) this._container.lookup("#_scrollUp");
             assert this._indexLabel != null;
             assert this._nameLabel != null;
-            assert this._dateLabel != null;
             assert this._highlight != null;
+            assert this._canScrollUp != null;
 
             this._lastCommand = lastCommand ;
             this._newTaskIndex = newTaskIndex;
@@ -145,6 +152,8 @@ public class TaskListView extends View {
             if (empty) {
                 this.setGraphic(null);
             } else {
+                System.out.println("update item");
+                //TODO: Check the time stored in the task. If it is an event, use TaskListItemEvent. Else, use TaskListItemSingle
                 int index = item.getVisualIndex();
                 Task task = item.getTask();
 
@@ -152,7 +161,6 @@ public class TaskListView extends View {
                 if (task.isCompleted()) {
                     this.getStyleClass().add("completed");
                 }
-                // reset priority before applying new one
 
                 // Take care of priority
                 if (task.getPriority() != null) {
@@ -179,9 +187,7 @@ public class TaskListView extends View {
                     setScrollUpIndicator();
                 }
 
-
-                // Optional date time to support floating tasks
-                this._dateLabel.setText(_df.getPairDateDisplay(task.getStartTime(),task.getEndTime()));
+                setUpTime(task);
 
                 this.setGraphic(this._container);
             }
@@ -227,6 +233,50 @@ public class TaskListView extends View {
             }
 
             return false;
+        }
+
+        private AnchorPane setContainer(Task task){
+            if (task.getStartTime() != null && task.getEndTime() != null) {
+                return (AnchorPane) Resources.getInstance().getComponent(STRING_NAME_TEMPLATE_EVENT);
+            } else {
+                return (AnchorPane) Resources.getInstance().getComponent(STRING_NAME_TEMPLATE_SINGLE);
+            }
+        }
+
+        private void setUpTime(Task task) {
+
+            if (isEvent(task)) { // task is an event
+
+                this._startLabelPrefix = (Label) this._container.lookup("#_startPrefix") ;
+                this._startLabelTime = (Label) this._container.lookup("#_startTime");
+                this._endLabelPrefix = (Label) this._container.lookup("#_endPrefix");
+                this._endLabelTime = (Label) this._container.lookup("#_endTime");
+
+                assert this._startLabelPrefix != null;
+                assert this._startLabelTime != null;
+                assert this._endLabelPrefix != null;
+                assert this._endLabelTime != null;
+
+                // set up time
+                this._startLabelPrefix.setText("From");
+                this._startLabelTime.setText(_df.getDateTimeDisplay(task.getStartTime()));
+                this._endLabelPrefix.setText("To");
+                this._endLabelTime.setText(_df.getDateTimeDisplay(task.getEndTime()));
+
+            } else { // Task is floating, or has only one time recorded
+
+                this._startLabelTime = (Label) this._container.lookup("#_timeLabel");
+
+                assert this._startLabelPrefix != null;
+                assert this._startLabelTime != null;
+
+               // this._startLabelTime.setText("");
+
+            }
+        }
+
+        private boolean isEvent(Task task) {
+            return task.getStartTime() != null && task.getEndTime() != null;
         }
     }
 
