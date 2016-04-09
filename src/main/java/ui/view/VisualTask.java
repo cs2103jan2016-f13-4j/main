@@ -25,4 +25,21 @@ public class VisualTask {
     public Task getTask() {
         return this._task;
     }
+
+    @Override public boolean equals(Object obj){
+        if(obj == null){
+            return false;
+        } else if ( this == obj){
+            return true;
+        } else if(!(obj instanceof VisualTask)) {
+         return false;
+        }
+
+
+        VisualTask compared = (VisualTask) obj;
+        return this.getTask().equals(compared.getTask()) &&
+                    this.getVisualIndex() == compared.getVisualIndex();
+
+    }
+
 }
