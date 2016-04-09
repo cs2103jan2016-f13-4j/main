@@ -127,31 +127,37 @@ public class TaskListView extends View {
 
         public Item(Command lastCommand, int newTaskIndex) {
             super();
-
-
-                this._container = Resources.getInstance().getComponent(STRING_NAME_TEMPLATE_EVENT);
-
-
-            this._indexLabel = (Label) this._container.lookup("#_indexLabel");
-            this._nameLabel = (Label) this._container.lookup("#_taskNameLabel");
-            this._highlight = (Rectangle) this._container.lookup("#_highlightEffect");
-            this._canScrollUp = (Rectangle) this._container.lookup("#_scrollUp");
-            assert this._indexLabel != null;
-            assert this._nameLabel != null;
-            assert this._highlight != null;
-            assert this._canScrollUp != null;
-
+            
             this._lastCommand = lastCommand ;
             this._newTaskIndex = newTaskIndex;
 
         }
 
+        private void updateGraphicPointer() {
+
+            this._container = this.setContainer(this.getItem().getTask());
+
+            assert this._container != null;
+
+            this._indexLabel = (Label) this._container.lookup("#_indexLabel");
+            this._nameLabel = (Label) this._container.lookup("#_taskNameLabel");
+            this._highlight = (Rectangle) this._container.lookup("#_highlightEffect");
+            this._canScrollUp = (Rectangle) this._container.lookup("#_scrollUp");
+
+            assert this._indexLabel != null;
+            assert this._nameLabel != null;
+            assert this._highlight != null;
+            assert this._canScrollUp != null;
+        }
+
         @Override protected void updateItem(VisualTask item, boolean empty) {
             super.updateItem(item, empty);
+
 
             if (empty) {
                 this.setGraphic(null);
             } else {
+                this.updateGraphicPointer();
                 System.out.println("update item");
                 //TODO: Check the time stored in the task. If it is an event, use TaskListItemEvent. Else, use TaskListItemSingle
                 int index = item.getVisualIndex();
@@ -270,7 +276,7 @@ public class TaskListView extends View {
                 assert this._startLabelPrefix != null;
                 assert this._startLabelTime != null;
 
-               // this._startLabelTime.setText("");
+                this._startLabelTime.setText(_df.getSingleTimeTaskDisplay(task));
 
             }
         }
