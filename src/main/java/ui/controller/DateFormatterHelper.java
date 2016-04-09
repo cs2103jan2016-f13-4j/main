@@ -1,5 +1,6 @@
 package ui.controller;
 
+import javafx.util.Pair;
 import shared.CustomTime;
 import shared.Task;
 
@@ -8,6 +9,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
+ * This class manages the format in which the time is going to be displayed in the User Interface
+ *
  * Created by Antonius Satrio Triatmoko on 4/1/2016.
  */
 public class DateFormatterHelper {
@@ -21,8 +24,8 @@ public class DateFormatterHelper {
     private final String DATE_NEXT_WEEK = "next %s";
     private final String DATE_PAIR_PATTERN = "%s\n to %s";
     private final String TIME_FORMAT = "hh:mm a" ;
-    private final String TIME_FROM = "from %s";
-    private final String TIME_BY = "by %s";
+    private final String TIME_FROM = "From";
+    private final String TIME_BY = "By";
     /**attribute **/
     private CustomTime _now;
     private DateTimeFormatter _inWeekFormat;
@@ -36,6 +39,20 @@ public class DateFormatterHelper {
         this._timeFormat = DateTimeFormatter.ofPattern(TIME_FORMAT);
     }
 
+    /***
+     * retrieve the date or day of the time relative to the current timing. the current time used as comparison will be time
+     * when the function is called.
+     *
+     * Today's date will be reflected as 'Today'
+     * Tomorrow's date will be reflected as 'Tomorrow'
+     * Yesterday's date will be reflected as 'Yesterday'
+     * Date that is still within the same week of today's date will be reflected as 'This [name of day]'
+     * Date that is within the next week from today will be reflected as 'Next [name of day]'
+     * Other date will be reflected as Date following the format DD/MM
+     *
+     * @param time time that is going to be processed
+     * @return String representing the specified date from the time parameter
+     */
     public String getDateDisplay(CustomTime time) {
         updateCurrentTime();
         String date = EMPTY_STRING;
@@ -69,6 +86,13 @@ public class DateFormatterHelper {
         return display;
     }
 
+    /***
+     * This method return both the date and the time stored in the cTime parameter in one String. separated by an empty space.
+     * The format of the return string is as [DATE] [TIME]
+     *
+     * @param cTime stored time to be processed
+     * @return String containing the date and the time from the cTime parameter
+     */
     public String getDateTimeDisplay(CustomTime cTime) {
         assert cTime != null;
 
@@ -86,35 +110,28 @@ public class DateFormatterHelper {
         return display;
     }
 
-    public String getSingleTimeTaskDisplay(Task task ) {
+    /***
+     * This special method is called only for task with only either the startTime or endTime, or Task that store no time at all.
+     * @param task the task to be processed
+     * @return a pair of strings, the key contains the preposition to indicate the type of task involved, the value contains the date and time
+     *          of task
+     */
+    public Pair<String,String> getSingleTimeTaskDisplay(Task task ) {
+
         assert(!(task.getStartTime() != null && task.getEndTime() != null));
+
         CustomTime taskTime;
         if (task.getStartTime() != null) {
             taskTime = task.getStartTime();
-            return String.format(TIME_FROM, this.getDateTimeDisplay(taskTime));
+            return new Pair<String,String>(TIME_FROM, this.getDateTimeDisplay(taskTime));
         } else if (task.getEndTime() != null) {
             taskTime = task.getEndTime();
-            return String.format(TIME_BY, this.getDateTimeDisplay(taskTime));
+            return new Pair<String,String>(TIME_BY, this.getDateTimeDisplay(taskTime));
         } else {
-            return EMPTY_STRING;
+            return new Pair<String,String>(EMPTY_STRING, EMPTY_STRING);
         }
     }
 
-
-    public String getPrefixDisplay(Task task){
-
-        CustomTime start = task.getStartTime();
-        CustomTime end = task.getEndTime();
-
-        if (start != null) {
-            return TIME_FROM;
-        } else if (end != null) {
-           return TIME_BY;
-        } else {
-            return EMPTY_STRING;
-        }
-
-    }
 
 
     private void updateCurrentTime() {
@@ -140,7 +157,7 @@ public class DateFormatterHelper {
         int taskYear = time.getDate().getYear();
         int taskDayOfYear = time.getDate().getDayOfYear();
 
-        if (curYear == taskYear){
+        if (curYear == taskYear) {
             return (taskDayOfYear -  curDayOfYear) == 1;
         } else {
             return (taskYear - curYear == 1) && ( taskDayOfYear == 1 && (curDayOfYear == 365 || curDayOfYear == 366));
@@ -157,7 +174,7 @@ public class DateFormatterHelper {
          int taskYear = time.getDate().getYear();
          int taskDayOfYear = time.getDate().getDayOfYear();
 
-        if(curYear == taskYear){
+        if (curYear == taskYear) {
             return (curYear == taskYear) && ((curDayOfYear - taskDayOfYear) == 1);
         } else {
             return (curYear - taskYear == 1) && ( curDayOfYear == 1 && (taskDayOfYear == 365 || taskDayOfYear == 366));
@@ -178,12 +195,11 @@ public class DateFormatterHelper {
         int taskDayValue = time.getDate().getDayOfWeek().getValue();
 
         int dayValueDifference = taskDayValue - curDayValue;
-        //System.out.println(dayValueDifference);
-        if( curYear == taskYear){
-            //System.out.println(taskDayOfYear - curDayOfYear);
+
+        if( curYear == taskYear) {
              return  taskDayOfYear - curDayOfYear  == dayValueDifference;
         } else {
-            if (taskYear - curYear == 1){
+            if (taskYear - curYear == 1) {
                 return (curDayOfYear + dayValueDifference) % dayYearValue(curYear) == taskDayOfYear;
             } else if(curYear - taskYear == 1){
                 return (taskDayOfYear - dayValueDifference) % dayYearValue(taskYear) == curDayOfYear;
@@ -208,7 +224,7 @@ public class DateFormatterHelper {
 
         int dayValueDifference;
 
-        if(curYear == taskYear) {
+        if (curYear == taskYear) {
             dayValueDifference = taskDayOfYear - curDayOfYear;
 
             if(dayValueDifference > 0) {
@@ -225,16 +241,20 @@ public class DateFormatterHelper {
 
     }
 
-    // help in testing, to be deceprated.
+    /***
+     * Set the current time attribute of the class to the specified input time. Should only be used in Testing.
+     *
+     * @param newTime time to be set as the current time
+     */
     public void setNow(CustomTime newTime){
         this._now = newTime;
     }
 
     private boolean isLeapYear(int year){
 
-        if(year%4 == 0) {
-            if(year%100 == 0){
-                if(year%400 == 0){
+        if (year%4 == 0) {
+            if (year%100 == 0){
+                if (year%400 == 0) {
                     return true;
                 }
                 return false;
@@ -245,7 +265,7 @@ public class DateFormatterHelper {
     }
 
     private int dayYearValue(int year){
-        if(isLeapYear(year)){
+        if (isLeapYear(year)) {
             return 366;
         } else {
             return 365;
