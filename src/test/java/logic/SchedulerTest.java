@@ -147,4 +147,21 @@ public class SchedulerTest {
 
         assertTrue(this._scheduler.isColliding(task5));
     }
+
+    @Test
+    public void Free_slot_computation_works() {
+        this._storage.save(task1);
+        this._storage.save(task3);
+
+        List<TemporalRange> expectedFreeRange1 = new LinkedList<>(), expectedFreeRange2 = new LinkedList<>();
+
+        expectedFreeRange1.add(range2);
+
+        assertEquals(this._scheduler.getFreeSlots(time1, time4), expectedFreeRange1);
+        assertEquals(this._scheduler.getFreeSlots(time2, time4), expectedFreeRange1);
+        assertEquals(this._scheduler.getFreeSlots(time1, time3), expectedFreeRange1);
+        assertEquals(this._scheduler.getFreeSlots(time2, time3), expectedFreeRange1);
+        assertEquals(this._scheduler.getFreeSlots(time1, time2), expectedFreeRange2);
+        assertEquals(this._scheduler.getFreeSlots(time3, time4), expectedFreeRange2);
+    }
 }

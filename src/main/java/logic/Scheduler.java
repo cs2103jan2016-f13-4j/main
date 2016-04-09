@@ -40,16 +40,48 @@ public class Scheduler implements SchedulerSpec {
     }
 
     @Override
-    public CustomTime getFreeSlot(CustomTime lowerBound, CustomTime upperBound) {
+    public List<TemporalRange> getFreeSlots(CustomTime lowerBound, CustomTime upperBound) {
+        // if lowerBound >= upperBound, return an empty list for obvious reasons
+        if (lowerBound.compareTo(upperBound) >= 0) {
+            return new LinkedList<TemporalRange>();
+        }
+
+        // first get the disjoint list of occupied time slots, sorted in chronological order
         List<TemporalRange> occupiedRanges = this.collapseOverlappingRanges(this._storage.getAll()
-        .stream()
-        .map(task -> new TemporalRange(task.getStartTime(), task.getEndTime()))
-        .collect(Collectors.toList()))
                 .stream()
-                .filter(task -> lowerBound.compareTo(task.getStart()) <= 0 && upperBound.compareTo(task.getEnd()) >= 0)
+                .map(task -> new TemporalRange(task.getStartTime(), task.getEndTime()))
+                .collect(Collectors.toList()));
+
+        // strip tasks that end before the lower bound or start after the upper bound
+        occupiedRanges = occupiedRanges
+                .stream()
+                .filter(task -> !(lowerBound.compareTo(task.getEnd()) >= 0 || upperBound.compareTo(task.getStart()) <= 0))
                 .collect(Collectors.toList());
 
-        return null;
+        /*
+         * run through the whole list of occupied ranges
+         * iteratively build the free ranges starting from the lower bound
+         * for each occupied range,
+         *     its start ends the free range just prior to it
+         *     its end starts the free range just after it
+         */
+        List<TemporalRange> freeSlots = new LinkedList<>();
+        CustomTime currentFreeSlotStartTime = lowerBound;
+
+        for (TemporalRange range : occupiedRanges) {
+            TemporalRange freeRangeToAdd = new TemporalRange(currentFreeSlotStartTime, range.getStart());
+            freeSlots.add(freeRangeToAdd);
+            currentFreeSlotStartTime = range.getEnd(); // the next free range starts only after the current occupied range ends
+        }
+        freeSlots.add(new TemporalRange(currentFreeSlotStartTime, upperBound));
+
+        // fix potential problems at the endpoints if there are occupied ranges that cross the lower or upper bounds
+        freeSlots = freeSlots
+                .stream()
+                .filter(range -> range.getStart().compareTo(range.getEnd()) < 0)
+                .collect(Collectors.toList());
+
+        return freeSlots;
     }
 
 
@@ -60,9 +92,10 @@ public class Scheduler implements SchedulerSpec {
     /**
      * takes a list of temporal ranges and returns a new list of disjoint ranges that represent
      * the time spanned by all the ranges
+     * the list is first sorted by start time, which ultimately results in a list sorted in chronological order
      *
      * @param ranges the original ranges
-     * @return new list of disjoint ranges sorted by start time
+     * @return new list of disjoint ranges sorted in chronological order
      */
     protected List<TemporalRange> collapseOverlappingRanges(List<TemporalRange> ranges) {
         List<TemporalRange> collapsedRanges = new LinkedList<>();
