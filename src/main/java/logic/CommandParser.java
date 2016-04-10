@@ -6,6 +6,7 @@ import logic.parser.*;
 import shared.Command;
 import shared.CustomTime;
 import shared.Resources;
+import shared.StringUtils;
 import skeleton.CommandParserSpec;
 
 import java.time.DayOfWeek;
@@ -98,12 +99,13 @@ public class CommandParser implements CommandParserSpec {
 
     private void constructTimeRegExp() {
         this._startTimePattern = constructTimeRegexUsing(prep ->
-                prep.getMeaning() != TimePreposition.Meaning.ENDING);
+                prep.getMeaning() != TimePreposition.Meaning.ENDING, false);
         this._endTimePattern = constructTimeRegexUsing(prep ->
-                prep.getMeaning() != TimePreposition.Meaning.STARTING);
+                prep.getMeaning() != TimePreposition.Meaning.STARTING, true);
     }
 
-    private String constructTimeRegexUsing(Predicate<? super TimePreposition> selectPredicate) {
+    private String constructTimeRegexUsing(Predicate<? super TimePreposition> selectPredicate,
+                                           boolean isPrepositionOptional) {
         //=====================================================================
         // UNCHAINABLE PREPOSITIONS
         //=====================================================================
@@ -162,8 +164,12 @@ public class CommandParser implements CommandParserSpec {
         );
 
         String aggregatePattern = String.format("%1$s%2$s%3$s%4$s",
-                // %1$s: Unchainable prepositions (required)
-                RegexUtils.word(RegexUtils.namedChoice(
+                // %1$s: Unchainable prepositions, optional based on
+                // the condition specified in parameters
+                isPrepositionOptional ? RegexUtils.optionalWord(RegexUtils.namedChoice(
+                        MATCHER_GROUP_PREPOSITION_1,
+                        unchainablePrepositions
+                )) : RegexUtils.word(RegexUtils.namedChoice(
                         MATCHER_GROUP_PREPOSITION_1,
                         unchainablePrepositions
                 )),
@@ -235,8 +241,16 @@ public class CommandParser implements CommandParserSpec {
 
         switch (instruction) {
             case ADD:
-                // Start by finding the start time
-                this.parseTimeParameters(partialCommand, command);
+                // Start by finding the time parameters, and keep track of the lowest
+                // index found using the regex. Truncating from this index onwards will
+                // give us the true task name
+                int lowestFoundIndex = this.parseTimeParameters(partialCommand, command);
+                String taskName = partialCommand.substring(0, lowestFoundIndex).trim();
+                if (StringUtils.isSurroundedByQuotes(taskName)) {
+                    taskName = StringUtils.stripEndCharacters(taskName);
+                }
+                // TODO: Verify that task name is not null or empty
+                command.setParameter(Command.ParamName.TASK_NAME, taskName);
                 break;
             case EDIT:
                 break;
@@ -250,26 +264,57 @@ public class CommandParser implements CommandParserSpec {
         return command;
     }
 
-    private void parseTimeParameters(String partialCommand, Command command) {
+    /**
+     * TODO: Write JavaDoc
+     * @param partialCommand
+     * @param command
+     * @return the lowest index that matches any time string
+     */
+    private int parseTimeParameters(String partialCommand, Command command) {
+        // Keep track of the lowest found index
+        int lowestFoundIndex = partialCommand.length();
+        // Also keep track of the highest found index so that end time
+        // can be differentiated from start time
+        int highestFoundIndex = 0;
+
+        // Prepare time variables
+        CustomTime startTime = null;
+        CustomTime endTime = null;
+
         // Match start time
         Matcher startTimeMatcher = RegexUtils.caseInsensitiveMatch(
                 this._startTimePattern,
                 partialCommand
         );
-        CustomTime startTime = startTimeMatcher.find() ? new CustomTime(
-                this.parseDate(startTimeMatcher),
-                this.parseTime(startTimeMatcher)
-        ) : null;
+        if (startTimeMatcher.find()) {
+            startTime = new CustomTime(
+                    this.parseDate(startTimeMatcher),
+                    this.parseTime(startTimeMatcher)
+            );
+
+            // Save the highest and lowest found index
+            if (startTimeMatcher.end() > highestFoundIndex) {
+                highestFoundIndex = startTimeMatcher.end();
+            }
+            if (startTimeMatcher.start() < lowestFoundIndex) {
+                lowestFoundIndex = startTimeMatcher.start();
+            }
+        }
 
         // Match end time
         Matcher endTimeMatcher = RegexUtils.caseInsensitiveMatch(
                 this._endTimePattern,
                 partialCommand
         );
-        CustomTime endTime = endTimeMatcher.find() ? new CustomTime(
-                this.parseDate(endTimeMatcher),
-                this.parseTime(endTimeMatcher)
-        ) : null;
+        if (endTimeMatcher.find(highestFoundIndex)) {
+            endTime = new CustomTime(
+                    this.parseDate(endTimeMatcher),
+                    this.parseTime(endTimeMatcher)
+            );
+            if (endTimeMatcher.start() < lowestFoundIndex) {
+                lowestFoundIndex = endTimeMatcher.start();
+            }
+        }
 
         // Finally register the time to the command object
         if (startTime != null && !startTime.isNullDate()) {
@@ -278,6 +323,9 @@ public class CommandParser implements CommandParserSpec {
         if (endTime != null && !endTime.isNullDate()) {
             command.setParameter(Command.ParamName.TASK_END, endTime);
         }
+
+        // return the lowest found index
+        return lowestFoundIndex;
     }
 
     private LocalDate parseDate(Matcher matcher) {
