@@ -197,4 +197,8 @@ public class ParserDefinitions {
     public DayOfWeek queryDayOfWeek(String dayOfWeekString) {
         return this._absoluteTimeTranslator.get(dayOfWeekString);
     }
+
+    public Task.Priority queryPriority(String priority) {
+        return this._priorityTranslator.get(priority);
+    }
 }

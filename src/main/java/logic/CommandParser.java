@@ -3,10 +3,7 @@ package logic;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import logic.parser.*;
-import shared.Command;
-import shared.CustomTime;
-import shared.Resources;
-import shared.StringUtils;
+import shared.*;
 import skeleton.CommandParserSpec;
 
 import java.time.DayOfWeek;
@@ -243,10 +240,14 @@ public class CommandParser implements CommandParserSpec {
 
         switch (instruction) {
             case ADD:
-                // Start by finding the time parameters, and keep track of the lowest
+                // Start by finding the parameters, and keep track of the lowest
                 // index found using the regex. Truncating from this index onwards will
                 // give us the true task name
-                int lowestFoundIndex = this.parseTimeParameters(partialCommand, command);
+                int lowestFoundIndex = Math.min(
+                        this.parseTimeParameters(partialCommand, command),
+                        this.parsePriorityParameters(partialCommand, command)
+                );
+
                 String taskName = partialCommand.substring(0, lowestFoundIndex).trim();
                 if (StringUtils.isSurroundedByQuotes(taskName)) {
                     taskName = StringUtils.stripEndCharacters(taskName);
@@ -274,6 +275,24 @@ public class CommandParser implements CommandParserSpec {
         }
 
         return command;
+    }
+
+    private int parsePriorityParameters(String partialCommand, Command command) {
+        Matcher matcher = RegexUtils.caseInsensitiveMatch(
+                this._priorityPattern,
+                partialCommand
+        );
+        // If cannot find, return lowest found to be string length
+        if (!matcher.find()) {
+            return partialCommand.length();
+        }
+
+        Task.Priority priority = this._definitions.queryPriority(
+                matcher.group(MATCHER_GROUP_PRIORITY).toLowerCase()
+        );
+        command.setParameter(Command.ParamName.PRIORITY_VALUE, priority);
+
+        return matcher.start();
     }
 
     /**

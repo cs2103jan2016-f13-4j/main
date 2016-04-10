@@ -4,6 +4,7 @@ import org.junit.Before;
 import org.junit.Test;
 import shared.Command;
 import shared.CustomTime;
+import shared.Task;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -90,4 +91,10 @@ public class CommandParserTest {
         assertThat(command.getInstruction(), is(Command.Instruction.INVALID));
     }
 
+    @Test
+    public void Command_parser_interprets_priority_correctly() {
+        Command command = this._parser.parse("add hello world with high priority");
+        assertThat(command.getParameter(Command.ParamName.PRIORITY_VALUE),
+                is(equalTo(Task.Priority.HIGH)));
+    }
 }
