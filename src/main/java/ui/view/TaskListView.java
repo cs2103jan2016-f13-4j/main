@@ -29,7 +29,9 @@ import java.util.List;
 import java.util.function.Function;
 
 /**
- * TaskListView deals with the proces of
+ * This class manage the process of displaying the list of Task that is called by the user to be displayed.
+ * Instead of Task, the View contains List of VisualTask which is a pair of Task and its display index.
+ *
  * @@author Antonius Satrio Triatmoko
  */
 public class TaskListView extends View {
@@ -83,9 +85,9 @@ public class TaskListView extends View {
 
     /**
      * The Item class is the extension of ListCell class which allow us to customize the display content of the list.
-     * There are two possible .xml file that can be loaded depending on Date and Time information stored by the task. If the task
-     * is an Event Task(Task with both start time and end time), it will load TaskListItemDouble.fxml while other type of task will
-     * use TaskListItemSingle.fxml class.
+     * There are two possible .xml files that can be loaded depending on Date and Time information stored by the task.Event Task
+     * (Task with both start time and end time)will load TaskListItemDouble.fxml while other type of task will
+     * use TaskListItemSingle.fxml .
      *
      * DateFormatterHelper is used to help determining the date and time presentation.
      */
@@ -209,7 +211,7 @@ public class TaskListView extends View {
                 }
 
                 // check for any reused cell, ListCell sometimes might reuse an existing cell,
-                // so there is a need to reset the effect applied, else it might interfere with the interface
+                // so there is a need to reset the effect applied, else it might interfere with the overall interface
                 if(this._canScrollUp.getOpacity() == 1){
                     this._canScrollUp.setOpacity(0);
                 }
@@ -261,6 +263,12 @@ public class TaskListView extends View {
             this._canScrollUp.setFill(gradientFlow);
         }
 
+        /***
+         * This method prepare the time String to be displayed by utilising DateFormatHelper
+         * For more detail on how the time stored within the task is procsessed, see DateFormatterHelper.java
+         *
+         * @param task
+         */
         private void setUpTime(Task task) {
 
             if (isEvent(task)) { // task is an event
@@ -270,7 +278,6 @@ public class TaskListView extends View {
 
             } else { // Task is floating, or only possess either start time or end time
 
-                // set up time
                 Pair<String, String> result = _df.getSingleTimeTaskDisplay(task);
                 this._startLabelPrefix.setText(result.getKey());
                 this._startLabelTime.setText(result.getValue());
@@ -305,7 +312,7 @@ public class TaskListView extends View {
 
             if(obj instanceof VisualTask){
                 VisualTask comparator = (VisualTask) obj;
-                return obj.equals(this.getItem());
+                return comparator.equals(this.getItem());
             }
 
             return false;
@@ -336,9 +343,12 @@ public class TaskListView extends View {
 
     private Pair<Integer,Integer> obtainNewTaskIndex(){
         List<VisualTask> taskList = this.getData();
+
         int index = 0;
+
         Task temp ;
         Task current= null;
+
         for (int i = 0; i < taskList.size();  i++) {
             if (current == null) {
                 current = taskList.get(i).getTask();
@@ -354,7 +364,7 @@ public class TaskListView extends View {
             }
         }
 
-        return new Pair<Integer, Integer>(index,index/MAXIMUM_DISPLAY_SIZE);
+        return new Pair<>(index,index/MAXIMUM_DISPLAY_SIZE);
     }
 
     @Override public Function<KeyEvent, Boolean> getKeyInputInterceptor() {

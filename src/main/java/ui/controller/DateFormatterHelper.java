@@ -102,8 +102,10 @@ public class DateFormatterHelper {
                 display  = getTimeDisplay(cTime);
             }
         } else {
+            System.out.println(cTime.getDate().toString());
             if (cTime.hasTime()) {
                 display = display + " " + getTimeDisplay(cTime);
+                System.out.println(cTime.getTime().toString());
             }
         }
 

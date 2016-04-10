@@ -90,7 +90,7 @@ public class UserInterface implements UserInterfaceSpec {
     }
 
     /**
-     * TODO: Write JavaDoc
+     * This method
      */
     @Override
     public void initialize() {
@@ -202,7 +202,7 @@ public class UserInterface implements UserInterfaceSpec {
     }
 
     private void registerViewContainer() {
-        StackPane main = new StackPane();
+        StackPane main;
         main = new StackPane();
         main.getStyleClass().add(STYLE_CLASS_CONTAINER_MAIN);
         main.setMinHeight(HEIGHT_MAIN_CONTAINER_MIN);
