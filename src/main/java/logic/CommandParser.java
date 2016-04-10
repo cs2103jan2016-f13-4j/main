@@ -31,10 +31,12 @@ public class CommandParser implements CommandParserSpec {
     private static final String MATCHER_GROUP_DATE = "DATE";
     private static final String MATCHER_GROUP_TIME_OF_DAY = "TIME";
     private static final String MATCHER_GROUP_PRIORITY = "PRIO";
+    private static final String MATCHER_GROUP_INDEX = "INDEX";
 
     private static final String STRING_INVALID_HOUR = "Invalid hour";
     private static final String STRING_INVALID_NAME_MISSING = "Task name is missing";
     private static final String STRING_INVALID_START_WITHOUT_END = "Task cannot have a start without an end";
+    public static final String STRING_INVALID_EDIT_ID_MISSING = "You must tell me which task to edit";
 
     /**
      * Singleton implementation
@@ -243,6 +245,7 @@ public class CommandParser implements CommandParserSpec {
                 command = this.parseAddCommand(command, partialCommand);
                 break;
             case EDIT:
+                command = this.parseEditCommand(command, partialCommand);
                 break;
             case DELETE:
             case MARK:
@@ -256,6 +259,13 @@ public class CommandParser implements CommandParserSpec {
         return command;
     }
 
+    /**
+     * Attempts to parse the partial command string into a valid <code>ADD</code>
+     * command.
+     * @param command a command object
+     * @param partialCommand a string containing parameters
+     * @return the processed command
+     */
     private Command parseAddCommand(Command command, String partialCommand) {
         // Start by finding the parameters, and keep track of the lowest
         // index found using the regex. Truncating from this index onwards will
@@ -281,6 +291,41 @@ public class CommandParser implements CommandParserSpec {
                 !command.hasParameter(Command.ParamName.TASK_END)) {
             return Command.invalidCommand(STRING_INVALID_START_WITHOUT_END);
         }
+        return command;
+    }
+
+    private Command parseEditCommand(Command command, String partialCommand) {
+        // Get the index first
+        Matcher indexMatcher = RegexUtils.caseInsensitiveMatch(
+                this.getIndexRegex(),
+                partialCommand
+        );
+        // Verify index's existence
+        if (!indexMatcher.find()) {
+            return Command.invalidCommand(STRING_INVALID_EDIT_ID_MISSING);
+        }
+
+        // Set ID parameter first, then truncate task
+        int taskId = Integer.parseInt(indexMatcher.group(MATCHER_GROUP_INDEX));
+        command.setParameter(Command.ParamName.TASK_INDEX, taskId);
+        partialCommand = partialCommand.substring(indexMatcher.end());
+
+        // Parse time parameters next, keeping track of lowest index
+        int lowestFoundIndex = Math.min(
+                this.parseTimeParameters(partialCommand, command),
+                this.parsePriorityParameters(partialCommand, command)
+        );
+
+        String taskName = partialCommand.substring(0, lowestFoundIndex).trim();
+        if (StringUtils.isSurroundedByQuotes(taskName)) {
+            taskName = StringUtils.stripEndCharacters(taskName);
+        }
+
+        // Keep the task name if it's not empty
+        if (!taskName.trim().isEmpty()) {
+            command.setParameter(Command.ParamName.TASK_NAME, taskName);
+        }
+
         return command;
     }
 
@@ -506,6 +551,11 @@ public class CommandParser implements CommandParserSpec {
         preposition = preposition.trim().toLowerCase();
         TimePreposition.Meaning meaning = this._definitions.queryTimePreposition(preposition);
         return meaning == TimePreposition.Meaning.NEXT;
+    }
+
+    private String getIndexRegex() {
+        return String.format("^(?:task\\s+)?(?:number(?:ed)?\\s+)?(?<%s>\\d+)",
+                MATCHER_GROUP_INDEX);
     }
 
 }

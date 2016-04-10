@@ -14,6 +14,7 @@ import java.time.Month;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertFalse;
 
 /**
  * Created by maianhvu on 06/04/2016.
@@ -96,5 +97,21 @@ public class CommandParserTest {
         Command command = this._parser.parse("add hello world with high priority");
         assertThat(command.getParameter(Command.ParamName.PRIORITY_VALUE),
                 is(equalTo(Task.Priority.HIGH)));
+    }
+
+    @Test
+    public void Command_parser_parses_simple_edit_command_correctly() {
+        Command command = this._parser.parse("edit task number 5 whatever from today until tomorrow");
+        assertThat(command.getInstruction(), is(Command.Instruction.EDIT));
+        assertThat(command.getParameter(Command.ParamName.TASK_NAME), is(equalTo("whatever")));
+        assertThat(command.getParameter(Command.ParamName.TASK_START), is(equalTo(CustomTime.todayAt(null))));
+        assertThat(command.getParameter(Command.ParamName.TASK_END), is(equalTo(CustomTime.tomorrowAt(null))));
+    }
+
+    @Test
+    public void Command_parser_regards_edit_without_task_name_correctly() {
+        Command command = this._parser.parse("edit 3 starting today");
+        assertThat(command.getParameter(Command.ParamName.TASK_START), is(equalTo(CustomTime.todayAt(null))));
+        assertFalse(command.hasParameter(Command.ParamName.TASK_NAME));
     }
 }
