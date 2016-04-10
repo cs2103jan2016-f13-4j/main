@@ -18,6 +18,7 @@ import javafx.scene.paint.Stop;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Pair;
 import shared.Command;
+import shared.CustomTime;
 import shared.Resources;
 import shared.Task;
 import ui.controller.DateFormatterHelper;
@@ -94,18 +95,16 @@ public class TaskListView extends View {
     private class Item extends ListCell<VisualTask> {
         private static final int STRING_FIRST_ITEM = 1;
         public static final double STRING_HIGHLIGHT_OPACITY = .31;
-        private static final String STRING_NAME_TEMPLATE_EVENT = "TaskListItemDouble";
-        private static final String STRING_NAME_TEMPLATE_SINGLE = "TaskListItemSingle";
+        private static final String STRING_NAME_TEMPLATE_WITH_DATE = "TaskListItemDouble";
+        private static final String STRING_NAME_TEMPLATE_NO_DATE = "TaskListItemSingle";
         private static final String STRING_HIGHLIGHT_COLOR = "#FBFF74";
         private final Color COLOR_TRANSPARENT_FULL = new Color(1,1,1,0);
         private final Color COLOR_TRANSPARENT_NONE = new Color(1,1,1,0.8);
         @FXML private AnchorPane _container;
         @FXML private Label _indexLabel;
         @FXML private Label _nameLabel;
-        @FXML private Label _startLabelPrefix;
-        @FXML private Label _startLabelTime;
-        @FXML private Label _endLabelPrefix;
-        @FXML private Label _endLabelTime;
+        @FXML private Label _timeLabel;
+        @FXML private Label _dateLabel;
         @FXML private Rectangle _highlight;
         @FXML private Rectangle _canScrollUp;
 
@@ -132,44 +131,31 @@ public class TaskListView extends View {
         private void updateGraphicPointer(Task task) {
 
 
-            if (isEvent(task)) {
-                this._container = (AnchorPane) Resources.getInstance().getComponent(STRING_NAME_TEMPLATE_EVENT);
+            if (isSameDate(task)) {
+                this._container = (AnchorPane) Resources.getInstance().getComponent(STRING_NAME_TEMPLATE_NO_DATE);
 
                 assert this._container != null;
-
-                this._startLabelPrefix = (Label)this._container.lookup("#_startPrefix");
-                this._startLabelTime = (Label)this._container.lookup("#_startTime");
-                this._endLabelPrefix = (Label)this._container.lookup("#_endPrefix");
-                this._endLabelTime = (Label)this._container.lookup("#_endTime");
-
-                assert this._startLabelPrefix != null;
-                assert this._startLabelTime != null;
-                assert this._endLabelTime != null;
-                assert this._endLabelPrefix != null;
 
             } else {
-                this._container = (AnchorPane) Resources.getInstance().getComponent(STRING_NAME_TEMPLATE_SINGLE);
+                this._container = (AnchorPane) Resources.getInstance().getComponent(STRING_NAME_TEMPLATE_WITH_DATE);
 
                 assert this._container != null;
-
-                this._startLabelPrefix = (Label) this._container.lookup("#_timePrefix");
-                this._startLabelTime = (Label) this._container.lookup("#_time");
-
-                assert this._startLabelPrefix != null;
-                assert this._startLabelTime != null;
+                //TODO: UNCOMMENT THIS PART OF CODE AFTER IMPLEMENTING THE OTHER COMPONENT
+                //this._dateLabel = (Label) this._container.lookup()
+                //assert this._dateLabel != null
             }
-
-
 
             this._indexLabel = (Label) this._container.lookup("#_indexLabel");
             this._nameLabel = (Label) this._container.lookup("#_taskNameLabel");
             this._highlight = (Rectangle) this._container.lookup("#_highlightEffect");
             this._canScrollUp = (Rectangle) this._container.lookup("#_scrollUp");
+            this._timeLabel = (Label) this._container.lookup("#_timeLabel");
 
             assert this._indexLabel != null;
             assert this._nameLabel != null;
             assert this._highlight != null;
             assert this._canScrollUp != null;
+            assert this._timeLabel != null;
         }
 
         /***
@@ -271,24 +257,49 @@ public class TaskListView extends View {
          */
         private void setUpTime(Task task) {
 
-            if (isEvent(task)) { // task is an event
-
-                this._startLabelTime.setText(_df.getDateTimeDisplay(task.getStartTime()));
-                this._endLabelTime.setText(_df.getDateTimeDisplay(task.getEndTime()));
-
-            } else { // Task is floating, or only possess either start time or end time
-
-                Pair<String, String> result = _df.getSingleTimeTaskDisplay(task);
-                this._startLabelPrefix.setText(result.getKey());
-                this._startLabelTime.setText(result.getValue());
-
+            if (!isSameDate(task)) { // task is not same date as previous
+                this._dateLabel.setText(_df.getDateDisplay(task.getStartTime()));
             }
+
+            this._timeLabel.setText(_df.getDateTimeDisplay(task.getEndTime()));
         }
 
-        private boolean isEvent(Task task) {
-            return task.getStartTime() != null && task.getEndTime() != null;
-        }
+        private boolean isSameDate(Task curTask){
+            int curIndex = this.getIndex();
 
+            if(curIndex == 0) {
+                return false;
+            } else {
+
+                Task prevTask = this.getListView().getItems().get(curIndex - 1).getTask();
+
+                CustomTime curStartTime = curTask.getStartTime();
+                CustomTime curEndTime = curTask.getEndTime();
+                CustomTime prevStartTime = prevTask.getStartTime();
+                CustomTime prevEndTime = curTask.getEndTime();
+
+                if (curStartTime != null) {
+                    if (prevStartTime != null) {
+                        return curStartTime.equals(prevStartTime);
+                    } else if (prevEndTime != null) {
+                        return curStartTime.equals(prevEndTime);
+                    } else {
+                        return false;
+                    }
+                } else if (curEndTime != null) {
+                    if (prevStartTime != null) {
+                        return curEndTime.equals(prevStartTime);
+                    } else if (prevEndTime != null) {
+                        return curEndTime.equals(prevEndTime);
+                    } else {
+                        return false;
+                    }
+                } else {
+                    return true;
+                }
+            }
+
+        }
         private boolean isFirstItemOnList(){
             return this.getItem().getVisualIndex()%MAXIMUM_DISPLAY_SIZE == STRING_FIRST_ITEM;
         }
