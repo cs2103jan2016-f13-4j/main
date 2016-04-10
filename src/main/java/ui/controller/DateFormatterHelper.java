@@ -26,6 +26,7 @@ public class DateFormatterHelper {
     private final String TIME_FORMAT = "hh:mm a" ;
     private final String TIME_FROM = "From";
     private final String TIME_BY = "By";
+    private final int ONE_DAY_DIFFERENCE = 1;
     /**attribute **/
     private CustomTime _now;
     private DateTimeFormatter _inWeekFormat;
@@ -88,7 +89,7 @@ public class DateFormatterHelper {
 
     /***
      * This method return both the date and the time stored in the cTime parameter in one String. separated by an empty space.
-     * The format of the return string is as [DATE] [TIME]
+     * The format of the return string is [DATE] [TIME]
      *
      * @param cTime stored time to be processed
      * @return String containing the date and the time from the cTime parameter
@@ -140,6 +141,11 @@ public class DateFormatterHelper {
         _now = CustomTime.now();
     }
 
+
+    /*
+    HELPER FUNCTION
+     */
+
     boolean isToday(CustomTime time) {
 
 
@@ -160,14 +166,13 @@ public class DateFormatterHelper {
         int taskDayOfYear = time.getDate().getDayOfYear();
 
         if (curYear == taskYear) {
-            return (taskDayOfYear -  curDayOfYear) == 1;
+            return (taskDayOfYear -  curDayOfYear) == ONE_DAY_DIFFERENCE;
         } else {
-            return (taskYear - curYear == 1) && ( taskDayOfYear == 1 && (curDayOfYear == 365 || curDayOfYear == 366));
+            return (taskYear - curYear == ONE_DAY_DIFFERENCE) && ( taskDayOfYear == 1 && (curDayOfYear == 365 || curDayOfYear == 366));
         }
 
 
     }
-
 
      boolean isYesterday(CustomTime time) {
 
@@ -195,15 +200,15 @@ public class DateFormatterHelper {
         int taskYear = time.getDate().getYear();
         int taskDayOfYear = time.getDate().getDayOfYear();
         int taskDayValue = time.getDate().getDayOfWeek().getValue();
-
+         // difference in value of current day to the task day.
         int dayValueDifference = taskDayValue - curDayValue;
 
         if( curYear == taskYear) {
              return  taskDayOfYear - curDayOfYear  == dayValueDifference;
         } else {
-            if (taskYear - curYear == 1) {
+            if (taskYear - curYear == ONE_DAY_DIFFERENCE) {
                 return (curDayOfYear + dayValueDifference) % dayYearValue(curYear) == taskDayOfYear;
-            } else if(curYear - taskYear == 1){
+            } else if(curYear - taskYear == ONE_DAY_DIFFERENCE){
                 return (taskDayOfYear - dayValueDifference) % dayYearValue(taskYear) == curDayOfYear;
             }
         }

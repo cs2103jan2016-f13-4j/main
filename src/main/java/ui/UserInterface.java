@@ -90,7 +90,7 @@ public class UserInterface implements UserInterfaceSpec {
     }
 
     /**
-     * This method
+     * This method will set up the GUI and its component.
      */
     @Override
     public void initialize() {
@@ -128,7 +128,9 @@ public class UserInterface implements UserInterfaceSpec {
     }
 
     /**
-     * TODO: Write JavaDoc
+     * This method will display the GUI.
+     * This should only be called after the primary components of user interface, excluding the View,
+     * has been constructed.
      */
     @Override
     public void show() {
@@ -242,6 +244,12 @@ public class UserInterface implements UserInterfaceSpec {
         this._mainContainer.getChildren().add(notificationContainer);
     }
 
+    /***
+     * The method will retrieve the display component which is constructed by the View Object and
+     * attached it to the current display
+     *
+     * @param view
+     */
     @Override
     public void render(View view) {
         assert this._viewWrapper != null;
@@ -259,6 +267,12 @@ public class UserInterface implements UserInterfaceSpec {
         this._commandInputController.cleanUp();
     }
 
+    /***
+     * This method will update the notification message following the given input parameter, and play
+     * the animation to bring the notification bar on-screen for a given duration.
+     *
+     * @param notif message to be displayed in the notification bar
+     */
     @Override
     public void showNotification(String notif) {
         assert this._notification != null;
