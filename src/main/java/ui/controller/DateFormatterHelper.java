@@ -17,15 +17,15 @@ public class DateFormatterHelper {
     /**Constant**/
     private final String EMPTY_STRING = "";
     private final String IN_WEEK_FORMAT = "EE";
-    private final String DATE_FORMAT = "dd/MM";
+    private final String DATE_FORMAT = "dd/MM/YYYY";
     private final String DATE_YESTERDAY = "Yesterday";
     private final String DATE_TODAY = "Today";
     private final String DATE_TOMMOROW = "Tomorrow";
-    private final String DATE_NEXT_WEEK = "next %s";
-    private final String DATE_PAIR_PATTERN = "%s\n to %s";
+    private final String DATE_NEXT_WEEK = "Next %s";
+    private final String DATE_PAIR_PATTERN = "%s to %s";
     private final String TIME_FORMAT = "hh:mm a" ;
-    private final String TIME_FROM = "From";
-    private final String TIME_BY = "By";
+    private final String TIME_FROM = "From %s";
+    private final String TIME_BY = "By %s";
     private final int ONE_DAY_DIFFERENCE = 1;
     /**attribute **/
     private CustomTime _now;
@@ -49,7 +49,7 @@ public class DateFormatterHelper {
      * Yesterday's date will be reflected as 'Yesterday'
      * Date that is still within the same week of today's date will be reflected as 'This [name of day]'
      * Date that is within the next week from today will be reflected as 'Next [name of day]'
-     * Other date will be reflected as Date following the format DD/MM
+     * Other date will be reflected as Date following the format DD/MM/YYYY
      *
      * @param time time that is going to be processed
      * @return String representing the specified date from the time parameter
@@ -103,7 +103,6 @@ public class DateFormatterHelper {
                 display  = getTimeDisplay(cTime);
             }
         } else {
-            System.out.println(cTime.getDate().toString());
             if (cTime.hasTime()) {
                 display = display + " " + getTimeDisplay(cTime);
                 System.out.println(cTime.getTime().toString());
@@ -119,20 +118,45 @@ public class DateFormatterHelper {
      * @return a pair of strings, the key contains the preposition to indicate the type of task involved, the value contains the date and time
      *          of task
      */
-    public Pair<String,String> getSingleTimeTaskDisplay(Task task ) {
+    public String getCellTimeTaskDisplay(Task task ) {
 
-        assert(!(task.getStartTime() != null && task.getEndTime() != null));
+        CustomTime startTime = task.getStartTime();
+        CustomTime endTime = task.getEndTime();
+        String display = EMPTY_STRING;
 
-        CustomTime taskTime;
-        if (task.getStartTime() != null) {
-            taskTime = task.getStartTime();
-            return new Pair<String,String>(TIME_FROM, this.getDateTimeDisplay(taskTime));
-        } else if (task.getEndTime() != null) {
-            taskTime = task.getEndTime();
-            return new Pair<String,String>(TIME_BY, this.getDateTimeDisplay(taskTime));
+        if(startTime != null) {
+            if (startTime.hasTime()) {
+                display = this.getTimeDisplay(startTime);
+
+                if (endTime != null) {
+                    if (endTime.hasSameDate(startTime)) {
+                        return String.format(DATE_PAIR_PATTERN, display, this.getTimeDisplay(endTime));
+                    } else {
+                        return String.format(DATE_PAIR_PATTERN, display, this.getDateTimeDisplay(endTime));
+                    }
+                }
+
+                return String.format(TIME_FROM, display);
+            } else {
+                if (endTime != null) {
+                    if (endTime.hasSameDate(startTime)) {
+                        return String.format(TIME_BY, this.getTimeDisplay(endTime));
+                    } else {
+                        return String.format(TIME_BY, this.getDateTimeDisplay(endTime));
+                    }
+                }
+                return display;
+            }
+
         } else {
-            return new Pair<String,String>(EMPTY_STRING, EMPTY_STRING);
+            if (endTime != null) {
+                if (endTime.hasTime()) {
+                    return String.format(TIME_BY, this.getTimeDisplay(endTime));
+                }
+            }
         }
+
+        return display;
     }
 
 

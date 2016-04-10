@@ -112,6 +112,8 @@ public class CustomTime implements Comparable<CustomTime> {
         return this._time != null;
     }
 
+    public boolean hasSameDate(CustomTime ct) { return this.getDate().equals(ct.getDate()); }
+
     @Override public String toString() {
         StringBuilder sb = new StringBuilder();
         if (this._date != null) {

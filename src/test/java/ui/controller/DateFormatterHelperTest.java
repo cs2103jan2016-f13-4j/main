@@ -8,6 +8,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import shared.CustomTime;
+import shared.Task;
 import ui.controller.DateFormatterHelper;
 
 import java.time.LocalDate;
@@ -129,6 +130,40 @@ public class DateFormatterHelperTest {
         time = new CustomTime(time.getDate().minusDays(2),time.getTime());
         assertTrue(this._dfh.getDateDisplay(time).equals("Yesterday"));
 
+    }
+
+    @Test public void Helper_get_correct_cell_display_test() {
+        // test for start time end time with same date
+        CustomTime startTime = new CustomTime(LocalDate.of(2016,12,12),LocalTime.of(12,00));
+        CustomTime endTime = new CustomTime(LocalDate.of(2016,12,12),LocalTime.of(14,00));
+        Task newTask = new Task(1,"random task","",startTime,endTime);
+        String result = "12:00 PM to 02:00 PM";
+        assertTrue(result.equals(this._dfh.getCellTimeTaskDisplay(newTask)));
+        // test for endTime different date
+        endTime = new CustomTime(LocalDate.of(2016,12,14), LocalTime.of(14,00));
+        newTask = new Task(1,"random task","",startTime,endTime);
+        result = "12:00 PM to 14/12/2016 02:00 PM";
+        System.out.println(this._dfh.getCellTimeTaskDisplay(newTask));
+        assertTrue(result.equals(this._dfh.getCellTimeTaskDisplay(newTask)));
+        // test for no start time
+        startTime = null;
+        newTask = new Task(1,"random task","", startTime,endTime);
+        result = "By 02:00 PM";
+        System.out.println(this._dfh.getCellTimeTaskDisplay(newTask));
+        assertTrue(result.equals(this._dfh.getCellTimeTaskDisplay(newTask)));
+        // test for floating task
+        endTime = null;
+        newTask = new Task(1,"random task","", startTime,endTime);
+        result = "";
+        System.out.println(this._dfh.getCellTimeTaskDisplay(newTask));
+        assertTrue(result.equals(this._dfh.getCellTimeTaskDisplay(newTask)));
+        // test for today no time to tomorrow no time
+        startTime = new CustomTime(LocalDate.now(),null);
+        endTime = new CustomTime(LocalDate.now().plusDays(1),null);
+        newTask = new Task(1,"random task","", startTime,endTime);
+        result = "By Tomorrow";
+        System.out.println(this._dfh.getCellTimeTaskDisplay(newTask));
+        assertTrue(result.equals(this._dfh.getCellTimeTaskDisplay(newTask)));
     }
 
 

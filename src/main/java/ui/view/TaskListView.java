@@ -39,7 +39,7 @@ public class TaskListView extends View {
     /**
      * Constants
      */
-    private final int MAXIMUM_DISPLAY_SIZE = 8;
+    private final int MAXIMUM_DISPLAY_SIZE = 7;
 
     /**
      * Properties
@@ -103,6 +103,7 @@ public class TaskListView extends View {
         @FXML private AnchorPane _container;
         @FXML private Label _indexLabel;
         @FXML private Label _nameLabel;
+        @FXML private Label _priorityLabel;
         @FXML private Label _timeLabel;
         @FXML private Label _dateLabel;
         @FXML private Rectangle _highlight;
@@ -141,8 +142,8 @@ public class TaskListView extends View {
 
                 assert this._container != null;
                 //TODO: UNCOMMENT THIS PART OF CODE AFTER IMPLEMENTING THE OTHER COMPONENT
-                //this._dateLabel = (Label) this._container.lookup()
-                //assert this._dateLabel != null
+                this._dateLabel = (Label) this._container.lookup("#_dateLabel");
+                assert this._dateLabel != null;
             }
 
             this._indexLabel = (Label) this._container.lookup("#_indexLabel");
@@ -150,7 +151,7 @@ public class TaskListView extends View {
             this._highlight = (Rectangle) this._container.lookup("#_highlightEffect");
             this._canScrollUp = (Rectangle) this._container.lookup("#_scrollUp");
             this._timeLabel = (Label) this._container.lookup("#_timeLabel");
-
+            this._priorityLabel = (Label) this._container.lookup("#_priorityIndicator");
             assert this._indexLabel != null;
             assert this._nameLabel != null;
             assert this._highlight != null;
@@ -185,6 +186,13 @@ public class TaskListView extends View {
                 // set priority indicator
                 if (task.getPriority() != null) {
                     this.getStyleClass().add("priority--" + task.getPriority().name().toLowerCase());
+                    if(task.getPriority() == Task.Priority.HIGH){
+                        this._priorityLabel.setText("HIGH");
+                    } else if (task.getPriority() == Task.Priority.MEDIUM){
+                        this._priorityLabel.setText("MEDIUM");
+                    } else if (task.getPriority() == Task.Priority.LOW){
+                        this._priorityLabel.setText("LOW");
+                    }
                 }
 
                 this._indexLabel.setText(Integer.toString(index));
@@ -192,7 +200,7 @@ public class TaskListView extends View {
 
 
                 // apply highlight effect to the new task when first displayed;
-                if (isAddCommand(this._lastCommand) && this.getItem().getVisualIndex() == this._newTaskIndex) {
+                if (isAddCommand(this._lastCommand) && (this.getItem().getVisualIndex() - 1) == this._newTaskIndex ) {
                     this.setHighlightAnimation();
                 }
 
@@ -258,10 +266,11 @@ public class TaskListView extends View {
         private void setUpTime(Task task) {
 
             if (!isSameDate(task)) { // task is not same date as previous
-                this._dateLabel.setText(_df.getDateDisplay(task.getStartTime()));
-            }
+                setDateHeading(task);
 
-            this._timeLabel.setText(_df.getDateTimeDisplay(task.getEndTime()));
+            }
+            String result = _df.getCellTimeTaskDisplay(task);
+            this._timeLabel.setText(result);
         }
 
         private boolean isSameDate(Task curTask){
@@ -280,26 +289,49 @@ public class TaskListView extends View {
 
                 if (curStartTime != null) {
                     if (prevStartTime != null) {
-                        return curStartTime.equals(prevStartTime);
+                        return curStartTime.hasSameDate(prevStartTime);
                     } else if (prevEndTime != null) {
-                        return curStartTime.equals(prevEndTime);
+                        return curStartTime.hasSameDate(prevEndTime);
                     } else {
                         return false;
                     }
                 } else if (curEndTime != null) {
                     if (prevStartTime != null) {
-                        return curEndTime.equals(prevStartTime);
+                        return curEndTime.hasSameDate(prevStartTime);
                     } else if (prevEndTime != null) {
-                        return curEndTime.equals(prevEndTime);
+                        return curEndTime.hasSameDate(prevEndTime);
                     } else {
                         return false;
                     }
                 } else {
-                    return true;
+                    if(prevStartTime != null && curStartTime != null) {
+                        return false;
+                    } else {
+                        return true;
+                    }
                 }
             }
 
         }
+
+        private void setDateHeading(Task task){
+            CustomTime startTime = task.getStartTime();
+            if (startTime != null) {
+                if (startTime.hasDate()) {
+                    this._dateLabel.setText(this._df.getDateDisplay(startTime));
+                }
+            } else {
+              CustomTime endTime = task.getEndTime();
+                if (endTime != null) {
+                    if (endTime.hasDate()) {
+                        this._dateLabel.setText(this._df.getDateDisplay(endTime));
+                    }
+                } else {
+                    this._dateLabel.setText("Floating");
+                }
+            }
+        }
+
         private boolean isFirstItemOnList(){
             return this.getItem().getVisualIndex()%MAXIMUM_DISPLAY_SIZE == STRING_FIRST_ITEM;
         }
