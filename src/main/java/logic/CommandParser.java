@@ -240,40 +240,47 @@ public class CommandParser implements CommandParserSpec {
 
         switch (instruction) {
             case ADD:
-                // Start by finding the parameters, and keep track of the lowest
-                // index found using the regex. Truncating from this index onwards will
-                // give us the true task name
-                int lowestFoundIndex = Math.min(
-                        this.parseTimeParameters(partialCommand, command),
-                        this.parsePriorityParameters(partialCommand, command)
-                );
-
-                String taskName = partialCommand.substring(0, lowestFoundIndex).trim();
-                if (StringUtils.isSurroundedByQuotes(taskName)) {
-                    taskName = StringUtils.stripEndCharacters(taskName);
-                }
-
-                // Verify that task name is not null or empty
-                if (taskName.trim().isEmpty()) {
-                    return Command.invalidCommand(STRING_INVALID_NAME_MISSING);
-                }
-                command.setParameter(Command.ParamName.TASK_NAME, taskName);
-
-                // Verify that it must have an end if it has a start
-                if (command.hasParameter(Command.ParamName.TASK_START) &&
-                        !command.hasParameter(Command.ParamName.TASK_END)) {
-                    return Command.invalidCommand(STRING_INVALID_START_WITHOUT_END);
-                }
+                command = this.parseAddCommand(command, partialCommand);
                 break;
             case EDIT:
                 break;
             case DELETE:
             case MARK:
                 break;
+            case SEARCH:
+                break;
             default:
                 break;
         }
 
+        return command;
+    }
+
+    private Command parseAddCommand(Command command, String partialCommand) {
+        // Start by finding the parameters, and keep track of the lowest
+        // index found using the regex. Truncating from this index onwards will
+        // give us the true task name
+        int lowestFoundIndex = Math.min(
+                this.parseTimeParameters(partialCommand, command),
+                this.parsePriorityParameters(partialCommand, command)
+        );
+
+        String taskName = partialCommand.substring(0, lowestFoundIndex).trim();
+        if (StringUtils.isSurroundedByQuotes(taskName)) {
+            taskName = StringUtils.stripEndCharacters(taskName);
+        }
+
+        // Verify that task name is not null or empty
+        if (taskName.trim().isEmpty()) {
+            return Command.invalidCommand(STRING_INVALID_NAME_MISSING);
+        }
+        command.setParameter(Command.ParamName.TASK_NAME, taskName);
+
+        // Verify that it must have an end if it has a start
+        if (command.hasParameter(Command.ParamName.TASK_START) &&
+                !command.hasParameter(Command.ParamName.TASK_END)) {
+            return Command.invalidCommand(STRING_INVALID_START_WITHOUT_END);
+        }
         return command;
     }
 
