@@ -137,8 +137,10 @@ public class Command {
     /**
      * Special types of commands
      */
-    public static Command invalidCommand() {
-        return new Command(Instruction.INVALID);
+    public static Command invalidCommand(String message) {
+        Command invalidCommand =  new Command(Instruction.INVALID);
+        invalidCommand._invalidationMessage = message;
+        return invalidCommand;
     }
     public static Command unrecognisedCommand() {
         return new Command(Instruction.UNRECOGNISED);

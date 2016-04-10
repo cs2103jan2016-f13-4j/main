@@ -36,6 +36,8 @@ public class CommandParser implements CommandParserSpec {
     private static final String MATCHER_GROUP_PRIORITY = "PRIO";
 
     private static final String STRING_INVALID_HOUR = "Invalid hour";
+    private static final String STRING_INVALID_NAME_MISSING = "Task name is missing";
+    private static final String STRING_INVALID_START_WITHOUT_END = "Task cannot have a start without an end";
 
     /**
      * Singleton implementation
@@ -249,8 +251,18 @@ public class CommandParser implements CommandParserSpec {
                 if (StringUtils.isSurroundedByQuotes(taskName)) {
                     taskName = StringUtils.stripEndCharacters(taskName);
                 }
-                // TODO: Verify that task name is not null or empty
+
+                // Verify that task name is not null or empty
+                if (taskName.trim().isEmpty()) {
+                    return Command.invalidCommand(STRING_INVALID_NAME_MISSING);
+                }
                 command.setParameter(Command.ParamName.TASK_NAME, taskName);
+
+                // Verify that it must have an end if it has a start
+                if (command.hasParameter(Command.ParamName.TASK_START) &&
+                        !command.hasParameter(Command.ParamName.TASK_END)) {
+                    return Command.invalidCommand(STRING_INVALID_START_WITHOUT_END);
+                }
                 break;
             case EDIT:
                 break;

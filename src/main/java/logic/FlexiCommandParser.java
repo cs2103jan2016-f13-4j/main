@@ -789,7 +789,7 @@ public class FlexiCommandParser implements CommandParserSpec {
         // This instruction type will then dictate how parameters are created
         Command.Instruction instruction = this.parseInstruction(commandString);
         if (instruction == Command.Instruction.INVALID) {
-            return Command.invalidCommand();
+            return Command.invalidCommand("");
         } else if (instruction == Command.Instruction.UNRECOGNISED) {
             return Command.unrecognisedCommand();
         }
@@ -848,7 +848,7 @@ public class FlexiCommandParser implements CommandParserSpec {
 
                 } else {
                     // No index to edit, return as invalid command
-                    command = Command.invalidCommand();
+                    command = Command.invalidCommand("");
                 }
                 break;
             case DELETE:
@@ -914,7 +914,7 @@ public class FlexiCommandParser implements CommandParserSpec {
 
                 // No empty search phrase
                 if (commandString.isEmpty()) {
-                    command = Command.invalidCommand();
+                    command = Command.invalidCommand("");
                     break;
                 }
 

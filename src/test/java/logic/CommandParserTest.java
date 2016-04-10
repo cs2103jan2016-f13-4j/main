@@ -77,4 +77,17 @@ public class CommandParserTest {
         assertThat(command.getParameter(Command.ParamName.TASK_END),
                 is(equalTo(CustomTime.todayAt(LocalTime.of(19,0)))));
     }
+
+    @Test
+    public void Command_parser_regards_empty_add_phrases_as_invalid() {
+        Command command = this._parser.parse("add");
+        assertThat(command.getInstruction(), is(Command.Instruction.INVALID));
+    }
+
+    @Test
+    public void Command_parser_regards_items_with_start_time_but_no_end_as_invalid() {
+        Command command = this._parser.parse("add hello world starting tomorrow 7pm");
+        assertThat(command.getInstruction(), is(Command.Instruction.INVALID));
+    }
+
 }
