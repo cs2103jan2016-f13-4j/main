@@ -7,6 +7,7 @@ import java.time.DayOfWeek;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @@author Mai Anh Vu
@@ -163,6 +164,12 @@ public class ParserDefinitions {
         return this._timeNouns;
     }
 
+    public Set<TimeNoun> getRelativeDates() {
+        return this.getTimeNouns().stream()
+                .filter(TimeNoun::isRelative)
+                .collect(Collectors.toSet());
+    }
+
     public String[] getPriorityPrepositionKeywords() {
         if (this._cachedPriorityPrepositionKeywords == null) {
             this._cachedPriorityPrepositionKeywords = this._priorityPrepositions
@@ -173,5 +180,21 @@ public class ParserDefinitions {
 
     public List<Priority> getPriorities() {
         return this._priorities;
+    }
+
+    public Command.Instruction queryInstruction(String instruction) {
+        return this._instructionTranslator.get(instruction);
+    }
+
+    public TimeNoun.Relative queryRelativeDate(String date) {
+        return this._relativeTimeTranslator.get(date);
+    }
+
+    public TimePreposition.Meaning queryTimePreposition(String preposition) {
+        return this._timePrepositionTranslator.get(preposition);
+    }
+
+    public DayOfWeek queryDayOfWeek(String dayOfWeekString) {
+        return this._absoluteTimeTranslator.get(dayOfWeekString);
     }
 }

@@ -187,4 +187,8 @@ public class CustomTime implements Comparable<CustomTime> {
             return false;
         }
     }
+
+    public boolean isNullDate() {
+        return !(this.hasDate() || this.hasTime());
+    }
 }

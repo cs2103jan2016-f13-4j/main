@@ -120,16 +120,6 @@ public class Command {
         return this._parameters.keySet().size();
     }
 
-    /**
-     * Special types of commands
-     */
-    public static Command invalidCommand() {
-        return new Command(Instruction.INVALID);
-    }
-    public static Command unrecognisedCommand() {
-        return new Command(Instruction.UNRECOGNISED);
-    }
-
     public static Command initialCommand() {
         Command command = new Command(Instruction.DISPLAY);
         command.setParameter(ParamName.TASK_UNIVERSALLY_QUANTIFIED, true);
@@ -142,5 +132,29 @@ public class Command {
         } catch (ClassCastException e) {
             return false;
         }
+    }
+
+    /**
+     * Special types of commands
+     */
+    public static Command invalidCommand() {
+        return new Command(Instruction.INVALID);
+    }
+    public static Command unrecognisedCommand() {
+        return new Command(Instruction.UNRECOGNISED);
+    }
+
+    /**
+     * Invalid commands handling
+     */
+    private String _invalidationMessage;
+    public void setAsInvalid(String message) {
+        this._instruction = Instruction.INVALID;
+        this._invalidationMessage = message;
+    }
+
+    public String getInvalidationMessage() {
+        assert this._instruction == Instruction.INVALID && this._invalidationMessage != null;
+        return this._invalidationMessage;
     }
 }

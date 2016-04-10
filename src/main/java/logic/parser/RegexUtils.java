@@ -10,6 +10,9 @@ import java.util.regex.Pattern;
 public class RegexUtils {
 
     private static final String DELIMITER_CHOICES = "|";
+    public static final String MATCHER_GROUP_DATE_YEAR = "YEAR";
+    public static final String MATCHER_GROUP_DATE_DAY = "DAY";
+    public static final String MATCHER_GROUP_DATE_MONTH = "MONTH";
 
     /**
      * Constructs a matcher that matches the test string case-insensitively
@@ -116,9 +119,12 @@ public class RegexUtils {
     }
 
     public static String dateRegex() {
-        return "(?:(?<YEAR>\\d{4})\\s*|(?<DAY>\\b\\d{1,2})(?:st|nd|rd|th)?\\b" +
-                "\\s*|(?<MONTH>january|february|march|april|may|june|july|august|september|" +
-                "october|november|december|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\\s*)+";
+        return String.format("(?:(?<%s>\\d{4})\\s*|(?<%s>\\b\\d{1,2})(?:st|nd|rd|th)?\\b" +
+                "\\s*|(?<%s>january|february|march|april|may|june|july|august|september|" +
+                "october|november|december|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\\s*){2,3}",
+                MATCHER_GROUP_DATE_YEAR,
+                MATCHER_GROUP_DATE_DAY,
+                MATCHER_GROUP_DATE_MONTH);
     }
 
     public static String timeRegex() {
