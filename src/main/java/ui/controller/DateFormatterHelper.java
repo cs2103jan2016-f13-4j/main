@@ -201,7 +201,7 @@ public class DateFormatterHelper {
             }
 
         } else {
-            System.out.println(this.getDateTimeDisplay(endTime));
+
             if (endTime != null) {
                 if (endTime.hasTime()) {
                     return String.format(TIME_BY, this.getTimeDisplay(endTime));
