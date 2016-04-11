@@ -58,6 +58,6 @@
     -fx-text-fill: #ddd;
 }
 
-.list-cell.completed .item__index {
+.list-cell.completed .item__time {
     -fx-text-fill: #B8E986;
 }

@@ -110,10 +110,6 @@ public class TaskListItem extends ListCell<VisualTask> {
             this._nameLabel.setText(task.getTaskName());
             // set up the time to be displayed
             this.setUpTime(task);
-            if (this._timeLabel.getText().trim().isEmpty()) {
-                // Shift the name label off
-                this._nameLabel.setTranslateY(8.0);
-            }
 
             //The item sometimes is displayed using a reused ListCell Object, instead of a completely new ListCell Object instantiated.
             // So previous applied style and effect might still persist.
@@ -124,6 +120,9 @@ public class TaskListItem extends ListCell<VisualTask> {
             if (task.isCompleted()) {
                 this.getStyleClass().add("completed");
                 this._timeLabel.setText("Completed");
+            } else if (this._timeLabel.getText().trim().isEmpty()) {
+                // Shift the name label off
+                this._nameLabel.setTranslateY(8.0);
             }
 
             // apply highlight effect to the new task when first displayed;
