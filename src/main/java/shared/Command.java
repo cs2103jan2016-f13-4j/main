@@ -15,7 +15,8 @@ public class Command {
      * Types
      */
     public enum Instruction {
-        ADD, DISPLAY, MARK, EDIT, SEARCH, UNDO, REDO, DELETE, TUTORIAL, EXIT, UNRECOGNISED, INVALID;
+        ADD, DISPLAY, MARK, EDIT, SEARCH, UNDO, REDO, DELETE,
+        SCHEDULE, TUTORIAL, EXIT, UNRECOGNISED, INVALID;
     }
 
     public enum ParamType {

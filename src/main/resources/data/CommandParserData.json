@@ -28,6 +28,9 @@
       "name": "TUTORIAL",
       "keywords": ["tutorial", "help", "gitgud"]
     }, {
+      "name": "SCHEDULE",
+      "keywords": ["schedule"]
+    }, {
       "name": "EXIT",
       "keywords": ["exit", "quit"]
     }
