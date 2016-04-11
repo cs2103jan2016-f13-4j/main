@@ -34,10 +34,6 @@ public class VisualIndexMapper {
         this._itemsList = new ArrayList<>();
     }
 
-    public void updateList(List<Task> list) {
-        this._itemsList = list;
-    }
-
     public void translateVisualToRaw(Command command) {
         assert !this._itemsList.isEmpty();
 
@@ -72,6 +68,7 @@ public class VisualIndexMapper {
     }
 
     public List<VisualTask> translateRawToVisual(List<Task> rawList) {
+        this._itemsList = rawList;
         return IntStream.range(0, rawList.size())
                 .mapToObj(index -> new VisualTask(
                         getVisualIndexFromArrayIndex(index),

@@ -106,7 +106,7 @@ public class Storage extends TimerTask implements StorageSpec<Task> {
 
         // Keep internal index serial
         List<String> tasksToWrite = IntStream.range(0, allTask.size()).mapToObj(index -> {
-            Task task = allTask.get(index);
+            Task task = allTask.get(index).clone();
             task.setId(index + 1);
             return task;
         }).map(Task::encodeTaskToString).collect(Collectors.toList());

@@ -88,9 +88,6 @@ public class TranslationEngine implements TranslationEngineSpec {
             // Convert list to one with visual IDs only
             List<VisualTask> visualTaskList = getVisualIndexMapper()
                     .translateRawToVisual(result.getData());
-
-            // Update mapper with list
-            VisualIndexMapper.getInstance().updateList(result.getData());
             View view = new TaskListView(visualTaskList, this._lastCommand);
             this.getUserInterface().render(view);
             break;
@@ -132,10 +129,7 @@ public class TranslationEngine implements TranslationEngineSpec {
         this._lastCommand = command;
 
         // Schedule for displaying
-        this._commandExecutionHandler.andThen(result -> {
-            this.displayResult(result);
-            return null;
-        }).apply(command);
+        this._commandExecutionHandler.apply(command);
     }
 
     @Override public UserInterfaceSpec getUserInterface() {
