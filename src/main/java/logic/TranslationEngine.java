@@ -170,6 +170,9 @@ public class TranslationEngine implements TranslationEngineSpec {
                 case DELETE:
                     if (result.hasErrorMessage()) {
                         message = result.getErrorMessage();
+                    } else if (this._lastCommand.hasTrueValue(
+                            Command.ParamName.TASK_UNIVERSALLY_QUANTIFIED)) {
+                        message = Message.DELETE_ALL_SUCCESS.toString();
                     } else {
                         message = Message.DELETE_SUCCESS.toString();
                     }
@@ -202,6 +205,9 @@ public class TranslationEngine implements TranslationEngineSpec {
                 case MARK:
                     if (result.hasErrorMessage()) {
                         message = result.getErrorMessage();
+                    } else if (this._lastCommand.hasTrueValue(
+                            Command.ParamName.TASK_UNIVERSALLY_QUANTIFIED)) {
+                        message = Message.MARK_ALL_SUCCESS.toString();
                     } else {
                         message = Message.REDO_SUCCESS.toString();
                     }

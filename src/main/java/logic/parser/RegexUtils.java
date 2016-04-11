@@ -1,8 +1,11 @@
 package logic.parser;
 
+import java.time.Month;
 import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * @@author Mai Anh Vu
@@ -41,10 +44,19 @@ public class RegexUtils {
      * @return a RegExp string that matches any choice given
      */
     public static String choice(String... choices) {
+        return String.format("(?:%s)", unbracketedChoice(choices));
+    }
+
+    /**
+     * Constructs a RegExp that matches any string in the choices given, but
+     * without surrounding brackets.
+     * @param choices a vararg array of different strings that can be matched
+     * @return a RegExp string that matches any choice given, without brackets
+     */
+    public static String unbracketedChoice(String... choices) {
         // We want the longer strings to be matched first
         Arrays.sort(choices, (string1, string2) -> string2.length() - string1.length());
-
-        return String.format("(?:%s)", String.join(DELIMITER_CHOICES, choices));
+        return String.join(DELIMITER_CHOICES, choices);
     }
 
     /**
@@ -127,16 +139,71 @@ public class RegexUtils {
         return String.format("(?<%s>%s)", name, group);
     }
 
+    /**
+     * Creates a RegExp that matches calendar date (with textual month)
+     * @return a calendar date reg exp
+     */
     public static String dateRegex() {
-        return String.format("(?:(?<%s>\\d{4})\\s*|(?<%s>\\b\\d{1,2})(?:st|nd|rd|th)?\\b" +
-                "\\s*|(?<%s>january|february|march|april|may|june|july|august|september|" +
-                "october|november|december|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\\s*){2,3}",
+        // Year
+        String yearPattern = "\\d{4}";
+        String fullYearPattern = namedGroup(
                 MATCHER_GROUP_DATE_YEAR,
-                MATCHER_GROUP_DATE_DAY,
-                MATCHER_GROUP_DATE_MONTH);
+                yearPattern
+        );
+
+        // Day
+        String dayPattern = "\\b\\d{1,2}";
+        String fullDayPattern = String.format("%s%s\\b",
+                namedGroup(MATCHER_GROUP_DATE_DAY, dayPattern),
+                optional(choice("st", "nd", "rd", "th")));
+
+        // Month
+        String[] monthStrings = Arrays.stream(Month.values())
+                .map(Month::name)
+                .map(String::toLowerCase)
+                .flatMap(fullMonthString -> Arrays.asList(
+                        fullMonthString,
+                        fullMonthString.substring(0, 3)
+                ).stream())
+                .toArray(String[]::new);
+        String fullMonthPattern = namedChoice(
+                MATCHER_GROUP_DATE_MONTH,
+                monthStrings
+        );
+
+        // Separator
+        String separatorPattern = optional(choice("\\s","\\/", "-"));
+
+        return RegexUtils.choice(Arrays.asList(
+                fullYearPattern,
+                fullDayPattern,
+                fullMonthPattern
+        ).stream().map(pattern -> pattern.concat(separatorPattern))
+                .toArray(String[]::new)).concat("{2,3}");
     }
 
+    /**
+     * Creates a RegExp that matches time of a day.
+     * @return a time of day regular expression
+     */
     public static String timeRegex() {
         return "(?:\\d|:(?=\\d(?<=\\d))){1,5}(?:\\s*(?:am|pm))?";
+    }
+
+    /**
+     * Creates a RegExp that matches only when the word stands alone between spaces
+     * @param word the word to assert boundary
+     * @return a regular expression that check if word satisfy boundary check
+     */
+    public static String wordBoundary(String word) {
+        return String.format("\\b%s\\b", word);
+    }
+
+    public static String positiveLookahead(String pattern, String lookahead) {
+        return String.format("%s(?=%s)", pattern, lookahead);
+    }
+
+    public static String negativeLookahead(String pattern, String lookahead) {
+        return String.format("%s(?!%s)", pattern, lookahead);
     }
 }
