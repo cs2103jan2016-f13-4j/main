@@ -26,7 +26,7 @@ public class ApplicationContext {
     }
 
     /**
-     * TODO: Write JavaDoc
+     * Returns the main application instance.
      *
      * @return
      */
@@ -38,7 +38,7 @@ public class ApplicationContext {
     }
 
     /**
-     * TODO: Write JavaDoc
+     * Returns the primary stage used by this JavaFX application.
      *
      * @return
      */
@@ -49,19 +49,27 @@ public class ApplicationContext {
     }
 
     /**
-     * TODO: Write JavaDoc
+     * Manually determines the primary stage to be used by this application.
      *
-     * @param primaryStage
+     * @param primaryStage the stage to be used
      */
     public void setPrimaryStage(Stage primaryStage) {
         assert primaryStage != null;
         this._primaryStage = primaryStage;
     }
 
+    /**
+     * Returns whether the current application stack is running on test mode.
+     * @return whether application is in test mode
+     */
     public boolean isTestingMode() {
         return this._isTestingMode;
     }
 
+    /**
+     * Manually determines if testing mode is to be activated.
+     * @param testing whether to activate testing mode
+     */
     public void setTestingMode(boolean testing) {
         this._isTestingMode = testing;
     }
