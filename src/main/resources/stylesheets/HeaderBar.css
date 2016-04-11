@@ -1,0 +1,11 @@
+.header-bar {
+    -fx-background-color: linear-gradient(#FFAD1F, #FFAE1C);
+}
+
+.header__text {
+    -fx-text-fill: white;
+    -fx-font-family: "Lato";
+    -fx-font-weight: bold;
+    -fx-font-size: 16px;
+    -fx-alignment: baseline-left;
+}

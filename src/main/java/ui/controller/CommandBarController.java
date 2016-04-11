@@ -23,26 +23,25 @@ import javafx.scene.layout.AnchorPane;
 import shared.Resources;
 
 /**
- * @@author Mai Anh Vu
+ * @@author A0127046L
  */
-public class CommandInputController {
+public class CommandBarController {
     private static final String ID_COMMAND_INPUT = "command-input";
-    private static final double PADDING_HORZ_COMMAND_INPUT = 0.0;
-    private static final double PADDING_VERT_COMMAND_INPUT = 0.0;
+    private static final double PADDING_HORZ_COMMAND_INPUT = 12.0;
+    private static final double PADDING_VERT_COMMAND_INPUT = 14.0;
     private static final int DELAY_HIGHLIGHT = 100;
     private static final String STYLE_CLASS_INSTRUCTION = "command__instruction";
     private static final String STYLE_CLASS_TIME = "command__time";
     private static final String STYLE_CLASS_NORMAL = "command__normal-text";
     private static final String STYLE_CLASS_PRIORITY = "command__priority";
 
-    @FXML private AnchorPane _commandInputContainer;
+    @FXML private AnchorPane _commandBarContainer;
+
     private StyleClassedTextArea _inputField;
     private Function<String, Void> _inputSubmissionHandler;
     private Function<KeyEvent, Boolean> _interceptor;
 
     private ExecutorService _executor;
-
-    private HashMap<String, String> _instructionStyleClassMap;
 
     // Regular expressions
     private String _instructionPattern;
@@ -65,10 +64,6 @@ public class CommandInputController {
      * command input field.
      */
     private void initializeHighlighters() {
-        // Prepare the hash map for dealing with finding a command reset
-        // instruction
-        this._instructionStyleClassMap = new LinkedHashMap<>();
-
         // Create the instruction highlight pattern
         CommandParser parser = CommandParser.getInstance();
         this._instructionPattern = parser.getInstructionPattern();
@@ -120,7 +115,7 @@ public class CommandInputController {
      * Put the appropriate elements in place, visually.
      */
     private void initializeLayout() {
-        String stylesheet = Resources.sharedResources().getStylesheet("CommandInput");
+        String stylesheet = Resources.sharedResources().getStylesheet("CommandBar");
         this._inputField.getStylesheets().add(stylesheet);
 
         this._inputField.getStyleClass().add("command-input__field");
@@ -130,7 +125,7 @@ public class CommandInputController {
         AnchorPane.setLeftAnchor(this._inputField, PADDING_HORZ_COMMAND_INPUT);
         AnchorPane.setRightAnchor(this._inputField, PADDING_HORZ_COMMAND_INPUT);
         AnchorPane.setTopAnchor(this._inputField, PADDING_VERT_COMMAND_INPUT);
-        AnchorPane.setBottomAnchor(this._inputField, 0.0);
+        AnchorPane.setBottomAnchor(this._inputField, -5.0);
     }
 
     /**
@@ -143,7 +138,7 @@ public class CommandInputController {
         // Set an ID to the input field for easy reference
         this._inputField.setId(ID_COMMAND_INPUT);
 
-        this._commandInputContainer.getChildren().add(this._inputField);
+        this._commandBarContainer.getChildren().add(this._inputField);
     }
 
     /**
@@ -232,5 +227,9 @@ public class CommandInputController {
      */
     public void cleanUp() {
         this._executor.shutdown();
+    }
+
+    public void requestFocus() {
+        this._inputField.requestFocus();
     }
 }

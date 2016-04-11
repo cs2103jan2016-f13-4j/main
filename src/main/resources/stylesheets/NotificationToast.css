@@ -1,13 +1,12 @@
-.notification__container {
-    -fx-background-color: #434343;
-    -fx-border-radius: 19px;
-    -fx-background-radius: 19px;
-    
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 4, 0.0, 0, 2);
+.toast__container {
+    -fx-background-color: white;
+    -fx-background-radius: 4px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,.10), 8, 0.0, 0, 4);
 }
 
-.notification__label {
-    -fx-text-fill: #ffffff;
+.toast__label {
     -fx-font-family: "Lato";
     -fx-font-size: 14px;
+    -fx-alignment: baseline-left;
+    -fx-text-alignment: left;
 }

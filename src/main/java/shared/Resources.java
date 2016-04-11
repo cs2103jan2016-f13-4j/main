@@ -68,7 +68,8 @@ public class Resources {
     public <T, C> Pair<T, C> getComponentAndController(String template) {
         try {
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getTemplateUrl(template));
+            URL templateUrl = getTemplateUrl(template);
+            loader.setLocation(templateUrl);
 
             T component = loader.load();
             C controller = loader.getController();

@@ -8,9 +8,9 @@ import javafx.animation.Timeline;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -19,8 +19,8 @@ import javafx.util.Pair;
 import shared.ApplicationContext;
 import shared.Resources;
 import skeleton.UserInterfaceSpec;
-import ui.controller.CommandInputController;
-import ui.controller.InfoPanelController;
+import ui.controller.CommandBarController;
+import ui.controller.HeaderBarController;
 import ui.controller.NotificationToastController;
 import ui.view.View;
 
@@ -35,17 +35,15 @@ public class UserInterface implements UserInterfaceSpec {
      * Constants
      */
     private static final String[] SOURCES_FONT = {
-            "Lato-Black",
             "Lato-Bold",
-            "Lato-Italic",
             "Lato-Regular",
             "Lato-Light"
     };
     private static final double SIZE_FONT_DEFAULT = 16.0;
     private static final String STYLE_CLASS_CONTAINER_MAIN = "sub-container";
-    private static final double HEIGHT_MAIN_CONTAINER_MIN = 300.0;
-    private static final double HEIGHT_MAIN_CONTAINER_MAX = 430.0;
-    private static final double OFFSET_HIDE = 400.0;
+    private static final double HEIGHT_MAIN_CONTAINER_MIN = 450.0;
+    private static final double HEIGHT_MAIN_CONTAINER_MAX = 450.0;
+    private static final double OFFSET_HIDE = 500.0;
 
     private static final int DURATION_ANIM_TRANSITION = 250;
     private static final int DURATION_ANIM_STOP = 3000;
@@ -70,9 +68,9 @@ public class UserInterface implements UserInterfaceSpec {
      */
     private Function<String, Void> _commandInputHandler;
     private Stage _primaryStage;
-    private VBox _rootView;
-    private InfoPanelController _infoPanelController;
-    private CommandInputController _commandInputController;
+    private BorderPane _rootView;
+    private HeaderBarController _headerBarController;
+    private CommandBarController _commandBarController;
 
     private StackPane _mainContainer;
     private AnchorPane _viewWrapper;
@@ -107,9 +105,11 @@ public class UserInterface implements UserInterfaceSpec {
 
         this.initializeFonts();
         this.setRootView();
-        this.registerCommandInput();
-        this.registerInfoPanel();
+
+        this.registerHeaderBar();
         this.registerViewContainer();
+        this.registerCommandBar();
+
         this.registerNotificationToast();
     }
 
@@ -151,34 +151,18 @@ public class UserInterface implements UserInterfaceSpec {
         this._commandInputHandler = onCommandInput;
     }
 
-    private void registerInfoPanel() {
-        Pair<AnchorPane, InfoPanelController> infoPanelMetadata =
-                Resources.sharedResources().getComponentAndController("InfoPanelWrapper");
+    private void registerHeaderBar() {
+        Pair<AnchorPane, HeaderBarController> headerBarMetadata =
+                Resources.sharedResources().getComponentAndController("HeaderBar");
 
-        AnchorPane infoPanelWrapper = infoPanelMetadata.getKey();
-        // TODO: Delete this line to show info panel
-        infoPanelWrapper.setClip(new Rectangle(0,0));
-        this._infoPanelController = infoPanelMetadata.getValue();
-
-        this._rootView.getChildren().add(infoPanelWrapper);
-    }
-
-    private void registerCommandInput() {
-        assert (this._commandInputHandler != null);
-
-        Pair<AnchorPane, CommandInputController> inputMetadata =
-                Resources.sharedResources().getComponentAndController("CommandInputWrapper");
-
-        assert inputMetadata != null;
-
-        AnchorPane commandInputWrapper = inputMetadata.getKey();
-        this._rootView.getChildren().add(commandInputWrapper);
+        AnchorPane headerBar = headerBarMetadata.getKey();
+        this._headerBarController = headerBarMetadata.getValue();
 
         final double[] originalPosition = new double[2];
         final double[] offset = new double[2];
 
-        // Command input anchor pane will be used for moving
-        commandInputWrapper.setOnMousePressed(event -> {
+        // Header bar anchor pane will be used for moving
+        headerBar.setOnMousePressed(event -> {
             Stage primaryStage = ApplicationContext.mainContext().getPrimaryStage();
 
             originalPosition[INDEX_X] = primaryStage.getX();
@@ -187,7 +171,7 @@ public class UserInterface implements UserInterfaceSpec {
             offset[INDEX_X] = event.getScreenX();
             offset[INDEX_Y] = event.getScreenY();
         });
-        commandInputWrapper.setOnMouseDragged(event -> {
+        headerBar.setOnMouseDragged(event -> {
             Stage primaryStage = ApplicationContext.mainContext().getPrimaryStage();
             double offsetX = event.getScreenX() - offset[INDEX_X];
             double offsetY = event.getScreenY() - offset[INDEX_Y];
@@ -195,15 +179,29 @@ public class UserInterface implements UserInterfaceSpec {
             primaryStage.setY(originalPosition[INDEX_Y] + offsetY);
         });
 
-        this._commandInputController = inputMetadata.getValue();
-        this._commandInputController.setInputSubmissionHandler(
+        this._rootView.setTop(headerBar);
+    }
+
+    private void registerCommandBar() {
+        assert (this._commandInputHandler != null);
+
+        Pair<AnchorPane, CommandBarController> inputMetadata =
+                Resources.sharedResources().getComponentAndController("CommandBar");
+
+        assert inputMetadata != null;
+
+        AnchorPane commandBar = inputMetadata.getKey();
+
+        this._commandBarController = inputMetadata.getValue();
+        this._commandBarController.setInputSubmissionHandler(
                 rawCommand -> this._commandInputHandler.apply(rawCommand)
         );
+
+        this._rootView.setBottom(commandBar);
     }
 
     private void registerViewContainer() {
         StackPane main = new StackPane();
-        main = new StackPane();
         main.getStyleClass().add(STYLE_CLASS_CONTAINER_MAIN);
         main.setMinHeight(HEIGHT_MAIN_CONTAINER_MIN);
         main.setMaxHeight(HEIGHT_MAIN_CONTAINER_MAX);
@@ -215,10 +213,10 @@ public class UserInterface implements UserInterfaceSpec {
         this._viewWrapper = wrapper;
         main.getChildren().add(this._viewWrapper);
 
-        main.setAlignment(Pos.BOTTOM_CENTER);
+        main.setAlignment(Pos.TOP_CENTER);
 
         this._mainContainer = main;
-        this._rootView.getChildren().add(this._mainContainer);
+        this._rootView.setCenter(main);
     }
 
     private void registerNotificationToast() {
@@ -250,13 +248,14 @@ public class UserInterface implements UserInterfaceSpec {
         // TODO: Account for similar controller, only update data
         this._viewWrapper.getChildren().clear();
         this._viewWrapper.getChildren().add(view.getComponent());
-        this._commandInputController.setKeyInputInterceptor(view.getKeyInputInterceptor());
+        this._commandBarController.setKeyInputInterceptor(view.getKeyInputInterceptor());
+        this._commandBarController.requestFocus();
     }
 
     @Override
     public void cleanUp() {
         // Trickle down to controller
-        this._commandInputController.cleanUp();
+        this._commandBarController.cleanUp();
     }
 
     @Override
