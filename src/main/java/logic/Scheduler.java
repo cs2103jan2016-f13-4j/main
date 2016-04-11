@@ -6,6 +6,9 @@ import shared.TemporalRange;
 import skeleton.SchedulerSpec;
 import storage.Storage;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,6 +31,39 @@ public class Scheduler implements SchedulerSpec {
 
 
     @Override
+    public TemporalRange schedule(Integer durationInMinutes) {
+        CustomTime startOfRangeToSearch = CustomTime.now();
+        CustomTime endOfRangeToSearch = this._storage.getAll()
+                .stream()
+                .map(Task::getEndTime)
+                .max(CustomTime::compareTo)
+                .get();
+
+        List<TemporalRange> freeSlots = this.getFreeSlots(startOfRangeToSearch, endOfRangeToSearch);
+
+        List<TemporalRange> suitableFreeSlots = freeSlots
+                .stream()
+                .filter(range -> CustomTime.difference(range.getStart(), range.getEnd()) >= durationInMinutes)
+                .map(range -> {
+                    CustomTime startTime = range.getStart();
+                    CustomTime endTime = new CustomTime(LocalDateTime.of(startTime.getDate(), startTime.getTime()).plusMinutes(durationInMinutes));
+                    return new TemporalRange(startTime, endTime);
+                })
+                .collect(Collectors.toList());
+
+        if (suitableFreeSlots.isEmpty()) {
+            LocalDateTime startDateTimeOfTask = LocalDateTime.of(endOfRangeToSearch.getDate().plusDays(1),
+                    LocalTime.of(8, 0));
+            LocalDateTime endDateTimeOfTask = startDateTimeOfTask.plusMinutes(durationInMinutes);
+
+            return new TemporalRange(new CustomTime(startDateTimeOfTask), new CustomTime(endDateTimeOfTask));
+        } else {
+            //System.err.printf("start = %s, end = %s%n", suitableFreeSlots.get(0).getStart().toString(), suitableFreeSlots.get(0).getEnd().toString());
+            return suitableFreeSlots.get(0);
+        }
+    }
+
+    @Override
     public boolean isColliding(Task task) {
         TemporalRange taskRange = new TemporalRange(task.getStartTime(), task.getEndTime());
 
@@ -38,7 +74,7 @@ public class Scheduler implements SchedulerSpec {
         return !this._storage.getAll()
                 .stream()
                 .map(task_ -> new TemporalRange(task_.getStartTime(), task_.getEndTime()))
-                .filter(range -> range.getStart() != null && range.getEnd() != null)
+                .filter(range -> range.getStart() != null && range.getEnd() != null) // ensure start and end time objects are there
                 .filter(range_ -> taskRange.overlaps(range_))
                 .collect(Collectors.toList())
                 .isEmpty();
@@ -52,9 +88,13 @@ public class Scheduler implements SchedulerSpec {
         }
 
         // first get the disjoint list of occupied time slots, sorted in chronological order
-        List<TemporalRange> occupiedRanges = this.collapseOverlappingRanges(this._storage.getAll()
+        List<TemporalRange> occupiedRanges = this._storage.getAll()
                 .stream()
                 .map(task -> new TemporalRange(task.getStartTime(), task.getEndTime()))
+                .collect(Collectors.toList());
+
+        occupiedRanges = this.collapseOverlappingRanges(occupiedRanges
+                .stream()
                 .filter(range -> range.getStart() != null && range.getEnd() != null) // remove tasks with missing start/end times
                 .collect(Collectors.toList()));
 
@@ -125,5 +165,35 @@ public class Scheduler implements SchedulerSpec {
         collapsedRanges.add(currentRange);
 
         return collapsedRanges;
+    }
+
+    protected List<TemporalRange> blockOutQuietTime(List<TemporalRange> ranges) {
+        LocalDate minDate = ranges
+                .stream()
+                .map(TemporalRange::getStart)
+                .min(CustomTime::compareTo)
+                .get().getDate();
+        LocalDate maxDate = ranges
+                .stream()
+                .map(TemporalRange::getEnd)
+                .max(CustomTime::compareTo)
+                .get().getDate();
+
+        List<LocalDate> dateRange = new LinkedList<>();
+        for (LocalDate i = minDate; i.isBefore(maxDate) || i.isEqual(maxDate); i = i.plusDays(1)) {
+            dateRange.add(i);
+        }
+
+        List<TemporalRange> blockedQuietTimeRanges = dateRange
+                .stream()
+                .map(date -> {
+                    CustomTime start = new CustomTime(date, LocalTime.of(0, 0));
+                    CustomTime end = new CustomTime(date, LocalTime.of(8, 0));
+                    return new TemporalRange(start, end);
+                })
+                .collect(Collectors.toList());
+
+        blockedQuietTimeRanges.addAll(this.collapseOverlappingRanges(ranges));
+        return this.collapseOverlappingRanges(blockedQuietTimeRanges);
     }
 }

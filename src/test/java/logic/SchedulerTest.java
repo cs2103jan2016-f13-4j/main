@@ -33,6 +33,13 @@ public class SchedulerTest {
     public static final CustomTime time2 = new CustomTime(2016, Month.APRIL, 2, 16, 0);
     public static final CustomTime time3 = new CustomTime(2016, Month.APRIL, 3, 12, 0);
     public static final CustomTime time4 = new CustomTime(2016, Month.APRIL, 4, 7, 30);
+    public static final CustomTime time5 = new CustomTime(2016, Month.APRIL, 11, 10, 0);
+    public static final CustomTime time6 = new CustomTime(2016, Month.APRIL, 12, 6, 0);
+    public static final CustomTime time7 = new CustomTime(2016, Month.MAY, 1, 18, 0);
+    public static final CustomTime time8 = new CustomTime(2016, Month.MAY, 1, 7, 0);
+    public static final CustomTime time9 = new CustomTime(2016, Month.MAY, 1, 10, 0);
+    public static final CustomTime timeA = new CustomTime(2016, Month.APRIL, 12, 6, 0);
+    public static final CustomTime timeB = new CustomTime(2016, Month.APRIL, 12, 9, 0);
 
     public static final TemporalRange range1 = new TemporalRange(time1, time2);
     public static final TemporalRange range2 = new TemporalRange(time2, time3);
@@ -40,6 +47,7 @@ public class SchedulerTest {
     public static final TemporalRange range4 = new TemporalRange(time1, time3);
     public static final TemporalRange range5 = new TemporalRange(time2, time4);
     public static final TemporalRange range6 = new TemporalRange(time1, time4);
+    public static final TemporalRange range7 = new TemporalRange(timeA, timeB);
 
     public static final Task task1 = new Task(null, "1", "", time1, time2);
     public static final Task task2 = new Task(null, "2", "", time2, time3);
@@ -47,6 +55,8 @@ public class SchedulerTest {
     public static final Task task4 = new Task(null, "4", "", time1, time3);
     public static final Task task5 = new Task(null, "5", "", time2, time4);
     public static final Task task6 = new Task(null, "6", "", time1, time4);
+    public static final Task task7 = new Task(null, "7", "", time5, time6);
+    public static final Task task8 = new Task(null, "8", "", time7, time8);
 
     public static final Task partialTask1 = new Task(null, "a", "", time1, null);
     public static final Task partialTask2 = new Task(null, "b", "", time2, null);
@@ -181,5 +191,14 @@ public class SchedulerTest {
         expectedFreeRange.add(range4);
 
         assertEquals(this._scheduler.getFreeSlots(time1, time4), expectedFreeRange);
+    }
+
+    @Test
+    public void Scheduler_works() {
+        this._storage.save(task7);
+        this._storage.save(task8);
+
+        TemporalRange scheduledRange = this._scheduler.schedule(180);
+        assertEquals(scheduledRange, range7);
     }
 }

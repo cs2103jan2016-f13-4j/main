@@ -50,14 +50,14 @@ public class TemporalRange {
             }
 
             @Override
-            public boolean isSpecial() {
+            public boolean isUniversal() {
                 return true;
             }
         };
     }
 
 
-    public boolean isSpecial() {
+    public boolean isUniversal() {
         return false;
     }
 
@@ -136,6 +136,13 @@ public class TemporalRange {
     @Override
     public boolean equals(Object o) {
         assert o instanceof TemporalRange;
-        return this._start == ((TemporalRange) o)._start && this._end == ((TemporalRange) o)._end;
+
+        // handle the universal range, in which _start and _end are not defined
+        if (this.isUniversal()) {
+            return ((TemporalRange) o).isUniversal();
+        }
+
+        TemporalRange range = (TemporalRange) o;
+        return this._start.equals(range._start) && this._end.equals(range._end);
     }
 }

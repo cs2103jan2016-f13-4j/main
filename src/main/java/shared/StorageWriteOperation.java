@@ -1,5 +1,6 @@
 package shared;
 
+import java.time.LocalTime;
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.Collectors;
@@ -92,9 +93,15 @@ public class StorageWriteOperation {
             }
             if (this._command.hasParameter(Command.ParamName.TASK_START)) {
                 from = this._command.getParameter(Command.ParamName.TASK_START);
+                if (!from.hasTime()) {
+                    from = new CustomTime(from.getDate(), LocalTime.of(7, 0)); // default to 0000
+                }
             }
             if (this._command.hasParameter(Command.ParamName.TASK_END)) {
                 to = this._command.getParameter(Command.ParamName.TASK_END);
+                if (!to.hasTime()) {
+                    to = new CustomTime(to.getDate(), LocalTime.of(23, 00)); // default to 2359
+                }
             }
             // we now build the Task object for adding into the store
             Task taskToAdd = new Task(null, name, "", from, to);
