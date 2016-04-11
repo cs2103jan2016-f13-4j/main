@@ -74,7 +74,7 @@ public class Scheduler implements SchedulerSpec {
             return new TemporalRange(endOfRangeToSearch.plusDays(1),
                     endOfRangeToSearch.plusDays(1).plusMinutes(durationInMinutes));
         } else {
-            //System.err.printf("start = %s, end = %s%n", suitableFreeSlots.get(0).getStart().toString(), suitableFreeSlots.get(0).getEnd().toString());
+            // get the first suitable free slot and return it
             return suitableFreeSlots.get(0);
         }
     }
