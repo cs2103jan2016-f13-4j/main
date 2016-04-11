@@ -16,16 +16,19 @@ import java.time.format.DateTimeFormatter;
 public class DateFormatterHelper {
     /**Constant**/
     private final String EMPTY_STRING = "";
-    private final String IN_WEEK_FORMAT = "EE";
-    private final String DATE_FORMAT = "dd/MM/YYYY";
+    private final String IN_WEEK_FORMAT = "EEEE";
+    private final String DATE_WITH_YEAR_FORMAT = "dd MMMM YYYY";
+    private final String DATE_FORMAT = "dd/MM";
+    private final String DATE_HEADING_FORMAT = "dd MMMM";
     private final String DATE_YESTERDAY = "Yesterday";
     private final String DATE_TODAY = "Today";
     private final String DATE_TOMMOROW = "Tomorrow";
-    private final String DATE_NEXT_WEEK = "Next %s";
+    private final String DATE_NEXT_WEEK = "next %s";
     private final String DATE_PAIR_PATTERN = "%s to %s";
     private final String TIME_FORMAT = "hh:mm a" ;
-    private final String TIME_FROM = "From %s";
-    private final String TIME_BY = "By %s";
+    private final String TIME_FROM = "from %s";
+    private final String TIME_BY = "by %s";
+    private final String STRING_DATE_HEADING = "%s, %s";
     private final int ONE_DAY_DIFFERENCE = 1;
     private final int FIRST_DAY = 1;
     private final int RANGE_BEFORE_DAY_IS_REPEATED = 6;
@@ -33,26 +36,30 @@ public class DateFormatterHelper {
     private CustomTime _now;
     private DateTimeFormatter _inWeekFormat;
     private DateTimeFormatter _otherDateFormat;
+    private DateTimeFormatter _dateYearFormat;
     private DateTimeFormatter _timeFormat;
+    private DateTimeFormatter _dateHeadingFormat;
 
     public DateFormatterHelper() {
         this.updateCurrentTime();
         this._inWeekFormat = DateTimeFormatter.ofPattern(IN_WEEK_FORMAT);
         this._otherDateFormat = DateTimeFormatter.ofPattern(DATE_FORMAT);
+        this._dateYearFormat = DateTimeFormatter.ofPattern(DATE_WITH_YEAR_FORMAT);
         this._timeFormat = DateTimeFormatter.ofPattern(TIME_FORMAT);
+        this._dateHeadingFormat = DateTimeFormatter.ofPattern(DATE_HEADING_FORMAT);
     }
 
     /***
      * retrieve the date or day of the time relative to the current timing. the current time used as comparison will be time
      * when the function is called.
-     *
-     * Today's date will be reflected as 'Today'
-     * Tomorrow's date will be reflected as 'Tomorrow'
-     * Yesterday's date will be reflected as 'Yesterday'
-     * Date that is still within the same week of today's date will be reflected as 'This [name of day]'
-     * Date that is within the next week from today will be reflected as 'Next [name of day]'
-     * Other date will be reflected as Date following the format DD/MM/YYYY
-     *
+     * <ul>
+     * <li> Today's date will be reflected as 'Today'
+     * <li> Tomorrow's date will be reflected as 'Tomorrow'
+     * <li> Yesterday's date will be reflected as 'Yesterday'
+     * <li> Date that is still within the same week of today's date will be reflected as 'This [name of day]'
+     * <li> Date that is within the next week from today will be reflected as 'Next [name of day]'
+     * <li> Other date will be reflected as Date following the format DD/MM/YYYY
+     * </ul>
      * @param time time that is going to be processed
      * @return String representing the specified date from the time parameter
      */
@@ -73,12 +80,27 @@ public class DateFormatterHelper {
             } else if (isNextWeek(time)) {
                 date = String.format(DATE_NEXT_WEEK,time.getDate().format(_inWeekFormat));
             } else {
-                date = time.getDate().format(_otherDateFormat);
+                if (isSameYear(time)) {
+                    date = time.getDate().format(_dateHeadingFormat);
+                } else {
+                    date = time.getDate().format(_dateYearFormat);
+                }
             }
 
         }
 
         return date;
+    }
+
+    /***
+     * this method will format the time element of the task to be displayed on the date header of a cell, if requuested
+     */
+    public String getCellDateDisplay(CustomTime time){
+        if(isToday(time) || isYesterday(time) || isTomorrow(time) || isSameWeek(time) || isNextWeek(time)){
+            return String.format(STRING_DATE_HEADING,this.getDateDisplay(time), this._dateHeadingFormat.format(time.getDate()));
+        }
+
+        return this._dateHeadingFormat.format(time.getDate());
     }
 
     /***
@@ -91,9 +113,13 @@ public class DateFormatterHelper {
      */
     public String getTimeDisplay(CustomTime time){
         String display = EMPTY_STRING;
-        if(time.hasTime()){
-            display = this._timeFormat.format(time.getTime());
+
+        if (time != null) {
+            if (time.hasTime()) {
+                display = this._timeFormat.format(time.getTime());
+            }
         }
+
         return display;
     }
 
@@ -105,16 +131,18 @@ public class DateFormatterHelper {
      * @return String containing the date and the time from the cTime parameter
      */
     public String getDateTimeDisplay(CustomTime cTime) {
-        assert cTime != null;
+        String display = EMPTY_STRING;
 
-        String display =  getDateDisplay(cTime);
-        if (display.isEmpty()) {
-            if (cTime.hasTime()) {
-                display  = getTimeDisplay(cTime);
-            }
-        } else {
-            if (cTime.hasTime()) {
-                display = display + " " + getTimeDisplay(cTime);
+        if (cTime != null) {
+             display = getDateDisplay(cTime);
+            if (display.isEmpty()) {
+                if (cTime.hasTime()) {
+                    display = getTimeDisplay(cTime);
+                }
+            } else {
+                if (cTime.hasTime()) {
+                    display = display + " " + getTimeDisplay(cTime);
+                }
             }
         }
 
@@ -126,11 +154,12 @@ public class DateFormatterHelper {
     /***
      * This special method is called to print the time stored in the task following the specification in the cell item.
      * Possible printed format:
-     * - [START TIME] to [END TIME]
-     * - [START TIME] T0 [END DATE] [END TIME]
-     * - by [START TIME]
-     * - by [START DATE] [START TIME]
-     *
+     * <ul>
+     * <li> [START TIME] to [END TIME]
+     * <li> [START TIME] T0 [END DATE] [END TIME]
+     * <li> by [START TIME]
+     * <li> by [START DATE] [START TIME]
+     *</ul>
      * @param task the task to be processed
      * @return String containing the formatted time information related to the task
      */
@@ -140,23 +169,30 @@ public class DateFormatterHelper {
         CustomTime endTime = task.getEndTime();
         String display = EMPTY_STRING;
 
-        if(startTime != null) {
+        if (startTime != null) {
             if (startTime.hasTime()) {
                 display = this.getTimeDisplay(startTime);
 
                 if (endTime != null) {
                     if (endTime.hasSameDate(startTime)) {
-                        return String.format(DATE_PAIR_PATTERN, display, this.getTimeDisplay(endTime));
+                        if (endTime.hasTime()) {
+                            return String.format(DATE_PAIR_PATTERN, display, this.getTimeDisplay(endTime));
+                        }
                     } else {
-                        return String.format(DATE_PAIR_PATTERN, display, this.getDateTimeDisplay(endTime));
+                        if (endTime.hasDate() || endTime.hasTime()) {
+                            return String.format(DATE_PAIR_PATTERN, display, this.getDateTimeDisplay(endTime));
+                        }
                     }
                 }
 
                 return String.format(TIME_FROM, display);
             } else {
+
                 if (endTime != null) {
                     if (endTime.hasSameDate(startTime)) {
-                        return String.format(TIME_BY, this.getTimeDisplay(endTime));
+                        if (endTime.hasTime()) {
+                            return String.format(TIME_BY, this.getTimeDisplay(endTime));
+                        }
                     } else {
                         return String.format(TIME_BY, this.getDateTimeDisplay(endTime));
                     }
@@ -165,6 +201,7 @@ public class DateFormatterHelper {
             }
 
         } else {
+
             if (endTime != null) {
                 if (endTime.hasTime()) {
                     return String.format(TIME_BY, this.getTimeDisplay(endTime));
@@ -182,9 +219,11 @@ public class DateFormatterHelper {
     }
 
 
-    /*
-    HELPER FUNCTION
-     */
+    // ----------------------------------------------------------------------------------------
+    //
+    // Helper method to determine Task time relationship with the current time
+    //
+    // ----------------------------------------------------------------------------------------
 
     boolean isToday(CustomTime time) {
 
@@ -212,6 +251,10 @@ public class DateFormatterHelper {
         }
 
 
+    }
+
+    boolean isSameYear(CustomTime time){
+        return this._now.getDate().getYear() == time.getDate().getYear();
     }
 
     boolean isLastYear(CustomTime time){
@@ -257,12 +300,12 @@ public class DateFormatterHelper {
          // difference in value of current day to the task day.
         int dayValueDifference = taskDayValue - curDayValue;
 
-        if( curYear == taskYear) {
+         if( curYear == taskYear) {
              return  taskDayOfYear - curDayOfYear  == dayValueDifference;
-        } else {
+         } else {
             if (isNextYear(time)) {
                 return (curDayOfYear + dayValueDifference) % dayYearValue(curYear) == taskDayOfYear;
-            } else if(isLastYear(time)){
+            } else if(isLastYear(time)) {
                 return (taskDayOfYear - dayValueDifference) % dayYearValue(taskYear) == curDayOfYear;
             }
         }
@@ -311,8 +354,8 @@ public class DateFormatterHelper {
         this._now = newTime;
     }
 
+    /** determine if the input year is a leap year */
     private boolean isLeapYear(int year){
-
         if (year%4 == 0) {
             if (year%100 == 0) {
                 if (year%400 == 0) {
@@ -325,6 +368,7 @@ public class DateFormatterHelper {
         return false;
     }
 
+    /** method to obtain the day of year value of the year */
     private int dayYearValue(int year){
         if (isLeapYear(year)) {
             return 366;

@@ -18,6 +18,9 @@ import ui.view.View;
 import ui.view.VisualTask;
 
 /**
+ * Translation Engine translate data provided by the logic component to a form that is presentable to the User. It also translate
+ * the visual data into a form that the logic component understand.
+ *
  * @@author Mai Anh Vu
  */
 public class TranslationEngine implements TranslationEngineSpec {
@@ -40,9 +43,11 @@ public class TranslationEngine implements TranslationEngineSpec {
     }
 
     /**
-     * Singleton getter TODO: Write a more descriptive JavaDoc
+     * Singleton getter
+     * Check if there is already an instance of TranslaitionEngine. If it exists, return that particular instance. Else
+     * instantiate a new TranslationEngine.
      *
-     * @return
+     * @return an instance of TranslationEngine.
      */
     public static TranslationEngine getInstance() {
         if (instance == null) {
@@ -75,9 +80,10 @@ public class TranslationEngine implements TranslationEngineSpec {
     }
 
     /**
-     * TODO: Write JavaDoc
+     * This method will display the result of the User's Command back to the user through the GUI.
+     * Translation Engine will generate the appropriate view to the type of result yielded.
      *
-     * @param result
+     * @param result ExecutionResult containing data that is going to be translated to a GUI display
      */
     @Override public void displayResult(ExecutionResult result) {
         if (result.isShutdownSignal()) {

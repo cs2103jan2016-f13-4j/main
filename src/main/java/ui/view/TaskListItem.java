@@ -22,13 +22,16 @@ import ui.controller.DateFormatterHelper;
  * use TaskListItemNormal.fxml .
  *
  * DateFormatterHelper is used to help determining the date and time presentation.
+ *
+ * @
  */
 public class TaskListItem extends ListCell<VisualTask> {
+    private static final String STRING_IS_COMPLETED = "Completed";
     private static final double STRING_HIGHLIGHT_OPACITY = .31;
     private static final String STRING_NAME_TEMPLATE_WITH_DATE = "TaskListItemDated";
     private static final String STRING_NAME_TEMPLATE_NO_DATE = "TaskListItemNormal";
     private static final String STRING_HIGHLIGHT_COLOR = "#FBFF74";
-
+    private static final String FLOATING_STRING = "Floating";
     @FXML
     private AnchorPane _container;
     @FXML private Label _indexLabel;
@@ -105,7 +108,7 @@ public class TaskListItem extends ListCell<VisualTask> {
             // display the index and the task name
             this._indexLabel.setText(Integer.toString(index));
             this._nameLabel.setText(task.getTaskName());
-
+            System.out.println(task.getTaskName());
             // set up the time to be displayed
             this.setUpTime(task);
             if (this._timeLabel.getText().trim().isEmpty()) {
@@ -121,6 +124,7 @@ public class TaskListItem extends ListCell<VisualTask> {
             // Grey out completed tasks
             if (task.isCompleted()) {
                 this.getStyleClass().add("completed");
+                this._timeLabel.setText("Completed");
             }
 
             // apply highlight effect to the new task when first displayed;
@@ -198,17 +202,19 @@ public class TaskListItem extends ListCell<VisualTask> {
 
         if (!isSameDate(task)) { // task is not same date as previous
             setDateHeading(task);
-
         }
-        String result = _df.getCellTimeTaskDisplay(task);
+
+        String result = this._df.getCellTimeTaskDisplay(task);
+       // System.out.println(this._df.getDateTimeDisplay(task.getStartTime()));
+       // System.out.println(this._df.getDateTimeDisplay(task.getEndTime()));
         this._timeLabel.setText(result);
     }
 
     /***
-     * this helper method check if the specified task has the same date as its previous task.
+     * this helper method check if the specified task's time component has the same date as its previous task.
      *
-     * @param curTask
-     * @return
+     * @param curTask currently checked task that is going to be compared to the previous task
+     * @return true if they belong to the same date, false if they do not
      */
     private boolean isSameDate(Task curTask){
         int curIndex = this.getIndex();
@@ -222,7 +228,7 @@ public class TaskListItem extends ListCell<VisualTask> {
             CustomTime curStartTime = curTask.getStartTime();
             CustomTime curEndTime = curTask.getEndTime();
             CustomTime prevStartTime = prevTask.getStartTime();
-            CustomTime prevEndTime = curTask.getEndTime();
+            CustomTime prevEndTime = prevTask.getEndTime();
 
             if (curStartTime != null) {
                 if (prevStartTime != null) {
@@ -253,18 +259,20 @@ public class TaskListItem extends ListCell<VisualTask> {
 
     private void setDateHeading(Task task){
         CustomTime startTime = task.getStartTime();
-        if (startTime != null) {
+        if(task.isCompleted()){
+            this._dateLabel.setText(STRING_IS_COMPLETED);
+        } else if (startTime != null) {
             if (startTime.hasDate()) {
-                this._dateLabel.setText(this._df.getDateDisplay(startTime));
+                this._dateLabel.setText(this._df.getCellDateDisplay(startTime));
             }
         } else {
             CustomTime endTime = task.getEndTime();
             if (endTime != null) {
                 if (endTime.hasDate()) {
-                    this._dateLabel.setText(this._df.getDateDisplay(endTime));
+                    this._dateLabel.setText(this._df.getCellDateDisplay(endTime));
                 }
             } else {
-                this._dateLabel.setText("Floating");
+                this._dateLabel.setText(FLOATING_STRING);
             }
         }
     }

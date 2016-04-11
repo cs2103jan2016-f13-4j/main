@@ -175,7 +175,7 @@ public class CommandBarController {
     /**
      * TODO: Write JavaDoc
      * 
-     * @param text
+     * @param text text that is going to be processed as the highlight effect
      * @return
      */
     private StyleSpans<Collection<String>> computeHighlighting(String text) {

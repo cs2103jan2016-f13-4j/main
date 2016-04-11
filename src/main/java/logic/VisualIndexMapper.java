@@ -12,6 +12,9 @@ import java.util.stream.IntStream;
 
 
 /**
+ * The following class transform Task class to VisualTask which will be used to be displayed in the User Interface, and
+ * vice-versa.
+ *
  * @@author Mai Anh Vu
  */
 public class VisualIndexMapper {

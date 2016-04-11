@@ -6,8 +6,10 @@ import java.util.function.Function;
 
 /**
  * UserInterface is a singleton class which construct the General User Interface structure and define most
- * of the components behavior. The only changing element in this class is the viewWrapper which display the
- * view constructed from the View object. Other than that the stage, and its other children stage is all persistent.
+ * of the components behavior.
+ *
+ * The only changing element of the UserInterface class is the viewWrapper which display the
+ * view constructed from the View object. Other than that, the stage and its other children stage are all persistent.
  *
  * the following interface define the behavior of the class
  */
@@ -20,11 +22,13 @@ public interface UserInterfaceSpec {
      */
     void initialize();
     /**
+     * this method set the behavior for the commandInput Box when receiving input from the user
      *
+     * @param commandInputHandler the function that defines the actions taken after receiving input
      */
     void setOnCommandInputHandler(Function<String, Void> commandInputHandler);
     /**
-     * This method is called when the GUI is first set up and the component is linked to the code.
+     * This method is called when the GUI is going to be displayed. initialize() method should be called before hand
      *
      * Should only be called once, when the UserInterface is first instantiated
      */
@@ -45,6 +49,9 @@ public interface UserInterfaceSpec {
      */
     void showNotification(String title);
 
+    /***
+     *
+     */
     void cleanUp();
 
     void setHeaderTitle(String title);
