@@ -72,7 +72,7 @@ public class TaskListView extends View {
         this._displayList = constructDisplayList();
         _observableList = FXCollections.observableArrayList(_displayList);
 
-        ListView listView = Resources.getInstance().getComponent("TaskList");
+        ListView listView = Resources.sharedResources().getComponent("TaskList");
         listView.setItems(this._observableList);
 
         final int highlightIndex = this._newTaskIndex;
@@ -133,7 +133,7 @@ public class TaskListView extends View {
 
 
             if (isEvent(task)) {
-                this._container = (AnchorPane) Resources.getInstance().getComponent(STRING_NAME_TEMPLATE_EVENT);
+                this._container = (AnchorPane) Resources.sharedResources().getComponent(STRING_NAME_TEMPLATE_EVENT);
 
                 assert this._container != null;
 
@@ -148,7 +148,7 @@ public class TaskListView extends View {
                 assert this._endLabelPrefix != null;
 
             } else {
-                this._container = (AnchorPane) Resources.getInstance().getComponent(STRING_NAME_TEMPLATE_SINGLE);
+                this._container = (AnchorPane) Resources.sharedResources().getComponent(STRING_NAME_TEMPLATE_SINGLE);
 
                 assert this._container != null;
 
