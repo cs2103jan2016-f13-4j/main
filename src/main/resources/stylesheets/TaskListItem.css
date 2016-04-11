@@ -1,0 +1,62 @@
+/* @@author Mai Anh Vu */
+.item__container {
+    -fx-background-color: #ffffff;
+}
+
+.item__index,
+.item__name,
+.item__date {
+    -fx-font-family: "Lato";
+}
+
+.item__name,
+.item__index {
+    -fx-text-fill: #343434;
+}
+
+.item__date {
+    -fx-text-fill: #636363;
+}
+
+.item__index {
+    -fx-font-weight: bold;
+    -fx-font-size: 18px;
+}
+
+.item__date {
+    -fx-font-style: italic;
+    -fx-text-alignment: right;
+}
+
+.list-cell.completed .item__index,
+.list-cell.completed .item__date,
+.list-cell.completed .item__name {
+    -fx-text-fill: #ccc;
+}
+
+
+.list-cell.priority--high .indicator--priority {
+    -fx-fill: #ff6f6f;
+}
+.list-cell.priority--high .indicator__text {
+    -fx-text:"HIGH";
+}
+
+.list-cell.priority--medium .indicator--priority {
+    -fx-fill: #ffbe13;
+}
+.list-cell.priority--medium .indicator__text {
+    -fx-text:"MEDIUM";
+
+}
+
+.list-cell.priority--low .indicator--priority {
+    -fx-fill: #8E8C8C;
+}
+.list-cell.priority--low .indicator__text {
+    -fx-text:"LOW";
+}
+
+.list-cell.priority--null .indicator--priority {
+    -fx-fill: #f2f2f2;
+}

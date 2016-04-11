@@ -10,7 +10,6 @@ import javafx.scene.Scene;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -27,6 +26,11 @@ import ui.view.View;
 import java.util.function.Function;
 
 /**
+ *
+ * UserInterface is a singleton class which construct the General User Interface structure and define most
+ * of the components behavior. The only changing element in this class is the viewWrapper which display the
+ * view constructed from the View object. Other than that the stage, and its other children stage is all persistent.
+ *
  * @@author Mai Anh Vu
  */
 public class UserInterface implements UserInterfaceSpec {
@@ -88,7 +92,8 @@ public class UserInterface implements UserInterfaceSpec {
     }
 
     /**
-     * TODO: Write JavaDoc
+     * This method will set up the GUI and its component. initialize() should only be called once when UserInterface is first
+     * instantiated.
      */
     @Override
     public void initialize() {
@@ -128,7 +133,9 @@ public class UserInterface implements UserInterfaceSpec {
     }
 
     /**
-     * TODO: Write JavaDoc
+     * This method will display the GUI.
+     * show() should only be once called after the primary components of user interface, excluding the View,
+     * has been constructed.
      */
     @Override
     public void show() {
@@ -142,9 +149,9 @@ public class UserInterface implements UserInterfaceSpec {
     }
 
     /**
-     * TODO: Write JavaDoc
+     * this method set the behavior for the commandInput Box when receiving input from the user
      *
-     * @param onCommandInput
+     * @param onCommandInput the function that defines the actions taken after receiving input
      */
     @Override
     public void setOnCommandInputHandler(Function<String, Void> onCommandInput) {
@@ -240,6 +247,12 @@ public class UserInterface implements UserInterfaceSpec {
         this._mainContainer.getChildren().add(notificationContainer);
     }
 
+    /***
+     * The method will retrieve the display component which is constructed by the View Object and
+     * attached it to the current display
+     *
+     * @param view View for the main Container, as of this version, view only has TaskListView object to display list of Task stored
+     */
     @Override
     public void render(View view) {
         assert this._viewWrapper != null;
@@ -258,6 +271,12 @@ public class UserInterface implements UserInterfaceSpec {
         this._commandBarController.cleanUp();
     }
 
+    /***
+     * This method will update the notification message following the given input parameter, and play
+     * the animation to bring the notification bar on-screen for a given duration.
+     *
+     * @param notif message to be displayed in the notification bar
+     */
     @Override
     public void showNotification(String notif) {
         assert this._notification != null;
