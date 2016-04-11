@@ -28,6 +28,10 @@ import ui.view.View;
 import java.util.function.Function;
 
 /**
+ *
+ * UserInterface is a singleton class which construct the General User Interface structure and define some
+ * of the components behavior.
+ *
  * @@author Mai Anh Vu
  */
 public class UserInterface implements UserInterfaceSpec {
@@ -91,7 +95,8 @@ public class UserInterface implements UserInterfaceSpec {
     }
 
     /**
-     * This method will set up the GUI and its component.
+     * This method will set up the GUI and its component. Should only be called once when UserInterface is first
+     * instantiated.
      */
     @Override
     public void initialize() {
@@ -145,9 +150,9 @@ public class UserInterface implements UserInterfaceSpec {
     }
 
     /**
-     * TODO: Write JavaDoc
+     * this method set the behavior for the commandInput Box when receiving input from the user
      *
-     * @param onCommandInput
+     * @param onCommandInput the function that defines the actions taken after receiving input
      */
     @Override
     public void setOnCommandInputHandler(Function<String, Void> onCommandInput) {
@@ -156,7 +161,7 @@ public class UserInterface implements UserInterfaceSpec {
 
     private void registerInfoPanel() {
         Pair<AnchorPane, InfoPanelController> infoPanelMetadata =
-                Resources.getInstance().getComponentAndController("InfoPanelWrapper");
+                Resources.getSharedResources().getComponentAndController("InfoPanelWrapper");
 
         AnchorPane infoPanelWrapper = infoPanelMetadata.getKey();
         // TODO: Delete this line to show info panel
@@ -249,7 +254,7 @@ public class UserInterface implements UserInterfaceSpec {
      * The method will retrieve the display component which is constructed by the View Object and
      * attached it to the current display
      *
-     * @param view
+     * @param view View for the main Container, as of this version, view only has TaskListView object to display list of Task stored
      */
     @Override
     public void render(View view) {
