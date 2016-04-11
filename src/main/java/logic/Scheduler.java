@@ -35,6 +35,7 @@ public class Scheduler implements SchedulerSpec {
         CustomTime startOfRangeToSearch = CustomTime.now();
         CustomTime endOfRangeToSearch = this._storage.getAll()
                 .stream()
+                .filter(task -> task.getStartTime() != null && task.getEndTime() != null)
                 .map(Task::getEndTime)
                 .max(CustomTime::compareTo)
                 .get();

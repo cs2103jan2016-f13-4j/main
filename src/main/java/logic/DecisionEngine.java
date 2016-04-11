@@ -136,12 +136,16 @@ public class DecisionEngine implements DecisionEngineSpec {
     protected ExecutionResult handleSchedule(Command command) {
         assert command.hasInstruction(Command.Instruction.SCHEDULE);
 
+        assert command.hasParameter(Command.ParamName.TASK_INDEX);
+        Integer id = command.getParameter(Command.ParamName.TASK_INDEX);
+
         assert command.hasParameter(Command.ParamName.TASK_DURATION);
         Integer duration = command.getParameter(Command.ParamName.TASK_DURATION);
         assert duration != null;
         TemporalRange rangeToScheduleIn = Scheduler.getInstance().schedule(duration);
 
         Command editCommand = new Command(Command.Instruction.EDIT);
+        editCommand.setParameter(Command.ParamName.TASK_INDEX, id);
         editCommand.setParameter(Command.ParamName.TASK_START, rangeToScheduleIn.getStart());
         editCommand.setParameter(Command.ParamName.TASK_END, rangeToScheduleIn.getEnd());
 
@@ -194,6 +198,7 @@ public class DecisionEngine implements DecisionEngineSpec {
                 break;
             case SCHEDULE:
                 result = this.handleSchedule(command);
+                break;
             default:
                 // if we reach this point, LTA Command Parser has failed in his duty
                 // and awaits court martial

@@ -3,9 +3,7 @@ package logic;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.function.*;
-import java.util.stream.Collectors;
 
-import logic.Scheduler;
 import shared.*;
 import skeleton.*;
 
