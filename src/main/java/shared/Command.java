@@ -15,7 +15,8 @@ public class Command {
      * Types
      */
     public enum Instruction {
-        ADD, DISPLAY, MARK, EDIT, SEARCH, UNDO, REDO, DELETE, TUTORIAL, EXIT, UNRECOGNISED, INVALID;
+        ADD, DISPLAY, MARK, EDIT, SEARCH, UNDO, REDO, DELETE,
+        SCHEDULE, TUTORIAL, EXIT, UNRECOGNISED, INVALID;
     }
 
     public enum ParamType {
@@ -43,7 +44,9 @@ public class Command {
 
         TASK_INDEX(ParamType.INTEGER),
         TASK_INDEX_RANGES(ParamType.LIST),
-        TASK_UNIVERSALLY_QUANTIFIED(ParamType.BOOLEAN);
+        TASK_UNIVERSALLY_QUANTIFIED(ParamType.BOOLEAN),
+
+        TASK_DURATION(ParamType.INTEGER);
 
         public final ParamType type;
 
