@@ -105,7 +105,6 @@ public class DateFormatterHelper {
         } else {
             if (cTime.hasTime()) {
                 display = display + " " + getTimeDisplay(cTime);
-                System.out.println(cTime.getTime().toString());
             }
         }
 

@@ -15,7 +15,7 @@
         <Line endX="408.0" layoutY="48.0" startX="12.0" stroke="#f0f0f0" />
         <Rectangle fx:id="_scrollUp" arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="48.0" layoutX="-35.0" layoutY="-24.0" opacity="0.0" stroke="#fffffff7" strokeMiterLimit="0.0" strokeType="INSIDE" strokeWidth="0.0" width="457.0" AnchorPane.bottomAnchor="24.0" AnchorPane.leftAnchor="-35.0" AnchorPane.rightAnchor="-12.0" AnchorPane.topAnchor="-24.0" />
       <Label fx:id="_timeLabel" alignment="CENTER_RIGHT" contentDisplay="RIGHT" layoutX="45.0" layoutY="22.0" maxHeight="24.0" maxWidth="275.0" prefHeight="24.0" styleClass="item__date" text="Tommorow" AnchorPane.leftAnchor="45.0" AnchorPane.topAnchor="22.0" />
-      <Rectangle fx:id="_priorityRectangle" arcHeight="5.0" arcWidth="5.0" fill="#ff4545" height="24.0" layoutX="325.0" layoutY="11.0" stroke="BLACK" strokeType="INSIDE" styleClass="indicator--priority" width="75.0" />
-      <Label fx:id="_priorityIndicator" alignment="CENTER" contentDisplay="CENTER" layoutX="338.0" layoutY="15.0" maxHeight="17.0" maxWidth="50.0" prefHeight="17.0" prefWidth="50.0" styleClass="indicator__text" textAlignment="CENTER" textFill="WHITE" />
+      <Rectangle fx:id="_priorityRectangle" arcHeight="5.0" arcWidth="5.0" fill="#ff4545" height="24.0" layoutX="325.0" layoutY="13.0" stroke="BLACK" strokeType="INSIDE" styleClass="indicator--priority" width="75.0" />
+      <Label fx:id="_priorityIndicator" alignment="CENTER" contentDisplay="CENTER" layoutX="338.0" layoutY="17.0" maxHeight="17.0" maxWidth="50.0" prefHeight="17.0" prefWidth="50.0" styleClass="indicator__text" textAlignment="CENTER" textFill="WHITE" />
     </children>
 </AnchorPane>

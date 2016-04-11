@@ -8,7 +8,7 @@
 <?import javafx.scene.shape.Rectangle?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="68.0" prefWidth="410.0" styleClass="item__container" stylesheets="@../stylesheets/TaskListItem.css" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="72.0" prefWidth="410.0" styleClass="item__container" stylesheets="@../stylesheets/TaskListItem.css" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
     <children>
         <Rectangle fx:id="_highlightEffect" arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="48.0" layoutY="20.0" stroke="WHITE" strokeType="INSIDE" width="410.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="20.0" />
         <Label fx:id="_indexLabel" alignment="CENTER" layoutX="11.0" layoutY="25.0" prefHeight="37.0" prefWidth="24.0" styleClass="item__index" text="1" AnchorPane.bottomAnchor="6.0" AnchorPane.leftAnchor="11.0" AnchorPane.topAnchor="25.0" />

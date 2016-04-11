@@ -39,7 +39,7 @@ public class TaskListView extends View {
     /**
      * Constants
      */
-    private final int MAXIMUM_DISPLAY_SIZE = 7;
+    private final int MAXIMUM_DISPLAY_SIZE = 6;
 
     /**
      * Properties
@@ -100,6 +100,8 @@ public class TaskListView extends View {
         private static final String STRING_HIGHLIGHT_COLOR = "#FBFF74";
         private final Color COLOR_TRANSPARENT_FULL = new Color(1,1,1,0);
         private final Color COLOR_TRANSPARENT_NONE = new Color(1,1,1,0.8);
+        private static final int WINDOW_SIZE = 384;
+
         @FXML private AnchorPane _container;
         @FXML private Label _indexLabel;
         @FXML private Label _nameLabel;
@@ -183,17 +185,6 @@ public class TaskListView extends View {
                     this.getStyleClass().add("completed");
                 }
 
-                // set priority indicator
-                if (task.getPriority() != null) {
-                    this.getStyleClass().add("priority--" + task.getPriority().name().toLowerCase());
-                    if(task.getPriority() == Task.Priority.HIGH){
-                        this._priorityLabel.setText("HIGH");
-                    } else if (task.getPriority() == Task.Priority.MEDIUM){
-                        this._priorityLabel.setText("MEDIUM");
-                    } else if (task.getPriority() == Task.Priority.LOW){
-                        this._priorityLabel.setText("LOW");
-                    }
-                }
 
                 this._indexLabel.setText(Integer.toString(index));
                 this._nameLabel.setText(task.getTaskName());
@@ -210,6 +201,21 @@ public class TaskListView extends View {
                     this._canScrollUp.setOpacity(0);
                 }
 
+
+                // set priority indicator
+                if (task.getPriority() != null) {
+                    resetStyleClass();
+                    this.getStyleClass().add("priority--" + task.getPriority().name().toLowerCase());
+                    System.out.println(this.getStyleClass());
+                    if(task.getPriority() == Task.Priority.HIGH){
+                        this._priorityLabel.setText("HIGH");
+                    } else if (task.getPriority() == Task.Priority.MEDIUM){
+                        this._priorityLabel.setText("MEDIUM");
+                    } else if (task.getPriority() == Task.Priority.LOW){
+                        this._priorityLabel.setText("LOW");
+                    }
+                }
+
                 // set indicator for scrolling up
                 if (this.isFirstItemOnList() && canScrollUp()) {
                     this.setScrollUpIndicator();
@@ -220,6 +226,13 @@ public class TaskListView extends View {
 
                 this.setGraphic(this._container);
             }
+        }
+
+        private void resetStyleClass() {
+            this.getStyleClass().clear();
+            this.getStyleClass().add("cell");
+            this.getStyleClass().add("indexed-cell");
+            this.getStyleClass().add("list-cell");
         }
 
 
@@ -304,7 +317,7 @@ public class TaskListView extends View {
                         return false;
                     }
                 } else {
-                    if(prevStartTime != null && curStartTime != null) {
+                    if(prevStartTime != null || curStartTime != null) {
                         return false;
                     } else {
                         return true;
@@ -364,6 +377,11 @@ public class TaskListView extends View {
 
     }
 
+    /***
+     * The following method construct the list to be displayed given the window size restriction.
+     * While the total height of the items have not exceeded the list, add item to the list.
+     * @return
+     */
     private List<VisualTask> constructDisplayList() {
         List<VisualTask> temp = new ArrayList<>();
         List<VisualTask> viewData = this.getData();
