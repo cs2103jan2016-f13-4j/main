@@ -7,6 +7,9 @@ import skeleton.TranslationEngineSpec;
 
 import java.util.function.Function;
 
+/**
+ * @@author A0124772E
+ */
 public class Dispatcher implements DispatcherSpec {
 
     /**

@@ -5,8 +5,8 @@ import java.util.Comparator;
 import shared.Task;
 
 /**
- * 
- * @@author Chng Hui Yie
+ *
+ * @@author A0127357B
  *
  */
 public class TaskPriorityComparator implements Comparator<Task> {
@@ -26,10 +26,6 @@ public class TaskPriorityComparator implements Comparator<Task> {
             return completionComparison;
         }
 
-        // Priority comparison
-        int priorityComparison = task2.getPriority().compareTo(task1.getPriority());
-        if (priorityComparison != 0) return priorityComparison;
-
         // Start time comparison
         if (task1.getStartTime() == null ^ task2.getStartTime() == null) {
             if (task1.getStartTime() == null) return 1;
@@ -40,6 +36,10 @@ public class TaskPriorityComparator implements Comparator<Task> {
             int startTimeComparison = task1.getStartTime().compareTo(task2.getStartTime());
             if (startTimeComparison != 0) return startTimeComparison;
         }
+
+        // Priority comparison
+        int priorityComparison = task2.getPriority().compareTo(task1.getPriority());
+        if (priorityComparison != 0) return priorityComparison;
 
         // End time comparison
         if (task1.getEndTime() == null ^ task2.getEndTime() == null) {

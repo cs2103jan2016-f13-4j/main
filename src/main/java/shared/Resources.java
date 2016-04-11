@@ -14,7 +14,7 @@ import javafx.scene.image.Image;
 import javafx.util.Pair;
 
 /**
- * @@author Mai Anh Vu
+ * @@author A0127046L
  */
 public class Resources {
     /**
@@ -38,7 +38,7 @@ public class Resources {
      */
     private static Resources instance = new Resources();
 
-    public static Resources getInstance() {
+    public static Resources sharedResources() {
         return instance;
     }
 
@@ -68,7 +68,8 @@ public class Resources {
     public <T, C> Pair<T, C> getComponentAndController(String template) {
         try {
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getTemplateUrl(template));
+            URL templateUrl = getTemplateUrl(template);
+            loader.setLocation(templateUrl);
 
             T component = loader.load();
             C controller = loader.getController();

@@ -1,7 +1,7 @@
 package shared;
 
 /**
- * @@author Mai Anh Vu
+ * @@author A0127046L
  */
 public enum ViewType {
     TASK_LIST("TaskListView"),

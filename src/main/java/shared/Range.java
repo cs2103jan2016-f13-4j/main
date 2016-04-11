@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
- * Created by maianhvu on 05/04/2016.
+ * @@author A0127046L
  */
 public class Range implements Comparable<Range> {
 

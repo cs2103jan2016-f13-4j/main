@@ -1,11 +1,13 @@
 package logic;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
 import javafx.util.Pair;
 import shared.Command;
 import shared.ExecutionResult;
+import shared.Message;
 import shared.Task;
 import skeleton.CommandParserSpec;
 import skeleton.TranslationEngineSpec;
@@ -16,7 +18,10 @@ import ui.view.View;
 import ui.view.VisualTask;
 
 /**
- * @@author Mai Anh Vu
+ * Translation Engine translate data provided by the logic component to a form that is presentable to the User. It also translate
+ * the visual data into a form that the logic component understand.
+ *
+ * @@author A0127046L
  */
 public class TranslationEngine implements TranslationEngineSpec {
     /**
@@ -38,9 +43,11 @@ public class TranslationEngine implements TranslationEngineSpec {
     }
 
     /**
-     * Singleton getter TODO: Write a more descriptive JavaDoc
+     * Singleton getter
+     * Check if there is already an instance of TranslaitionEngine. If it exists, return that particular instance. Else
+     * instantiate a new TranslationEngine.
      *
-     * @return
+     * @return an instance of TranslationEngine.
      */
     public static TranslationEngine getInstance() {
         if (instance == null) {
@@ -55,7 +62,7 @@ public class TranslationEngine implements TranslationEngineSpec {
     }
 
     @Override public void initialise() {
-        // Trigger initialisation of FlexiCommandParser
+        // Trigger initialisation of CommandParser
         this.getCommandParser().initialise();
 
         // Create input handler
@@ -73,9 +80,10 @@ public class TranslationEngine implements TranslationEngineSpec {
     }
 
     /**
-     * TODO: Write JavaDoc
+     * This method will display the result of the User's Command back to the user through the GUI.
+     * Translation Engine will generate the appropriate view to the type of result yielded.
      *
-     * @param result
+     * @param result ExecutionResult containing data that is going to be translated to a GUI display
      */
     @Override public void displayResult(ExecutionResult result) {
         if (result.isShutdownSignal()) {
@@ -88,11 +96,24 @@ public class TranslationEngine implements TranslationEngineSpec {
             // Convert list to one with visual IDs only
             List<VisualTask> visualTaskList = getVisualIndexMapper()
                     .translateRawToVisual(result.getData());
-
-            // Update mapper with list
-            VisualIndexMapper.getInstance().updateList(result.getData());
             View view = new TaskListView(visualTaskList, this._lastCommand);
             this.getUserInterface().render(view);
+
+            // Set header title
+            if (this._lastCommand != null) {
+                if (this._lastCommand.getInstruction() == Command.Instruction.SEARCH) {
+                    String searchQuery = this._lastCommand.getParameter(Command.ParamName.SEARCH_QUERY);
+                    this.getUserInterface().setHeaderTitle(String.format(
+                            "Search results for \"%s\"",
+                            searchQuery
+                    ));
+                } else {
+                    this.getUserInterface().setHeaderTitle(
+                            "All tasks"
+                    );
+                }
+            }
+
             break;
         default:
             break;
@@ -120,11 +141,11 @@ public class TranslationEngine implements TranslationEngineSpec {
         // Catch unrecognised or invalid command
         if (command.getInstruction() == Command.Instruction.INVALID) {
             this.getUserInterface().showNotification(
-                    "Oops! There is something wrong with your command");
+                    command.getInvalidationMessage());
             return;
         } else if (command.getInstruction() == Command.Instruction.UNRECOGNISED) {
             this.getUserInterface().showNotification(
-                    "Oops! I don't really understand what you are saying");
+                    Message.UNRECOGNISED.toString());
             return;
         }
 
@@ -132,10 +153,7 @@ public class TranslationEngine implements TranslationEngineSpec {
         this._lastCommand = command;
 
         // Schedule for displaying
-        this._commandExecutionHandler.andThen(result -> {
-            this.displayResult(result);
-            return null;
-        }).apply(command);
+        this._commandExecutionHandler.apply(command);
     }
 
     @Override public UserInterfaceSpec getUserInterface() {
@@ -143,7 +161,7 @@ public class TranslationEngine implements TranslationEngineSpec {
     }
 
     @Override public CommandParserSpec getCommandParser() {
-        return FlexiCommandParser.getInstance();
+        return CommandParser.getInstance();
     }
 
     private static VisualIndexMapper getVisualIndexMapper() {
@@ -151,37 +169,44 @@ public class TranslationEngine implements TranslationEngineSpec {
     }
 
     private void displayNotification(ExecutionResult result) {
-        String message = "Welcome to Your MOM!";
+        String message = Message.WELCOME.toString();
 
         if (this._lastCommand != null) {
             switch (this._lastCommand.getInstruction()) {
                 case DISPLAY:
                     int taskCount = ((List<?>) result.getData()).size();
                     if (taskCount == 0) {
-                        message = "Add a new to-do by entering \"add <task>\"!";
+                        message = Message.DISPLAY_EMPTY.toString();
                     } else {
-                        message = String.format("Found %d to-dos!", taskCount);
+                        message = String.format(
+                                Message.DISPLAY_NORMAL.toString(),
+                                taskCount);
                     }
                     break;
                 case ADD:
-                    // TODO: Take care of failed addition
                     String taskName = this._lastCommand.getParameter(Command.ParamName.TASK_NAME);
-                    message = String.format("Added: %s", taskName);
+                    message = String.format(Message.ADD_SUCCESS.toString(), taskName);
                     break;
                 case EDIT:
-                    // TODO: Take care of failed edit
-                    message = "Edited task with new details!";
+                    message = Message.EDIT_SUCCESS.toString();
                     break;
                 case DELETE:
-                    message = "Deleted task! (undo-able)";
+                    if (result.hasErrorMessage()) {
+                        message = result.getErrorMessage();
+                    } else if (this._lastCommand.hasTrueValue(
+                            Command.ParamName.TASK_UNIVERSALLY_QUANTIFIED)) {
+                        message = Message.DELETE_ALL_SUCCESS.toString();
+                    } else {
+                        message = Message.DELETE_SUCCESS.toString();
+                    }
                     break;
                 case SEARCH:
                     int searchFound = ((List<?>) result.getData()).size();
                     String searchQuery = this._lastCommand.getParameter(Command.ParamName.SEARCH_QUERY);
                     if (searchFound == 0) {
-                        message = String.format("Found no to-do with the search query \"%s\"", searchQuery);
+                        message = String.format(Message.SEARCH_FAIL.toString(), searchQuery);
                     } else {
-                        message = String.format("Found %d matches with the query \"%s\"",
+                        message = String.format(Message.SEARCH_SUCCESS.toString(),
                                 searchFound,
                                 searchQuery);
                     }
@@ -190,21 +215,24 @@ public class TranslationEngine implements TranslationEngineSpec {
                     if (result.hasErrorMessage()) {
                         message = result.getErrorMessage();
                     } else {
-                        message = "Reverted last command!";
+                        message = Message.UNDO_SUCCESS.toString();
                     }
                     break;
                 case REDO:
                     if (result.hasErrorMessage()) {
                         message = result.getErrorMessage();
                     } else {
-                        message = "Redone last command!";
+                        message = Message.REDO_SUCCESS.toString();
                     }
                     break;
                 case MARK:
                     if (result.hasErrorMessage()) {
                         message = result.getErrorMessage();
+                    } else if (this._lastCommand.hasTrueValue(
+                            Command.ParamName.TASK_UNIVERSALLY_QUANTIFIED)) {
+                        message = Message.MARK_ALL_SUCCESS.toString();
                     } else {
-                        message = "Marked task as complete! (undoable)";
+                        message = Message.MARK_SUCCESS.toString();
                     }
             }
         }

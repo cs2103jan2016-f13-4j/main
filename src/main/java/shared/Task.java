@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * @@author Chng Hui Yie
+ * @@author A0127357B
  */
 public class Task implements Comparable<Task> {
 
@@ -31,7 +31,7 @@ public class Task implements Comparable<Task> {
 
     /**
      * Priority types
-     * 
+     *
      * @author Huiyie
      *
      */
@@ -55,7 +55,7 @@ public class Task implements Comparable<Task> {
 
     /**
      * TODO: Write JavaDoc
-     * 
+     *
      * @param id
      * @param taskName
      * @param description

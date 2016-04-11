@@ -9,50 +9,135 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javafx.util.Pair;
-import shared.Command;
-import shared.CustomTime;
-import shared.ExecutionResult;
-import shared.StorageWriteOperation;
-import shared.Task;
-import shared.ViewType;
+import shared.*;
 import skeleton.DecisionEngineSpec;
 import skeleton.SchedulerSpec;
 import skeleton.StorageSpec;
+import skeleton.WriteHistorySpec;
 import storage.Storage;
 import storage.TaskPriorityComparator;
 
 /**
- * @@author Thenaesh Elango
+ * @@author A0124772E
  */
 public class DecisionEngine implements DecisionEngineSpec {
-    public static final double THRESHOLD_POWERSEARCH_WEIGHTED = 0.0;
-    /**
-     * Singleton instance and constructor
-     */
-    private static DecisionEngine instance = new DecisionEngine();
 
+    // singleton instance, cosntructor and accessor
+    private static DecisionEngine instance = new DecisionEngine();
+    public static DecisionEngine getInstance() {
+        if (instance == null) {
+            instance = new DecisionEngine();
+        }
+        return instance;
+    }
     private DecisionEngine() {
     }
 
+
     /**
-     * instance fields
+     * the most important method in this class
+     * this is the method that gets called by the Dispatcher
+     * it takes in a command, executes it, and returns the execution result back to the caller
+     * @param command
+     * @return
      */
-    public static DecisionEngine getInstance() {
-        return instance;
+    @Override public ExecutionResult performCommand(Command command) {
+
+        // this sort of nonsense should have been handled in the front end
+        assert !command.hasInstruction(Command.Instruction.INVALID);
+        assert !command.hasInstruction(Command.Instruction.UNRECOGNISED);
+
+        // handle exit command here, without creating a task unnecessarily
+        if (command.hasInstruction(Command.Instruction.EXIT)) {
+            return ExecutionResult.shutdownSignal();
+        }
+
+        // Prepare final execution result to be returned
+        ExecutionResult result = null;
+
+        // all the standard commands
+        switch (command.getInstruction()) {
+            case ADD:
+            case DELETE:
+            case EDIT:
+            case MARK:
+                result = this.handleWriteOperation(command);
+                break;
+            case DISPLAY:
+                result = this.handleDisplay(command);
+                break;
+            case SEARCH:
+                result = this.handleSearch(command);
+                break;
+            case SCHEDULE:
+                result = this.handleSchedule(command);
+                break;
+            case UNDO:
+                boolean undoActuallyHappened = this.getWriteHistory().undo();
+                result = this.displayAllTasks();
+                if (!undoActuallyHappened) {
+                    result.setErrorMessage(Message.UNDO_FAIL.toString());
+                }
+                break;
+            case REDO:
+                boolean redoActuallyHappened = this.getWriteHistory().redo();
+                result = this.displayAllTasks();
+                if (!redoActuallyHappened) {
+                    result.setErrorMessage(Message.REDO_FAIL.toString());
+                }
+                break;
+            default:
+                // if we reach this point, LTA Command Parser has failed in his duty
+                // and awaits court martial
+                assert false;
+        }
+
+        return result;
     }
+
 
     @Override public void initialise() {
         StorageSpec<?> storage = this.getStorage();
         storage.initialise();
     }
 
-    protected ExecutionResult displayAllTasks() {
-        List<Task> listToDisplay = this.getStorage().getAll().stream().sorted(TaskPriorityComparator.getInstance())
-                .collect(Collectors.toList());
-
-        return new ExecutionResult(ViewType.TASK_LIST, listToDisplay);
+    @Override public void shutdown() {
+        StorageSpec<?> storage = this.getStorage();
+        storage.shutdown();
     }
 
+    ///////////////////////////////
+    // START OF COMMAND HANDLERS //
+    ///////////////////////////////
+
+    /**
+     * handles any one of ADD/DELETE/EDIT/MARK commands
+     * essentially handles any commands that involve changing the state of one or more tasks in the Storage handler
+     * another way to look at this method is that it handles any undo-able commands
+     * @param command
+     * @return
+     */
+    protected ExecutionResult handleWriteOperation(Command command) {
+        assert command.hasInstruction(Command.Instruction.ADD)
+                || command.hasInstruction(Command.Instruction.DELETE)
+                || command.hasInstruction(Command.Instruction.EDIT)
+                || command.hasInstruction(Command.Instruction.MARK);
+
+        StorageWriteOperation op = new StorageWriteOperation(command, this.getStorage());
+        String errorMsg = this.getWriteHistory().addToHistoryAfterExecuting(op);
+
+        ExecutionResult result = this.displayAllTasks();
+        result.setErrorMessage(errorMsg);
+
+        return result;
+    }
+
+    /**
+     * handles a DISPLAY command with bounds
+     *
+     * @param command
+     * @return
+     */
     protected ExecutionResult handleDisplay(Command command) {
         assert command.hasInstruction(Command.Instruction.DISPLAY);
 
@@ -61,7 +146,9 @@ public class DecisionEngine implements DecisionEngineSpec {
         // for each command parameter, filter the list of tasks
         if (command.hasParameter(Command.ParamName.TASK_NAME)) {
             String name = command.getParameter(Command.ParamName.TASK_NAME);
-            listToDisplay = listToDisplay.stream().filter(task -> task.getTaskName() == name)
+            listToDisplay = listToDisplay
+                    .stream()
+                    .filter(task -> task.getTaskName().equals(name))
                     .collect(Collectors.toList());
         }
         if (command.hasParameter(Command.ParamName.TASK_START)) {
@@ -81,6 +168,13 @@ public class DecisionEngine implements DecisionEngineSpec {
         return new ExecutionResult(ViewType.TASK_LIST, listToDisplay);
     }
 
+
+    /**
+     * handles a SEARCH command, including PowerSearch functionality
+     *
+     * @param command
+     * @return
+     */
     protected ExecutionResult handleSearch(Command command) {
         assert command.hasInstruction(Command.Instruction.SEARCH);
 
@@ -113,82 +207,64 @@ public class DecisionEngine implements DecisionEngineSpec {
         return new ExecutionResult(ViewType.TASK_LIST, foundTask);
     }
 
-    protected ExecutionResult handleWriteOperation(Command command) {
-        assert command.hasInstruction(Command.Instruction.ADD) || command.hasInstruction(Command.Instruction.DELETE)
-                || command.hasInstruction(Command.Instruction.EDIT) || command.hasInstruction(Command.Instruction.MARK);
+    /**
+     * handles the SCHEDULE command
+     * @param command
+     * @return
+     */
+    protected ExecutionResult handleSchedule(Command command) {
+        assert command.hasInstruction(Command.Instruction.SCHEDULE);
 
-        StorageWriteOperation op = new StorageWriteOperation(command);
-        String errorMsg = StorageWriteOperationHistory.getInstance().addToHistoryAfterExecuting(op);
+        assert command.hasParameter(Command.ParamName.TASK_INDEX);
+        Integer id = command.getParameter(Command.ParamName.TASK_INDEX);
 
-        ExecutionResult result = this.displayAllTasks();
-        result.setErrorMessage(errorMsg);
+        assert command.hasParameter(Command.ParamName.TASK_DURATION);
+        Integer duration = command.getParameter(Command.ParamName.TASK_DURATION);
+        assert duration != null;
+        TemporalRange rangeToScheduleIn = this.getTaskScheduler().schedule(duration);
 
-        return result;
+        // transform the SCHEDULE command into an EDIT command
+        Command editCommand = new Command(Command.Instruction.EDIT);
+        editCommand.setParameter(Command.ParamName.TASK_INDEX, id);
+        editCommand.setParameter(Command.ParamName.TASK_START, rangeToScheduleIn.getStart());
+        editCommand.setParameter(Command.ParamName.TASK_END, rangeToScheduleIn.getEnd());
+
+        // just handle the newly generate EDIT command the usual way
+        return this.handleWriteOperation(editCommand);
     }
 
-    @Override public ExecutionResult performCommand(Command command) {
+    /////////////////////////////
+    // END OF COMMAND HANDLERS //
+    /////////////////////////////
 
-        // this sort of nonsense should have been handled in the front end
-        assert !command.hasInstruction(Command.Instruction.INVALID);
-        assert !command.hasInstruction(Command.Instruction.UNRECOGNISED);
+    /**
+     * a special display method that displays all tasks currently stored
+     * @return
+     */
+    protected ExecutionResult displayAllTasks() {
+        List<Task> listToDisplay = this.getStorage().getAll().stream()
+                .sorted(TaskPriorityComparator.getInstance()).collect(Collectors.toList());
 
-        // handle exit command here, without creating a task unnecessarily
-        if (command.hasInstruction(Command.Instruction.EXIT)) {
-            return ExecutionResult.shutdownSignal();
-        }
-
-        // Prepare final execution result to be returned
-        ExecutionResult result = null;
-
-        // all the standard commands
-        switch (command.getInstruction()) {
-        case ADD:
-        case DELETE:
-        case EDIT:
-        case MARK:
-            result = this.handleWriteOperation(command);
-            break;
-        case DISPLAY:
-            result = this.handleDisplay(command);
-            break;
-        case SEARCH:
-            result = this.handleSearch(command);
-            break;
-        case UNDO:
-            boolean undoActuallyHappened = StorageWriteOperationHistory.getInstance().undo();
-            result = this.displayAllTasks();
-            if (!undoActuallyHappened) {
-                result.setErrorMessage("No tasks to undo!");
-            }
-            break;
-        case REDO:
-            boolean redoActuallyHappened = StorageWriteOperationHistory.getInstance().redo();
-            result = this.displayAllTasks();
-            if (!redoActuallyHappened) {
-                result.setErrorMessage("No tasks to redo!");
-            }
-            break;
-        default:
-            // if we reach this point, LTA Command Parser has failed in his duty
-            // and awaits court martial
-            assert false;
-        }
-
-        return result;
+        return new ExecutionResult(ViewType.TASK_LIST, listToDisplay);
     }
 
-    @Override public SchedulerSpec getTaskScheduler() {
+
+    private SchedulerSpec getTaskScheduler() {
         return Scheduler.getInstance();
     }
 
-    @Override public void shutdown() {
-        StorageSpec<?> storage = this.getStorage();
-        storage.shutdown();
-    }
-
-    @Override public StorageSpec<Task> getStorage() {
+    private StorageSpec<Task> getStorage() {
         return Storage.getInstance();
     }
+
+    private WriteHistorySpec getWriteHistory() {
+        return WriteHistory.getInstance();
+    }
+
+
+    // HELPER METHODS & FIELDS //
+
+    private static final double THRESHOLD_POWERSEARCH_WEIGHTED = 0.0;
 
     private static Pattern buildPowerSearchPattern(Command command) {
         String query = command.getParameter(Command.ParamName.SEARCH_QUERY);

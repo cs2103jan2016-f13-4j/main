@@ -12,7 +12,10 @@ import java.util.stream.IntStream;
 
 
 /**
- * @@author Mai Anh Vu
+ * The following class transform Task class to VisualTask which will be used to be displayed in the User Interface, and
+ * vice-versa.
+ *
+ * @@author A0127046L
  */
 public class VisualIndexMapper {
 
@@ -32,10 +35,6 @@ public class VisualIndexMapper {
 
     private VisualIndexMapper() {
         this._itemsList = new ArrayList<>();
-    }
-
-    public void updateList(List<Task> list) {
-        this._itemsList = list;
     }
 
     public void translateVisualToRaw(Command command) {
@@ -72,6 +71,7 @@ public class VisualIndexMapper {
     }
 
     public List<VisualTask> translateRawToVisual(List<Task> rawList) {
+        this._itemsList = rawList;
         return IntStream.range(0, rawList.size())
                 .mapToObj(index -> new VisualTask(
                         getVisualIndexFromArrayIndex(index),

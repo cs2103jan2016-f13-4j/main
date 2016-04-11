@@ -7,7 +7,7 @@ import java.util.List;
 import exception.ExceptionHandler;
 
 /**
- * @@author Mai Anh Vu
+ * @@author A0127046L
  */
 public class Command {
 
@@ -15,7 +15,8 @@ public class Command {
      * Types
      */
     public enum Instruction {
-        ADD, DISPLAY, MARK, EDIT, SEARCH, UNDO, REDO, DELETE, TUTORIAL, EXIT, UNRECOGNISED, INVALID;
+        ADD, DISPLAY, MARK, EDIT, SEARCH, UNDO, REDO, DELETE,
+        SCHEDULE, EXIT, UNRECOGNISED, INVALID;
     }
 
     public enum ParamType {
@@ -43,7 +44,9 @@ public class Command {
 
         TASK_INDEX(ParamType.INTEGER),
         TASK_INDEX_RANGES(ParamType.LIST),
-        TASK_UNIVERSALLY_QUANTIFIED(ParamType.BOOLEAN);
+        TASK_UNIVERSALLY_QUANTIFIED(ParamType.BOOLEAN),
+
+        TASK_DURATION(ParamType.INTEGER);
 
         public final ParamType type;
 
@@ -60,7 +63,7 @@ public class Command {
 
     /**
      * Constructs a command with the given instruction, index OR quantifier.
-     * 
+     *
      * @param instruction
      */
     public Command(Instruction instruction) {
@@ -120,16 +123,6 @@ public class Command {
         return this._parameters.keySet().size();
     }
 
-    /**
-     * Special types of commands
-     */
-    public static Command invalidCommand() {
-        return new Command(Instruction.INVALID);
-    }
-    public static Command unrecognisedCommand() {
-        return new Command(Instruction.UNRECOGNISED);
-    }
-
     public static Command initialCommand() {
         Command command = new Command(Instruction.DISPLAY);
         command.setParameter(ParamName.TASK_UNIVERSALLY_QUANTIFIED, true);
@@ -142,5 +135,31 @@ public class Command {
         } catch (ClassCastException e) {
             return false;
         }
+    }
+
+    /**
+     * Special types of commands
+     */
+    public static Command invalidCommand(String message) {
+        Command invalidCommand =  new Command(Instruction.INVALID);
+        invalidCommand._invalidationMessage = message;
+        return invalidCommand;
+    }
+    public static Command unrecognisedCommand() {
+        return new Command(Instruction.UNRECOGNISED);
+    }
+
+    /**
+     * Invalid commands handling
+     */
+    private String _invalidationMessage;
+    public void setAsInvalid(String message) {
+        this._instruction = Instruction.INVALID;
+        this._invalidationMessage = message;
+    }
+
+    public String getInvalidationMessage() {
+        assert this._instruction == Instruction.INVALID && this._invalidationMessage != null;
+        return this._invalidationMessage;
     }
 }

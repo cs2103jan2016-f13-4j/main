@@ -1,6 +1,5 @@
 package logic;
 
-import javafx.util.Pair;
 import org.junit.Test;
 import shared.Command;
 import shared.CustomTime;
@@ -9,7 +8,6 @@ import shared.Task;
 import ui.view.VisualTask;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,7 +20,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 
 /**
- * Created by maianhvu on 23/03/2016.
+ * @@author A0127046L
  */
 public class VisualIndexMapperTest {
 
@@ -42,7 +40,7 @@ public class VisualIndexMapperTest {
 
     @Test
     public void Mapper_transforms_visual_command_into_raw_command() {
-        getMapper().updateList(buildTaskList());
+        getMapper().translateRawToVisual(buildTaskList());
         Command deleteCommand = new Command(Command.Instruction.DELETE);
         deleteCommand.setParameter(Command.ParamName.TASK_INDEX, 1);
         getMapper().translateVisualToRaw(deleteCommand);
@@ -51,7 +49,7 @@ public class VisualIndexMapperTest {
 
     @Test
     public void Mapper_transform_complex_task_list_correctly() {
-        getMapper().updateList(stubTasks(128, 47, 12, 13, 15, 67, 90, 20, 14, 68));
+        getMapper().translateRawToVisual(stubTasks(128, 47, 12, 13, 15, 67, 90, 20, 14, 68));
         Command deleteCommand = new Command(Command.Instruction.DELETE);
         deleteCommand.setParameter(Command.ParamName.TASK_INDEX_RANGES, Arrays.asList(
                 new Range(2, 4),

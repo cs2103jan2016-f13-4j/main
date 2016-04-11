@@ -3,7 +3,7 @@ package shared;
 import exception.ExceptionHandler;
 
 /**
- * @@author Mai Anh Vu
+ * @@author A0127046L
  */
 public class ExecutionResult {
     /**
