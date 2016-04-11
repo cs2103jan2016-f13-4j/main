@@ -145,4 +145,17 @@ public class CommandParserTest {
         assertThat(ranges, hasSize(1));
         assertThat(ranges, hasItem(new Range(5)));
     }
+
+    @Test public void CommandParser_parses_simple_search_correctly() {
+        Command command = this._parser.parse("search for this and that");
+        assertThat(command.getInstruction(), is(Command.Instruction.SEARCH));
+        assertThat(command.getParameter(Command.ParamName.SEARCH_QUERY),
+                is(equalTo("this and that")));
+    }
+
+    @Test public void CommandParser_parses_complex_search_correctly() {
+        Command command = this._parser.parse("find  \"for whatever\"");
+        assertThat(command.getParameter(Command.ParamName.SEARCH_QUERY),
+                is(equalTo("for whatever")));
+    }
 }

@@ -2,6 +2,7 @@ package logic;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import jdk.nashorn.internal.runtime.regexp.joni.Regex;
 import logic.parser.*;
 import shared.*;
 import skeleton.CommandParserSpec;
@@ -45,6 +46,7 @@ public class CommandParser implements CommandParserSpec {
     private static final String STRING_INVALID_START_WITHOUT_END = "Task cannot have a start without an end";
     private static final String STRING_INVALID_EDIT_ID_MISSING = "You must tell me which task to edit";
     private static final String STRING_INVALID_RANGE_MISSING = "You must indicate an index or a range of tasks";
+    public static final String STRING_INVALID_QUERY_MISSING = "You must specify a search query";
 
     /**
      * Singleton implementation
@@ -260,8 +262,7 @@ public class CommandParser implements CommandParserSpec {
                 command = this.parseRangeCommand(command, partialCommand);
                 break;
             case SEARCH:
-                break;
-            default:
+                command = this.parseSearchCommand(command, partialCommand);
                 break;
         }
 
@@ -280,8 +281,8 @@ public class CommandParser implements CommandParserSpec {
         // index found using the regex. Truncating from this index onwards will
         // give us the true task name
         int lowestFoundIndex = Math.min(
-                this.parseTimeParameters(partialCommand, command),
-                this.parsePriorityParameters(partialCommand, command)
+                this.parseTimeParameters(command, partialCommand),
+                this.parsePriorityParameters(command, partialCommand)
         );
 
         String taskName = partialCommand.substring(0, lowestFoundIndex).trim();
@@ -321,8 +322,8 @@ public class CommandParser implements CommandParserSpec {
 
         // Parse time parameters next, keeping track of lowest index
         int lowestFoundIndex = Math.min(
-                this.parseTimeParameters(partialCommand, command),
-                this.parsePriorityParameters(partialCommand, command)
+                this.parseTimeParameters(command, partialCommand),
+                this.parsePriorityParameters(command, partialCommand)
         );
 
         String taskName = partialCommand.substring(0, lowestFoundIndex).trim();
@@ -384,31 +385,41 @@ public class CommandParser implements CommandParserSpec {
         return command;
     }
 
-    private int parsePriorityParameters(String partialCommand, Command command) {
-        Matcher matcher = RegexUtils.caseInsensitiveMatch(
-                this._priorityPattern,
+    private Command parseSearchCommand(Command command, String partialCommand) {
+        String fillerPattern = RegexUtils.optionalWord(
+                RegexUtils.noSurroundingQuotes("for")
+        );
+        Matcher fillerMatcher = RegexUtils.caseInsensitiveMatch(
+                fillerPattern,
                 partialCommand
         );
-        // If cannot find, return lowest found to be string length
-        if (!matcher.find()) {
-            return partialCommand.length();
+        // Truncate up to filler
+        if (fillerMatcher.find()) {
+            partialCommand = partialCommand.substring(fillerMatcher.end()).trim();
+        }
+        // Remove quotes if required
+        String searchQuery = partialCommand;
+        if (StringUtils.isSurroundedByQuotes(searchQuery)) {
+            searchQuery = StringUtils.stripEndCharacters(searchQuery);
         }
 
-        Task.Priority priority = this._definitions.queryPriority(
-                matcher.group(MATCHER_GROUP_PRIORITY).toLowerCase()
-        );
-        command.setParameter(Command.ParamName.PRIORITY_VALUE, priority);
+        if (searchQuery.trim().isEmpty()) {
+            return Command.invalidCommand(STRING_INVALID_QUERY_MISSING);
+        }
 
-        return matcher.start();
+        // Set parameter and finish
+        command.setParameter(Command.ParamName.SEARCH_QUERY, searchQuery);
+        return command;
     }
+
 
     /**
      * TODO: Write JavaDoc
-     * @param partialCommand
      * @param command
+     * @param partialCommand
      * @return the lowest index that matches any time string
      */
-    private int parseTimeParameters(String partialCommand, Command command) {
+    private int parseTimeParameters(Command command, String partialCommand) {
         // Keep track of the lowest found index
         int lowestFoundIndex = partialCommand.length();
         // Also keep track of the highest found index so that end time
@@ -464,6 +475,24 @@ public class CommandParser implements CommandParserSpec {
 
         // return the lowest found index
         return lowestFoundIndex;
+    }
+
+    private int parsePriorityParameters(Command command, String partialCommand) {
+        Matcher matcher = RegexUtils.caseInsensitiveMatch(
+                this._priorityPattern,
+                partialCommand
+        );
+        // If cannot find, return lowest found to be string length
+        if (!matcher.find()) {
+            return partialCommand.length();
+        }
+
+        Task.Priority priority = this._definitions.queryPriority(
+                matcher.group(MATCHER_GROUP_PRIORITY).toLowerCase()
+        );
+        command.setParameter(Command.ParamName.PRIORITY_VALUE, priority);
+
+        return matcher.start();
     }
 
     private LocalDate parseDate(Matcher matcher) {
