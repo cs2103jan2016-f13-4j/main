@@ -43,7 +43,9 @@ public class Command {
 
         TASK_INDEX(ParamType.INTEGER),
         TASK_INDEX_RANGES(ParamType.LIST),
-        TASK_UNIVERSALLY_QUANTIFIED(ParamType.BOOLEAN);
+        TASK_UNIVERSALLY_QUANTIFIED(ParamType.BOOLEAN),
+
+        TASK_DURATION(ParamType.INTEGER);
 
         public final ParamType type;
 
