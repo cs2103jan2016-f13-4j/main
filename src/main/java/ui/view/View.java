@@ -7,6 +7,9 @@ import shared.Command;
 import java.util.function.Function;
 
 /**
+ * View is the abstract class which controls the display and the behavior of the content displayed in the User Interface.
+ *
+ *
  * @@author Mai Anh Vu
  */
 public abstract class View {
@@ -41,6 +44,9 @@ public abstract class View {
         return this._lastCommand;
     }
 
+    /**
+     * this method is called to register the view
+     */
     protected abstract void buildContent();
 
     protected void setComponent(Node component) {

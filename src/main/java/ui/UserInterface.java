@@ -29,8 +29,9 @@ import java.util.function.Function;
 
 /**
  *
- * UserInterface is a singleton class which construct the General User Interface structure and define some
- * of the components behavior.
+ * UserInterface is a singleton class which construct the General User Interface structure and define most
+ * of the components behavior. The only changing element in this class is the viewWrapper which display the
+ * view constructed from the View object. Other than that the stage, and its other children stage is all persistent.
  *
  * @@author Mai Anh Vu
  */
@@ -95,7 +96,7 @@ public class UserInterface implements UserInterfaceSpec {
     }
 
     /**
-     * This method will set up the GUI and its component. Should only be called once when UserInterface is first
+     * This method will set up the GUI and its component. initialize() should only be called once when UserInterface is first
      * instantiated.
      */
     @Override
@@ -135,7 +136,7 @@ public class UserInterface implements UserInterfaceSpec {
 
     /**
      * This method will display the GUI.
-     * This should only be called after the primary components of user interface, excluding the View,
+     * show() should only be once called after the primary components of user interface, excluding the View,
      * has been constructed.
      */
     @Override

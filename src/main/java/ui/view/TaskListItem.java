@@ -14,17 +14,16 @@ import shared.CustomTime;
 import shared.Resources;
 import shared.Task;
 import ui.controller.DateFormatterHelper;
-import ui.view.VisualTask;
 
 /**
- * The Item class is the extension of ListCell class which allow us to customize the display content of the list.
+ * The TaskListItem class is the extension of ListCell class which allows us to customize the display content of the list.
  * There are two possible .xml files that can be loaded depending on Date and Time information stored by the task.Event Task
  * (Task with both start time and end time)will load TaskListItemDated.fxml while other type of task will
  * use TaskListItemSingle.fxml .
  *
  * DateFormatterHelper is used to help determining the date and time presentation.
  */
-public class Item extends ListCell<VisualTask> {
+public class TaskListItem extends ListCell<VisualTask> {
     public static final double STRING_HIGHLIGHT_OPACITY = .31;
     private static final String STRING_NAME_TEMPLATE_WITH_DATE = "TaskListItemDated";
     private static final String STRING_NAME_TEMPLATE_NO_DATE = "TaskListItemSingle";
@@ -45,7 +44,7 @@ public class Item extends ListCell<VisualTask> {
     private int _newTaskIndex;
     private boolean _canHighlight = true;
 
-    public Item(Command lastCommand, int newTaskIndex) {
+    public TaskListItem(Command lastCommand, int newTaskIndex) {
         super();
 
         this._lastCommand = lastCommand ;
@@ -54,7 +53,9 @@ public class Item extends ListCell<VisualTask> {
     }
 
     /***
-     * This method link the Item Class to the corresponding  .fxml file used to display the list content.
+     * This method link the TaskListItem Class to the corresponding  .fxml file used to display the list content.
+     * Having reference to the .fxml file component give us the ability to edit its component attribute to set up
+     * our intended behaviour
      *
      * @param task the task that is going to be checked. Event Task will call TasklistItemDouble.fxml  whereas
      *             other type of task will call TaskListItemSingle.fxml.
@@ -87,7 +88,7 @@ public class Item extends ListCell<VisualTask> {
     }
 
     /***
-     * Update the corresponding ListView cell with the appropriate content
+     * Update the corresponding ListView cell with the appropriate content.
      * @param item  Task (in form of Visual Task) that is going to be displayed
      * @param empty check if the item is empty
      */
@@ -148,6 +149,11 @@ public class Item extends ListCell<VisualTask> {
         }
     }
 
+    /**
+     * The item sometimes is displayed using a reused ListCell Object, instead of a completely new ListCell Object instantiated.
+     * So previous applied style and effect might still persist. Hence, there is a need to reset the StyleClass applied to the cell
+     * before applying a new one when the list of item is updated.
+     */
     private void resetEffect() {
         this.getStyleClass().clear();
         this.getStyleClass().add("cell");
@@ -163,7 +169,7 @@ public class Item extends ListCell<VisualTask> {
 
     /***
      * prepare and play the highlight animation to show new task
-     * should only work the first time the task is created.
+     * The highlight effect will only be played the first time the task is displayed.
      */
     private void setHighlightAnimation(){
         if (_canHighlight) {
@@ -188,7 +194,7 @@ public class Item extends ListCell<VisualTask> {
 
     /***
      * This method prepare the time String to be displayed by utilising DateFormatHelper
-     * For more detail on how the time stored within the task is procsessed, see DateFormatterHelper.java
+     * For more detail on how the time stored within the task is procsessed, @see DateFormatterHelper.java
      *
      * @param task task obtained from the list stored in the ListView Scene
      */
@@ -202,6 +208,12 @@ public class Item extends ListCell<VisualTask> {
         this._timeLabel.setText(result);
     }
 
+    /***
+     * this helper method check if the specified task has the same date as its previous task.
+     *
+     * @param curTask
+     * @return
+     */
     private boolean isSameDate(Task curTask){
         int curIndex = this.getIndex();
 
@@ -272,8 +284,8 @@ public class Item extends ListCell<VisualTask> {
             return true;
         }
 
-        if(obj instanceof Item){
-            Item another = (Item) obj;
+        if(obj instanceof TaskListItem){
+            TaskListItem another = (TaskListItem) obj;
             VisualTask itemStored = another.getItem();
             return this.equals(itemStored);
         }

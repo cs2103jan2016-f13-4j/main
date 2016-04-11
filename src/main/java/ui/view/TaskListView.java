@@ -15,7 +15,7 @@ import java.util.function.Function;
 
 /**
  * This class manage the process of displaying the list of Task that is called by the user to be displayed.
- * The View contains List of VisualTask which is a pair of Task and its display index. @
+ * The View contains List of VisualTask which is a pair of Task and its display index.
  *
  * @@author Antonius Satrio Triatmoko
  */
@@ -48,8 +48,6 @@ public class TaskListView extends View {
         ListView listView = Resources.getInstance().getComponent("TaskList");
         listView.setItems(this._observableList);
 
-
-
         if (this.getLastCommand().getInstruction() == Command.Instruction.ADD) {
             this._newTaskIndex = obtainNewTaskIndex();
         } else {
@@ -58,7 +56,7 @@ public class TaskListView extends View {
 
         final int highlightIndex = this._newTaskIndex;
 
-        listView.setCellFactory(list -> new Item(this.getLastCommand(),highlightIndex));
+        listView.setCellFactory(list -> new TaskListItem(this.getLastCommand(),highlightIndex));
 
         listView.scrollTo(this._newTaskIndex);
         this._viewIndex += this._newTaskIndex;
