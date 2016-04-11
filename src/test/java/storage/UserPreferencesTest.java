@@ -10,8 +10,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * 
- * @@author Chng Hui Yie
+ * Tests for UserPreferences class
+ *
+ * @@author A0127357B
  *
  */
 public class UserPreferencesTest {

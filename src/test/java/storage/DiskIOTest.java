@@ -18,8 +18,9 @@ import org.junit.Test;
 import exception.ExceptionHandler;
 
 /**
+ * Tests for DiskIO class
  *
- * @@author Chng Hui Yie
+ * @@author A0127357B
  *
  */
 public class DiskIOTest {

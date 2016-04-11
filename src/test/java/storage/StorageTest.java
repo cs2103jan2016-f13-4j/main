@@ -13,8 +13,9 @@ import shared.Task;
 import static org.junit.Assert.*;
 
 /**
- * 
- * @@author Chng Hui Yie
+ * Tests for Storage class
+ *
+ * @@author A0127357B
  *
  */
 
