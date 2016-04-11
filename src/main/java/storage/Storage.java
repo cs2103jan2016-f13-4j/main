@@ -41,8 +41,10 @@ public class Storage extends TimerTask implements StorageSpec<Task> {
 
     /**
      * Constructs a new Storage instance.
+     * the singleton constructor is made protected instead of private to enable dependency injection of Storage in tests
+     * of other components
      */
-    private Storage() {
+    protected Storage() {
         // Instantiates storage
         this._taskData = new TreeMap<>();
         this._isDirty = false;
