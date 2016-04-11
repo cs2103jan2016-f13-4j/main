@@ -6,10 +6,7 @@ import logic.parser.*;
 import shared.*;
 import skeleton.CommandParserSpec;
 
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.Month;
+import java.time.*;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,6 +34,9 @@ public class CommandParser implements CommandParserSpec {
     private static final String MATCHER_GROUP_RANGE_START = "RSTART";
     private static final String MATCHER_GROUP_RANGE_END = "REND";
     private static final String MATCHER_GROUP_UNIVERSAL_QUANTIFIER = "UQ";
+    private static final String MATCHER_GROUP_HOUR = "HOUR";
+    private static final String MATCHER_GROUP_MINUTES = "MIN";
+    private static final String MATCHER_GROUP_HOUR_DOT = "HDOT";
 
     private static final String STRING_INVALID_NAME_MISSING = "Task name is missing";
     private static final String STRING_INVALID_START_WITHOUT_END = "Task cannot have a start without an end";
@@ -44,6 +44,8 @@ public class CommandParser implements CommandParserSpec {
     private static final String STRING_INVALID_RANGE_MISSING = "You must indicate an index or a range of tasks";
     private static final String STRING_INVALID_QUERY_MISSING = "You must specify a search query";
     private static final String STRING_INVALID_RANGE_FORMAT = "Invalid range";
+    private static final String STRING_INVALID_SCHEDULE_ID_MISSING = "You must tell me which task to schedule";
+    public static final String STRING_INVALID_DURATION_MISSING = "You must tell me how long you want your task to last!";
 
     /**
      * Singleton implementation
@@ -261,7 +263,84 @@ public class CommandParser implements CommandParserSpec {
             case SEARCH:
                 command = this.parseSearchCommand(command, partialCommand);
                 break;
+            case SCHEDULE:
+                command = this.parseScheduleCommand(command, partialCommand);
+                break;
         }
+
+        return command;
+    }
+
+    private Command parseScheduleCommand(Command command, String partialCommand) {
+        // Find index first
+        Matcher indexMatcher = RegexUtils.caseInsensitiveMatch(
+                this.getIndexRegex(),
+                partialCommand
+        );
+        // No index found, return invalid command
+        if (!indexMatcher.find()) {
+            return Command.invalidCommand(STRING_INVALID_SCHEDULE_ID_MISSING);
+        }
+
+        // Set index first
+        int taskId = Integer.parseInt(indexMatcher.group(MATCHER_GROUP_INDEX));
+        command.setParameter(Command.ParamName.TASK_INDEX, taskId);
+
+        // Truncate partial command string, with filler words too
+        partialCommand = partialCommand.substring(indexMatcher.end()).trim();
+
+        // Cut away filler words
+        Matcher fillerMatcher = RegexUtils.caseInsensitiveMatch(
+                RegexUtils.optionalWord("using"),
+                partialCommand
+        );
+        if (fillerMatcher.find()) {
+            partialCommand = partialCommand.substring(fillerMatcher.end()).trim();
+        }
+
+        // Get duration
+        Matcher durationMatcher = RegexUtils.caseInsensitiveMatch(
+                this.getDurationRegex(),
+                partialCommand);
+
+        int hour = 0;
+        int minutes = 0;
+        boolean matchFound = false;
+        boolean hasDot = false;
+
+        while (durationMatcher.find()) {
+            matchFound = true;
+            // Parse hour
+            if (durationMatcher.group(MATCHER_GROUP_HOUR) != null) {
+                hour = Integer.parseInt(durationMatcher.group(MATCHER_GROUP_HOUR));
+                hasDot = false;
+            }
+
+            if (durationMatcher.group(MATCHER_GROUP_HOUR_DOT) != null) {
+                hasDot = true;
+            }
+
+            // Parse minutes
+            if (durationMatcher.group(MATCHER_GROUP_MINUTES) != null) {
+                minutes = Integer.parseInt(durationMatcher.group(MATCHER_GROUP_MINUTES));
+
+                // If the dot exists, we need to be able to find the minutes
+                // in terms of decimal places
+                if (minutes != 0 && hasDot) {
+                    minutes = minutes * 6;
+                }
+            }
+        }
+
+        // If there is no duration, return error
+        if (!matchFound) {
+            return Command.invalidCommand(STRING_INVALID_DURATION_MISSING);
+        }
+
+
+        // Find the final duration and set it to the command
+        int duration = hour * 60 + minutes;
+        command.setParameter(Command.ParamName.TASK_DURATION, duration);
 
         return command;
     }
@@ -663,6 +742,38 @@ public class CommandParser implements CommandParserSpec {
                 MATCHER_GROUP_UNIVERSAL_QUANTIFIER,
                 "all", "everything"
         ));
+    }
+
+    private String getDurationRegex() {
+        // This will be used for capturing the dot
+        String timeDelimiterPattern1 = RegexUtils.unbracketedChoice(
+                "h", "\\s+hour(?:s)?\\s+", RegexUtils.namedGroup(
+                        MATCHER_GROUP_HOUR_DOT, "\\."
+                )
+        );
+        // This will not, just for negative lookahead
+        String timeDelimiterPattern2 = RegexUtils.unbracketedChoice(
+                "h", "\\s+hour(?:s)?\\s+", "\\."
+        );
+
+        // Construct the patterns
+        String hourPattern = RegexUtils.namedGroup(
+                MATCHER_GROUP_HOUR,
+                RegexUtils.positiveLookahead(
+                        "\\d+",
+                        timeDelimiterPattern1
+                )
+        );
+        String minutesPattern = RegexUtils.namedGroup(
+                MATCHER_GROUP_MINUTES,
+                RegexUtils.negativeLookahead(
+                        "\\d+",
+                        timeDelimiterPattern2
+                )
+        );
+        return RegexUtils.unbracketedChoice(
+                hourPattern, minutesPattern
+        );
     }
 
     //-------------------------------------------------------------------------------------------------

@@ -44,10 +44,19 @@ public class RegexUtils {
      * @return a RegExp string that matches any choice given
      */
     public static String choice(String... choices) {
+        return String.format("(?:%s)", unbracketedChoice(choices));
+    }
+
+    /**
+     * Constructs a RegExp that matches any string in the choices given, but
+     * without surrounding brackets.
+     * @param choices a vararg array of different strings that can be matched
+     * @return a RegExp string that matches any choice given, without brackets
+     */
+    public static String unbracketedChoice(String... choices) {
         // We want the longer strings to be matched first
         Arrays.sort(choices, (string1, string2) -> string2.length() - string1.length());
-
-        return String.format("(?:%s)", String.join(DELIMITER_CHOICES, choices));
+        return String.join(DELIMITER_CHOICES, choices);
     }
 
     /**
@@ -188,5 +197,13 @@ public class RegexUtils {
      */
     public static String wordBoundary(String word) {
         return String.format("\\b%s\\b", word);
+    }
+
+    public static String positiveLookahead(String pattern, String lookahead) {
+        return String.format("%s(?=%s)", pattern, lookahead);
+    }
+
+    public static String negativeLookahead(String pattern, String lookahead) {
+        return String.format("%s(?!%s)", pattern, lookahead);
     }
 }

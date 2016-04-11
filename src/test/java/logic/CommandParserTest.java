@@ -3,6 +3,7 @@ package logic;
 import logic.parser.RegexUtils;
 import org.junit.Before;
 import org.junit.Test;
+import org.omg.IOP.ServiceContextHelper;
 import shared.Command;
 import shared.CustomTime;
 import shared.Range;
@@ -167,6 +168,18 @@ public class CommandParserTest {
             Command command = this._parser.parse(commandString);
             assertTrue(command.hasTrueValue(Command.ParamName.TASK_UNIVERSALLY_QUANTIFIED));
             assertFalse(command.hasParameter(Command.ParamName.TASK_INDEX_RANGES));
+        });
+    }
+
+    @Test public void CommandParser_parses_schedule_command_correctly() {
+        Arrays.asList(
+                "schedule task number 5 using 4 hours 30 minutes",
+                "schedule task 5 4h30",
+                "schedule 5 4.5"
+        ).stream().map(this._parser::parse).forEach(command -> {
+            assertThat(command.getInstruction(), is(Command.Instruction.SCHEDULE));
+            assertThat(command.getParameter(Command.ParamName.TASK_INDEX), is(equalTo(5)));
+            assertThat(command.getParameter(Command.ParamName.TASK_DURATION), is(equalTo(270)));
         });
     }
 }
