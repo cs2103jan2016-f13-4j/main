@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.function.*;
 import java.util.stream.Collectors;
 
+import logic.Scheduler;
 import storage.*;
 
 /**
@@ -23,6 +24,7 @@ public class StorageWriteOperation {
 
     public static final String ERROR_RANGE_EMPTY_FOR_DELETE = "No valid tasks in range to delete!";
     public static final String ERROR_RANGE_EMPTY_FOR_MARK = "No valid tasks in range to mark as complete!";
+    public static final String WARNING_COLLIDING_TASK = "Task collides with another already existing task!";
 
     private Function<?, String> _initialOperation; // returns the error string for the operation, to be placed in an ExecutionResult
     private Function<?, Boolean> _undoOperation; // returns false if nothing was done due to original operation not being run
@@ -105,12 +107,20 @@ public class StorageWriteOperation {
                 }
             }
 
+            boolean taskCollides = Scheduler.getInstance().isColliding(taskToAdd);
+
             this._id = Storage.getInstance().save(taskToAdd);
             // TODO: REMEMBER TO GET RID OF THIS SHIT
             System.err.printf("added %s at id %d%n", name, this._id);
 
             this._wasExecuted = true; // adding a task never fails
-            return null;
+
+            if (taskCollides) {
+                System.err.println(WARNING_COLLIDING_TASK);
+                return WARNING_COLLIDING_TASK;
+            } else {
+                return null;
+            }
         };
 
 

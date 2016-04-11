@@ -48,6 +48,11 @@ public class SchedulerTest {
     public static final Task task5 = new Task(null, "5", "", time2, time4);
     public static final Task task6 = new Task(null, "6", "", time1, time4);
 
+    public static final Task partialTask1 = new Task(null, "a", "", time1, null);
+    public static final Task partialTask2 = new Task(null, "b", "", time2, null);
+    public static final Task partialTask3 = new Task(null, "c", "", null, time1);
+    public static final Task partialTask4 = new Task(null, "d", "", null, time2);
+
 
     // dependency injection of Storage
     private Storage _storage;
@@ -149,7 +154,7 @@ public class SchedulerTest {
     }
 
     @Test
-    public void Free_slot_computation_works() {
+    public void Free_slot_computation_works_for_fully_defined_tasks() {
         this._storage.save(task1);
         this._storage.save(task3);
 
@@ -163,5 +168,18 @@ public class SchedulerTest {
         assertEquals(this._scheduler.getFreeSlots(time2, time3), expectedFreeRange1);
         assertEquals(this._scheduler.getFreeSlots(time1, time2), expectedFreeRange2);
         assertEquals(this._scheduler.getFreeSlots(time3, time4), expectedFreeRange2);
+    }
+
+    @Test
+    public void Free_slot_computation_works_for_partially_defined_tasks() {
+        this._storage.save(partialTask1);
+        this._storage.save(partialTask2);
+        this._storage.save(task3);
+
+        List<TemporalRange> expectedFreeRange = new LinkedList<>();
+
+        expectedFreeRange.add(range4);
+
+        assertEquals(this._scheduler.getFreeSlots(time1, time4), expectedFreeRange);
     }
 }

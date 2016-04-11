@@ -31,9 +31,14 @@ public class Scheduler implements SchedulerSpec {
     public boolean isColliding(Task task) {
         TemporalRange taskRange = new TemporalRange(task.getStartTime(), task.getEndTime());
 
+        if (taskRange.getStart() == null || taskRange.getEnd() == null) {
+            return false;
+        }
+
         return !this._storage.getAll()
                 .stream()
                 .map(task_ -> new TemporalRange(task_.getStartTime(), task_.getEndTime()))
+                .filter(range -> range.getStart() != null && range.getEnd() != null)
                 .filter(range_ -> taskRange.overlaps(range_))
                 .collect(Collectors.toList())
                 .isEmpty();
@@ -50,6 +55,7 @@ public class Scheduler implements SchedulerSpec {
         List<TemporalRange> occupiedRanges = this.collapseOverlappingRanges(this._storage.getAll()
                 .stream()
                 .map(task -> new TemporalRange(task.getStartTime(), task.getEndTime()))
+                .filter(range -> range.getStart() != null && range.getEnd() != null) // remove tasks with missing start/end times
                 .collect(Collectors.toList()));
 
         // strip tasks that end before the lower bound or start after the upper bound
