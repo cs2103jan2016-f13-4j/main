@@ -6,6 +6,9 @@ package shared;
 public enum Message {
 
     WELCOME("Welcome to Your MOM!"),
+
+    UNRECOGNISED("Oops! I don't really understand what you are saying"),
+
     DISPLAY_EMPTY("Add a new task by entering \"add <task name>\""),
     DISPLAY_NORMAL("Found %d tasks!"),
 
