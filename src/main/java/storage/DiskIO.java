@@ -107,7 +107,7 @@ public class DiskIO {
 
     /**
      * Checks that a file with the specified file name already exists
-     * 
+     *
      * @return
      */
     private File checkFileExists() {
