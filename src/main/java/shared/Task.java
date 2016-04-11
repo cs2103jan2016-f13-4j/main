@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
+ * Stores attributes belonging to a task created by user.
+ *
  * @@author A0127357B
  */
 public class Task implements Comparable<Task> {
