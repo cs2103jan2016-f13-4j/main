@@ -209,7 +209,7 @@ public class TranslationEngine implements TranslationEngineSpec {
                             Command.ParamName.TASK_UNIVERSALLY_QUANTIFIED)) {
                         message = Message.MARK_ALL_SUCCESS.toString();
                     } else {
-                        message = Message.REDO_SUCCESS.toString();
+                        message = Message.MARK_SUCCESS.toString();
                     }
             }
         }

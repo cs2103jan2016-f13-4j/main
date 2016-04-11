@@ -52,3 +52,12 @@
     visibility: visible;
     -fx-fill: #73C3FF;
 }
+
+.list-cell.completed .item__name {
+    -fx-font-weight: normal;
+    -fx-text-fill: #ddd;
+}
+
+.list-cell.completed .item__index {
+    -fx-text-fill: #B8E986;
+}

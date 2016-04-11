@@ -153,9 +153,9 @@ public class RegexUtils {
 
         // Day
         String dayPattern = "\\b\\d{1,2}";
-        String fullDayPattern = String.format("%s%s\\b",
+        String fullDayPattern = negativeLookahead(String.format("%s%s\\b",
                 namedGroup(MATCHER_GROUP_DATE_DAY, dayPattern),
-                optional(choice("st", "nd", "rd", "th")));
+                optional(choice("st", "nd", "rd", "th"))), unbracketedChoice("am", "pm"));
 
         // Month
         String[] monthStrings = Arrays.stream(Month.values())

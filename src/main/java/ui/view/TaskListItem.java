@@ -108,6 +108,10 @@ public class TaskListItem extends ListCell<VisualTask> {
 
             // set up the time to be displayed
             this.setUpTime(task);
+            if (this._timeLabel.getText().trim().isEmpty()) {
+                // Shift the name label off
+                this._nameLabel.setTranslateY(8.0);
+            }
 
             //The item sometimes is displayed using a reused ListCell Object, instead of a completely new ListCell Object instantiated.
             // So previous applied style and effect might still persist.
@@ -128,7 +132,6 @@ public class TaskListItem extends ListCell<VisualTask> {
             if (task.getPriority() != null) {
                 this.setPriority(task);
             }
-
 
             this.setGraphic(this._container);
         }
