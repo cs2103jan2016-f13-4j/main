@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- @@author Antonius Satrio Triatmoko -->
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Line?>
+<?import javafx.scene.shape.Rectangle?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="54.0" prefWidth="448.0" styleClass="item__container" stylesheets="@../stylesheets/TaskListItem.css" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <Rectangle fx:id="_highlightEffect" arcHeight="5.0" arcWidth="5.0" fill="WHITE" height="54.0" layoutY="40.0" strokeType="INSIDE" width="448.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+        <Label fx:id="_indexLabel" alignment="CENTER" layoutX="15.0" layoutY="30.0" prefHeight="37.0" prefWidth="24.0" styleClass="item__index" text="1" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="0.0" />
+        <Label fx:id="_taskNameLabel" alignment="BOTTOM_LEFT" layoutX="46.0" layoutY="16.0" maxWidth="275.0" minHeight="-Infinity" minWidth="-Infinity" styleClass="item__name" text="Label" AnchorPane.bottomAnchor="28.0" AnchorPane.leftAnchor="46.0" AnchorPane.rightAnchor="90.0" AnchorPane.topAnchor="11.0" />
+        <Label fx:id="_timeLabel" contentDisplay="RIGHT" layoutX="46.0" layoutY="61.0" maxHeight="54.0" maxWidth="275.0" prefHeight="54.0" prefWidth="69.0" styleClass="item__time" text="Tommorow" AnchorPane.bottomAnchor="11.0" AnchorPane.leftAnchor="46.0" AnchorPane.rightAnchor="90.0" AnchorPane.topAnchor="27.0" />
+        <Rectangle fx:id="_priorityRectangle" height="24.0" layoutX="367.0" layoutY="55.0" smooth="false" strokeType="INSIDE" strokeWidth="0.0" styleClass="indicator--priority" width="75.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="358.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="15.0" />
+        <Label fx:id="_priorityIndicator" alignment="CENTER" contentDisplay="CENTER" layoutX="379.0" layoutY="52.0" maxHeight="17.0" maxWidth="50.0" prefHeight="17.0" prefWidth="50.0" styleClass="indicator__text" textAlignment="CENTER" textFill="WHITE" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="358.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="20.0" />
+      <Line endX="448.0" startX="15.0" stroke="#f9f9f9" />
+    </children>
+</AnchorPane>

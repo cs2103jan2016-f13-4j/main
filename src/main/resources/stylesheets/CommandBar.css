@@ -1,0 +1,20 @@
+.command-bar__wrapper {
+    -fx-background-color: transparent;
+}
+
+.command-bar__container {
+    -fx-background-color: white;
+    -fx-background-radius: 4px;
+    -fx-border-radius: 4px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,.11), 8, 0.0, 0, 4);
+}
+
+.command-input__field {
+    -fx-background-color: transparent;
+    -fx-highlight-fill: #ddd;
+}
+
+.command-input__field .scroll-bar {
+    -fx-opacity: 0;
+    visibility: hidden;
+}
