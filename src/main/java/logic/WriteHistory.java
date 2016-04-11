@@ -1,6 +1,7 @@
 package logic;
 
-import shared.*;
+import skeleton.WriteHistorySpec;
+
 import java.util.*;
 
 
@@ -11,17 +12,17 @@ import java.util.*;
  *
  * @@author Thenaesh Elango
  */
-public class StorageWriteOperationHistory {
+public class WriteHistory implements WriteHistorySpec {
 
     // singleton declaration
-    private static StorageWriteOperationHistory instance = null;
-    public static StorageWriteOperationHistory getInstance() {
+    private static WriteHistory instance = null;
+    public static WriteHistory getInstance() {
         if (instance == null) {
-            instance = new StorageWriteOperationHistory();
+            instance = new WriteHistory();
         }
         return instance;
     }
-    private StorageWriteOperationHistory() {
+    private WriteHistory() {
     }
 
 
@@ -31,6 +32,7 @@ public class StorageWriteOperationHistory {
 
 
     // methods
+    @Override
     public void addToHistory(StorageWriteOperation op) {
         this.checkIndexInvariant();
 
@@ -41,6 +43,7 @@ public class StorageWriteOperationHistory {
         this.checkIndexInvariant();
     }
 
+    @Override
     public String addToHistoryAfterExecuting(StorageWriteOperation op) {
         String errorMsg = op.getInitialOperation().apply(null);
         this.addToHistory(op);
@@ -51,6 +54,7 @@ public class StorageWriteOperationHistory {
     /**
      * @return false if there were no ops to undo, true otherwise
      */
+    @Override
     public boolean undo() {
         this.checkIndexInvariant();
 
@@ -77,6 +81,7 @@ public class StorageWriteOperationHistory {
     /**
      * @return false if there were no ops to redo, true otherwise
      */
+    @Override
     public boolean redo() {
         this.checkIndexInvariant();
 

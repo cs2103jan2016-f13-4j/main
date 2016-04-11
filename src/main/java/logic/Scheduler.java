@@ -6,27 +6,84 @@ import shared.TemporalRange;
 import skeleton.SchedulerSpec;
 import storage.Storage;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
  * @@author Thenaesh Elango
  */
 public class Scheduler implements SchedulerSpec {
+
+    // singleton instance, constructor and accessor
     private static final Scheduler instance = new Scheduler(Storage.getInstance());
     public static Scheduler getInstance() {
         return instance;
     }
-
     protected Scheduler(Storage storage) {
         this._storage = storage;
     }
 
-
+    // storage instance to be used by this scheduler
     private Storage _storage;
 
 
+    /**
+     * finds a time range in which to slot a task of specified duration in
+     * @param durationInMinutes of task to slot in
+     * @return time range to slot the task in
+     */
+    @Override
+    public TemporalRange schedule(Integer durationInMinutes) {
+
+        // get the task that ends the latest, if it exists
+        Optional<CustomTime> endOfRangeToSearchIfItExists = this._storage.getAll()
+                .stream()
+                .filter(task -> task.getStartTime() != null && task.getEndTime() != null)
+                .map(Task::getEndTime)
+                .max(CustomTime::compareTo);
+
+        // if such a task does not exist, then there are no tasks, so just schedule the new task immediately
+        if (!endOfRangeToSearchIfItExists.isPresent()) {
+            return new TemporalRange(CustomTime.now(), CustomTime.now().plusMinutes(durationInMinutes));
+        }
+
+        CustomTime startOfRangeToSearch = CustomTime.now();
+        CustomTime endOfRangeToSearch = endOfRangeToSearchIfItExists.get();
+
+        List<TemporalRange> freeSlots = this.getFreeSlots(startOfRangeToSearch, endOfRangeToSearch);
+
+        List<TemporalRange> suitableFreeSlots = freeSlots
+                .stream()
+                .filter(range -> CustomTime.difference(range.getStart(), range.getEnd()) >= durationInMinutes)
+                .map(range -> {
+                    CustomTime startTime = range.getStart();
+                    CustomTime endTime = new CustomTime(
+                            LocalDateTime.of(startTime.getDate(), startTime.getTime())
+                                    .plusMinutes(durationInMinutes));
+                    return new TemporalRange(startTime, endTime);
+                })
+                .collect(Collectors.toList());
+
+        // just choose the day after the end date if we can't find a suitable slot
+        if (suitableFreeSlots.isEmpty()) {
+            return new TemporalRange(endOfRangeToSearch.plusDays(1),
+                    endOfRangeToSearch.plusDays(1).plusMinutes(durationInMinutes));
+        } else {
+            // get the first suitable free slot and return it
+            return suitableFreeSlots.get(0);
+        }
+    }
+
+    /**
+     * checks task to be inserted for clashes (collisions) with pre-existing tasks
+     * @param task to check for collision
+     * @return does the task collide?
+     */
     @Override
     public boolean isColliding(Task task) {
         TemporalRange taskRange = new TemporalRange(task.getStartTime(), task.getEndTime());
@@ -38,24 +95,38 @@ public class Scheduler implements SchedulerSpec {
         return !this._storage.getAll()
                 .stream()
                 .map(task_ -> new TemporalRange(task_.getStartTime(), task_.getEndTime()))
-                .filter(range -> range.getStart() != null && range.getEnd() != null)
+                .filter(range -> range.getStart() != null && range.getEnd() != null) // ensure start and end time objects are there
                 .filter(range_ -> taskRange.overlaps(range_))
                 .collect(Collectors.toList())
                 .isEmpty();
     }
 
-    @Override
-    public List<TemporalRange> getFreeSlots(CustomTime lowerBound, CustomTime upperBound) {
+
+    // HELPER METHODS //
+
+    /**
+     * gets free time slots within the specified bounds
+     * the resulting list will be disjoint and sorted
+     * @param lowerBound
+     * @param upperBound
+     * @return
+     */
+    protected List<TemporalRange> getFreeSlots(CustomTime lowerBound, CustomTime upperBound) {
         // if lowerBound >= upperBound, return an empty list for obvious reasons
         if (lowerBound.compareTo(upperBound) >= 0) {
             return new LinkedList<TemporalRange>();
         }
 
         // first get the disjoint list of occupied time slots, sorted in chronological order
-        List<TemporalRange> occupiedRanges = this.collapseOverlappingRanges(this._storage.getAll()
+        List<TemporalRange> occupiedRanges = this._storage.getAll()
                 .stream()
                 .map(task -> new TemporalRange(task.getStartTime(), task.getEndTime()))
-                .filter(range -> range.getStart() != null && range.getEnd() != null) // remove tasks with missing start/end times
+                .collect(Collectors.toList());
+
+        // remove tasks with missing start/end times
+        occupiedRanges = this.collapseOverlappingRanges(occupiedRanges
+                .stream()
+                .filter(range -> range.getStart() != null && range.getEnd() != null)
                 .collect(Collectors.toList()));
 
         // strip tasks that end before the lower bound or start after the upper bound
@@ -90,11 +161,6 @@ public class Scheduler implements SchedulerSpec {
         return freeSlots;
     }
 
-
-    /*
-     * helper methods
-     */
-
     /**
      * takes a list of temporal ranges and returns a new list of disjoint ranges that represent
      * the time spanned by all the ranges
@@ -125,5 +191,40 @@ public class Scheduler implements SchedulerSpec {
         collapsedRanges.add(currentRange);
 
         return collapsedRanges;
+    }
+
+    /**
+     * takes a disjoint, sorted time range of time slots and adds time slots blocking out the qiet period from 0000-0800
+     * @param ranges disjoint and sorted
+     * @return a disjoint and sorted range expanded to include the additional slots denoting the quiet period
+     */
+    protected List<TemporalRange> blockOutQuietTime(List<TemporalRange> ranges) {
+        LocalDate minDate = ranges
+                .stream()
+                .map(TemporalRange::getStart)
+                .min(CustomTime::compareTo)
+                .get().getDate();
+        LocalDate maxDate = ranges
+                .stream()
+                .map(TemporalRange::getEnd)
+                .max(CustomTime::compareTo)
+                .get().getDate();
+
+        List<LocalDate> dateRange = new LinkedList<>();
+        for (LocalDate i = minDate; i.isBefore(maxDate) || i.isEqual(maxDate); i = i.plusDays(1)) {
+            dateRange.add(i);
+        }
+
+        List<TemporalRange> blockedQuietTimeRanges = dateRange
+                .stream()
+                .map(date -> {
+                    CustomTime start = new CustomTime(date, LocalTime.of(0, 0));
+                    CustomTime end = new CustomTime(date, LocalTime.of(8, 0));
+                    return new TemporalRange(start, end);
+                })
+                .collect(Collectors.toList());
+
+        blockedQuietTimeRanges.addAll(this.collapseOverlappingRanges(ranges));
+        return this.collapseOverlappingRanges(blockedQuietTimeRanges);
     }
 }
