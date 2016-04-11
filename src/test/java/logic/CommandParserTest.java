@@ -1,5 +1,6 @@
 package logic;
 
+import logic.parser.RegexUtils;
 import org.junit.Before;
 import org.junit.Test;
 import shared.Command;

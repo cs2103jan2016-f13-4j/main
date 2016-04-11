@@ -99,10 +99,10 @@ public class CommandParser implements CommandParserSpec {
 
     private void constructInstructionRegExp() {
         assert this._definitions != null && this._definitions.getInstructionKeywords() != null;
-        this._instructionPattern = RegexUtils.startOfString(RegexUtils.namedChoice(
+        this._instructionPattern = RegexUtils.startOfString(RegexUtils.wordBoundary(RegexUtils.namedChoice(
                 MATCHER_GROUP_INSTRUCTION,
                 this._definitions.getInstructionKeywords()
-        ));
+        )));
     }
 
     private void constructTimeRegExp() {
