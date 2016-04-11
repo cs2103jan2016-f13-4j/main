@@ -11,7 +11,9 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.Month;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -21,6 +23,10 @@ import java.util.regex.Matcher;
  */
 public class CommandParser implements CommandParserSpec {
 
+    public static final String STRING_INVALID_RANGE_FORMAT = "Invalid range";
+    /**
+     * Constants
+     */
     private static final String FILE_PARSER_DATA = "CommandParserData.json";
 
     private static final String MATCHER_GROUP_INSTRUCTION = "INST";
@@ -32,11 +38,13 @@ public class CommandParser implements CommandParserSpec {
     private static final String MATCHER_GROUP_TIME_OF_DAY = "TIME";
     private static final String MATCHER_GROUP_PRIORITY = "PRIO";
     private static final String MATCHER_GROUP_INDEX = "INDEX";
+    private static final String MATCHER_GROUP_RANGE_START = "RSTART";
+    private static final String MATCHER_GROUP_RANGE_END = "REND";
 
-    private static final String STRING_INVALID_HOUR = "Invalid hour";
     private static final String STRING_INVALID_NAME_MISSING = "Task name is missing";
     private static final String STRING_INVALID_START_WITHOUT_END = "Task cannot have a start without an end";
-    public static final String STRING_INVALID_EDIT_ID_MISSING = "You must tell me which task to edit";
+    private static final String STRING_INVALID_EDIT_ID_MISSING = "You must tell me which task to edit";
+    private static final String STRING_INVALID_RANGE_MISSING = "You must indicate an index or a range of tasks";
 
     /**
      * Singleton implementation
@@ -249,6 +257,7 @@ public class CommandParser implements CommandParserSpec {
                 break;
             case DELETE:
             case MARK:
+                command = this.parseRangeCommand(command, partialCommand);
                 break;
             case SEARCH:
                 break;
@@ -325,6 +334,52 @@ public class CommandParser implements CommandParserSpec {
         if (!taskName.trim().isEmpty()) {
             command.setParameter(Command.ParamName.TASK_NAME, taskName);
         }
+
+        return command;
+    }
+
+    private Command parseRangeCommand(Command command, String partialCommand) {
+        Matcher rangeMatcher = RegexUtils.caseInsensitiveMatch(
+                this.getRangeRegex(),
+                partialCommand
+        );
+
+        List<Range> rangeList = new ArrayList<>();
+
+        while (rangeMatcher.find()) {
+            if (rangeMatcher.group(MATCHER_GROUP_RANGE_START) != null) {
+                // Create new range
+                Range newRange = new Range(
+                        Integer.parseInt(rangeMatcher.group(MATCHER_GROUP_RANGE_START))
+                );
+                rangeList.add(newRange);
+            }
+
+            if (rangeMatcher.group(MATCHER_GROUP_RANGE_END) != null) {
+                // Hypothetically, the case when an end exists while there were no
+                // previous range or the previous range already has an end is not
+                // likely to happen, but we will catch it anyway
+                if (rangeList.isEmpty() || rangeList.get(rangeList.size() - 1).hasEnd()) {
+                    return Command.invalidCommand(STRING_INVALID_RANGE_FORMAT);
+                }
+
+                Range lastRange = rangeList.get(rangeList.size() - 1);
+                lastRange.setEnd(
+                        Integer.parseInt(rangeMatcher.group(MATCHER_GROUP_RANGE_END))
+                );
+            }
+        }
+
+        // If no match found, return invalid
+        if (rangeList.isEmpty()) {
+            return Command.invalidCommand(STRING_INVALID_RANGE_MISSING);
+        }
+
+        // Straighten the range first
+        Range.straightenRanges(rangeList);
+
+        // Set command parameters
+        command.setParameter(Command.ParamName.TASK_INDEX_RANGES, rangeList);
 
         return command;
     }
@@ -556,6 +611,13 @@ public class CommandParser implements CommandParserSpec {
     private String getIndexRegex() {
         return String.format("^(?:task\\s+)?(?:number(?:ed)?\\s+)?(?<%s>\\d+)",
                 MATCHER_GROUP_INDEX);
+    }
+
+    private String getRangeRegex() {
+        return String.format("(?:all\\s+)?(?:task(?:s)?\\s+)?(?:number(?:ed)?\\s+)?" +
+                        "(?:(?<%s>\\d+)(?:\\s*(?:to|-)\\s*(?<%s>\\d+))?)",
+                MATCHER_GROUP_RANGE_START,
+                MATCHER_GROUP_RANGE_END);
     }
 
 }

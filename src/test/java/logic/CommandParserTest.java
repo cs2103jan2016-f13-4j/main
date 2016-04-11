@@ -4,16 +4,18 @@ import org.junit.Before;
 import org.junit.Test;
 import shared.Command;
 import shared.CustomTime;
+import shared.Range;
 import shared.Task;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.Month;
+import java.util.List;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertFalse;
 
 /**
@@ -109,9 +111,38 @@ public class CommandParserTest {
     }
 
     @Test
-    public void Command_parser_regards_edit_without_task_name_correctly() {
+    public void Command_parser_regards_edit_without_task_name_as_correct() {
         Command command = this._parser.parse("edit 3 starting today");
         assertThat(command.getParameter(Command.ParamName.TASK_START), is(equalTo(CustomTime.todayAt(null))));
         assertFalse(command.hasParameter(Command.ParamName.TASK_NAME));
+    }
+
+    @Test
+    public void Command_parser_parses_edit_with_priority_correctly() {
+        Command command = this._parser.parse("edit 3 with high priority");
+        assertThat(command.getParameter(Command.ParamName.PRIORITY_VALUE),
+                is(Task.Priority.HIGH));
+    }
+
+    @Test
+    public void Command_parser_parses_delete_with_range_correctly() {
+        String commandString = "delete 1-5, 3-7, 2-4, 10-19, 12, 21 to 23";
+        Command command = this._parser.parse(commandString);
+        List<Range> ranges = command.getParameter(Command.ParamName.TASK_INDEX_RANGES);
+
+        assertThat(ranges, hasSize(3));
+        assertThat(ranges, hasItems(
+                new Range(1, 7),
+                new Range(10, 19),
+                new Range(21, 23)
+        ));
+    }
+
+    @Test public void CommandParser_parses_simple_mark_correctly() {
+        Command command = this._parser.parse("mark 5");
+        assertThat(command.getInstruction(), is(equalTo(Command.Instruction.MARK)));
+        List<Range> ranges = command.getParameter(Command.ParamName.TASK_INDEX_RANGES);
+        assertThat(ranges, hasSize(1));
+        assertThat(ranges, hasItem(new Range(5)));
     }
 }
