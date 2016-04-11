@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * @@author Chng Hui Yie
+ * @@author A0127357B
  */
 public class Task implements Comparable<Task> {
 
@@ -32,30 +32,30 @@ public class Task implements Comparable<Task> {
     /**
      * Priority types
      * 
-     * @author Huiyie
+     * @@author A0127357B
      *
      */
     public enum Priority {
         LOW(0), NULL(1), MEDIUM(2), HIGH(3);
 
-        private final int PRIORITY_VALUE;
+        private final int _priorityValue;
 
         Priority(int priority) {
-            this.PRIORITY_VALUE = priority;
+            this._priorityValue = priority;
         }
 
         public int getPriorityValue() {
-            return this.PRIORITY_VALUE;
+            return this._priorityValue;
         }
 
         @Override public String toString() {
-            return Integer.toString(PRIORITY_VALUE);
+            return Integer.toString(_priorityValue);
         }
     };
 
     /**
-     * TODO: Write JavaDoc
-     * 
+     * Construct a new Task instance.
+     *
      * @param id
      * @param taskName
      * @param description
@@ -66,11 +66,24 @@ public class Task implements Comparable<Task> {
         this(id, taskName, description, LocalDateTime.now(), startTime, endTime, false, Priority.NULL, false);
     }
 
+    /**
+     * Construct a new Task instance.
+     *
+     * @param id
+     * @param taskName
+     * @param description
+     * @param startTime
+     * @param endTime
+     */
     public Task(Integer id, String taskName, String description, LocalDateTime startTime, LocalDateTime endTime) {
         this(id, taskName, description, new CustomTime(startTime), new CustomTime(endTime));
     }
 
-    // copy ctor, used to construct an identical copy in the clone method
+    /**
+     * Copy constructor that constructs an identical copy in the clone method.
+     *
+     * @param o
+     */
     private Task(Task o) {
         this(o._id,
                 o._taskName,
@@ -83,6 +96,19 @@ public class Task implements Comparable<Task> {
                 o._isDeleted);
     }
 
+    /**
+     * Construct a new Task instance.
+     *
+     * @param id
+     * @param taskName
+     * @param description
+     * @param creationTime
+     * @param startTime
+     * @param endTime
+     * @param isCompleted
+     * @param priority
+     * @param isDeleted
+     */
     private Task(Integer id, String taskName, String description, LocalDateTime creationTime, CustomTime startTime,
             CustomTime endTime, boolean isCompleted, Priority priority, boolean isDeleted) {
         this._id = id;
@@ -96,6 +122,11 @@ public class Task implements Comparable<Task> {
         this._isDeleted = isDeleted;
     }
 
+    /**
+     * Clones a Task instance.
+     *
+     * @return the cloned Task
+     */
     @Override public Task clone() {
         return new Task(this);
     }
@@ -106,6 +137,11 @@ public class Task implements Comparable<Task> {
     //
     // ----------------------------------------------------------------------------------------
 
+    /**
+     * Encodes Task instance to String.
+     *
+     * @return String representation of the Task instance
+     */
     public String encodeTaskToString() {
         return String.join(Character.toString(DELIMITER_CSV), this.taskAttributesToStringArray());
     }
@@ -115,6 +151,12 @@ public class Task implements Comparable<Task> {
                 this._endTime, this._isCompleted, this._priority };
     }
 
+    /**
+     * Sanitise Task attribute to output as String.
+     *
+     * @param attribute
+     * @return sanitised String representation of the Task attribute
+     */
     private String sanitise(Object attribute) {
         // Empty or null objects are treated similarly
         if (attribute == null) {
@@ -137,14 +179,54 @@ public class Task implements Comparable<Task> {
         return sanitised;
     }
 
+    /**
+     * Converts attributes of this Task to a new String array.
+     *
+     * @return a String array representation of Task attributes
+     */
     public String[] taskAttributesToStringArray() {
         // Sanitise data
         return Arrays.stream(this.attributesToSerialize()).map(this::sanitise).collect(Collectors.toList())
                 .toArray(new String[] {});
     }
 
+    // ----------------------------------------------------------------------------------------
+    //
+    // Methods for decoding Task from String
+    //
+    // ----------------------------------------------------------------------------------------
+
+    /**
+     * Decodes Task instance from a line of CSV.
+     *
+     * @param line
+     *              CSV representation of Task instance
+     * @return Task instance representation by the line of CSV
+     */
     public static Task decodeTaskFromString(String line) {
-        // Begin dynamic decoding
+        List<String> taskValues = decodeStringFromCsv(line);
+
+        // Decode Task attributes from String array
+        int id = decodeTaskID(taskValues.get(0));
+        String taskName = taskValues.get(1);
+        String description = taskValues.get(2);
+        LocalDateTime creationTime = decodeCreationTime(taskValues.get(3));
+        CustomTime startTime = decodeStartTimeOrEndTime(taskValues.get(4));
+        CustomTime endTime = decodeStartTimeOrEndTime(taskValues.get(5));
+        boolean isCompleted = decodeIsCompleted(taskValues.get(6));
+        Priority priority = decodePriority(taskValues.get(7));
+
+        return new Task(id, taskName, description, creationTime, startTime, endTime, isCompleted, priority, false);
+    }
+
+    /**
+     * Decodes a line of CSV into String representation of Task attributes.
+     *
+     * @param line
+     *              CSV representation of Task attributes
+     * @return a List of String representation of Task attributes
+     */
+    public static List<String> decodeStringFromCsv(String line) {
         List<String> taskValues = new ArrayList<>();
 
         int begin = 0;
@@ -181,40 +263,107 @@ public class Task implements Comparable<Task> {
             taskValues.add(line.substring(begin));
         }
 
-        // Begin decoding values
-        int id = Integer.parseInt(taskValues.get(0));
-        String taskName = taskValues.get(1);
-        String description = taskValues.get(2);
-        LocalDateTime creationTime = LocalDateTime.parse(taskValues.get(3));
-        CustomTime startTime = CustomTime.fromString(taskValues.get(4).trim());
-        CustomTime endTime   = CustomTime.fromString(taskValues.get(5).trim());
-
-        boolean isCompleted = taskValues.get(6).trim().toLowerCase().equals("true");
-
-        final Priority[] priority = new Priority[] { Priority.LOW };
-        int priorityValue = Integer.parseInt(taskValues.get(7));
-        Arrays.stream(Priority.values()).filter(p -> p.getPriorityValue() == priorityValue).findFirst()
-                .ifPresent(p -> priority[0] = p);
-
-        return new Task(id, taskName, description, creationTime, startTime, endTime, isCompleted, priority[0], false);
+        return taskValues;
     }
 
+    /**
+     * Decodes Task ID from its String representation.
+     *
+     * @param id
+     *            String representation of Task ID
+     * @return assigned ID of Task instance
+     */
+    public static int decodeTaskID(String id) {
+        return Integer.parseInt(id);
+    }
+
+    /**
+     * Decodes Task creation time from its String representation.
+     *
+     * @param creationTime
+     *                      String representation of Task creation time
+     * @return creation time of Task instance
+     */
+    public static LocalDateTime decodeCreationTime(String creationTime) {
+        return LocalDateTime.parse(creationTime);
+    }
+
+    /**
+     * Decodes Task start time or end time from its String representation.
+     *
+     * @param time
+     *              String representation of Task start time or end time
+     * @return CustomTime
+     */
+    public static CustomTime decodeStartTimeOrEndTime(String time) {
+        return CustomTime.fromString(time.trim());
+    }
+
+    /**
+     * Decodes Task isCompleted status from its String representation.
+     *
+     * @param isCompleted
+     *                     String representation of Task isCompleted status
+     * @return isCompleted status of Task instance
+     */
+    public static boolean decodeIsCompleted(String isCompleted) {
+        return isCompleted.trim().toLowerCase().equals("true");
+    }
+
+    /**
+     * Decodes Task priority from its String representation.
+     *
+     * @param priority
+     *                  String representation of Task priority
+     * @return priority of Task instance
+     */
+    public static Priority decodePriority(String priority) {
+        final Priority[] priorityArr = new Priority[] { Priority.LOW };
+        int priorityValue = Integer.parseInt(priority);
+        Arrays.stream(Priority.values()).filter(p -> p.getPriorityValue() == priorityValue).findFirst()
+                .ifPresent(p -> priorityArr[0] = p);
+        return priorityArr[0];
+    }
+
+    /**
+     * Compare this object with the specified object for order
+     *
+     * @param o
+     *           the object to be compared
+     * @return a negative integer, zero, or a positive integer as this object is less than, equal to,
+     * or greater than the specified object.
+     */
     @Override public int compareTo(Task o) {
         return this.getId().compareTo(o.getId());
     }
 
+    /**
+     * Indicates whether some other object is "equal to" this one
+     *
+     * @param o
+     *           the reference object with which to compare
+     * @return true if this object is the same as the o argument; false otherwise
+     */
     @Override public boolean equals(Object o) {
-        if (o == null)
+        if (o == null) {
             return false;
-        if (this == o)
+        }
+        if (this == o) {
             return true;
-        if (!(o instanceof Task))
+        }
+        if (!(o instanceof Task)) {
             return false;
+        }
 
         Task task = (Task) o;
         return this.getId().equals(task.getId());
     }
 
+    /**
+     * Returns a hash code value for the object.
+     *
+     * @return a hash code value for this object.
+     */
     @Override public int hashCode() {
         return this.getId().hashCode();
     }
