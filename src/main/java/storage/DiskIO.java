@@ -15,46 +15,56 @@ import shared.ApplicationContext;
 /**
  * Handles reading from and writing to disk.
  * 
- * @@author Chng Hui Yie
+ * @@author A0127357B
  *
  */
 public class DiskIO {
 
+    /**
+     * Singleton implementation
+     */
     private static final DiskIO instance = new DiskIO();
-
     public static DiskIO getInstance() {
         return instance;
     }
 
+    /**
+     * Properties
+     */
     private String _fileName;
     private UserPreferences _userPreferences;
 
+    /**
+     * Constructs a new DiskIO instance.
+     */
     private DiskIO() {
         this._userPreferences = UserPreferences.getInstance();
         processUserPreferencesFile();
         this.createDirectory();
     }
 
+    /**
+     * Processes user preferences file stored on disk.
+     */
     public void processUserPreferencesFile() {
         this._userPreferences.createOrReadPreferencesFile();
         this._fileName = this._userPreferences.getTodoDataPath();
     }
 
-    public String getFileName() {
-        return this._fileName;
-    }
-
-    public void setFileName(String fileName) {
-        this._fileName = fileName;
-        createDirectory();
-    }
-
+    /**
+     * Creates directory for writing file to disk
+     */
     public void createDirectory() {
         // Try to create directory
         File folder = new File(this._fileName).getParentFile();
         folder.mkdirs();
     }
 
+    /**
+     * Reads file from disk
+     *
+     * @return lines read from file as a List of String values
+     */
     public ArrayList<String> read() {
         // Create file if it does not already exist
         this.checkFileExists();
@@ -74,6 +84,13 @@ public class DiskIO {
         return taskStrings;
     }
 
+    /**
+     * Writes file to disk
+     *
+     * @param taskStrings
+     *                     List of String values to be written to file
+     * @return
+     */
     public List<String> write(List<String> taskStrings) {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(this._fileName));
@@ -88,6 +105,11 @@ public class DiskIO {
         return taskStrings;
     }
 
+    /**
+     * Checks that a file with the specified file name already exists
+     * 
+     * @return
+     */
     private File checkFileExists() {
         File file = new File(this._fileName);
         if (!file.exists()) {
@@ -98,5 +120,20 @@ public class DiskIO {
             }
         }
         return file;
+    }
+
+    /**
+     * Getters
+     */
+    public String getFileName() {
+        return this._fileName;
+    }
+
+    /**
+     * Setters
+     */
+    public void setFileName(String fileName) {
+        this._fileName = fileName;
+        createDirectory();
     }
 }
