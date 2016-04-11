@@ -175,11 +175,8 @@ public class CustomTime implements Comparable<CustomTime> {
             }
 
             if (this.hasTime() ^ time.hasTime()) return false;
-            if (this.hasTime() && !this.getTime().equals(time.getTime())) {
-                return false;
-            }
+            return !(this.hasTime() && !this.getTime().equals(time.getTime()));
 
-            return true;
         } else if (o instanceof LocalDateTime) {
             CustomTime time = new CustomTime((LocalDateTime) o);
             return this.equals(time);
@@ -190,5 +187,15 @@ public class CustomTime implements Comparable<CustomTime> {
 
     public boolean isNullDate() {
         return !(this.hasDate() || this.hasTime());
+    }
+
+    public static int difference(CustomTime time1, CustomTime time2) {
+        assert time1.hasDate() && time2.hasDate();
+        LocalTime timeOf1 = time1.hasTime() ? time1.getTime() : LocalTime.of(0, 0);
+        LocalTime timeOf2 = time2.hasTime() ? time2.getTime() : LocalTime.of(0, 0);
+
+        LocalDateTime fullTime1 = time1.getDate().atTime(timeOf1);
+        LocalDateTime fullTime2 = time2.getDate().atTime(timeOf2);
+        return (int) Math.abs(fullTime1.until(fullTime2, ChronoUnit.MINUTES));
     }
 }
