@@ -1,6 +1,7 @@
 package skeleton;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @@author Mai Anh Vu
@@ -16,6 +17,8 @@ public interface StorageSpec<T> {
     T get(int index);
 
     void undelete(int index);
+
+    Set<Integer> getNonDeletedTasks();
 
     List<T> getAll();
 

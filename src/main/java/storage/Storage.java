@@ -213,6 +213,7 @@ public class Storage extends TimerTask implements StorageSpec<Task> {
         this._isDirty = true;
     }
 
+    @Override
     public Set<Integer> getNonDeletedTasks() {
         return this._taskData.keySet()
                 .stream()

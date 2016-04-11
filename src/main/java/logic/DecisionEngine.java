@@ -124,7 +124,7 @@ public class DecisionEngine implements DecisionEngineSpec {
                 || command.hasInstruction(Command.Instruction.EDIT)
                 || command.hasInstruction(Command.Instruction.MARK);
 
-        StorageWriteOperation op = new StorageWriteOperation(command);
+        StorageWriteOperation op = new StorageWriteOperation(command, this.getStorage());
         String errorMsg = StorageWriteOperationHistory.getInstance().addToHistoryAfterExecuting(op);
 
         ExecutionResult result = this.displayAllTasks();
