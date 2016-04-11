@@ -108,7 +108,6 @@ public class TaskListItem extends ListCell<VisualTask> {
             // display the index and the task name
             this._indexLabel.setText(Integer.toString(index));
             this._nameLabel.setText(task.getTaskName());
-            System.out.println(task.getTaskName());
             // set up the time to be displayed
             this.setUpTime(task);
             if (this._timeLabel.getText().trim().isEmpty()) {
@@ -205,8 +204,6 @@ public class TaskListItem extends ListCell<VisualTask> {
         }
 
         String result = this._df.getCellTimeTaskDisplay(task);
-       // System.out.println(this._df.getDateTimeDisplay(task.getStartTime()));
-       // System.out.println(this._df.getDateTimeDisplay(task.getEndTime()));
         this._timeLabel.setText(result);
     }
 
