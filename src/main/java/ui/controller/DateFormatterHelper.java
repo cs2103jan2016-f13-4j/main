@@ -18,6 +18,7 @@ public class DateFormatterHelper {
     private final String EMPTY_STRING = "";
     private final String IN_WEEK_FORMAT = "EE";
     private final String DATE_FORMAT = "dd/MM/YYYY";
+    private final String DATE_HEADING_FORMAT = "dd MMMM";
     private final String DATE_YESTERDAY = "Yesterday";
     private final String DATE_TODAY = "Today";
     private final String DATE_TOMMOROW = "Tomorrow";
@@ -26,6 +27,7 @@ public class DateFormatterHelper {
     private final String TIME_FORMAT = "hh:mm a" ;
     private final String TIME_FROM = "From %s";
     private final String TIME_BY = "By %s";
+    private final String STRING_DATE_HEADING = "%s, %s";
     private final int ONE_DAY_DIFFERENCE = 1;
     private final int FIRST_DAY = 1;
     private final int RANGE_BEFORE_DAY_IS_REPEATED = 6;
@@ -34,12 +36,14 @@ public class DateFormatterHelper {
     private DateTimeFormatter _inWeekFormat;
     private DateTimeFormatter _otherDateFormat;
     private DateTimeFormatter _timeFormat;
+    private DateTimeFormatter _dateHeadingFormat;
 
     public DateFormatterHelper() {
         this.updateCurrentTime();
         this._inWeekFormat = DateTimeFormatter.ofPattern(IN_WEEK_FORMAT);
         this._otherDateFormat = DateTimeFormatter.ofPattern(DATE_FORMAT);
         this._timeFormat = DateTimeFormatter.ofPattern(TIME_FORMAT);
+        this._dateHeadingFormat = DateTimeFormatter.ofPattern(DATE_HEADING_FORMAT);
     }
 
     /***
@@ -82,6 +86,17 @@ public class DateFormatterHelper {
     }
 
     /***
+     * this method will format the time element of the task to be displayed on the date header of a cell, if requuested
+     */
+    public String getCellDateDisplay(CustomTime time){
+        if(isToday(time) || isYesterday(time) || isTomorrow(time) || isSameWeek(time) || isNextWeek(time)){
+            return String.format(STRING_DATE_HEADING,this.getDateDisplay(time), this._dateHeadingFormat.format(time.getDate()));
+        }
+
+        return this._dateHeadingFormat.format(time.getDate());
+    }
+
+    /***
      * this method return the time stored in the CustomTime object.
      * The format of the returned String is HH:mm
      * if the time is a null object, it will return an empty string
@@ -110,6 +125,8 @@ public class DateFormatterHelper {
         assert cTime != null;
 
         String display =  getDateDisplay(cTime);
+        System.out.println(display);
+        System.out.println(cTime.hasTime());
         if (display.isEmpty()) {
             if (cTime.hasTime()) {
                 display  = getTimeDisplay(cTime);
@@ -149,17 +166,24 @@ public class DateFormatterHelper {
 
                 if (endTime != null) {
                     if (endTime.hasSameDate(startTime)) {
-                        return String.format(DATE_PAIR_PATTERN, display, this.getTimeDisplay(endTime));
+                        if (endTime.hasTime()) {
+                            return String.format(DATE_PAIR_PATTERN, display, this.getTimeDisplay(endTime));
+                        }
                     } else {
-                        return String.format(DATE_PAIR_PATTERN, display, this.getDateTimeDisplay(endTime));
+                        if (endTime.hasDate() || endTime.hasTime()) {
+                            return String.format(DATE_PAIR_PATTERN, display, this.getDateTimeDisplay(endTime));
+                        }
                     }
                 }
 
                 return String.format(TIME_FROM, display);
             } else {
+
                 if (endTime != null) {
                     if (endTime.hasSameDate(startTime)) {
-                        return String.format(TIME_BY, this.getTimeDisplay(endTime));
+                        if (endTime.hasTime()) {
+                            return String.format(TIME_BY, this.getTimeDisplay(endTime));
+                        }
                     } else {
                         return String.format(TIME_BY, this.getDateTimeDisplay(endTime));
                     }
@@ -168,6 +192,7 @@ public class DateFormatterHelper {
             }
 
         } else {
+            System.out.println(this.getDateTimeDisplay(endTime));
             if (endTime != null) {
                 if (endTime.hasTime()) {
                     return String.format(TIME_BY, this.getTimeDisplay(endTime));

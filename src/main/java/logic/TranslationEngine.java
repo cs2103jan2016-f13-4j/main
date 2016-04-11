@@ -17,7 +17,8 @@ import ui.view.View;
 import ui.view.VisualTask;
 
 /**
- * Translation Engine translate data provided by the logic component to a form that is presentable to the User, and vice versa
+ * Translation Engine translate data provided by the logic component to a form that is presentable to the User. It also translate
+ * the visual data into a form that the logic component understand.
  *
  * @@author Mai Anh Vu
  */

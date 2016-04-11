@@ -28,7 +28,7 @@ public class TaskListItem extends ListCell<VisualTask> {
     private static final String STRING_NAME_TEMPLATE_WITH_DATE = "TaskListItemDated";
     private static final String STRING_NAME_TEMPLATE_NO_DATE = "TaskListItemNormal";
     private static final String STRING_HIGHLIGHT_COLOR = "#FBFF74";
-
+    private static final String FLOATING_STRING = "Floating";
     @FXML
     private AnchorPane _container;
     @FXML private Label _indexLabel;
@@ -105,7 +105,7 @@ public class TaskListItem extends ListCell<VisualTask> {
             // display the index and the task name
             this._indexLabel.setText(Integer.toString(index));
             this._nameLabel.setText(task.getTaskName());
-
+            System.out.println(task.getTaskName());
             // set up the time to be displayed
             this.setUpTime(task);
 
@@ -197,7 +197,9 @@ public class TaskListItem extends ListCell<VisualTask> {
             setDateHeading(task);
 
         }
-        String result = _df.getCellTimeTaskDisplay(task);
+        String result = this._df.getCellTimeTaskDisplay(task);
+        System.out.println(this._df.getDateTimeDisplay(task.getStartTime()));
+        System.out.println(this._df.getDateTimeDisplay(task.getEndTime()));
         this._timeLabel.setText(result);
     }
 
@@ -219,7 +221,7 @@ public class TaskListItem extends ListCell<VisualTask> {
             CustomTime curStartTime = curTask.getStartTime();
             CustomTime curEndTime = curTask.getEndTime();
             CustomTime prevStartTime = prevTask.getStartTime();
-            CustomTime prevEndTime = curTask.getEndTime();
+            CustomTime prevEndTime = prevTask.getEndTime();
 
             if (curStartTime != null) {
                 if (prevStartTime != null) {
@@ -252,16 +254,16 @@ public class TaskListItem extends ListCell<VisualTask> {
         CustomTime startTime = task.getStartTime();
         if (startTime != null) {
             if (startTime.hasDate()) {
-                this._dateLabel.setText(this._df.getDateDisplay(startTime));
+                this._dateLabel.setText(this._df.getCellDateDisplay(startTime));
             }
         } else {
             CustomTime endTime = task.getEndTime();
             if (endTime != null) {
                 if (endTime.hasDate()) {
-                    this._dateLabel.setText(this._df.getDateDisplay(endTime));
+                    this._dateLabel.setText(this._df.getCellDateDisplay(endTime));
                 }
             } else {
-                this._dateLabel.setText("Floating");
+                this._dateLabel.setText(FLOATING_STRING);
             }
         }
     }
