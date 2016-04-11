@@ -79,6 +79,13 @@ public class DateFormatterHelper {
         return date;
     }
 
+    /***
+     * this method return the time stored in the CustomTime object.
+     * The format of the returned String is HH:mm
+     *
+     * @param time CustomTime object which time stored going to be formatted
+     * @return time stored in CustomTime following the described format
+     */
     public String getTimeDisplay(CustomTime time){
         String display = EMPTY_STRING;
         if(time.hasTime()){
@@ -111,43 +118,18 @@ public class DateFormatterHelper {
         return display;
     }
 
-    public boolean hasSameDate(Task task1,Task task2) {
 
-        CustomTime curStartTime = task1.getStartTime();
-        CustomTime curEndTime = task1.getEndTime();
-        CustomTime prevStartTime = task2.getStartTime();
-        CustomTime prevEndTime = task2.getEndTime();
-
-        if (curStartTime != null) {
-            if (prevStartTime != null) {
-                return curStartTime.hasSameDate(prevStartTime);
-            } else if (prevEndTime != null) {
-                return curStartTime.hasSameDate(prevEndTime);
-            } else {
-                return false;
-            }
-        } else if (curEndTime != null) {
-            if (prevStartTime != null) {
-                return curEndTime.hasSameDate(prevStartTime);
-            } else if (prevEndTime != null) {
-                return curEndTime.hasSameDate(prevEndTime);
-            } else {
-                return false;
-            }
-        } else {
-            if(prevStartTime != null || curStartTime != null) {
-                return false;
-            } else {
-                return true;
-            }
-        }
-    }
 
     /***
-     * This special method is called only for task with only either the startTime or endTime, or Task that store no time at all.
+     * This special method is called to print the time stored in the task following the specification in the cell item.
+     * Possible printed format:
+     * - [START TIME] to [END TIME]
+     * - [START TIME] T0 [END DATE] [END TIME]
+     * - by [START TIME]
+     * - by [START DATE] [START TIME]
+     *
      * @param task the task to be processed
-     * @return a pair of strings, the key contains the preposition to indicate the type of task involved, the value contains the date and time
-     *          of task
+     * @return String containing the formatted time information related to the task
      */
     public String getCellTimeTaskDisplay(Task task) {
 
@@ -237,7 +219,7 @@ public class DateFormatterHelper {
          int taskDayOfYear = time.getDate().getDayOfYear();
 
         if (curYear == taskYear) {
-            return (curYear == taskYear) && ((curDayOfYear - taskDayOfYear) == 1);
+            return (curDayOfYear - taskDayOfYear) == 1;
         } else {
             return (curYear - taskYear == 1) && ( curDayOfYear == 1 && (taskDayOfYear == 365 || taskDayOfYear == 366));
         }
@@ -315,7 +297,7 @@ public class DateFormatterHelper {
     private boolean isLeapYear(int year){
 
         if (year%4 == 0) {
-            if (year%100 == 0){
+            if (year%100 == 0) {
                 if (year%400 == 0) {
                     return true;
                 }
