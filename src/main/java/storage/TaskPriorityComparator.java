@@ -5,18 +5,31 @@ import java.util.Comparator;
 import shared.Task;
 
 /**
- * 
- * @@author Chng Hui Yie
+ * A comparison function which imposes a total ordering on collection of Task objects
+ *
+ * @@author A0127357B
  *
  */
 public class TaskPriorityComparator implements Comparator<Task> {
 
+    /**
+     * Singleton implementation
+     */
     private static TaskPriorityComparator instance = new TaskPriorityComparator();
-
     public static TaskPriorityComparator getInstance() {
         return instance;
     }
 
+    /**
+     * Compares its two arguments for order
+     *
+     * @param task1
+     *               the first object to be compared
+     * @param task2
+     *               the second object to be compared
+     * @return a negative integer, zero, or a positive integer as the first argument is less than,
+     * equal to, or greater than the second.
+     */
     @Override public int compare(Task task1, Task task2) {
         // Completion comparison
         Integer task1Completed = task1.isCompleted() ? 1 : 0;
@@ -28,28 +41,42 @@ public class TaskPriorityComparator implements Comparator<Task> {
 
         // Priority comparison
         int priorityComparison = task2.getPriority().compareTo(task1.getPriority());
-        if (priorityComparison != 0) return priorityComparison;
+        if (priorityComparison != 0) {
+            return priorityComparison;
+        }
 
         // Start time comparison
         if (task1.getStartTime() == null ^ task2.getStartTime() == null) {
-            if (task1.getStartTime() == null) return 1;
-            if (task2.getStartTime() == null) return -1;
+            if (task1.getStartTime() == null) {
+                return 1;
+            }
+            if (task2.getStartTime() == null) {
+                return -1;
+            }
         }
 
         if (task1.getStartTime() != null && task2.getStartTime() != null) {
             int startTimeComparison = task1.getStartTime().compareTo(task2.getStartTime());
-            if (startTimeComparison != 0) return startTimeComparison;
+            if (startTimeComparison != 0) {
+                return startTimeComparison;
+            }
         }
 
         // End time comparison
         if (task1.getEndTime() == null ^ task2.getEndTime() == null) {
-            if (task1.getEndTime() == null) return 1;
-            if (task2.getEndTime() == null) return -1;
+            if (task1.getEndTime() == null) {
+                return 1;
+            }
+            if (task2.getEndTime() == null) {
+                return -1;
+            }
         }
 
         if (task1.getEndTime() != null && task2.getEndTime() != null) {
             int endTimeComparison = task1.getEndTime().compareTo(task2.getEndTime());
-            if (endTimeComparison != 0) return endTimeComparison;
+            if (endTimeComparison != 0) {
+                return endTimeComparison;
+            }
         }
 
         // Creation time comparison
