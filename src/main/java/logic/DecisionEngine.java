@@ -5,6 +5,7 @@ import shared.*;
 import skeleton.StorageSpec;
 import skeleton.DecisionEngineSpec;
 import skeleton.SchedulerSpec;
+import skeleton.WriteHistorySpec;
 import storage.Storage;
 import storage.TaskPriorityComparator;
 
@@ -69,14 +70,14 @@ public class DecisionEngine implements DecisionEngineSpec {
                 result = this.handleSchedule(command);
                 break;
             case UNDO:
-                boolean undoActuallyHappened = WriteHistory.getInstance().undo();
+                boolean undoActuallyHappened = this.getWriteHistory().undo();
                 result = this.displayAllTasks();
                 if (!undoActuallyHappened) {
                     result.setErrorMessage(Message.UNDO_FAIL.toString());
                 }
                 break;
             case REDO:
-                boolean redoActuallyHappened = WriteHistory.getInstance().redo();
+                boolean redoActuallyHappened = this.getWriteHistory().redo();
                 result = this.displayAllTasks();
                 if (!redoActuallyHappened) {
                     result.setErrorMessage(Message.REDO_FAIL.toString());
@@ -121,7 +122,7 @@ public class DecisionEngine implements DecisionEngineSpec {
                 || command.hasInstruction(Command.Instruction.MARK);
 
         StorageWriteOperation op = new StorageWriteOperation(command, this.getStorage());
-        String errorMsg = WriteHistory.getInstance().addToHistoryAfterExecuting(op);
+        String errorMsg = this.getWriteHistory().addToHistoryAfterExecuting(op);
 
         ExecutionResult result = this.displayAllTasks();
         result.setErrorMessage(errorMsg);
@@ -257,6 +258,10 @@ public class DecisionEngine implements DecisionEngineSpec {
 
     private StorageSpec<Task> getStorage() {
         return Storage.getInstance();
+    }
+
+    private WriteHistorySpec getWriteHistory() {
+        return WriteHistory.getInstance();
     }
 
 

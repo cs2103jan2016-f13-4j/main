@@ -1,5 +1,7 @@
 package logic;
 
+import skeleton.WriteHistorySpec;
+
 import java.util.*;
 
 
@@ -10,7 +12,7 @@ import java.util.*;
  *
  * @@author Thenaesh Elango
  */
-public class WriteHistory {
+public class WriteHistory implements WriteHistorySpec {
 
     // singleton declaration
     private static WriteHistory instance = null;
@@ -30,6 +32,7 @@ public class WriteHistory {
 
 
     // methods
+    @Override
     public void addToHistory(StorageWriteOperation op) {
         this.checkIndexInvariant();
 
@@ -40,6 +43,7 @@ public class WriteHistory {
         this.checkIndexInvariant();
     }
 
+    @Override
     public String addToHistoryAfterExecuting(StorageWriteOperation op) {
         String errorMsg = op.getInitialOperation().apply(null);
         this.addToHistory(op);
@@ -50,6 +54,7 @@ public class WriteHistory {
     /**
      * @return false if there were no ops to undo, true otherwise
      */
+    @Override
     public boolean undo() {
         this.checkIndexInvariant();
 
@@ -76,6 +81,7 @@ public class WriteHistory {
     /**
      * @return false if there were no ops to redo, true otherwise
      */
+    @Override
     public boolean redo() {
         this.checkIndexInvariant();
 
