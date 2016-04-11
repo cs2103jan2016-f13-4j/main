@@ -18,7 +18,7 @@ import java.time.LocalTime;
 /**
  * Test for the DateFormatterHelper behavior in determining time relation.
  *
- * Created by A0127036M
+ * @@author A0127036M
  */
 public class DateFormatterHelperTest {
 

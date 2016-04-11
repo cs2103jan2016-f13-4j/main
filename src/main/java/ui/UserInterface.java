@@ -31,7 +31,7 @@ import java.util.function.Function;
  * of the components behavior. The only changing element in this class is the viewWrapper which display the
  * view constructed from the View object. Other than that the stage, and its other children stage is all persistent.
  *
- * @@author Mai Anh Vu
+ * @@author A0127046L
  */
 public class UserInterface implements UserInterfaceSpec {
 

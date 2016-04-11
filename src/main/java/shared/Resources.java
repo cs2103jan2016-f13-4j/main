@@ -14,7 +14,7 @@ import javafx.scene.image.Image;
 import javafx.util.Pair;
 
 /**
- * @@author Mai Anh Vu
+ * @@author A0127046L
  */
 public class Resources {
     /**

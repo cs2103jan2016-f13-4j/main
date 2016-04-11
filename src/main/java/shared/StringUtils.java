@@ -5,7 +5,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * @@author Mai Anh Vu
+ * @@author A0127046L
  */
 public class StringUtils {
     public static final char CHAR_QUOTES = '\"';

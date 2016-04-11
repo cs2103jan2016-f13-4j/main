@@ -1,7 +1,7 @@
 package skeleton;
 
 /**
- * @@author Thenaesh Elango
+ * @@author A0124772E
  */
 public interface DispatcherSpec {
 

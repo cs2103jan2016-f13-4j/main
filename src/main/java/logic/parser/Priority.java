@@ -6,7 +6,7 @@ import shared.Task;
 import java.util.Set;
 
 /**
- * @@author Mai Anh Vu
+ * @@author A0127046L
  */
 public class Priority {
     private static final String KEY_JSON_MEANING = "meaning";

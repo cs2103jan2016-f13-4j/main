@@ -8,7 +8,7 @@ import java.util.List;
  * The Scheduler is called upon by the Decision Engine to schedule a floating task,
  * as well as to check if a task is colliding.
  *
- * @@author Thenaesh Elango
+ * @@author A0124772E
  */
 public interface SchedulerSpec {
 

@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * @@author Mai Anh Vu
+ * @@author A0127046L
  */
 public interface StorageSpec<T> {
 

@@ -7,7 +7,7 @@ import java.util.List;
 import exception.ExceptionHandler;
 
 /**
- * @@author Mai Anh Vu
+ * @@author A0127046L
  */
 public class Command {
 
@@ -63,7 +63,7 @@ public class Command {
 
     /**
      * Constructs a command with the given instruction, index OR quantifier.
-     * 
+     *
      * @param instruction
      */
     public Command(Instruction instruction) {

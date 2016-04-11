@@ -7,7 +7,7 @@ import java.util.function.Function;
 
 /**
  *
- * @@author Mai Anh Vu
+ * @@author A0127046L
  */
 public interface TranslationEngineSpec {
     UserInterfaceSpec getUserInterface();

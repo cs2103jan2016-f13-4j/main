@@ -6,7 +6,7 @@ import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
 
 /**
- * @@author Mai Anh Vu
+ * @@author A0127046L
  */
 public class CustomTime implements Comparable<CustomTime> {
     /**

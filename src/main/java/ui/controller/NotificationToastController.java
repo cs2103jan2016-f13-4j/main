@@ -7,7 +7,7 @@ import javafx.scene.layout.AnchorPane;
 /**
  * this class control the information stored in the notification bar
  *
- * Created by maianhvu on 03/04/2016.
+ * @@author A0127046L
  */
 public class NotificationToastController {
 

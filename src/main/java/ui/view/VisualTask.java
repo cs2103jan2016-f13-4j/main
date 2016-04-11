@@ -3,7 +3,7 @@ package ui.view;
 import shared.Task;
 
 /**
- * Created by maianhvu on 05/04/2016.
+ * @@author A0127036M
  */
 public class VisualTask {
 

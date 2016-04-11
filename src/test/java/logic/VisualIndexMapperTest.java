@@ -1,6 +1,5 @@
 package logic;
 
-import javafx.util.Pair;
 import org.junit.Test;
 import shared.Command;
 import shared.CustomTime;
@@ -9,7 +8,6 @@ import shared.Task;
 import ui.view.VisualTask;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,7 +20,7 @@ import static org.hamcrest.core.IsEqual.equalTo;
 import static org.junit.Assert.assertThat;
 
 /**
- * Created by maianhvu on 23/03/2016.
+ * @@author A0127046L
  */
 public class VisualIndexMapperTest {
 

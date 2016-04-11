@@ -9,7 +9,7 @@ import shared.TemporalRange;
 import java.time.Month;
 
 /**
- * @@author Thenaesh Elango
+ * @@author A0124772E
  */
 public class TemporalRangeTest {
     public static final CustomTime time1 = new CustomTime(2016, Month.APRIL, 1, 8, 0);

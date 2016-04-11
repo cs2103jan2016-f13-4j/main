@@ -1,17 +1,15 @@
 package ui.controller;
 
-import javafx.util.Pair;
 import shared.CustomTime;
 import shared.Task;
 
 import java.time.DayOfWeek;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
  * This class manages the format in which the time is going to be displayed in the User Interface
  *
- * Created by Antonius Satrio Triatmoko on 4/1/2016.
+ * @@author A0127036M
  */
 public class DateFormatterHelper {
     /**Constant**/
@@ -263,11 +261,11 @@ public class DateFormatterHelper {
 
         return curYear - taskYear == 1;
     }
-    
+
     boolean isNextYear(CustomTime time){
-        int curYear = this._now.getDate().getYear(); 
-        int taskYear = time.getDate().getYear(); 
-        
+        int curYear = this._now.getDate().getYear();
+        int taskYear = time.getDate().getYear();
+
         return taskYear - curYear == 1;
     }
 

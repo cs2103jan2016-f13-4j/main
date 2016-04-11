@@ -3,7 +3,7 @@ package shared;
 /**
  * Represents a range spanning two CustomTime bounds
  *
- * @@author Thenaesh Elango
+ * @@author A0124772E
  */
 public class TemporalRange {
     private CustomTime _start;

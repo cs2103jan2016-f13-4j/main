@@ -6,7 +6,7 @@ import logic.StorageWriteOperation;
  * This component assists the Decision Engine by keeping track of all write operations performed on Storage.
  * This component will enable undo/redo operations.
  *
- * @@author Thenaesh Elango
+ * @@author A0124772E
  */
 public interface WriteHistorySpec {
 

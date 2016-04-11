@@ -12,6 +12,7 @@ import java.util.function.Function;
  * view constructed from the View object. Other than that, the stage and its other children stage are all persistent.
  *
  * the following interface define the behavior of the class
+ * @@author A0124772E
  */
 public interface UserInterfaceSpec {
 

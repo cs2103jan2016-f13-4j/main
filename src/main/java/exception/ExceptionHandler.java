@@ -1,7 +1,7 @@
 package exception;
 
 /**
- * @@author Mai Anh Vu
+ * @@author A0127046L
  */
 public class ExceptionHandler {
     private static ExceptionHandler instance = new ExceptionHandler();

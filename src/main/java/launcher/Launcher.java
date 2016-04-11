@@ -7,7 +7,7 @@ import shared.ApplicationContext;
 import skeleton.DispatcherSpec;
 
 /**
- * @@author Mai Anh Vu
+ * @@author A0127046L
  */
 public class Launcher extends Application {
 

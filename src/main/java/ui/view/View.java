@@ -10,7 +10,7 @@ import java.util.function.Function;
  * View is the abstract class which controls the display and the behavior of the content displayed in the User Interface.
  *
  *
- * @@author Mai Anh Vu
+ * @@author A0127046L
  */
 public abstract class View {
 

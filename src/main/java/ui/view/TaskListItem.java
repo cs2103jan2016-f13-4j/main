@@ -23,7 +23,7 @@ import ui.controller.DateFormatterHelper;
  *
  * DateFormatterHelper is used to help determining the date and time presentation.
  *
- * @
+ * @@author A0127036M
  */
 public class TaskListItem extends ListCell<VisualTask> {
     private static final String STRING_IS_COMPLETED = "Completed";

@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
- * @@author Mai Anh Vu
+ * @@author A0127046L
  */
 public class RegexUtils {
 

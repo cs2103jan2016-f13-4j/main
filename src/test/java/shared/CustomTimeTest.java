@@ -13,7 +13,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
- * Created by maianhvu on 23/03/2016.
+ * @@author A0127046L
  */
 public class CustomTimeTest {
 

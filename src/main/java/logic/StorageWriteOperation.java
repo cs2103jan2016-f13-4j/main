@@ -18,7 +18,7 @@ import skeleton.*;
  *
  * WARNING: These objects should NOT persist between sessions. Undefined behaviour may result.
  *
- * @@author Thenaesh Elango
+ * @@author A0124772E
  */
 public class StorageWriteOperation {
 

@@ -15,12 +15,12 @@ import java.util.List;
 
 
 /**
- * @@author Thenaesh Elango
+ * @@author A0124772E
  */
 public class SchedulerTest {
     /**
      * class to enable dependency injection of Storage
-     * @@author Thenaesh Elango
+     * @@author A0124772E
      */
     static class StorageTester extends Storage {
         public StorageTester() {
