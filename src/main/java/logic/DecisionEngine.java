@@ -251,11 +251,11 @@ public class DecisionEngine implements DecisionEngineSpec {
     }
 
 
-    @Override public SchedulerSpec getTaskScheduler() {
+    private SchedulerSpec getTaskScheduler() {
         return Scheduler.getInstance();
     }
 
-    @Override public StorageSpec<Task> getStorage() {
+    private StorageSpec<Task> getStorage() {
         return Storage.getInstance();
     }
 

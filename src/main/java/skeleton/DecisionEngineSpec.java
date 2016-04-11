@@ -13,11 +13,7 @@ public interface DecisionEngineSpec {
 
     void initialise();
 
-    StorageSpec<Task> getStorage();
-
     ExecutionResult performCommand(Command cmd);
-
-    SchedulerSpec getTaskScheduler();
 
     void shutdown();
 
