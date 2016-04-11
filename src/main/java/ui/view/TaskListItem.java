@@ -37,7 +37,6 @@ public class TaskListItem extends ListCell<VisualTask> {
     @FXML private Label _timeLabel;
     @FXML private Label _dateLabel;
     @FXML private Rectangle _highlight;
-    @FXML private Rectangle _canScrollUp;
 
     private DateFormatterHelper _df = new DateFormatterHelper();
     private Command _lastCommand;
@@ -76,14 +75,12 @@ public class TaskListItem extends ListCell<VisualTask> {
         this._indexLabel = (Label) this._container.lookup("#_indexLabel");
         this._nameLabel = (Label) this._container.lookup("#_taskNameLabel");
         this._highlight = (Rectangle) this._container.lookup("#_highlightEffect");
-        this._canScrollUp = (Rectangle) this._container.lookup("#_scrollUp");
         this._timeLabel = (Label) this._container.lookup("#_timeLabel");
         this._priorityLabel = (Label) this._container.lookup("#_priorityIndicator");
 
         assert this._indexLabel != null;
         assert this._nameLabel != null;
         assert this._highlight != null;
-        assert this._canScrollUp != null;
         assert this._timeLabel != null;
     }
 
@@ -141,11 +138,11 @@ public class TaskListItem extends ListCell<VisualTask> {
         this.getStyleClass().add("priority--" + task.getPriority().name().toLowerCase());
 
         if (task.getPriority() == Task.Priority.HIGH) {
-            this._priorityLabel.setText("HIGH");
+            this._priorityLabel.setText("High");
         } else if (task.getPriority() == Task.Priority.MEDIUM) {
-            this._priorityLabel.setText("MEDIUM");
+            this._priorityLabel.setText("Medium");
         } else if (task.getPriority() == Task.Priority.LOW) {
-            this._priorityLabel.setText("LOW");
+            this._priorityLabel.setText("Low");
         }
     }
 
@@ -160,10 +157,6 @@ public class TaskListItem extends ListCell<VisualTask> {
         this.getStyleClass().add("indexed-cell");
         this.getStyleClass().add("list-cell");
 
-        // check if any cell has scrollup indicator applied
-        if(this._canScrollUp.getOpacity() == 1) {
-            this._canScrollUp.setOpacity(0);
-        }
     }
 
 

@@ -1,62 +1,54 @@
 /* @@author Mai Anh Vu */
 .item__container {
-    -fx-background-color: #ffffff;
+    -fx-background-color: #f7f7f7;
 }
 
-.item__index,
-.item__name,
+.item__index {
+    -fx-font-family: "Lato Light";
+    -fx-font-weight: 300;
+    -fx-font-size: 24px;
+    -fx-text-fill: #828282;
+}
+
+.item__name {
+    -fx-font-family: "Lato";
+    -fx-font-weight: bold;
+    -fx-text-fill: #525252;
+    -fx-font-size: 14px;
+}
+
 .item__date {
     -fx-font-family: "Lato";
+    -fx-font-size: 14px;
+    -fx-text-fill: #787878;
 }
 
-.item__name,
-.item__index {
-    -fx-text-fill: #343434;
+.item__time {
+    -fx-font-family: "Lato Light";
+    -fx-font-weight: 300;
+    -fx-text-fill: #2E2E2E;
+    -fx-background-color: transparent;
 }
 
-.item__date {
-    -fx-text-fill: #636363;
+.indicator--priority {
+    visibility: hidden;
 }
 
-.item__index {
+.indicator__text {
+    -fx-font-family: "Lato";
+    -fx-font-size: 12px;
     -fx-font-weight: bold;
-    -fx-font-size: 18px;
 }
 
-.item__date {
-    -fx-font-style: italic;
-    -fx-text-alignment: right;
+.priority--high .indicator--priority {
+    visibility: visible;
+    -fx-fill: #FD6666;
 }
-
-.list-cell.completed .item__index,
-.list-cell.completed .item__date,
-.list-cell.completed .item__name {
-    -fx-text-fill: #ccc;
+.priority--medium .indicator--priority {
+    visibility: visible;
+    -fx-fill: #FDBA66;
 }
-
-
-.list-cell.priority--high .indicator--priority {
-    -fx-fill: #ff6f6f;
-}
-.list-cell.priority--high .indicator__text {
-    -fx-text:"HIGH";
-}
-
-.list-cell.priority--medium .indicator--priority {
-    -fx-fill: #ffbe13;
-}
-.list-cell.priority--medium .indicator__text {
-    -fx-text:"MEDIUM";
-
-}
-
-.list-cell.priority--low .indicator--priority {
-    -fx-fill: #8E8C8C;
-}
-.list-cell.priority--low .indicator__text {
-    -fx-text:"LOW";
-}
-
-.list-cell.priority--null .indicator--priority {
-    -fx-fill: #f2f2f2;
+.priority--low .indicator--priority {
+    visibility: visible;
+    -fx-fill: #73C3FF;
 }
