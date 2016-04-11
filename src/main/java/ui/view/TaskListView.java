@@ -29,6 +29,9 @@ import java.util.List;
 import java.util.function.Function;
 
 /**
+ * This class manage the process of displaying the list of Task that is called by the user to be displayed.
+ * Instead of Task, the View contains List of VisualTask which is a pair of Task and its display index.
+ *
  * @@author Antonius Satrio Triatmoko
  */
 public class TaskListView extends View {
@@ -56,7 +59,7 @@ public class TaskListView extends View {
     }
 
     @Override protected void buildContent() {
-        // find viewIndex for new task if the last command is add
+
         if(this.getLastCommand().getInstruction() == Command.Instruction.ADD){
             Pair<Integer, Integer> indexPair =  obtainNewTaskIndex();
             this._viewIndex = indexPair.getValue();
@@ -69,7 +72,7 @@ public class TaskListView extends View {
         this._displayList = constructDisplayList();
         _observableList = FXCollections.observableArrayList(_displayList);
 
-        ListView listView = Resources.sharedResources().getComponent("TaskList");
+        ListView listView = Resources.getInstance().getComponent("TaskList");
         listView.setItems(this._observableList);
 
         final int highlightIndex = this._newTaskIndex;
@@ -79,65 +82,101 @@ public class TaskListView extends View {
         this.setComponent(listView);
     }
 
-    private Pair<Integer,Integer> obtainNewTaskIndex(){
-        List<VisualTask> taskList = this.getData();
-        int index = 0;
-        Task temp ;
-        Task current= null;
-        for(int i = 0; i < taskList.size();  i++){
-            if(current == null){
-                current = taskList.get(i).getTask();
-            } else {
-                temp = taskList.get(i).getTask();
-                LocalDateTime curCreationTime = current.getCreationTime();
-                LocalDateTime tempCreationTime = temp.getCreationTime();
-                if(curCreationTime.compareTo(tempCreationTime) < 0){
-                    current = temp;
-                    index = i;
-                }
-            }
-        }
-        return new Pair<Integer, Integer>(index,index/MAXIMUM_DISPLAY_SIZE);
-    }
 
+    /**
+     * The Item class is the extension of ListCell class which allow us to customize the display content of the list.
+     * There are two possible .xml files that can be loaded depending on Date and Time information stored by the task.Event Task
+     * (Task with both start time and end time)will load TaskListItemDouble.fxml while other type of task will
+     * use TaskListItemSingle.fxml .
+     *
+     * DateFormatterHelper is used to help determining the date and time presentation.
+     */
     private class Item extends ListCell<VisualTask> {
         private static final int STRING_FIRST_ITEM = 1;
         public static final double STRING_HIGHLIGHT_OPACITY = .31;
-        private static final String STRING_NAME_TEMPLATE = "TaskListItem";
+        private static final String STRING_NAME_TEMPLATE_EVENT = "TaskListItemDouble";
+        private static final String STRING_NAME_TEMPLATE_SINGLE = "TaskListItemSingle";
         private static final String STRING_HIGHLIGHT_COLOR = "#FBFF74";
         private final Color COLOR_TRANSPARENT_FULL = new Color(1,1,1,0);
         private final Color COLOR_TRANSPARENT_NONE = new Color(1,1,1,0.8);
         @FXML private AnchorPane _container;
         @FXML private Label _indexLabel;
         @FXML private Label _nameLabel;
-        @FXML private Label _dateLabel;
+        @FXML private Label _startLabelPrefix;
+        @FXML private Label _startLabelTime;
+        @FXML private Label _endLabelPrefix;
+        @FXML private Label _endLabelTime;
         @FXML private Rectangle _highlight;
         @FXML private Rectangle _canScrollUp;
+
         private DateFormatterHelper _df = new DateFormatterHelper();
         private Command _lastCommand;
         private int _newTaskIndex;
+        private boolean canHighlight = true;
 
-        public Item(Command lastCommand){
-            this(lastCommand,-1);
-        }
 
         public Item(Command lastCommand, int newTaskIndex) {
             super();
-            this._container = Resources.sharedResources().getComponent(STRING_NAME_TEMPLATE);
-            this._indexLabel = (Label) this._container.lookup("#_indexLabel");
-            this._nameLabel = (Label) this._container.lookup("#_taskNameLabel");
-            this._dateLabel = (Label) this._container.lookup("#_timeLabel");
-            this._highlight = (Rectangle) this._container.lookup("#_highlightEffect");
-            this._canScrollUp = (Rectangle) this._container.lookup("#_scrollUp");
-            assert this._indexLabel != null;
-            assert this._nameLabel != null;
-            assert this._dateLabel != null;
-            assert this._highlight != null;
 
             this._lastCommand = lastCommand ;
             this._newTaskIndex = newTaskIndex;
 
         }
+
+        /***
+         * This method link the Item Class to the corresponding  .fxml file used to display the list content.
+         *
+         * @param task the task that is going to be checked. Event Task will call TasklistItemDouble.fxml  whereas
+         *             other type of task will call TaskListItemSingle.fxml.
+         */
+        private void updateGraphicPointer(Task task) {
+
+
+            if (isEvent(task)) {
+                this._container = (AnchorPane) Resources.getInstance().getComponent(STRING_NAME_TEMPLATE_EVENT);
+
+                assert this._container != null;
+
+                this._startLabelPrefix = (Label)this._container.lookup("#_startPrefix");
+                this._startLabelTime = (Label)this._container.lookup("#_startTime");
+                this._endLabelPrefix = (Label)this._container.lookup("#_endPrefix");
+                this._endLabelTime = (Label)this._container.lookup("#_endTime");
+
+                assert this._startLabelPrefix != null;
+                assert this._startLabelTime != null;
+                assert this._endLabelTime != null;
+                assert this._endLabelPrefix != null;
+
+            } else {
+                this._container = (AnchorPane) Resources.getInstance().getComponent(STRING_NAME_TEMPLATE_SINGLE);
+
+                assert this._container != null;
+
+                this._startLabelPrefix = (Label) this._container.lookup("#_timePrefix");
+                this._startLabelTime = (Label) this._container.lookup("#_time");
+
+                assert this._startLabelPrefix != null;
+                assert this._startLabelTime != null;
+            }
+
+
+
+            this._indexLabel = (Label) this._container.lookup("#_indexLabel");
+            this._nameLabel = (Label) this._container.lookup("#_taskNameLabel");
+            this._highlight = (Rectangle) this._container.lookup("#_highlightEffect");
+            this._canScrollUp = (Rectangle) this._container.lookup("#_scrollUp");
+
+            assert this._indexLabel != null;
+            assert this._nameLabel != null;
+            assert this._highlight != null;
+            assert this._canScrollUp != null;
+        }
+
+        /***
+         * Update the corresponding ListView cell with the appropriate content
+         * @param item  Task (in form of Visual Task) that is going to be displayed
+         * @param empty check if the item is empty
+         */
 
         @Override protected void updateItem(VisualTask item, boolean empty) {
             super.updateItem(item, empty);
@@ -148,13 +187,16 @@ public class TaskListView extends View {
                 int index = item.getVisualIndex();
                 Task task = item.getTask();
 
+
+                // Update Cell Graphic Container and Link to Container Component
+                this.updateGraphicPointer(task);
+
                 // Grey out completed tasks
                 if (task.isCompleted()) {
                     this.getStyleClass().add("completed");
                 }
-                // reset priority before applying new one
 
-                // Take care of priority
+                // set priority indicator
                 if (task.getPriority() != null) {
                     this.getStyleClass().add("priority--" + task.getPriority().name().toLowerCase());
                 }
@@ -162,50 +204,97 @@ public class TaskListView extends View {
                 this._indexLabel.setText(Integer.toString(index));
                 this._nameLabel.setText(task.getTaskName());
 
-                //set animation for newly added task
-                if (this._lastCommand.getInstruction() == Command.Instruction.ADD &&
-                        item.getVisualIndex() == (this._newTaskIndex +1)) {
-                    setHighlightAnimation();
+
+                // apply highlight effect to the new task when first displayed;
+                if (isAddCommand(this._lastCommand) && this.getItem().getVisualIndex() == this._newTaskIndex) {
+                    this.setHighlightAnimation();
                 }
 
-                // check for any reused cell, the behaviour of the ListCell is that sometimes it might reproduce an existing cell,
-                // so there is a need to reset the effect applied, else it might interfere with the interface
+                // check for any reused cell, ListCell sometimes might reuse an existing cell,
+                // so there is a need to reset the effect applied, else it might interfere with the overall interface
                 if(this._canScrollUp.getOpacity() == 1){
                     this._canScrollUp.setOpacity(0);
                 }
 
                 // set indicator for scrolling up
-                if (this.getItem().getVisualIndex()%MAXIMUM_DISPLAY_SIZE == STRING_FIRST_ITEM && canScrollUp()) {
-                    setScrollUpIndicator();
+                if (this.isFirstItemOnList() && canScrollUp()) {
+                    this.setScrollUpIndicator();
                 }
 
-
-                // Optional date time to support floating tasks
-                this._dateLabel.setText(_df.getPairDateDisplay(task.getStartTime(),task.getEndTime()));
+                // set up the time to be displayed
+                this.setUpTime(task);
 
                 this.setGraphic(this._container);
             }
         }
 
+
+        /***
+         * prepare and play the highlight animation to show new task
+         *
+         */
         private void setHighlightAnimation(){
-            FillTransition highlight = new FillTransition(
-                    Duration.millis(750),
-                    this._highlight,
-                    Color.WHITE,
-                    Color.web(STRING_HIGHLIGHT_COLOR, STRING_HIGHLIGHT_OPACITY)
-            );
-            highlight.setCycleCount(2);
-            highlight.setAutoReverse(true);
-            highlight.setInterpolator(Interpolator.EASE_BOTH);
-            highlight.play();
+            if (canHighlight) {
+
+                canHighlight = !canHighlight;
+
+                FillTransition highlight = new FillTransition(
+                        Duration.millis(1500),
+                        this._highlight,
+                        Color.WHITE,
+                        Color.web(STRING_HIGHLIGHT_COLOR, STRING_HIGHLIGHT_OPACITY)
+                );
+                highlight.setCycleCount(2);
+                highlight.setAutoReverse(true);
+                highlight.setInterpolator(Interpolator.EASE_BOTH);
+                highlight.play();
+
+            }
 
         }
 
+        /***
+         * apply scroll up indicator effect to the relevant listCell, usually the current first item on display
+         */
         private void setScrollUpIndicator() {
             this._canScrollUp.setOpacity(1);
             Stop[] pattern = new Stop[] {new Stop(0.9,COLOR_TRANSPARENT_NONE), new Stop(1,COLOR_TRANSPARENT_FULL)};
             LinearGradient gradientFlow = new LinearGradient(0,0,0,1,true, CycleMethod.NO_CYCLE,pattern);
             this._canScrollUp.setFill(gradientFlow);
+        }
+
+        /***
+         * This method prepare the time String to be displayed by utilising DateFormatHelper
+         * For more detail on how the time stored within the task is procsessed, see DateFormatterHelper.java
+         *
+         * @param task
+         */
+        private void setUpTime(Task task) {
+
+            if (isEvent(task)) { // task is an event
+
+                this._startLabelTime.setText(_df.getDateTimeDisplay(task.getStartTime()));
+                this._endLabelTime.setText(_df.getDateTimeDisplay(task.getEndTime()));
+
+            } else { // Task is floating, or only possess either start time or end time
+
+                Pair<String, String> result = _df.getSingleTimeTaskDisplay(task);
+                this._startLabelPrefix.setText(result.getKey());
+                this._startLabelTime.setText(result.getValue());
+
+            }
+        }
+
+        private boolean isEvent(Task task) {
+            return task.getStartTime() != null && task.getEndTime() != null;
+        }
+
+        private boolean isFirstItemOnList(){
+            return this.getItem().getVisualIndex()%MAXIMUM_DISPLAY_SIZE == STRING_FIRST_ITEM;
+        }
+
+        private boolean isAddCommand(Command cmd){
+            return cmd.getInstruction() == Command.Instruction.ADD;
         }
 
         @Override public boolean equals( Object obj){
@@ -223,11 +312,13 @@ public class TaskListView extends View {
 
             if(obj instanceof VisualTask){
                 VisualTask comparator = (VisualTask) obj;
-                return obj.equals(this.getItem());
+                return comparator.equals(this.getItem());
             }
 
             return false;
         }
+
+
     }
 
     private List<VisualTask> constructDisplayList() {
@@ -248,6 +339,32 @@ public class TaskListView extends View {
 
         return temp;
 
+    }
+
+    private Pair<Integer,Integer> obtainNewTaskIndex(){
+        List<VisualTask> taskList = this.getData();
+
+        int index = 0;
+
+        Task temp ;
+        Task current= null;
+
+        for (int i = 0; i < taskList.size();  i++) {
+            if (current == null) {
+                current = taskList.get(i).getTask();
+            } else {
+                temp = taskList.get(i).getTask();
+                LocalDateTime curCreationTime = current.getCreationTime();
+                LocalDateTime tempCreationTime = temp.getCreationTime();
+
+                if (curCreationTime.compareTo(tempCreationTime) < 0) {
+                    current = temp;
+                    index = i;
+                }
+            }
+        }
+
+        return new Pair<>(index,index/MAXIMUM_DISPLAY_SIZE);
     }
 
     @Override public Function<KeyEvent, Boolean> getKeyInputInterceptor() {
@@ -277,4 +394,6 @@ public class TaskListView extends View {
         int size = viewData.size() - (this._viewIndex + 1) * MAXIMUM_DISPLAY_SIZE;
         return size > 0;
     }
+
+
 }

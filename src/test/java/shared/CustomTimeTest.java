@@ -99,18 +99,21 @@ public class CustomTimeTest {
         assertThat(specificTime.compareTo(floatingTime) < 0, is(true));
     }
 
-    @Test public void CustomTime_calculates_correct_time_difference() {
-        CustomTime time1 = CustomTime.todayAt(LocalTime.of(5, 30));
-        CustomTime time2 = CustomTime.todayAt(LocalTime.of(7, 0));
-        assertThat(CustomTime.difference(time1, time2),
-                is(equalTo(90)));
+    @Test public void CustomTime_with_both_null_date_time_return_equal_time() {
+        CustomTime nullTime = new CustomTime(null,null);
+        CustomTime otherNullTime = new CustomTime(null,null);
+
+        assertThat(nullTime.compareTo(otherNullTime) == 0, is(true));
     }
 
-    @Test public void CustomTime_calculates_absolute_difference() {
-        CustomTime time1 = CustomTime.todayAt(LocalTime.of(5, 30));
-        CustomTime time2 = CustomTime.todayAt(LocalTime.of(7, 0));
-        assertThat(CustomTime.difference(time2, time1),
-                is(equalTo(90)));
-    }
+    @Test public void CustomTime_with_null_date_time_always_greater_than_other_date() {
+        CustomTime nullTime = new CustomTime(null,null);
+        CustomTime specificDayTime = new CustomTime(LocalDateTime.now());
+        CustomTime specificDay = new CustomTime(LocalDate.now(),null);
+        CustomTime specificTime = new CustomTime(null,LocalTime.now());
 
+        assertThat(nullTime.compareTo(specificDayTime) > 0, is(true));
+        assertThat(nullTime.compareTo(specificDay) > 0, is(true));
+        assertThat(nullTime.compareTo(specificTime) > 0, is(true));
+    }
 }
