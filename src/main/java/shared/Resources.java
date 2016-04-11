@@ -38,7 +38,7 @@ public class Resources {
      */
     private static Resources instance = new Resources();
 
-    public static Resources getInstance() {
+    public static Resources sharedResources() {
         return instance;
     }
 

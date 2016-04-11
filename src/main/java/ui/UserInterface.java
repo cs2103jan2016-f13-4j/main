@@ -115,12 +115,12 @@ public class UserInterface implements UserInterfaceSpec {
 
     private void initializeFonts() {
         for (String font : SOURCES_FONT) {
-            Font.loadFont(Resources.getInstance().getFontUrl(font), SIZE_FONT_DEFAULT);
+            Font.loadFont(Resources.sharedResources().getFontUrl(font), SIZE_FONT_DEFAULT);
         }
     }
 
     private void setRootView() {
-        this._rootView = Resources.getInstance().getComponent("Window");
+        this._rootView = Resources.sharedResources().getComponent("Window");
         Scene rootScene = new Scene(this._rootView);
         this._primaryStage.setScene(rootScene);
         this._primaryStage.setTitle("Your MOM");
@@ -153,7 +153,7 @@ public class UserInterface implements UserInterfaceSpec {
 
     private void registerInfoPanel() {
         Pair<AnchorPane, InfoPanelController> infoPanelMetadata =
-                Resources.getInstance().getComponentAndController("InfoPanelWrapper");
+                Resources.sharedResources().getComponentAndController("InfoPanelWrapper");
 
         AnchorPane infoPanelWrapper = infoPanelMetadata.getKey();
         // TODO: Delete this line to show info panel
@@ -167,7 +167,7 @@ public class UserInterface implements UserInterfaceSpec {
         assert (this._commandInputHandler != null);
 
         Pair<AnchorPane, CommandInputController> inputMetadata =
-                Resources.getInstance().getComponentAndController("CommandInputWrapper");
+                Resources.sharedResources().getComponentAndController("CommandInputWrapper");
 
         assert inputMetadata != null;
 
@@ -225,7 +225,7 @@ public class UserInterface implements UserInterfaceSpec {
         assert this._mainContainer != null;
 
         Pair<AnchorPane, NotificationToastController> toastMetadata =
-                Resources.getInstance().getComponentAndController("NotificationToast");
+                Resources.sharedResources().getComponentAndController("NotificationToast");
 
         AnchorPane notificationContainer = toastMetadata.getKey();
         notificationContainer.setLayoutY(
