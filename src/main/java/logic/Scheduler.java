@@ -49,7 +49,7 @@ public class Scheduler implements SchedulerSpec {
 
         // if such a task does not exist, then there are no tasks, so just schedule the new task immediately
         if (!endOfRangeToSearchIfItExists.isPresent()) {
-            return new TemporalRange(CustomTime.now(), CustomTime.now().plus(durationInMinutes));
+            return new TemporalRange(CustomTime.now(), CustomTime.now().plusMinutes(durationInMinutes));
         }
 
         CustomTime startOfRangeToSearch = CustomTime.now();
@@ -69,12 +69,10 @@ public class Scheduler implements SchedulerSpec {
                 })
                 .collect(Collectors.toList());
 
+        // just choose the day after the end date if we can't find a suitable slot
         if (suitableFreeSlots.isEmpty()) {
-            LocalDateTime startDateTimeOfTask = LocalDateTime.of(endOfRangeToSearch.getDate().plusDays(1),
-                    LocalTime.of(8, 0));
-            LocalDateTime endDateTimeOfTask = startDateTimeOfTask.plusMinutes(durationInMinutes);
-
-            return new TemporalRange(new CustomTime(startDateTimeOfTask), new CustomTime(endDateTimeOfTask));
+            return new TemporalRange(endOfRangeToSearch.plusDays(1),
+                    endOfRangeToSearch.plusDays(1).plusMinutes(durationInMinutes));
         } else {
             //System.err.printf("start = %s, end = %s%n", suitableFreeSlots.get(0).getStart().toString(), suitableFreeSlots.get(0).getEnd().toString());
             return suitableFreeSlots.get(0);
@@ -108,6 +106,7 @@ public class Scheduler implements SchedulerSpec {
 
     /**
      * gets free time slots within the specified bounds
+     * the resulting list will be disjoint and sorted
      * @param lowerBound
      * @param upperBound
      * @return

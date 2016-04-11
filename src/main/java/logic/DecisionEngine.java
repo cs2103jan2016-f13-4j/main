@@ -65,6 +65,9 @@ public class DecisionEngine implements DecisionEngineSpec {
             case SEARCH:
                 result = this.handleSearch(command);
                 break;
+            case SCHEDULE:
+                result = this.handleSchedule(command);
+                break;
             case UNDO:
                 boolean undoActuallyHappened = WriteHistory.getInstance().undo();
                 result = this.displayAllTasks();
@@ -79,9 +82,6 @@ public class DecisionEngine implements DecisionEngineSpec {
                     result.setErrorMessage(Message.REDO_FAIL.toString());
                 }
                 break;
-            case SCHEDULE:
-                result = this.handleSchedule(command);
-                break;
             default:
                 // if we reach this point, LTA Command Parser has failed in his duty
                 // and awaits court martial
@@ -95,6 +95,11 @@ public class DecisionEngine implements DecisionEngineSpec {
     @Override public void initialise() {
         StorageSpec<?> storage = this.getStorage();
         storage.initialise();
+    }
+
+    @Override public void shutdown() {
+        StorageSpec<?> storage = this.getStorage();
+        storage.shutdown();
     }
 
 
@@ -220,11 +225,13 @@ public class DecisionEngine implements DecisionEngineSpec {
         assert duration != null;
         TemporalRange rangeToScheduleIn = this.getTaskScheduler().schedule(duration);
 
+        // transform the SCHEDULE command into an EDIT command
         Command editCommand = new Command(Command.Instruction.EDIT);
         editCommand.setParameter(Command.ParamName.TASK_INDEX, id);
         editCommand.setParameter(Command.ParamName.TASK_START, rangeToScheduleIn.getStart());
         editCommand.setParameter(Command.ParamName.TASK_END, rangeToScheduleIn.getEnd());
 
+        // just handle the newly generate EDIT command the usual way
         return this.handleWriteOperation(editCommand);
     }
 
@@ -243,11 +250,6 @@ public class DecisionEngine implements DecisionEngineSpec {
         return new ExecutionResult(ViewType.TASK_LIST, listToDisplay);
     }
 
-
-    @Override public void shutdown() {
-        StorageSpec<?> storage = this.getStorage();
-        storage.shutdown();
-    }
 
     @Override public SchedulerSpec getTaskScheduler() {
         return Scheduler.getInstance();
