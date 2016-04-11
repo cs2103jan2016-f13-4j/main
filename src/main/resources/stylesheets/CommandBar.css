@@ -1,0 +1,63 @@
+/* @@author A0127046L */
+.command-bar__wrapper {
+    -fx-background-color: transparent;
+}
+
+.command-bar__container {
+    -fx-background-color: white;
+    -fx-background-radius: 4px;
+    -fx-border-radius: 4px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,.11), 8, 0.0, 0, 4);
+}
+
+.command-input__field {
+    -fx-background-color: transparent;
+    -fx-highlight-fill: #ddd;
+}
+
+.command-input__field .scroll-bar {
+    -fx-opacity: 0;
+    visibility: hidden;
+}
+
+
+/*-------------------------------------------------------------------------------------------------
+ * COMMAND INPUT STYLES
+ *-----------------------------------------------------------------------------------------------*/
+.command-input__field {
+    -fx-font-family: "Lato";
+    -fx-font-size: 15px;
+}
+
+.command__instruction,
+.command__start-date,
+.command__end-date,
+.command__start-time,
+.command__end-time,
+.command__priority {
+    -fx-font-weight: bold;
+}
+
+.command__instruction {
+    -fx-fill: #4198CF;
+}
+
+.command__start-date {
+    -fx-fill: #00C779;
+}
+
+.command__start-time {
+    -fx-fill: #108754;
+}
+
+.command__end-date {
+    -fx-fill: #F6A500;
+}
+
+.command__end-time {
+    -fx-fill: #E98205;
+}
+
+.command__priority {
+    -fx-fill: #D926DC;
+}

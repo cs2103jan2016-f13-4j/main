@@ -13,7 +13,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 /**
- * @@author Mai Anh Vu
+ * @@author A0127046L
  */
 public class RangeTest {
 

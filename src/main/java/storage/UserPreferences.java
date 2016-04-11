@@ -21,8 +21,8 @@ import exception.ExceptionHandler;
 import shared.ApplicationContext;
 
 /**
- * 
- * @@author Chng Hui Yie
+ *
+ * @@author A0127357B
  *
  */
 public class UserPreferences {
@@ -77,7 +77,7 @@ public class UserPreferences {
     /**
      * Checks if json file containing user preferences data already exist,
      * creates a new file if it does not
-     * 
+     *
      * @return true if the file already exists, false otherwise
      */
     public boolean checkPreferencesFileExists() {
@@ -121,7 +121,7 @@ public class UserPreferences {
 
     /**
      * Write user preferences data to disk in json format.
-     * 
+     *
      * @throws IOException
      */
     public void writeUserPreferencesToDisk() throws IOException {
@@ -136,7 +136,7 @@ public class UserPreferences {
 
     /**
      * Prepare json to be written to disk.
-     * 
+     *
      * @return
      */
     public String prepareJson() {
@@ -178,7 +178,7 @@ public class UserPreferences {
 
     /**
      * Read user preferences data from disk in json format.
-     * 
+     *
      * @throws IOException
      */
     public void readUserPreferencesFromDisk() throws IOException {
@@ -187,7 +187,7 @@ public class UserPreferences {
 
     /**
      * Process json to obtain Java object.
-     * 
+     *
      * @param jsonString
      */
     public void handleJson(String jsonString) {

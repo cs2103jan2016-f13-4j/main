@@ -1,10 +1,11 @@
-package shared;
+package logic;
 
+import java.time.LocalTime;
 import java.util.*;
 import java.util.function.*;
-import java.util.stream.Collectors;
 
-import storage.*;
+import shared.*;
+import skeleton.*;
 
 /**
  * Represents an write operation on Storage by the Decision Engine, in response to a Command
@@ -17,10 +18,13 @@ import storage.*;
  *
  * WARNING: These objects should NOT persist between sessions. Undefined behaviour may result.
  *
- * @@author Thenaesh Elango
+ * @@author A0124772E
  */
 public class StorageWriteOperation {
-    public static final String ERROR_RANGE_EMPTY = "No valid tasks in range!";
+
+    private static final String ERROR_RANGE_EMPTY_FOR_DELETE = Message.DELETE_FAIL.toString();
+    private static final String ERROR_RANGE_EMPTY_FOR_MARK = Message.MARK_FAIL.toString();
+    private static final String WARNING_COLLIDING_TASK = "Task collides with another already existing task!";
 
     private Function<?, String> _initialOperation; // returns the error string for the operation, to be placed in an ExecutionResult
     private Function<?, Boolean> _undoOperation; // returns false if nothing was done due to original operation not being run
@@ -33,8 +37,11 @@ public class StorageWriteOperation {
     private Task _taskPostModification = null; // snapshot of the task after it is modified
     private boolean _wasExecuted = false; // success code for the operation
 
-    public StorageWriteOperation(Command command) {
+    private StorageSpec<Task> _storage; // the Storage instance used for the operation
+
+    public StorageWriteOperation(Command command, StorageSpec storage) {
         this._command = command;
+        this._storage = storage;
 
         switch (this._command.getInstruction()) {
             case ADD:
@@ -81,21 +88,41 @@ public class StorageWriteOperation {
             CustomTime from = null;
             CustomTime to = null;
 
-            // for each command parameter, check if it was supplied
-            // if so, extract the value and set the appropriate reference above to point to the extracted value
+            /*
+             * for each command parameter, check if it was supplied
+             * if so, extract the value and set the appropriate reference above to point to the extracted value
+             */
+
+            // extract name if it exists
             if (this._command.hasParameter(Command.ParamName.TASK_NAME)) {
                 name = this._command.getParameter(Command.ParamName.TASK_NAME);
             }
+            // extract start time if it exists
             if (this._command.hasParameter(Command.ParamName.TASK_START)) {
                 from = this._command.getParameter(Command.ParamName.TASK_START);
+
+                // if the start time is not defined, default to 0000
+                if (!from.hasTime()) {
+                    from = new CustomTime(from.getDate(), LocalTime.of(7, 0));
+                }
             }
+            // extract end time if it exists
             if (this._command.hasParameter(Command.ParamName.TASK_END)) {
                 to = this._command.getParameter(Command.ParamName.TASK_END);
+
+                // if the end time is not defined, default to 2359
+                if (!to.hasTime()) {
+                    to = new CustomTime(to.getDate(), LocalTime.of(23, 00));
+                }
             }
+
+            // ensure the task has a name, at the very least
+            assert name != null;
+
             // we now build the Task object for adding into the store
             Task taskToAdd = new Task(null, name, "", from, to);
 
-            // Check for priority
+            // extract priority if it exists
             if (this._command.hasParameter(Command.ParamName.PRIORITY_VALUE)) {
                 Task.Priority priority = this._command.getParameter(Command.ParamName.PRIORITY_VALUE);
                 if (priority != null) {
@@ -103,22 +130,31 @@ public class StorageWriteOperation {
                 }
             }
 
-            this._id = Storage.getInstance().save(taskToAdd);
+            // check for collisions
+            boolean taskCollides = Scheduler.getInstance().isColliding(taskToAdd);
+
+            this._id = this._storage.save(taskToAdd);
 
             this._wasExecuted = true; // adding a task never fails
-            return null;
+
+            if (taskCollides) {
+                System.err.println(WARNING_COLLIDING_TASK);
+                return WARNING_COLLIDING_TASK;
+            } else {
+                return null;
+            }
         };
 
 
         this._undoOperation = v -> {
             assert this._id != null;
-            Storage.getInstance().remove(this._id);
+            this._storage.remove(this._id);
             return true;
         };
 
         this._redoOperation = v -> {
             assert this._id != null;
-            Storage.getInstance().undelete(this._id);
+            this._storage.undelete(this._id);
             return true;
         };
 
@@ -129,13 +165,13 @@ public class StorageWriteOperation {
         this._initialOperation = v -> {
             // get the set of IDs whose corresponding tasks are to be deleted
             if (this._command.hasTrueValue(Command.ParamName.TASK_UNIVERSALLY_QUANTIFIED)) {
-                this._idRange = Storage.getInstance().getNonDeletedTasks()
+                this._idRange = this._storage.getNonDeletedTasks()
                         .stream() // get all tasks (that have not been deleted)
                         .mapToInt(Integer::intValue).toArray();
             } else {
                 List<Range> ranges = this._command.getParameter(Command.ParamName.TASK_INDEX_RANGES);
                 this._idRange = Arrays.stream(Range.enumerateRanges(ranges))
-                        .filter(id -> !Storage.getInstance().get(id).isDeleted())
+                        .filter(id -> !this._storage.get(id).isDeleted())
                         .toArray();
             }
 
@@ -143,11 +179,11 @@ public class StorageWriteOperation {
 
             if (this._idRange.length == 0) {
                 this._wasExecuted = false; // we didn't delete anything
-                return ERROR_RANGE_EMPTY;
+                return ERROR_RANGE_EMPTY_FOR_DELETE;
             }
 
             Arrays.stream(this._idRange)
-                    .forEach(Storage.getInstance()::remove);
+                    .forEach(this._storage::remove);
 
             this._wasExecuted = true; // we actually deleted some tasks
             return null;
@@ -161,7 +197,7 @@ public class StorageWriteOperation {
 
             assert this._idRange != null;
             Arrays.stream(this._idRange)
-                    .forEach(Storage.getInstance()::undelete);
+                    .forEach(this._storage::undelete);
             return true;
         };
 
@@ -172,7 +208,7 @@ public class StorageWriteOperation {
 
             assert this._idRange != null;
             Arrays.stream(this._idRange)
-                    .forEach(Storage.getInstance()::remove);
+                    .forEach(this._storage::remove);
             return true;
         };
 
@@ -183,7 +219,7 @@ public class StorageWriteOperation {
         this._initialOperation = v -> {
             this._id = this._command.getParameter(Command.ParamName.TASK_INDEX);
             assert this._id != null;
-            Task task = Storage.getInstance().get(this._id);
+            Task task = this._storage.get(this._id);
 
              this._taskPreModification = task.clone(); // take snapshot of task before modifying it, for undo operation
 
@@ -215,13 +251,13 @@ public class StorageWriteOperation {
 
         this._undoOperation = v -> {
             assert this._taskPreModification != null;
-            Storage.getInstance().save(this._taskPreModification);
+            this._storage.save(this._taskPreModification);
             return true;
         };
 
         this._redoOperation = v -> {
             assert this._taskPostModification != null;
-            Storage.getInstance().save(this._taskPostModification);
+            this._storage.save(this._taskPostModification);
             return true;
         };
 
@@ -233,7 +269,7 @@ public class StorageWriteOperation {
             List<Range> ranges = this._command.getParameter(Command.ParamName.TASK_INDEX_RANGES);
             this._idRange = Arrays.stream(Range.enumerateRanges(ranges))
                     .filter(id -> {
-                        Task task = Storage.getInstance().get(id);
+                        Task task = this._storage.get(id);
                         return !(task.isDeleted() || task.isCompleted());
                     })
                     .toArray();
@@ -242,11 +278,11 @@ public class StorageWriteOperation {
 
             if (this._idRange.length == 0) {
                 this._wasExecuted = false;
-                return ERROR_RANGE_EMPTY;
+                return ERROR_RANGE_EMPTY_FOR_MARK;
             }
 
             Arrays.stream(this._idRange)
-                    .mapToObj(Storage.getInstance()::get)
+                    .mapToObj(this._storage::get)
                     .forEach(task -> task.setCompleted(true));
 
             this._wasExecuted = true;
@@ -260,8 +296,9 @@ public class StorageWriteOperation {
             }
 
             assert this._idRange != null;
+
             Arrays.stream(this._idRange)
-                    .mapToObj(Storage.getInstance()::get)
+                    .mapToObj(this._storage::get)
                     .forEach(task -> task.setCompleted(false));
             return true;
         };
@@ -272,8 +309,9 @@ public class StorageWriteOperation {
             }
 
             assert this._idRange != null;
+
             Arrays.stream(this._idRange)
-                    .mapToObj(Storage.getInstance()::get)
+                    .mapToObj(this._storage::get)
                     .forEach(task -> task.setCompleted(true));
             return true;
         };

@@ -5,17 +5,15 @@ import shared.ExecutionResult;
 import shared.Task;
 
 /**
- * @@author Thenaesh Elango
+ * The Decision Engine receives a Command object from the Dispatcher. It then executes it and
+ * returns the execution result back to the Dispatcher.
+ * @@author A0124772E
  */
 public interface DecisionEngineSpec {
 
     void initialise();
 
-    StorageSpec<Task> getStorage();
-
     ExecutionResult performCommand(Command cmd);
-
-    SchedulerSpec getTaskScheduler();
 
     void shutdown();
 

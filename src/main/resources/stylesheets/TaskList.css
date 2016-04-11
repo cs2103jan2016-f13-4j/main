@@ -1,9 +1,22 @@
+/* @@author A0127046L */
 .list--task {
     -fx-background-insets: 0;
-    -fx-background-color: transparent;
+    -fx-background-color: #f7f7f7;
 }
 
 .list-cell {
     -fx-padding: 0;
-    -fx-background-color: white;
+    -fx-background-color: #f7f7f7;
+}
+
+.list--task .scroll-bar {
+    -fx-opacity: 0;
+    visibility: hidden;
+}
+
+.list--task .scroll-bar .increment-arrow,
+.list--task .scroll-bar .decrement-arrow,
+.list--task .scroll-bar .increment-button,
+.list--task .scroll-bar .decrement-button {
+    -fx-padding:0;
 }

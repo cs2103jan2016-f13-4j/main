@@ -2,6 +2,7 @@ package storage;
 
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Semaphore;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -14,7 +15,7 @@ import shared.Task;
 import skeleton.StorageSpec;
 
 /**
- * @@author Chng Hui Yie
+ * @@author A0127357B
  */
 public class Storage extends TimerTask implements StorageSpec<Task> {
 
@@ -22,6 +23,7 @@ public class Storage extends TimerTask implements StorageSpec<Task> {
      * Constants
      */
     private static final int INDEX_TASK_INITIAL = 1;
+    private static final int SAVE_FIRST_DELAY = 5000;
     private static final int SAVE_DELAY = 5000;
 
     /**
@@ -41,8 +43,10 @@ public class Storage extends TimerTask implements StorageSpec<Task> {
 
     /**
      * Constructs a new Storage instance.
+     * the singleton constructor is made protected instead of private to enable dependency injection of Storage in tests
+     * of other components
      */
-    private Storage() {
+    protected Storage() {
         // Instantiates storage
         this._taskData = new TreeMap<>();
         this._isDirty = false;
@@ -59,7 +63,7 @@ public class Storage extends TimerTask implements StorageSpec<Task> {
         this.readFromDisk();
 
         this._autosaveTimer = new Timer();
-        this._autosaveTimer.scheduleAtFixedRate(this, SAVE_DELAY, SAVE_DELAY);
+        this._autosaveTimer.scheduleAtFixedRate(this, SAVE_FIRST_DELAY, SAVE_DELAY);
     }
 
 
@@ -71,7 +75,7 @@ public class Storage extends TimerTask implements StorageSpec<Task> {
 
     /**
      * Saves a Task object to TreeMap
-     * 
+     *
      * @param task
      *            the Task to put into TreeMap
      * @return the ID of the added Task
@@ -104,7 +108,7 @@ public class Storage extends TimerTask implements StorageSpec<Task> {
 
         // Keep internal index serial
         List<String> tasksToWrite = IntStream.range(0, allTask.size()).mapToObj(index -> {
-            Task task = allTask.get(index);
+            Task task = allTask.get(index).clone();
             task.setId(index + 1);
             return task;
         }).map(Task::encodeTaskToString).collect(Collectors.toList());
@@ -121,7 +125,7 @@ public class Storage extends TimerTask implements StorageSpec<Task> {
 
     /**
      * Returns the Task to which the specified index is mapped
-     * 
+     *
      * @param index
      *            the index whose associated Task is to be returned
      * @return the Task to which the specified index is mapped
@@ -152,7 +156,7 @@ public class Storage extends TimerTask implements StorageSpec<Task> {
      * Returns a filtered list of Tasks that match the specified TaskDescriptor
      * Returns the full (unfiltered) list of Tasks when no TaskDescriptor is
      * specified
-     * 
+     *
      * @return results which is a list of filtered Tasks that matches
      *         TaskDescriptor if one is specified, else results is the full list
      *         of Tasks stored in TreeMap
@@ -211,6 +215,7 @@ public class Storage extends TimerTask implements StorageSpec<Task> {
         this._isDirty = true;
     }
 
+    @Override
     public Set<Integer> getNonDeletedTasks() {
         return this._taskData.keySet()
                 .stream()
@@ -227,7 +232,7 @@ public class Storage extends TimerTask implements StorageSpec<Task> {
     /**
      * Search for all Tasks that has startTime before or at the same time as
      * dateTime
-     * 
+     *
      *            high endpoint (inclusive) of the Tasks in the returned list
      * @return a list of Tasks that starts before or at the same time as
      *         dateTime

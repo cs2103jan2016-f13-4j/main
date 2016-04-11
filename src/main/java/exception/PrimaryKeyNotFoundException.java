@@ -1,11 +1,11 @@
 package exception;
 
 /**
- * Created by maianhvu on 20/03/2016.
+ * @@author A0127046L
  */
 public class PrimaryKeyNotFoundException extends Exception {
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -8577319752977443484L;
     /**
@@ -17,7 +17,7 @@ public class PrimaryKeyNotFoundException extends Exception {
     /**
      * Constructs a new PrimaryKeyNotFoundException with the provided integer
      * primary key
-     * 
+     *
      * @param pKey
      *            an integer key
      */

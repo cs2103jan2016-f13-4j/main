@@ -7,7 +7,7 @@ import shared.ApplicationContext;
 import skeleton.DispatcherSpec;
 
 /**
- * @@author Mai Anh Vu
+ * @@author A0127046L
  */
 public class Launcher extends Application {
 
@@ -15,6 +15,11 @@ public class Launcher extends Application {
         launch(args);
     }
 
+    /**
+     * Starts the application, initialising the full stack.
+     * @param primaryStage the stage to be used for the application
+     * @throws Exception
+     */
     @Override public void start(Stage primaryStage) throws Exception {
         ApplicationContext.mainContext().setPrimaryStage(primaryStage);
 

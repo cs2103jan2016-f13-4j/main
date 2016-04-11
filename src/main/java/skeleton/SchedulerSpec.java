@@ -1,8 +1,18 @@
 package skeleton;
 
+import shared.*;
+
+import java.util.List;
+
 /**
- * @@author Thenaesh Elango
+ * The Scheduler is called upon by the Decision Engine to schedule a floating task,
+ * as well as to check if a task is colliding.
+ *
+ * @@author A0124772E
  */
 public interface SchedulerSpec {
 
+    public TemporalRange schedule(Integer durationInMinutes);
+
+    public boolean isColliding(Task task);
 }

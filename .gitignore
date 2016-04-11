@@ -105,3 +105,4 @@ data/
 
 ###Project Specific###
 !src/main/resources/data
+!/collated/
