@@ -60,7 +60,7 @@ public class DecisionEngine implements DecisionEngineSpec {
             String name = command.getParameter(Command.ParamName.TASK_NAME);
             listToDisplay = listToDisplay
                     .stream()
-                    .filter(task -> task.getTaskName() == name)
+                    .filter(task -> task.getTaskName().equals(name))
                     .collect(Collectors.toList());
         }
         if (command.hasParameter(Command.ParamName.TASK_START)) {
@@ -167,14 +167,14 @@ public class DecisionEngine implements DecisionEngineSpec {
                 boolean undoActuallyHappened = StorageWriteOperationHistory.getInstance().undo();
                 result = this.displayAllTasks();
                 if (!undoActuallyHappened) {
-                    result.setErrorMessage("No tasks to undo!");
+                    result.setErrorMessage(Message.UNDO_FAIL.toString());
                 }
                 break;
             case REDO:
                 boolean redoActuallyHappened = StorageWriteOperationHistory.getInstance().redo();
                 result = this.displayAllTasks();
                 if (!redoActuallyHappened) {
-                    result.setErrorMessage("No tasks to redo!");
+                    result.setErrorMessage(Message.REDO_FAIL.toString());
                 }
                 break;
             default:

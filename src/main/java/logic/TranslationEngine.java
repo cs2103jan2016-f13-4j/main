@@ -6,6 +6,7 @@ import java.util.function.Function;
 import javafx.util.Pair;
 import shared.Command;
 import shared.ExecutionResult;
+import shared.Message;
 import shared.Task;
 import skeleton.CommandParserSpec;
 import skeleton.TranslationEngineSpec;
@@ -145,37 +146,41 @@ public class TranslationEngine implements TranslationEngineSpec {
     }
 
     private void displayNotification(ExecutionResult result) {
-        String message = "Welcome to Your MOM!";
+        String message = Message.WELCOME.toString();
 
         if (this._lastCommand != null) {
             switch (this._lastCommand.getInstruction()) {
                 case DISPLAY:
                     int taskCount = ((List<?>) result.getData()).size();
                     if (taskCount == 0) {
-                        message = "Add a new to-do by entering \"add <task>\"!";
+                        message = Message.DISPLAY_EMPTY.toString();
                     } else {
-                        message = String.format("Found %d to-dos!", taskCount);
+                        message = String.format(
+                                Message.DISPLAY_NORMAL.toString(),
+                                taskCount);
                     }
                     break;
                 case ADD:
-                    // TODO: Take care of failed addition
                     String taskName = this._lastCommand.getParameter(Command.ParamName.TASK_NAME);
-                    message = String.format("Added: %s", taskName);
+                    message = String.format(Message.ADD_SUCCESS.toString(), taskName);
                     break;
                 case EDIT:
-                    // TODO: Take care of failed edit
-                    message = "Edited task with new details!";
+                    message = Message.EDIT_SUCCESS.toString();
                     break;
                 case DELETE:
-                    message = "Deleted task! (undo-able)";
+                    if (result.hasErrorMessage()) {
+                        message = result.getErrorMessage();
+                    } else {
+                        message = Message.DELETE_SUCCESS.toString();
+                    }
                     break;
                 case SEARCH:
                     int searchFound = ((List<?>) result.getData()).size();
                     String searchQuery = this._lastCommand.getParameter(Command.ParamName.SEARCH_QUERY);
                     if (searchFound == 0) {
-                        message = String.format("Found no to-do with the search query \"%s\"", searchQuery);
+                        message = String.format(Message.SEARCH_FAIL.toString(), searchQuery);
                     } else {
-                        message = String.format("Found %d matches with the query \"%s\"",
+                        message = String.format(Message.SEARCH_SUCCESS.toString(),
                                 searchFound,
                                 searchQuery);
                     }
@@ -184,21 +189,21 @@ public class TranslationEngine implements TranslationEngineSpec {
                     if (result.hasErrorMessage()) {
                         message = result.getErrorMessage();
                     } else {
-                        message = "Reverted last command!";
+                        message = Message.UNDO_SUCCESS.toString();
                     }
                     break;
                 case REDO:
                     if (result.hasErrorMessage()) {
                         message = result.getErrorMessage();
                     } else {
-                        message = "Redone last command!";
+                        message = Message.REDO_SUCCESS.toString();
                     }
                     break;
                 case MARK:
                     if (result.hasErrorMessage()) {
                         message = result.getErrorMessage();
                     } else {
-                        message = "Marked task as complete! (undoable)";
+                        message = Message.REDO_SUCCESS.toString();
                     }
             }
         }

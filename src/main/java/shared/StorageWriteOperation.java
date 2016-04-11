@@ -22,9 +22,9 @@ import storage.*;
  */
 public class StorageWriteOperation {
 
-    public static final String ERROR_RANGE_EMPTY_FOR_DELETE = "No valid tasks in range to delete!";
-    public static final String ERROR_RANGE_EMPTY_FOR_MARK = "No valid tasks in range to mark as complete!";
-    public static final String WARNING_COLLIDING_TASK = "Task collides with another already existing task!";
+    private static final String ERROR_RANGE_EMPTY_FOR_DELETE = Message.DELETE_FAIL.toString();
+    private static final String ERROR_RANGE_EMPTY_FOR_MARK = Message.MARK_FAIL.toString();
+    private static final String WARNING_COLLIDING_TASK = "Task collides with another already existing task!";
 
     private Function<?, String> _initialOperation; // returns the error string for the operation, to be placed in an ExecutionResult
     private Function<?, Boolean> _undoOperation; // returns false if nothing was done due to original operation not being run
