@@ -11,12 +11,14 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.Month;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by maianhvu on 06/04/2016.
@@ -157,5 +159,13 @@ public class CommandParserTest {
         Command command = this._parser.parse("find  \"for whatever\"");
         assertThat(command.getParameter(Command.ParamName.SEARCH_QUERY),
                 is(equalTo("for whatever")));
+    }
+
+    @Test public void CommandParser_parses_universal_quantifier_correctly() {
+        Arrays.asList("delete all tasks", "remove everything").forEach(commandString -> {
+            Command command = this._parser.parse(commandString);
+            assertTrue(command.hasTrueValue(Command.ParamName.TASK_UNIVERSALLY_QUANTIFIED));
+            assertFalse(command.hasParameter(Command.ParamName.TASK_INDEX_RANGES));
+        });
     }
 }

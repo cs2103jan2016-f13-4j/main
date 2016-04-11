@@ -2,7 +2,6 @@ package logic;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import jdk.nashorn.internal.runtime.regexp.joni.Regex;
 import logic.parser.*;
 import shared.*;
 import skeleton.CommandParserSpec;
@@ -37,6 +36,7 @@ public class CommandParser implements CommandParserSpec {
     private static final String MATCHER_GROUP_INDEX = "INDEX";
     private static final String MATCHER_GROUP_RANGE_START = "RSTART";
     private static final String MATCHER_GROUP_RANGE_END = "REND";
+    private static final String MATCHER_GROUP_UNIVERSAL_QUANTIFIER = "UQ";
 
     private static final String STRING_INVALID_NAME_MISSING = "Task name is missing";
     private static final String STRING_INVALID_START_WITHOUT_END = "Task cannot have a start without an end";
@@ -368,9 +368,21 @@ public class CommandParser implements CommandParserSpec {
             }
         }
 
-        // If no match found, return invalid
+        // If no match found, we attempt to find the universal quantifier instead
         if (rangeList.isEmpty()) {
-            return Command.invalidCommand(STRING_INVALID_RANGE_MISSING);
+            Matcher universalQuantifierMatcher = RegexUtils.caseInsensitiveMatch(
+                    this.getUniversalQuantifierRegex(),
+                    partialCommand
+            );
+
+            if (!universalQuantifierMatcher.find()) {
+                // No universal quantifier found either, command is invalid!
+                return Command.invalidCommand(STRING_INVALID_RANGE_MISSING);
+            }
+
+            // Set as universally quantified and exit straight away
+            command.setParameter(Command.ParamName.TASK_UNIVERSALLY_QUANTIFIED, true);
+            return command;
         }
 
         // Straighten the range first
@@ -646,6 +658,12 @@ public class CommandParser implements CommandParserSpec {
                 MATCHER_GROUP_RANGE_END);
     }
 
+    private String getUniversalQuantifierRegex() {
+        return RegexUtils.startOfString(RegexUtils.namedChoice(
+                MATCHER_GROUP_UNIVERSAL_QUANTIFIER,
+                "all", "everything"
+        ));
+    }
 
     //-------------------------------------------------------------------------------------------------
     //
