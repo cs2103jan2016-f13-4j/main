@@ -21,14 +21,23 @@ import exception.ExceptionHandler;
 import shared.ApplicationContext;
 
 /**
- * 
- * @@author Chng Hui Yie
+ * Manages user's preferences which is stored in JSON format.
+ *
+ * @@author A0127357B
  *
  */
 public class UserPreferences {
 
-    private static UserPreferences instance = new UserPreferences();
+    /**
+     * Constants
+     */
+    private static final String DEFAULT_TO_DO_PATH = "data/ToDoData.csv";
+    private static final String PREFERENCES_FILE_NAME = "data/user/UserPreferences.json";
 
+    /**
+     * Singleton implementation
+     */
+    private static UserPreferences instance = new UserPreferences();
     public static UserPreferences getInstance() {
         return instance;
     }
@@ -37,11 +46,9 @@ public class UserPreferences {
      * Properties
      */
     private String todoDataPath;
-    private static final String defaultToDoPath = "data/ToDoData.csv";
-    private static final String preferencesFileName = "data/user/UserPreferences.json";
 
     /**
-     * Constructor
+     * Constructs a new UserPreference instance.
      */
     private UserPreferences() {
         createOrReadPreferencesFile();
@@ -53,11 +60,10 @@ public class UserPreferences {
      * assign the default To-Do data path and create a new user preferences file
      * on disk.
      */
-
     public void createOrReadPreferencesFile() {
         boolean preferencesFileExists = checkPreferencesFileExists();
         if (!preferencesFileExists) {
-            this.setTodoDataPath(this.defaultToDoPath); // set path to default
+            this.setTodoDataPath(this.DEFAULT_TO_DO_PATH); // set path to default
                                                         // one
             try {
                 this.writeUserPreferencesToDisk(); // create preferences file on
@@ -81,7 +87,7 @@ public class UserPreferences {
      * @return true if the file already exists, false otherwise
      */
     public boolean checkPreferencesFileExists() {
-        File file = new File(this.preferencesFileName);
+        File file = new File(this.PREFERENCES_FILE_NAME);
         if (!file.exists()) {
             try {
                 file.createNewFile();
@@ -98,9 +104,9 @@ public class UserPreferences {
      * Resets UserPreferences attributes to default values
      */
     public void resetUserPreferences() {
-        File file = new File(this.preferencesFileName);
+        File file = new File(this.PREFERENCES_FILE_NAME);
         file.delete();
-        this.todoDataPath = this.defaultToDoPath;
+        this.todoDataPath = this.DEFAULT_TO_DO_PATH;
     }
 
     // ----------------------------------------------------------------------------------------
@@ -111,6 +117,15 @@ public class UserPreferences {
 
     public class UserPreferencesSerializer implements JsonSerializer<UserPreferences> {
 
+        /**
+         * Gson invokes this call-back method during serialization when it encounters
+         * a field of the specified type.
+         *
+         * @param userPreferences
+         * @param typeOfSrc
+         * @param context
+         * @return
+         */
         @Override public JsonElement serialize(UserPreferences userPreferences, Type typeOfSrc,
                 JsonSerializationContext context) {
             JsonObject jsonObject = new JsonObject();
@@ -127,8 +142,8 @@ public class UserPreferences {
     public void writeUserPreferencesToDisk() throws IOException {
         String json = prepareJson();
 
-        File file = new File(this.preferencesFileName);
-        this.createDirectory(this.preferencesFileName);
+        File file = new File(this.PREFERENCES_FILE_NAME);
+        this.createDirectory(this.PREFERENCES_FILE_NAME);
         FileWriter fileWriter = new FileWriter(file);
         fileWriter.write(json);
         fileWriter.close();
@@ -151,6 +166,11 @@ public class UserPreferences {
         return json;
     }
 
+    /**
+     * Creates directory for writing user preferences file
+     *
+     * @param fileName
+     */
     public void createDirectory(String fileName) {
         // Try to create directory
         File folder = new File(fileName).getParentFile();
@@ -165,6 +185,16 @@ public class UserPreferences {
 
     public class UserPreferencesDeserializer implements JsonDeserializer<UserPreferences> {
 
+        /**
+         * Gson invokes this call-back method during deserialization when it encounters
+         * a field of the specified type.
+         *
+         * @param json
+         * @param typeOfT
+         * @param context
+         * @return
+         * @throws JsonParseException
+         */
         @Override public UserPreferences deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
                 throws JsonParseException {
             final JsonObject jsonObject = json.getAsJsonObject();
@@ -199,10 +229,15 @@ public class UserPreferences {
         this.setTodoDataPath(userPreferences.getTodoDataPath());
     }
 
+    /**
+     * Reads a line from user preferences file stored on disk
+     *
+     * @return
+     */
     public String readLineFromDisk() {
         String jsonString = null;
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(this.preferencesFileName));
+            BufferedReader reader = new BufferedReader(new FileReader(this.PREFERENCES_FILE_NAME));
             jsonString = reader.readLine();
         } catch (IOException e) {
             ExceptionHandler.handle(e);
@@ -210,12 +245,9 @@ public class UserPreferences {
         return jsonString;
     }
 
-    // ----------------------------------------------------------------------------------------
-    //
-    // III. Getter and Setter Methods
-    //
-    // ----------------------------------------------------------------------------------------
-
+    /**
+     * Getters
+     */
     public String getTodoDataPath() {
         if (ApplicationContext.mainContext().isTestingMode()) {
             return "tmp/ToDoData.csv";
@@ -223,6 +255,9 @@ public class UserPreferences {
         return this.todoDataPath;
     }
 
+    /**
+     * Setters
+     */
     public void setTodoDataPath(String pathName) {
         this.todoDataPath = pathName;
     }
