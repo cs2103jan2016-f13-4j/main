@@ -45,14 +45,14 @@ public class DateFormatterHelper {
     /***
      * retrieve the date or day of the time relative to the current timing. the current time used as comparison will be time
      * when the function is called.
-     *
-     * Today's date will be reflected as 'Today'
-     * Tomorrow's date will be reflected as 'Tomorrow'
-     * Yesterday's date will be reflected as 'Yesterday'
-     * Date that is still within the same week of today's date will be reflected as 'This [name of day]'
-     * Date that is within the next week from today will be reflected as 'Next [name of day]'
-     * Other date will be reflected as Date following the format DD/MM/YYYY
-     *
+     * <ul>
+     * <li> Today's date will be reflected as 'Today'
+     * <li> Tomorrow's date will be reflected as 'Tomorrow'
+     * <li> Yesterday's date will be reflected as 'Yesterday'
+     * <li> Date that is still within the same week of today's date will be reflected as 'This [name of day]'
+     * <li> Date that is within the next week from today will be reflected as 'Next [name of day]'
+     * <li> Other date will be reflected as Date following the format DD/MM/YYYY
+     * </ul>
      * @param time time that is going to be processed
      * @return String representing the specified date from the time parameter
      */
@@ -91,9 +91,11 @@ public class DateFormatterHelper {
      */
     public String getTimeDisplay(CustomTime time){
         String display = EMPTY_STRING;
-        if(time.hasTime()){
+
+        if (time.hasTime()) {
             display = this._timeFormat.format(time.getTime());
         }
+
         return display;
     }
 
@@ -126,11 +128,12 @@ public class DateFormatterHelper {
     /***
      * This special method is called to print the time stored in the task following the specification in the cell item.
      * Possible printed format:
-     * - [START TIME] to [END TIME]
-     * - [START TIME] T0 [END DATE] [END TIME]
-     * - by [START TIME]
-     * - by [START DATE] [START TIME]
-     *
+     * <ul>
+     * <li> [START TIME] to [END TIME]
+     * <li> [START TIME] T0 [END DATE] [END TIME]
+     * <li> by [START TIME]
+     * <li> by [START DATE] [START TIME]
+     *</ul>
      * @param task the task to be processed
      * @return String containing the formatted time information related to the task
      */
@@ -140,7 +143,7 @@ public class DateFormatterHelper {
         CustomTime endTime = task.getEndTime();
         String display = EMPTY_STRING;
 
-        if(startTime != null) {
+        if (startTime != null) {
             if (startTime.hasTime()) {
                 display = this.getTimeDisplay(startTime);
 
@@ -182,9 +185,11 @@ public class DateFormatterHelper {
     }
 
 
-    /*
-    HELPER FUNCTION
-     */
+    // ----------------------------------------------------------------------------------------
+    //
+    // Helper method to determine Task time relationship with the current time
+    //
+    // ----------------------------------------------------------------------------------------
 
     boolean isToday(CustomTime time) {
 
@@ -257,12 +262,12 @@ public class DateFormatterHelper {
          // difference in value of current day to the task day.
         int dayValueDifference = taskDayValue - curDayValue;
 
-        if( curYear == taskYear) {
+         if( curYear == taskYear) {
              return  taskDayOfYear - curDayOfYear  == dayValueDifference;
-        } else {
+         } else {
             if (isNextYear(time)) {
                 return (curDayOfYear + dayValueDifference) % dayYearValue(curYear) == taskDayOfYear;
-            } else if(isLastYear(time)){
+            } else if(isLastYear(time)) {
                 return (taskDayOfYear - dayValueDifference) % dayYearValue(taskYear) == curDayOfYear;
             }
         }
@@ -311,8 +316,8 @@ public class DateFormatterHelper {
         this._now = newTime;
     }
 
+    /** determine if the input year is a leap year */
     private boolean isLeapYear(int year){
-
         if (year%4 == 0) {
             if (year%100 == 0) {
                 if (year%400 == 0) {
@@ -325,6 +330,7 @@ public class DateFormatterHelper {
         return false;
     }
 
+    /** method to obtain the day of year value of the year */
     private int dayYearValue(int year){
         if (isLeapYear(year)) {
             return 366;

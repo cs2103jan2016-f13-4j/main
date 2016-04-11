@@ -14,10 +14,10 @@ import java.util.List;
 import java.util.function.Function;
 
 /**
- * This class manage the process of displaying the list of Task that is called by the user to be displayed.
+ * This class manage the structure and the behavior of task list that is called by the user to be displayed.
  * The View contains List of VisualTask which is a pair of Task and its display index.
  *
- * @@author Antonius Satrio Triatmoko
+ * @@author A0127036M
  */
 public class TaskListView extends View {
     /***
