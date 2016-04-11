@@ -34,6 +34,7 @@
     -fx-text-fill: #ccc;
 }
 
+
 .list-cell.priority--high .indicator--priority {
     -fx-fill: #ff6f6f;
 }

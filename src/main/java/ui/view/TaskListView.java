@@ -40,7 +40,9 @@ public class TaskListView extends View {
      * Constants
      */
     private final int MAXIMUM_DISPLAY_SIZE = 6;
-
+    private final int CELL_WITH_DATE_HEADING_SIZE = 72;
+    private final int NORMAL_CELL_SIZE = 48;
+    private static final int LIST_VIEW_HEIGHT = 384;
     /**
      * Properties
      */
@@ -48,6 +50,7 @@ public class TaskListView extends View {
     private List<VisualTask> _displayList;
     private int _viewIndex;
     private int _newTaskIndex;
+    private List<Integer> _taskPerPage;
 
     /**
      * Constructs a new view containing the provided data
@@ -56,18 +59,18 @@ public class TaskListView extends View {
      */
     public TaskListView(List<VisualTask> data, Command lastCommand) {
         super(data, lastCommand);
-
     }
 
     @Override protected void buildContent() {
 
-        if(this.getLastCommand().getInstruction() == Command.Instruction.ADD){
-            Pair<Integer, Integer> indexPair =  obtainNewTaskIndex();
-            this._viewIndex = indexPair.getValue();
-            this._newTaskIndex = indexPair.getKey();
+        this._taskPerPage = this.constructContentPageList();
+
+        if (this.getLastCommand().getInstruction() == Command.Instruction.ADD) {
+            this._newTaskIndex = obtainNewTaskIndex();
+            //this._viewIndex = getViewIndex(this._newTaskIndex);
         } else {
             this._viewIndex = 0;
-            this._newTaskIndex = -1;
+            //this._newTaskIndex = -1;
         }
 
         this._displayList = constructDisplayList();
@@ -100,7 +103,6 @@ public class TaskListView extends View {
         private static final String STRING_HIGHLIGHT_COLOR = "#FBFF74";
         private final Color COLOR_TRANSPARENT_FULL = new Color(1,1,1,0);
         private final Color COLOR_TRANSPARENT_NONE = new Color(1,1,1,0.8);
-        private static final int WINDOW_SIZE = 384;
 
         @FXML private AnchorPane _container;
         @FXML private Label _indexLabel;
@@ -114,8 +116,7 @@ public class TaskListView extends View {
         private DateFormatterHelper _df = new DateFormatterHelper();
         private Command _lastCommand;
         private int _newTaskIndex;
-        private boolean canHighlight = true;
-
+        private boolean _canHighlight = true;
 
         public Item(Command lastCommand, int newTaskIndex) {
             super();
@@ -132,18 +133,14 @@ public class TaskListView extends View {
          *             other type of task will call TaskListItemSingle.fxml.
          */
         private void updateGraphicPointer(Task task) {
-
-
             if (isSameDate(task)) {
                 this._container = (AnchorPane) Resources.getInstance().getComponent(STRING_NAME_TEMPLATE_NO_DATE);
-
                 assert this._container != null;
 
             } else {
                 this._container = (AnchorPane) Resources.getInstance().getComponent(STRING_NAME_TEMPLATE_WITH_DATE);
-
                 assert this._container != null;
-                //TODO: UNCOMMENT THIS PART OF CODE AFTER IMPLEMENTING THE OTHER COMPONENT
+
                 this._dateLabel = (Label) this._container.lookup("#_dateLabel");
                 assert this._dateLabel != null;
             }
@@ -154,6 +151,7 @@ public class TaskListView extends View {
             this._canScrollUp = (Rectangle) this._container.lookup("#_scrollUp");
             this._timeLabel = (Label) this._container.lookup("#_timeLabel");
             this._priorityLabel = (Label) this._container.lookup("#_priorityIndicator");
+
             assert this._indexLabel != null;
             assert this._nameLabel != null;
             assert this._highlight != null;
@@ -176,44 +174,34 @@ public class TaskListView extends View {
                 int index = item.getVisualIndex();
                 Task task = item.getTask();
 
-
                 // Update Cell Graphic Container and Link to Container Component
                 this.updateGraphicPointer(task);
+
+                // display the index and the task name
+                this._indexLabel.setText(Integer.toString(index));
+                this._nameLabel.setText(task.getTaskName());
+
+                // set up the time to be displayed
+                this.setUpTime(task);
+
+                //The item sometimes is displayed using a reused ListCell Object, instead of a completely new ListCell Object instantiated.
+                // So previous applied style and effect might still persist.
+                // Hence, there is a need to reset the StyleClass applied to the cell.
+                this.resetEffect();
 
                 // Grey out completed tasks
                 if (task.isCompleted()) {
                     this.getStyleClass().add("completed");
                 }
 
-
-                this._indexLabel.setText(Integer.toString(index));
-                this._nameLabel.setText(task.getTaskName());
-
-
                 // apply highlight effect to the new task when first displayed;
                 if (isAddCommand(this._lastCommand) && (this.getItem().getVisualIndex() - 1) == this._newTaskIndex ) {
                     this.setHighlightAnimation();
                 }
 
-                // check for any reused cell, ListCell sometimes might reuse an existing cell,
-                // so there is a need to reset the effect applied, else it might interfere with the overall interface
-                if(this._canScrollUp.getOpacity() == 1){
-                    this._canScrollUp.setOpacity(0);
-                }
-
-
-                // set priority indicator
+                // set priority indicator.
                 if (task.getPriority() != null) {
-                    resetStyleClass();
-                    this.getStyleClass().add("priority--" + task.getPriority().name().toLowerCase());
-                    System.out.println(this.getStyleClass());
-                    if(task.getPriority() == Task.Priority.HIGH){
-                        this._priorityLabel.setText("HIGH");
-                    } else if (task.getPriority() == Task.Priority.MEDIUM){
-                        this._priorityLabel.setText("MEDIUM");
-                    } else if (task.getPriority() == Task.Priority.LOW){
-                        this._priorityLabel.setText("LOW");
-                    }
+                    this.setPriority(task);
                 }
 
                 // set indicator for scrolling up
@@ -221,29 +209,43 @@ public class TaskListView extends View {
                     this.setScrollUpIndicator();
                 }
 
-                // set up the time to be displayed
-                this.setUpTime(task);
-
                 this.setGraphic(this._container);
             }
         }
 
-        private void resetStyleClass() {
+        private void setPriority(Task task) {
+            this.getStyleClass().add("priority--" + task.getPriority().name().toLowerCase());
+
+            if (task.getPriority() == Task.Priority.HIGH) {
+                this._priorityLabel.setText("HIGH");
+            } else if (task.getPriority() == Task.Priority.MEDIUM) {
+                this._priorityLabel.setText("MEDIUM");
+            } else if (task.getPriority() == Task.Priority.LOW) {
+                this._priorityLabel.setText("LOW");
+            }
+        }
+
+        private void resetEffect() {
             this.getStyleClass().clear();
             this.getStyleClass().add("cell");
             this.getStyleClass().add("indexed-cell");
             this.getStyleClass().add("list-cell");
+
+            // check if any cell has scrollup indicator applied
+            if(this._canScrollUp.getOpacity() == 1) {
+                this._canScrollUp.setOpacity(0);
+            }
         }
 
 
         /***
          * prepare and play the highlight animation to show new task
-         *
+         * should only work the first time the task is created.
          */
         private void setHighlightAnimation(){
-            if (canHighlight) {
+            if (_canHighlight) {
 
-                canHighlight = !canHighlight;
+                _canHighlight = !_canHighlight;
 
                 FillTransition highlight = new FillTransition(
                         Duration.millis(1500),
@@ -274,7 +276,7 @@ public class TaskListView extends View {
          * This method prepare the time String to be displayed by utilising DateFormatHelper
          * For more detail on how the time stored within the task is procsessed, see DateFormatterHelper.java
          *
-         * @param task
+         * @param task task obtained from the list stored in the ListView Scene
          */
         private void setUpTime(Task task) {
 
@@ -345,15 +347,15 @@ public class TaskListView extends View {
             }
         }
 
-        private boolean isFirstItemOnList(){
+        private boolean isFirstItemOnList() {
             return this.getItem().getVisualIndex()%MAXIMUM_DISPLAY_SIZE == STRING_FIRST_ITEM;
         }
 
-        private boolean isAddCommand(Command cmd){
+        private boolean isAddCommand(Command cmd) {
             return cmd.getInstruction() == Command.Instruction.ADD;
         }
 
-        @Override public boolean equals( Object obj){
+        @Override public boolean equals(Object obj) {
             if(obj == null){
                 return false;
             } else if ( this == obj){
@@ -382,27 +384,71 @@ public class TaskListView extends View {
      * While the total height of the items have not exceeded the list, add item to the list.
      * @return
      */
+
+    private List<Integer> constructContentPageList() {
+        DateFormatterHelper helper = new DateFormatterHelper();
+        List<VisualTask> viewData = this.getData();
+        List<Integer> contentPage = new ArrayList<Integer>();
+
+        int viewDataSize = viewData.size();
+        int curIndex = 0;
+        int lastIndex = 0;
+
+        while (curIndex < viewDataSize) {
+
+            int curSize = 0;
+            Task prevTask = null;
+            Task curTask;
+            int additionalSize = 0;
+
+            while (curSize + additionalSize < LIST_VIEW_HEIGHT  && curIndex < viewDataSize) {
+                curSize += additionalSize;
+                if (curIndex == 0) {
+                    additionalSize= CELL_WITH_DATE_HEADING_SIZE;
+                    prevTask = viewData.get(curIndex).getTask();
+                } else {
+                    curTask = viewData.get(curIndex).getTask();
+                    if (helper.hasSameDate(prevTask,curTask)) {
+                        additionalSize = NORMAL_CELL_SIZE;
+                    } else {
+                        additionalSize = CELL_WITH_DATE_HEADING_SIZE;
+                    }
+                    prevTask = curTask;
+                }
+                curIndex++;
+            }
+
+            int noOfTask = curIndex - lastIndex;
+            contentPage.add(noOfTask);
+            lastIndex = curIndex;
+
+        }
+        System.out.println(contentPage.toString());
+        return contentPage;
+    }
+
     private List<VisualTask> constructDisplayList() {
         List<VisualTask> temp = new ArrayList<>();
         List<VisualTask> viewData = this.getData();
 
-        int startIndex = this._viewIndex * MAXIMUM_DISPLAY_SIZE;
-        int difference = viewData.size() - startIndex;
-        if (difference > MAXIMUM_DISPLAY_SIZE) {
-            for (int i = startIndex; i < (startIndex + MAXIMUM_DISPLAY_SIZE); i++) {
-                temp.add(viewData.get(i));
-            }
-        } else {
-            for (int i = startIndex; i < viewData.size(); i++) {
-                temp.add(viewData.get(i));
-            }
+        int prevViewIndex = 0;
+
+        if(this._viewIndex != 0) {
+            prevViewIndex = this._viewIndex - 1;
+        }
+
+        int startIndex = this._taskPerPage.get(prevViewIndex);
+        int curIndexTaskSize = this._taskPerPage.get(this._viewIndex);
+
+        for(int i = 0 ; i < curIndexTaskSize && startIndex != viewData.size() ; i++ ){
+            temp.add(viewData.get(startIndex++));
         }
 
         return temp;
 
     }
 
-    private Pair<Integer,Integer> obtainNewTaskIndex(){
+    private int obtainNewTaskIndex(){
         List<VisualTask> taskList = this.getData();
 
         int index = 0;
@@ -425,9 +471,22 @@ public class TaskListView extends View {
             }
         }
 
-        return new Pair<>(index,index/MAXIMUM_DISPLAY_SIZE);
+        return  index;
     }
 
+    public int getViewIndex(int taskIndex){
+
+        assert this._taskPerPage != null;
+        int index = 0;
+        int curTaskTotal = 0;
+
+        do{
+             curTaskTotal = this._taskPerPage.get(index++);
+        } while(curTaskTotal < taskIndex );
+
+        return index;
+    }
+    /**
     @Override public Function<KeyEvent, Boolean> getKeyInputInterceptor() {
         return (event -> {
 
@@ -456,5 +515,6 @@ public class TaskListView extends View {
         return size > 0;
     }
 
+    **/
 
 }
