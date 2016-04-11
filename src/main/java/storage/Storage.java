@@ -14,6 +14,8 @@ import shared.Task;
 import skeleton.StorageSpec;
 
 /**
+ * Stores a collection of Task objects in memory
+ * 
  * @@author A0127357B
  */
 public class Storage extends TimerTask implements StorageSpec<Task> {
