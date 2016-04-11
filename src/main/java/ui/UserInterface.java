@@ -311,4 +311,9 @@ public class UserInterface implements UserInterfaceSpec {
         timeline.setCycleCount(1);
         timeline.play();
     }
+
+    @Override
+    public void setHeaderTitle(String title) {
+        this._headerBarController.setTitle(title);
+    }
 }

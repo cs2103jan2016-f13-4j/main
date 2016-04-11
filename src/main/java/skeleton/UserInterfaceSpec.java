@@ -46,4 +46,6 @@ public interface UserInterfaceSpec {
     void showNotification(String title);
 
     void cleanUp();
+
+    void setHeaderTitle(String title);
 }

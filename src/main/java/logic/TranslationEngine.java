@@ -1,5 +1,6 @@
 package logic;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
@@ -91,6 +92,22 @@ public class TranslationEngine implements TranslationEngineSpec {
                     .translateRawToVisual(result.getData());
             View view = new TaskListView(visualTaskList, this._lastCommand);
             this.getUserInterface().render(view);
+
+            // Set header title
+            if (this._lastCommand != null) {
+                if (this._lastCommand.getInstruction() == Command.Instruction.SEARCH) {
+                    String searchQuery = this._lastCommand.getParameter(Command.ParamName.SEARCH_QUERY);
+                    this.getUserInterface().setHeaderTitle(String.format(
+                            "Search results for \"%s\"",
+                            searchQuery
+                    ));
+                } else {
+                    this.getUserInterface().setHeaderTitle(
+                            "All tasks"
+                    );
+                }
+            }
+
             break;
         default:
             break;
