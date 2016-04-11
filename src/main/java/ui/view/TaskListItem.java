@@ -222,6 +222,14 @@ public class TaskListItem extends ListCell<VisualTask> {
 
             Task prevTask = this.getListView().getItems().get(curIndex - 1).getTask();
 
+            if(curTask.isCompleted()){
+                if(prevTask.isCompleted()){
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+
             CustomTime curStartTime = curTask.getStartTime();
             CustomTime curEndTime = curTask.getEndTime();
             CustomTime prevStartTime = prevTask.getStartTime();
