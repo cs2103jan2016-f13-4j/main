@@ -25,11 +25,11 @@ public class CommandParser implements CommandParserSpec {
     public static final String MATCHER_GROUP_INSTRUCTION = "INST";
     private static final String MATCHER_GROUP_PREPOSITION_1 = "PREP1";
     private static final String MATCHER_GROUP_PREPOSITION_2 = "PREP2";
-    private static final String MATCHER_GROUP_RELATIVE_TIME = "RELTIME";
-    private static final String MATCHER_GROUP_DAY_OF_WEEK = "DOW";
-    private static final String MATCHER_GROUP_DATE = "DATE";
-    private static final String MATCHER_GROUP_TIME_OF_DAY = "TIME";
-    private static final String MATCHER_GROUP_PRIORITY = "PRIO";
+    public static final String MATCHER_GROUP_RELATIVE_TIME = "RELTIME";
+    public static final String MATCHER_GROUP_DAY_OF_WEEK = "DOW";
+    public static final String MATCHER_GROUP_DATE = "DATE";
+    public static final String MATCHER_GROUP_TIME_OF_DAY = "TIME";
+    public static final String MATCHER_GROUP_PRIORITY = "PRIO";
     private static final String MATCHER_GROUP_INDEX = "INDEX";
     private static final String MATCHER_GROUP_RANGE_START = "RSTART";
     private static final String MATCHER_GROUP_RANGE_END = "REND";

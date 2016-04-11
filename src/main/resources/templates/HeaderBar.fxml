@@ -8,11 +8,11 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="55.0" prefWidth="450.0" styleClass="header-bar" stylesheets="@../stylesheets/HeaderBar.css" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ui.controller.HeaderBarController">
    <children>
-      <ImageView fitHeight="32.0" fitWidth="32.0" layoutX="15.0" layoutY="16.0" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="15.0" AnchorPane.topAnchor="13.0">
+      <ImageView fitHeight="26.0" fitWidth="26.0" layoutX="15.0" layoutY="16.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="16.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="400.0" AnchorPane.topAnchor="15.0">
          <image>
             <Image url="@../images/checkbox_icon.png" />
          </image></ImageView>
-      <Label layoutX="56.0" layoutY="19.0" styleClass="header__text" text="All tasks" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="56.0" AnchorPane.topAnchor="18.0" fx:id="_titleLabel"/>
+      <Label fx:id="_titleLabel" layoutX="56.0" layoutY="19.0" styleClass="header__text" text="All tasks" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="56.0" AnchorPane.topAnchor="18.0" />
       <Line endX="450.0" endY="55.0" startY="55.0" stroke="#e58816" />
    </children>
 </AnchorPane>

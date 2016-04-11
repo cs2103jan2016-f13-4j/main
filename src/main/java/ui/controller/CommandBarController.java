@@ -31,7 +31,10 @@ public class CommandBarController {
     private static final double PADDING_VERT_COMMAND_INPUT = 14.0;
     private static final int DELAY_HIGHLIGHT = 100;
     private static final String STYLE_CLASS_INSTRUCTION = "command__instruction";
-    private static final String STYLE_CLASS_TIME = "command__time";
+    private static final String STYLE_CLASS_START_DATE = "command__start-date";
+    private static final String STYLE_CLASS_END_DATE = "command__end-date";
+    private static final String STYLE_CLASS_START_TIME = "command__start-time";
+    private static final String STYLE_CLASS_END_TIME = "command__end-time";
     private static final String STYLE_CLASS_NORMAL = "command__normal-text";
     private static final String STYLE_CLASS_PRIORITY = "command__priority";
 
@@ -207,10 +210,99 @@ public class CommandBarController {
             return spansBuilder.create();
         }
 
+        //-------------------------------------------------------------------
+        // II. Start Time
+        //-------------------------------------------------------------------
+        Matcher startTimeMatcher = RegexUtils.caseInsensitiveMatch(
+                this._startTimePattern,
+                text
+        );
+        lastKeywordEnd = this.highlightTime(lastKeywordEnd, spansBuilder, startTimeMatcher, true);
 
+        //-------------------------------------------------------------------
+        // III. End Time
+        //-------------------------------------------------------------------
+        Matcher endTimeMatcher = RegexUtils.caseInsensitiveMatch(
+                this._endTimePattern,
+                text
+        );
+        lastKeywordEnd = this.highlightTime(lastKeywordEnd, spansBuilder, endTimeMatcher, false);
+
+        //-------------------------------------------------------------------
+        // IV. Priority
+        //-------------------------------------------------------------------
+        Matcher priorityMatcher = RegexUtils.caseInsensitiveMatch(
+                this._priorityPattern,
+                text
+        );
+        if (priorityMatcher.find()) {
+            // Get group first
+            int matcherStart = priorityMatcher.start(CommandParser.MATCHER_GROUP_PRIORITY);
+            int matcherEnd = priorityMatcher.end(CommandParser.MATCHER_GROUP_PRIORITY);
+            // Fill in previous non-highlighted part
+            spansBuilder.add(Collections.singleton(STYLE_CLASS_NORMAL),
+                    matcherStart - lastKeywordEnd);
+
+            // Highlight priority
+            spansBuilder.add(
+                    Collections.singleton(STYLE_CLASS_PRIORITY),
+                    matcherEnd - matcherStart
+            );
+            // Update last keyword end
+            lastKeywordEnd = matcherEnd;
+        }
 
         spansBuilder.add(Collections.singleton(STYLE_CLASS_NORMAL), text.length() - lastKeywordEnd);
         return spansBuilder.create();
+    }
+
+    private int highlightTime(int lastKeywordEnd, StyleSpansBuilder<Collection<String>> spansBuilder,
+                              Matcher timeMatcher, boolean isStart) {
+        String dateStyle = isStart ? STYLE_CLASS_START_DATE : STYLE_CLASS_END_DATE;
+        String timeStyle = isStart ? STYLE_CLASS_START_TIME : STYLE_CLASS_END_TIME;
+
+        if (timeMatcher.find(lastKeywordEnd)) {
+            String matcherGroup = Arrays.asList(
+                    CommandParser.MATCHER_GROUP_RELATIVE_TIME,
+                    CommandParser.MATCHER_GROUP_DAY_OF_WEEK,
+                    CommandParser.MATCHER_GROUP_DATE
+            ).stream().filter(groupName -> timeMatcher.group(groupName) != null)
+                    .findFirst().orElse(null);
+
+            if (matcherGroup != null) {
+                int matcherStart = timeMatcher.start(matcherGroup);
+                int matcherEnd = timeMatcher.end(matcherGroup);
+
+                // Fill in previous non-highlighted part
+                spansBuilder.add(Collections.singleton(STYLE_CLASS_NORMAL),
+                        matcherStart - lastKeywordEnd);
+
+                // Highlight start date
+                spansBuilder.add(
+                        Collections.singleton(dateStyle),
+                        matcherEnd - matcherStart
+                );
+                // Update last keyword end
+                lastKeywordEnd = matcherEnd;
+
+                if (timeMatcher.group(CommandParser.MATCHER_GROUP_TIME_OF_DAY) != null) {
+                    int timeStart = timeMatcher.start(CommandParser.MATCHER_GROUP_TIME_OF_DAY);
+                    int timeEnd = timeMatcher.end(CommandParser.MATCHER_GROUP_TIME_OF_DAY);
+                    // Fill in previous non-highlighted part
+                    spansBuilder.add(Collections.singleton(STYLE_CLASS_NORMAL),
+                            timeStart - matcherEnd);
+                    // Highlight start time
+                    spansBuilder.add(
+                            Collections.singleton(timeStyle),
+                            timeEnd - timeStart
+                    );
+
+                    // Update last keyword end
+                    lastKeywordEnd = timeEnd;
+                }
+            }
+        }
+        return lastKeywordEnd;
     }
 
     /**

@@ -2,6 +2,7 @@ package storage;
 
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Semaphore;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -22,6 +23,7 @@ public class Storage extends TimerTask implements StorageSpec<Task> {
      * Constants
      */
     private static final int INDEX_TASK_INITIAL = 1;
+    private static final int SAVE_FIRST_DELAY = 5000;
     private static final int SAVE_DELAY = 5000;
 
     /**
@@ -61,7 +63,7 @@ public class Storage extends TimerTask implements StorageSpec<Task> {
         this.readFromDisk();
 
         this._autosaveTimer = new Timer();
-        this._autosaveTimer.scheduleAtFixedRate(this, SAVE_DELAY, SAVE_DELAY);
+        this._autosaveTimer.scheduleAtFixedRate(this, SAVE_FIRST_DELAY, SAVE_DELAY);
     }
 
 

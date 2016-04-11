@@ -50,7 +50,7 @@ public class UserInterface implements UserInterfaceSpec {
     private static final double OFFSET_HIDE = 500.0;
 
     private static final int DURATION_ANIM_TRANSITION = 250;
-    private static final int DURATION_ANIM_STOP = 3000;
+    private static final int DURATION_ANIM_STOP = 5000;
 
     private static final Duration TIMELINE_INCOMING = Duration.millis(DURATION_ANIM_TRANSITION);
     private static final Duration TIMELINE_HANGING  = Duration.millis(DURATION_ANIM_TRANSITION + DURATION_ANIM_STOP);
