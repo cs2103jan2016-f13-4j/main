@@ -19,14 +19,14 @@ import ui.controller.DateFormatterHelper;
  * The TaskListItem class is the extension of ListCell class which allows us to customize the display content of the list.
  * There are two possible .xml files that can be loaded depending on Date and Time information stored by the task.Event Task
  * (Task with both start time and end time)will load TaskListItemDated.fxml while other type of task will
- * use TaskListItemSingle.fxml .
+ * use TaskListItemNormal.fxml .
  *
  * DateFormatterHelper is used to help determining the date and time presentation.
  */
 public class TaskListItem extends ListCell<VisualTask> {
     private static final double STRING_HIGHLIGHT_OPACITY = .31;
-    private static final String STRING_NAME_TEMPLATE_WITH_DATE = "TaskListItemDouble";
-    private static final String STRING_NAME_TEMPLATE_NO_DATE = "TaskListItemSingle";
+    private static final String STRING_NAME_TEMPLATE_WITH_DATE = "TaskListItemDated";
+    private static final String STRING_NAME_TEMPLATE_NO_DATE = "TaskListItemNormal";
     private static final String STRING_HIGHLIGHT_COLOR = "#FBFF74";
 
     @FXML
@@ -58,7 +58,7 @@ public class TaskListItem extends ListCell<VisualTask> {
      * our intended behaviour
      *
      * @param task the task that is going to be checked. Event Task will call TasklistItemDouble.fxml  whereas
-     *             other type of task will call TaskListItemSingle.fxml.
+     *             other type of task will call TaskListItemNormal.fxml.
      */
     private void updateGraphicPointer(Task task) {
         if (isSameDate(task)) {
