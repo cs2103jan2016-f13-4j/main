@@ -1,6 +1,8 @@
 package shared;
 
 /**
+ * Represents a range spanning two CustomTime bounds
+ *
  * @@author Thenaesh Elango
  */
 public class TemporalRange {
