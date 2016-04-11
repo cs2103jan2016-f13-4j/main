@@ -14,7 +14,7 @@ import shared.Task;
 import skeleton.StorageSpec;
 
 /**
- * @@author Chng Hui Yie
+ * @@author A0127357B
  */
 public class Storage extends TimerTask implements StorageSpec<Task> {
 
@@ -41,7 +41,7 @@ public class Storage extends TimerTask implements StorageSpec<Task> {
 
     /**
      * Constructs a new Storage instance.
-     * the singleton constructor is made protected instead of private to enable dependency injection of Storage in tests
+     * The singleton constructor is made protected instead of private to enable dependency injection of Storage in tests
      * of other components
      */
     protected Storage() {
@@ -50,12 +50,20 @@ public class Storage extends TimerTask implements StorageSpec<Task> {
         this._isDirty = false;
     }
 
+    /**
+     * The action to be performed by this timer task
+     */
     @Override
     public void run() {
-        if (!this._isDirty) return;
+        if (!this._isDirty) {
+            return;
+        }
         this.writeToDisk();
     }
 
+    /**
+     * Initialise Storage instance
+     */
     @Override
     public void initialise() {
         this.readFromDisk();
@@ -101,6 +109,9 @@ public class Storage extends TimerTask implements StorageSpec<Task> {
         return task.getId();
     }
 
+    /**
+     * Writes Task data to disk
+     */
     private void writeToDisk() {
         List<Task> allTask = this.getAll();
 
@@ -193,6 +204,12 @@ public class Storage extends TimerTask implements StorageSpec<Task> {
         return this._taskData.get(id);
     }
 
+    /**
+     * Undeletes a Task instance given its assigned ID.
+     *
+     * @param id
+     *            index of Task that should be undeleted
+     */
     @Override public void undelete(int id) {
         if (!(this._taskData.containsKey(id) && this._taskData.get(id).isDeleted())) {
             try {
@@ -213,6 +230,10 @@ public class Storage extends TimerTask implements StorageSpec<Task> {
         this._isDirty = true;
     }
 
+    /**
+     * Returns non-deleted Tasks
+     * @return set of Task IDs corresponding to Tasks that have not been marked as deleted
+     */
     public Set<Integer> getNonDeletedTasks() {
         return this._taskData.keySet()
                 .stream()
@@ -246,9 +267,7 @@ public class Storage extends TimerTask implements StorageSpec<Task> {
                 .collect(Collectors.toList());
     }
 
-    public DiskIO getDiskIO() {
-        return DiskIO.getInstance();
-    }
+
 
     // ----------------------------------------------------------------------------------------
     //
@@ -256,6 +275,9 @@ public class Storage extends TimerTask implements StorageSpec<Task> {
     //
     // ----------------------------------------------------------------------------------------
 
+    /**
+     * Reads Task data from disk
+     */
     public void readFromDisk() {
         readFromDisk(this.getDiskIO().read());
     }
@@ -268,10 +290,19 @@ public class Storage extends TimerTask implements StorageSpec<Task> {
         this._isDirty = false;
     }
 
+    /**
+     * Saves memory to disk and cleanup
+     */
     @Override
     public void shutdown() {
         this.writeToDisk();
         this._autosaveTimer.cancel();
     }
 
+    /**
+     * Getters
+     */
+    public DiskIO getDiskIO() {
+        return DiskIO.getInstance();
+    }
 }
