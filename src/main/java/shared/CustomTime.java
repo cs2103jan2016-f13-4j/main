@@ -198,4 +198,11 @@ public class CustomTime implements Comparable<CustomTime> {
         LocalDateTime fullTime2 = time2.getDate().atTime(timeOf2);
         return (int) Math.abs(fullTime1.until(fullTime2, ChronoUnit.MINUTES));
     }
+
+    public CustomTime plus(long minutes) {
+        LocalDateTime timeRepresentation = LocalDateTime.of(this.getDate(), this.getTime());
+        LocalDateTime timeRepresentationAfterIncrement = timeRepresentation.plusMinutes(minutes);
+
+        return new CustomTime(timeRepresentationAfterIncrement);
+    }
 }

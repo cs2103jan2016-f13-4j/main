@@ -10,17 +10,17 @@ import java.util.*;
  *
  * @@author Thenaesh Elango
  */
-public class StorageWriteOperationHistory {
+public class WriteHistory {
 
     // singleton declaration
-    private static StorageWriteOperationHistory instance = null;
-    public static StorageWriteOperationHistory getInstance() {
+    private static WriteHistory instance = null;
+    public static WriteHistory getInstance() {
         if (instance == null) {
-            instance = new StorageWriteOperationHistory();
+            instance = new WriteHistory();
         }
         return instance;
     }
-    private StorageWriteOperationHistory() {
+    private WriteHistory() {
     }
 
 

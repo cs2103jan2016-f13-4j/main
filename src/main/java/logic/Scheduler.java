@@ -11,34 +11,49 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
  * @@author Thenaesh Elango
  */
 public class Scheduler implements SchedulerSpec {
+
+    // singleton instance, constructor and accessor
     private static final Scheduler instance = new Scheduler(Storage.getInstance());
     public static Scheduler getInstance() {
         return instance;
     }
-
     protected Scheduler(Storage storage) {
         this._storage = storage;
     }
 
-
+    // storage instance to be used by this scheduler
     private Storage _storage;
 
 
+    /**
+     * finds a time range in which to slot a task of specified duration in
+     * @param durationInMinutes of task to slot in
+     * @return time range to slot the task in
+     */
     @Override
     public TemporalRange schedule(Integer durationInMinutes) {
-        CustomTime startOfRangeToSearch = CustomTime.now();
-        CustomTime endOfRangeToSearch = this._storage.getAll()
+
+        // get the task that ends the latest, if it exists
+        Optional<CustomTime> endOfRangeToSearchIfItExists = this._storage.getAll()
                 .stream()
                 .filter(task -> task.getStartTime() != null && task.getEndTime() != null)
                 .map(Task::getEndTime)
-                .max(CustomTime::compareTo)
-                .get();
+                .max(CustomTime::compareTo);
+
+        // if such a task does not exist, then there are no tasks, so just schedule the new task immediately
+        if (!endOfRangeToSearchIfItExists.isPresent()) {
+            return new TemporalRange(CustomTime.now(), CustomTime.now().plus(durationInMinutes));
+        }
+
+        CustomTime startOfRangeToSearch = CustomTime.now();
+        CustomTime endOfRangeToSearch = endOfRangeToSearchIfItExists.get();
 
         List<TemporalRange> freeSlots = this.getFreeSlots(startOfRangeToSearch, endOfRangeToSearch);
 
@@ -47,7 +62,9 @@ public class Scheduler implements SchedulerSpec {
                 .filter(range -> CustomTime.difference(range.getStart(), range.getEnd()) >= durationInMinutes)
                 .map(range -> {
                     CustomTime startTime = range.getStart();
-                    CustomTime endTime = new CustomTime(LocalDateTime.of(startTime.getDate(), startTime.getTime()).plusMinutes(durationInMinutes));
+                    CustomTime endTime = new CustomTime(
+                            LocalDateTime.of(startTime.getDate(), startTime.getTime())
+                                    .plusMinutes(durationInMinutes));
                     return new TemporalRange(startTime, endTime);
                 })
                 .collect(Collectors.toList());
@@ -64,6 +81,11 @@ public class Scheduler implements SchedulerSpec {
         }
     }
 
+    /**
+     * checks task to be inserted for clashes (collisions) with pre-existing tasks
+     * @param task to check for collision
+     * @return does the task collide?
+     */
     @Override
     public boolean isColliding(Task task) {
         TemporalRange taskRange = new TemporalRange(task.getStartTime(), task.getEndTime());
@@ -81,8 +103,16 @@ public class Scheduler implements SchedulerSpec {
                 .isEmpty();
     }
 
-    @Override
-    public List<TemporalRange> getFreeSlots(CustomTime lowerBound, CustomTime upperBound) {
+
+    // HELPER METHODS //
+
+    /**
+     * gets free time slots within the specified bounds
+     * @param lowerBound
+     * @param upperBound
+     * @return
+     */
+    protected List<TemporalRange> getFreeSlots(CustomTime lowerBound, CustomTime upperBound) {
         // if lowerBound >= upperBound, return an empty list for obvious reasons
         if (lowerBound.compareTo(upperBound) >= 0) {
             return new LinkedList<TemporalRange>();
@@ -94,9 +124,10 @@ public class Scheduler implements SchedulerSpec {
                 .map(task -> new TemporalRange(task.getStartTime(), task.getEndTime()))
                 .collect(Collectors.toList());
 
+        // remove tasks with missing start/end times
         occupiedRanges = this.collapseOverlappingRanges(occupiedRanges
                 .stream()
-                .filter(range -> range.getStart() != null && range.getEnd() != null) // remove tasks with missing start/end times
+                .filter(range -> range.getStart() != null && range.getEnd() != null)
                 .collect(Collectors.toList()));
 
         // strip tasks that end before the lower bound or start after the upper bound
@@ -131,11 +162,6 @@ public class Scheduler implements SchedulerSpec {
         return freeSlots;
     }
 
-
-    /*
-     * helper methods
-     */
-
     /**
      * takes a list of temporal ranges and returns a new list of disjoint ranges that represent
      * the time spanned by all the ranges
@@ -168,6 +194,11 @@ public class Scheduler implements SchedulerSpec {
         return collapsedRanges;
     }
 
+    /**
+     * takes a disjoint, sorted time range of time slots and adds time slots blocking out the qiet period from 0000-0800
+     * @param ranges disjoint and sorted
+     * @return a disjoint and sorted range expanded to include the additional slots denoting the quiet period
+     */
     protected List<TemporalRange> blockOutQuietTime(List<TemporalRange> ranges) {
         LocalDate minDate = ranges
                 .stream()
