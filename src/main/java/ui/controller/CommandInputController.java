@@ -7,9 +7,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.function.Function;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import logic.FlexiCommandParser;
+import logic.CommandParser;
+import logic.parser.RegexUtils;
 import org.fxmisc.richtext.StyleClassedTextArea;
 import org.fxmisc.richtext.StyleSpans;
 import org.fxmisc.richtext.StyleSpansBuilder;
@@ -43,7 +43,12 @@ public class CommandInputController {
     private ExecutorService _executor;
 
     private HashMap<String, String> _instructionStyleClassMap;
-    private Pattern _highlightPattern;
+
+    // Regular expressions
+    private String _instructionPattern;
+    private String _startTimePattern;
+    private String _endTimePattern;
+    private String _priorityPattern;
 
     @FXML public void initialize() {
         this.initializeHighlighters();
@@ -65,14 +70,11 @@ public class CommandInputController {
         this._instructionStyleClassMap = new LinkedHashMap<>();
 
         // Create the instruction highlight pattern
-        FlexiCommandParser parser = FlexiCommandParser.getInstance();
-        String highlightPatternString = String.join("|", new String[] {
-                parser.getInstructionPattern(),
-                parser.getTimePattern(),
-                parser.getPriorityPattern()
-        });
-
-        this._highlightPattern = Pattern.compile(highlightPatternString, Pattern.CASE_INSENSITIVE);
+        CommandParser parser = CommandParser.getInstance();
+        this._instructionPattern = parser.getInstructionPattern();
+        this._startTimePattern   = parser.getStartTimePattern();
+        this._endTimePattern     = parser.getEndTimePattern();
+        this._priorityPattern    = parser.getPriorityPattern();
     }
 
     /**
@@ -179,36 +181,38 @@ public class CommandInputController {
      * @return
      */
     private StyleSpans<Collection<String>> computeHighlighting(String text) {
-        Matcher matcher = this._highlightPattern.matcher(text);
         int lastKeywordEnd = 0;
         StyleSpansBuilder<Collection<String>> spansBuilder = new StyleSpansBuilder<>();
 
-        while (matcher.find()) {
+        //-------------------------------------------------------------------
+        // I. Instruction
+        //-------------------------------------------------------------------
+        Matcher instructionMatcher = RegexUtils.caseInsensitiveMatch(
+                this._instructionPattern,
+                text
+        );
+        // Must have a valid instruction before the rest gets highlighted
+        if (instructionMatcher.find()) {
             // Fill in previous non-highlighted part
-            spansBuilder.add(Collections.singleton(STYLE_CLASS_NORMAL), matcher.start() - lastKeywordEnd);
-
+            spansBuilder.add(Collections.singleton(STYLE_CLASS_NORMAL),
+                    instructionMatcher.start() - lastKeywordEnd);
             // Highlight instruction
-            if (matcher.group("INST") != null) {
-                // Prepare the list of classes to be added
+            if (instructionMatcher.group(CommandParser.MATCHER_GROUP_INSTRUCTION) != null) {
                 spansBuilder.add(
                         Collections.singleton(STYLE_CLASS_INSTRUCTION),
-                        matcher.end() - matcher.start()
-                );
-            } else if (matcher.group("DATE") != null || matcher.group("TIME") != null) {
-                spansBuilder.add(
-                        Collections.singleton(STYLE_CLASS_TIME),
-                        matcher.end() - matcher.start()
-                );
-            } else if (matcher.group("PRIORITY") != null) {
-                spansBuilder.add(
-                        Collections.singleton(STYLE_CLASS_PRIORITY),
-                        matcher.end() - matcher.start()
+                        instructionMatcher.end() - instructionMatcher.start()
                 );
             }
-
-            // Increase last keyword end to the end of the current word
-            lastKeywordEnd = matcher.end();
+            // Update last keyword end
+            lastKeywordEnd = instructionMatcher.end();
+        } else {
+            // Instruction not found, abort highlighting
+            // Find in the rest
+            spansBuilder.add(Collections.singleton(STYLE_CLASS_NORMAL), text.length() - lastKeywordEnd);
+            return spansBuilder.create();
         }
+
+
 
         spansBuilder.add(Collections.singleton(STYLE_CLASS_NORMAL), text.length() - lastKeywordEnd);
         return spansBuilder.create();

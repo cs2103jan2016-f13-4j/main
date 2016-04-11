@@ -24,13 +24,9 @@ import java.util.regex.Matcher;
  */
 public class CommandParser implements CommandParserSpec {
 
-    public static final String STRING_INVALID_RANGE_FORMAT = "Invalid range";
-    /**
-     * Constants
-     */
     private static final String FILE_PARSER_DATA = "CommandParserData.json";
 
-    private static final String MATCHER_GROUP_INSTRUCTION = "INST";
+    public static final String MATCHER_GROUP_INSTRUCTION = "INST";
     private static final String MATCHER_GROUP_PREPOSITION_1 = "PREP1";
     private static final String MATCHER_GROUP_PREPOSITION_2 = "PREP2";
     private static final String MATCHER_GROUP_RELATIVE_TIME = "RELTIME";
@@ -46,7 +42,8 @@ public class CommandParser implements CommandParserSpec {
     private static final String STRING_INVALID_START_WITHOUT_END = "Task cannot have a start without an end";
     private static final String STRING_INVALID_EDIT_ID_MISSING = "You must tell me which task to edit";
     private static final String STRING_INVALID_RANGE_MISSING = "You must indicate an index or a range of tasks";
-    public static final String STRING_INVALID_QUERY_MISSING = "You must specify a search query";
+    private static final String STRING_INVALID_QUERY_MISSING = "You must specify a search query";
+    private static final String STRING_INVALID_RANGE_FORMAT = "Invalid range";
 
     /**
      * Singleton implementation
@@ -649,4 +646,25 @@ public class CommandParser implements CommandParserSpec {
                 MATCHER_GROUP_RANGE_END);
     }
 
+
+    //-------------------------------------------------------------------------------------------------
+    //
+    // GETTERS for constructed regexp
+    //
+    //-------------------------------------------------------------------------------------------------
+    public String getInstructionPattern() {
+        return this._instructionPattern;
+    }
+
+    public String getStartTimePattern() {
+        return this._startTimePattern;
+    }
+
+    public String getEndTimePattern() {
+        return this._endTimePattern;
+    }
+
+    public String getPriorityPattern() {
+        return this._priorityPattern;
+    }
 }

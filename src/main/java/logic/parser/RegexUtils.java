@@ -15,6 +15,16 @@ public class RegexUtils {
     public static final String MATCHER_GROUP_DATE_MONTH = "MONTH";
 
     /**
+     * Constructs a Pattern that uses the Regular Expression inside the
+     * pattern
+     * @param pattern
+     * @return
+     */
+    public static Pattern caseInsensitive(String pattern) {
+        return Pattern.compile(pattern, Pattern.CASE_INSENSITIVE);
+    }
+
+    /**
      * Constructs a matcher that matches the test string case-insensitively
      * with the RegExp pattern given.
      * @param pattern a regex string
@@ -22,8 +32,7 @@ public class RegexUtils {
      * @return a matcher that matches the string with the regex
      */
     public static Matcher caseInsensitiveMatch(String pattern, String testString) {
-        Pattern p = Pattern.compile(pattern, Pattern.CASE_INSENSITIVE);
-        return p.matcher(testString);
+        return caseInsensitive(pattern).matcher(testString);
     }
 
     /**

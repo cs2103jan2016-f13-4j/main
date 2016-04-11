@@ -55,7 +55,7 @@ public class TranslationEngine implements TranslationEngineSpec {
     }
 
     @Override public void initialise() {
-        // Trigger initialisation of FlexiCommandParser
+        // Trigger initialisation of CommandParser
         this.getCommandParser().initialise();
 
         // Create input handler
@@ -143,7 +143,7 @@ public class TranslationEngine implements TranslationEngineSpec {
     }
 
     @Override public CommandParserSpec getCommandParser() {
-        return FlexiCommandParser.getInstance();
+        return CommandParser.getInstance();
     }
 
     private static VisualIndexMapper getVisualIndexMapper() {
