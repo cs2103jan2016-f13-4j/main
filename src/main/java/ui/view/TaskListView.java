@@ -36,21 +36,13 @@ import java.util.function.Function;
  * @@author Antonius Satrio Triatmoko
  */
 public class TaskListView extends View {
-    /**
-     * Constants
-     */
-    private final int MAXIMUM_DISPLAY_SIZE = 6;
-    private final int CELL_WITH_DATE_HEADING_SIZE = 72;
-    private final int NORMAL_CELL_SIZE = 48;
-    private static final int LIST_VIEW_HEIGHT = 384;
+
     /**
      * Properties
      */
     private ObservableList _observableList;
-    private List<VisualTask> _displayList;
     private int _viewIndex;
     private int _newTaskIndex;
-    private List<Integer> _taskPerPage;
 
     /**
      * Constructs a new view containing the provided data
@@ -63,25 +55,27 @@ public class TaskListView extends View {
 
     @Override protected void buildContent() {
 
-        this._taskPerPage = this.constructContentPageList();
-
-        if (this.getLastCommand().getInstruction() == Command.Instruction.ADD) {
-            this._newTaskIndex = obtainNewTaskIndex();
-            //this._viewIndex = getViewIndex(this._newTaskIndex);
-        } else {
-            this._viewIndex = 0;
-            //this._newTaskIndex = -1;
-        }
-
-        this._displayList = constructDisplayList();
-        _observableList = FXCollections.observableArrayList(_displayList);
+        List<VisualTask> viewData = (List<VisualTask>) this.getData();
+        _observableList = FXCollections.observableArrayList(viewData);
 
         ListView listView = Resources.getInstance().getComponent("TaskList");
         listView.setItems(this._observableList);
 
+
+
+        if (this.getLastCommand().getInstruction() == Command.Instruction.ADD) {
+            this._newTaskIndex = obtainNewTaskIndex();
+        } else {
+            this._newTaskIndex = 0;
+        }
+
         final int highlightIndex = this._newTaskIndex;
 
         listView.setCellFactory(list -> new Item(this.getLastCommand(),highlightIndex));
+
+        listView.scrollTo(this._newTaskIndex);
+        this._viewIndex += this._newTaskIndex;
+
 
         this.setComponent(listView);
     }
@@ -96,7 +90,6 @@ public class TaskListView extends View {
      * DateFormatterHelper is used to help determining the date and time presentation.
      */
     private class Item extends ListCell<VisualTask> {
-        private static final int STRING_FIRST_ITEM = 1;
         public static final double STRING_HIGHLIGHT_OPACITY = .31;
         private static final String STRING_NAME_TEMPLATE_WITH_DATE = "TaskListItemDouble";
         private static final String STRING_NAME_TEMPLATE_NO_DATE = "TaskListItemSingle";
@@ -196,6 +189,7 @@ public class TaskListView extends View {
 
                 // apply highlight effect to the new task when first displayed;
                 if (isAddCommand(this._lastCommand) && (this.getItem().getVisualIndex() - 1) == this._newTaskIndex ) {
+                    System.out.println("highlighted " + this.getItem().getVisualIndex());
                     this.setHighlightAnimation();
                 }
 
@@ -204,10 +198,6 @@ public class TaskListView extends View {
                     this.setPriority(task);
                 }
 
-                // set indicator for scrolling up
-                if (this.isFirstItemOnList() && canScrollUp()) {
-                    this.setScrollUpIndicator();
-                }
 
                 this.setGraphic(this._container);
             }
@@ -347,10 +337,6 @@ public class TaskListView extends View {
             }
         }
 
-        private boolean isFirstItemOnList() {
-            return this.getItem().getVisualIndex()%MAXIMUM_DISPLAY_SIZE == STRING_FIRST_ITEM;
-        }
-
         private boolean isAddCommand(Command cmd) {
             return cmd.getInstruction() == Command.Instruction.ADD;
         }
@@ -379,74 +365,7 @@ public class TaskListView extends View {
 
     }
 
-    /***
-     * The following method construct the list to be displayed given the window size restriction.
-     * While the total height of the items have not exceeded the list, add item to the list.
-     * @return
-     */
 
-    private List<Integer> constructContentPageList() {
-        DateFormatterHelper helper = new DateFormatterHelper();
-        List<VisualTask> viewData = this.getData();
-        List<Integer> contentPage = new ArrayList<Integer>();
-
-        int viewDataSize = viewData.size();
-        int curIndex = 0;
-        int lastIndex = 0;
-
-        while (curIndex < viewDataSize) {
-
-            int curSize = 0;
-            Task prevTask = null;
-            Task curTask;
-            int additionalSize = 0;
-
-            while (curSize + additionalSize < LIST_VIEW_HEIGHT  && curIndex < viewDataSize) {
-                curSize += additionalSize;
-                if (curIndex == 0) {
-                    additionalSize= CELL_WITH_DATE_HEADING_SIZE;
-                    prevTask = viewData.get(curIndex).getTask();
-                } else {
-                    curTask = viewData.get(curIndex).getTask();
-                    if (helper.hasSameDate(prevTask,curTask)) {
-                        additionalSize = NORMAL_CELL_SIZE;
-                    } else {
-                        additionalSize = CELL_WITH_DATE_HEADING_SIZE;
-                    }
-                    prevTask = curTask;
-                }
-                curIndex++;
-            }
-
-            int noOfTask = curIndex - lastIndex;
-            contentPage.add(noOfTask);
-            lastIndex = curIndex;
-
-        }
-        System.out.println(contentPage.toString());
-        return contentPage;
-    }
-
-    private List<VisualTask> constructDisplayList() {
-        List<VisualTask> temp = new ArrayList<>();
-        List<VisualTask> viewData = this.getData();
-
-        int prevViewIndex = 0;
-
-        if(this._viewIndex != 0) {
-            prevViewIndex = this._viewIndex - 1;
-        }
-
-        int startIndex = this._taskPerPage.get(prevViewIndex);
-        int curIndexTaskSize = this._taskPerPage.get(this._viewIndex);
-
-        for(int i = 0 ; i < curIndexTaskSize && startIndex != viewData.size() ; i++ ){
-            temp.add(viewData.get(startIndex++));
-        }
-
-        return temp;
-
-    }
 
     private int obtainNewTaskIndex(){
         List<VisualTask> taskList = this.getData();
@@ -470,36 +389,24 @@ public class TaskListView extends View {
                 }
             }
         }
-
+        System.out.println("new task created: " + current.toString() + "index is" + index);
         return  index;
     }
 
-    public int getViewIndex(int taskIndex){
 
-        assert this._taskPerPage != null;
-        int index = 0;
-        int curTaskTotal = 0;
-
-        do{
-             curTaskTotal = this._taskPerPage.get(index++);
-        } while(curTaskTotal < taskIndex );
-
-        return index;
-    }
-    /**
     @Override public Function<KeyEvent, Boolean> getKeyInputInterceptor() {
         return (event -> {
 
             if (event.getCode().equals(KeyCode.UP) && canScrollUp()) {
-                this._viewIndex--;
+                this._viewIndex -= 5;
             } else if (event.getCode().equals(KeyCode.DOWN) && canScrollDown()) {
-                this._viewIndex++;
+                this._viewIndex += 5;
             } else {
                 return false;
             }
 
-            this._displayList = this.constructDisplayList();
-            this._observableList.setAll(this._displayList);
+            ListView temp = (ListView) this.getComponent();
+            temp.scrollTo(this._viewIndex);
             event.consume();
             return true;
         });
@@ -511,10 +418,10 @@ public class TaskListView extends View {
 
     private boolean canScrollDown() {
         List<VisualTask> viewData = this.getData();
-        int size = viewData.size() - (this._viewIndex + 1) * MAXIMUM_DISPLAY_SIZE;
+        int size = viewData.size() - (this._viewIndex + 1);
         return size > 0;
     }
 
-    **/
+
 
 }
