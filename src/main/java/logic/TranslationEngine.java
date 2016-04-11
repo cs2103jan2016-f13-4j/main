@@ -118,11 +118,11 @@ public class TranslationEngine implements TranslationEngineSpec {
         // Catch unrecognised or invalid command
         if (command.getInstruction() == Command.Instruction.INVALID) {
             this.getUserInterface().showNotification(
-                    "Oops! There is something wrong with your command");
+                    command.getInvalidationMessage());
             return;
         } else if (command.getInstruction() == Command.Instruction.UNRECOGNISED) {
             this.getUserInterface().showNotification(
-                    "Oops! I don't really understand what you are saying");
+                    Message.UNRECOGNISED.toString());
             return;
         }
 

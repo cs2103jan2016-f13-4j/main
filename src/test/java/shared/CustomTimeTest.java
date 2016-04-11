@@ -99,4 +99,18 @@ public class CustomTimeTest {
         assertThat(specificTime.compareTo(floatingTime) < 0, is(true));
     }
 
+    @Test public void CustomTime_calculates_correct_time_difference() {
+        CustomTime time1 = CustomTime.todayAt(LocalTime.of(5, 30));
+        CustomTime time2 = CustomTime.todayAt(LocalTime.of(7, 0));
+        assertThat(CustomTime.difference(time1, time2),
+                is(equalTo(90)));
+    }
+
+    @Test public void CustomTime_calculates_absolute_difference() {
+        CustomTime time1 = CustomTime.todayAt(LocalTime.of(5, 30));
+        CustomTime time2 = CustomTime.todayAt(LocalTime.of(7, 0));
+        assertThat(CustomTime.difference(time2, time1),
+                is(equalTo(90)));
+    }
+
 }
