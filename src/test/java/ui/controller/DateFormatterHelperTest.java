@@ -115,7 +115,6 @@ public class DateFormatterHelperTest {
 
     @Test public void Helper_Days_Are_Next_Week(){
         CustomTime time = new CustomTime(LocalDate.of(2016,12,31),LocalTime.of(12,12));
-        System.out.println(time.toString());
         this._dfh.setNow(time);
         time = new CustomTime(LocalDate.of(2016,12,31).plusDays(2),LocalTime.of(12,12));
         assertTrue(this._dfh.isNextWeek(time));
@@ -147,13 +146,13 @@ public class DateFormatterHelperTest {
         // test for endTime different date
         endTime = new CustomTime(LocalDate.of(2016,12,14), LocalTime.of(14,00));
         newTask = new Task(1,"random task","",startTime,endTime);
-        result = "12:00 PM to 14/12/2016 02:00 PM";
+        result = "12:00 PM to 14 December 02:00 PM";
         assertTrue(result.equals(this._dfh.getCellTimeTaskDisplay(newTask)));
 
         // test for no start time
         startTime = null;
         newTask = new Task(1,"random task","", startTime,endTime);
-        result = "By 02:00 PM";
+        result = "by 02:00 PM";
         assertTrue(result.equals(this._dfh.getCellTimeTaskDisplay(newTask)));
 
         // test for floating task
@@ -166,7 +165,7 @@ public class DateFormatterHelperTest {
         startTime = new CustomTime(LocalDate.now(),null);
         endTime = new CustomTime(LocalDate.now().plusDays(1),null);
         newTask = new Task(1,"random task","", startTime,endTime);
-        result = "By Tomorrow";
+        result = "by Tomorrow";
         assertTrue(result.equals(this._dfh.getCellTimeTaskDisplay(newTask)));
     }
 

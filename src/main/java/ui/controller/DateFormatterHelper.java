@@ -16,17 +16,18 @@ import java.time.format.DateTimeFormatter;
 public class DateFormatterHelper {
     /**Constant**/
     private final String EMPTY_STRING = "";
-    private final String IN_WEEK_FORMAT = "EE";
-    private final String DATE_FORMAT = "dd/MM/YYYY";
+    private final String IN_WEEK_FORMAT = "EEEE";
+    private final String DATE_WITH_YEAR_FORMAT = "dd MMMM YYYY";
+    private final String DATE_FORMAT = "dd/MM";
     private final String DATE_HEADING_FORMAT = "dd MMMM";
     private final String DATE_YESTERDAY = "Yesterday";
     private final String DATE_TODAY = "Today";
     private final String DATE_TOMMOROW = "Tomorrow";
-    private final String DATE_NEXT_WEEK = "Next %s";
+    private final String DATE_NEXT_WEEK = "next %s";
     private final String DATE_PAIR_PATTERN = "%s to %s";
     private final String TIME_FORMAT = "hh:mm a" ;
-    private final String TIME_FROM = "From %s";
-    private final String TIME_BY = "By %s";
+    private final String TIME_FROM = "from %s";
+    private final String TIME_BY = "by %s";
     private final String STRING_DATE_HEADING = "%s, %s";
     private final int ONE_DAY_DIFFERENCE = 1;
     private final int FIRST_DAY = 1;
@@ -35,6 +36,7 @@ public class DateFormatterHelper {
     private CustomTime _now;
     private DateTimeFormatter _inWeekFormat;
     private DateTimeFormatter _otherDateFormat;
+    private DateTimeFormatter _dateYearFormat;
     private DateTimeFormatter _timeFormat;
     private DateTimeFormatter _dateHeadingFormat;
 
@@ -42,6 +44,7 @@ public class DateFormatterHelper {
         this.updateCurrentTime();
         this._inWeekFormat = DateTimeFormatter.ofPattern(IN_WEEK_FORMAT);
         this._otherDateFormat = DateTimeFormatter.ofPattern(DATE_FORMAT);
+        this._dateYearFormat = DateTimeFormatter.ofPattern(DATE_WITH_YEAR_FORMAT);
         this._timeFormat = DateTimeFormatter.ofPattern(TIME_FORMAT);
         this._dateHeadingFormat = DateTimeFormatter.ofPattern(DATE_HEADING_FORMAT);
     }
@@ -77,7 +80,11 @@ public class DateFormatterHelper {
             } else if (isNextWeek(time)) {
                 date = String.format(DATE_NEXT_WEEK,time.getDate().format(_inWeekFormat));
             } else {
-                date = time.getDate().format(_otherDateFormat);
+                if (isSameYear(time)) {
+                    date = time.getDate().format(_dateHeadingFormat);
+                } else {
+                    date = time.getDate().format(_dateYearFormat);
+                }
             }
 
         }
@@ -107,8 +114,10 @@ public class DateFormatterHelper {
     public String getTimeDisplay(CustomTime time){
         String display = EMPTY_STRING;
 
-        if (time.hasTime()) {
-            display = this._timeFormat.format(time.getTime());
+        if (time != null) {
+            if (time.hasTime()) {
+                display = this._timeFormat.format(time.getTime());
+            }
         }
 
         return display;
@@ -122,18 +131,18 @@ public class DateFormatterHelper {
      * @return String containing the date and the time from the cTime parameter
      */
     public String getDateTimeDisplay(CustomTime cTime) {
-        assert cTime != null;
+        String display = EMPTY_STRING;
 
-        String display =  getDateDisplay(cTime);
-        System.out.println(display);
-        System.out.println(cTime.hasTime());
-        if (display.isEmpty()) {
-            if (cTime.hasTime()) {
-                display  = getTimeDisplay(cTime);
-            }
-        } else {
-            if (cTime.hasTime()) {
-                display = display + " " + getTimeDisplay(cTime);
+        if (cTime != null) {
+             display = getDateDisplay(cTime);
+            if (display.isEmpty()) {
+                if (cTime.hasTime()) {
+                    display = getTimeDisplay(cTime);
+                }
+            } else {
+                if (cTime.hasTime()) {
+                    display = display + " " + getTimeDisplay(cTime);
+                }
             }
         }
 
@@ -242,6 +251,10 @@ public class DateFormatterHelper {
         }
 
 
+    }
+
+    boolean isSameYear(CustomTime time){
+        return this._now.getDate().getYear() == time.getDate().getYear();
     }
 
     boolean isLastYear(CustomTime time){

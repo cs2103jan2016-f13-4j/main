@@ -204,10 +204,10 @@ public class TaskListItem extends ListCell<VisualTask> {
     }
 
     /***
-     * this helper method check if the specified task has the same date as its previous task.
+     * this helper method check if the specified task's time component has the same date as its previous task.
      *
-     * @param curTask
-     * @return
+     * @param curTask currently checked task that is going to be compared to the previous task
+     * @return true if they belong to the same date, false if they do not
      */
     private boolean isSameDate(Task curTask){
         int curIndex = this.getIndex();
