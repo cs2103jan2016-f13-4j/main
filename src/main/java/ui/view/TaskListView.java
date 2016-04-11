@@ -20,7 +20,10 @@ import java.util.function.Function;
  * @@author Antonius Satrio Triatmoko
  */
 public class TaskListView extends View {
-
+    /***
+     * constant
+     */
+    private final int SCROLL_RANGE = 5;
     /**
      * Properties
      */
@@ -77,6 +80,7 @@ public class TaskListView extends View {
             if (current == null) {
                 current = taskList.get(i).getTask();
             } else {
+
                 temp = taskList.get(i).getTask();
                 LocalDateTime curCreationTime = current.getCreationTime();
                 LocalDateTime tempCreationTime = temp.getCreationTime();
@@ -85,9 +89,10 @@ public class TaskListView extends View {
                     current = temp;
                     index = i;
                 }
+
             }
         }
-        System.out.println("new task created: " + current.toString() + "index is" + index);
+
         return  index;
     }
 
@@ -96,9 +101,9 @@ public class TaskListView extends View {
         return (event -> {
 
             if (event.getCode().equals(KeyCode.UP) && canScrollUp()) {
-                this._viewIndex -= 5;
+                this._viewIndex -= SCROLL_RANGE;
             } else if (event.getCode().equals(KeyCode.DOWN) && canScrollDown()) {
-                this._viewIndex += 5;
+                this._viewIndex += SCROLL_RANGE;
             } else {
                 return false;
             }
@@ -111,12 +116,12 @@ public class TaskListView extends View {
     }
 
     private boolean canScrollUp() {
-        return (this._viewIndex - 1) >= 0;
+        return (this._viewIndex - SCROLL_RANGE) >= 0;
     }
 
     private boolean canScrollDown() {
         List<VisualTask> viewData = this.getData();
-        int size = viewData.size() - (this._viewIndex + 1);
+        int size = viewData.size() - (this._viewIndex + SCROLL_RANGE);
         return size > 0;
     }
 

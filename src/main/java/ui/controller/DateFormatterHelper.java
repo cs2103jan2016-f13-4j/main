@@ -27,6 +27,8 @@ public class DateFormatterHelper {
     private final String TIME_FROM = "From %s";
     private final String TIME_BY = "By %s";
     private final int ONE_DAY_DIFFERENCE = 1;
+    private final int FIRST_DAY = 1;
+    private final int RANGE_BEFORE_DAY_IS_REPEATED = 6;
     /**attribute **/
     private CustomTime _now;
     private DateTimeFormatter _inWeekFormat;
@@ -82,6 +84,7 @@ public class DateFormatterHelper {
     /***
      * this method return the time stored in the CustomTime object.
      * The format of the returned String is HH:mm
+     * if the time is a null object, it will return an empty string
      *
      * @param time CustomTime object which time stored going to be formatted
      * @return time stored in CustomTime following the described format
@@ -205,10 +208,24 @@ public class DateFormatterHelper {
         if (curYear == taskYear) {
             return (taskDayOfYear -  curDayOfYear) == ONE_DAY_DIFFERENCE;
         } else {
-            return (taskYear - curYear == ONE_DAY_DIFFERENCE) && ( taskDayOfYear == 1 && (curDayOfYear == 365 || curDayOfYear == 366));
+            return isNextYear(time) && ( taskDayOfYear == 1 && (curDayOfYear == this.dayYearValue(curYear)));
         }
 
 
+    }
+
+    boolean isLastYear(CustomTime time){
+        int curYear = this._now.getDate().getYear();
+        int taskYear = time.getDate().getYear();
+
+        return curYear - taskYear == 1;
+    }
+    
+    boolean isNextYear(CustomTime time){
+        int curYear = this._now.getDate().getYear(); 
+        int taskYear = time.getDate().getYear(); 
+        
+        return taskYear - curYear == 1;
     }
 
      boolean isYesterday(CustomTime time) {
@@ -219,9 +236,9 @@ public class DateFormatterHelper {
          int taskDayOfYear = time.getDate().getDayOfYear();
 
         if (curYear == taskYear) {
-            return (curDayOfYear - taskDayOfYear) == 1;
+            return (curDayOfYear - taskDayOfYear) == ONE_DAY_DIFFERENCE;
         } else {
-            return (curYear - taskYear == 1) && ( curDayOfYear == 1 && (taskDayOfYear == 365 || taskDayOfYear == 366));
+            return isLastYear(time) && ( curDayOfYear == FIRST_DAY && (taskDayOfYear == dayYearValue(taskYear)));
         }
 
 
@@ -243,9 +260,9 @@ public class DateFormatterHelper {
         if( curYear == taskYear) {
              return  taskDayOfYear - curDayOfYear  == dayValueDifference;
         } else {
-            if (taskYear - curYear == ONE_DAY_DIFFERENCE) {
+            if (isNextYear(time)) {
                 return (curDayOfYear + dayValueDifference) % dayYearValue(curYear) == taskDayOfYear;
-            } else if(curYear - taskYear == ONE_DAY_DIFFERENCE){
+            } else if(isLastYear(time)){
                 return (taskDayOfYear - dayValueDifference) % dayYearValue(taskYear) == curDayOfYear;
             }
         }
@@ -264,7 +281,7 @@ public class DateFormatterHelper {
         int taskDayOfYear = time.getDate().getDayOfYear();
         int curNewWeekDistance = sunday - curDayValue;
 
-        int maxRange = curNewWeekDistance + 6;
+        int maxRange = curNewWeekDistance + RANGE_BEFORE_DAY_IS_REPEATED;
 
         int dayValueDifference;
 
@@ -290,7 +307,7 @@ public class DateFormatterHelper {
      *
      * @param newTime time to be set as the current time
      */
-    public void setNow(CustomTime newTime){
+    void setNow(CustomTime newTime){
         this._now = newTime;
     }
 
